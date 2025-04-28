@@ -2,10 +2,7 @@ from aiogram.types import BotCommand
 from InstanceBot import bot, dp
 import handlers
 import asyncio
-import logging
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(filename='Logs.log', level=logging.INFO)
+from logger import logger
 
 async def on_startup() -> None:
 
@@ -20,11 +17,9 @@ async def on_startup() -> None:
     
     bot_info = await bot.get_me()
 
-    logging.basicConfig(level=logging.INFO)
-
     await bot.delete_webhook(drop_pending_updates=True)
 
-    print(f'Бот запущен - @{bot_info.username}')
+    logger.info(f'Бот запущен - @{bot_info.username}')
 
     await dp.start_polling(bot, skip_updates=True)
 
