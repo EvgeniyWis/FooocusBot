@@ -2,9 +2,11 @@ import base64
 from PIL import Image
 import io
 from logger import logger
+import os
+
 
 # Функция для преобразования изображения из base64 в PIL Image
-async def base64_to_image(image_data: str) -> Image.Image:
+async def base64_to_image(image_data: str, folder_name: str, index: int) -> Image.Image:
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
     
@@ -29,11 +31,14 @@ async def base64_to_image(image_data: str) -> Image.Image:
         # Проверяем, что изображение было успешно загружено
         image.verify()
         image = Image.open(io.BytesIO(image_bytes))  # Открываем заново после verify
+        os.makedirs("temp", exist_ok=True)
+        file_path = f"temp/{folder_name}_{index}.png"
+        image.save(file_path) # Сохраняем изображение в папку
 
         logger.info(f"Изображение успешно загружено: {image}")
         
         # Возвращаем изображение
-        return image
+        return file_path
         
     except Exception as e:
         print(f"Ошибка при обработке изображения: {str(e)}")
