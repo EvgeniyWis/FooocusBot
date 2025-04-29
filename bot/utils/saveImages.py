@@ -5,8 +5,11 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import os
 import pickle
+from PIL import Image
 
-def save_images(images: list[str], folder_name: str):
+
+# Функция для сохранения изображений в Google Drive
+def save_images(images: list[Image.Image], folder_name: str):
     # Настройка аутентификации Google Drive API
     SCOPES = ['https://www.googleapis.com/auth/drive.file']
     creds = None

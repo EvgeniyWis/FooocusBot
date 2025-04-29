@@ -4,7 +4,7 @@ from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from utils import text
 from states import UserState
-from utils.generateImages import generateImages
+from utils.generateImages.generateImages import generateImages
 from logger import logger
 
 
@@ -20,7 +20,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
     message_for_edit = await message.answer(text.GET_PROMPT_SUCCESS_TEXT)
 
     try:
-        image = await generateImages(prompt, message_for_edit)
+        image = await generateImages(prompt, message_for_edit, state)
 
         if image:
             await message_for_edit.delete()
