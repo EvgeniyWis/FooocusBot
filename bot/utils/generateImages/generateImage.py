@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 
 
 # Функция для генерации изображений с помощью API
-async def generateImage(message: types.Message, data: dict, state: FSMContext):
+async def generateImage(message: types.Message, data: dict, state: FSMContext, folder_name: str, index: int):
     # Делаем запрос на генерацию
     headers = {
         "Content-Type": "application/json",
@@ -70,5 +70,5 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext):
     except Exception as e:
         raise Exception(f"Ошибка при получении изображения: {e}")
     
-    return await base64_to_image(image_data)
+    return await base64_to_image(image_data, folder_name, index)
 
