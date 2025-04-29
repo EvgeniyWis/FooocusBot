@@ -3,6 +3,8 @@ from googleapiclient.http import MediaFileUpload
 from googleapiclient.discovery import build
 import os
 from logger import logger
+import shutil
+
 
 # Авторизация и инициализация клиента google drive
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -47,9 +49,12 @@ async def save_images(images: list[str], folder_name: str) -> str:
         media = MediaFileUpload(file_path, resumable=True)
         service.files().create(body=file_metadata, media_body=media, fields='id').execute()
         logger.info(f"Изображение {name} успешно загружено в папку {folder_name}")
+        # Закрываем файл после загрузки
+        media.stream().close()
 
-    # Полная очистка папки temp
-    for file in os.listdir("temp"):
-        os.remove(os.path.join("temp", file))
+    # Удаляем папку temp
+    shutil.rmtree("temp")
+
+    logger.info(f"Временная папка temp успешно удалена!")
 
     return folder.get('webViewLink')

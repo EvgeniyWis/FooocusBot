@@ -31,9 +31,14 @@ async def base64_to_image(image_data: str, folder_name: str, index: int) -> Imag
         # Проверяем, что изображение было успешно загружено
         image.verify()
         image = Image.open(io.BytesIO(image_bytes))  # Открываем заново после verify
+        
         os.makedirs("temp", exist_ok=True)
         file_path = f"temp/{folder_name}_{index}.png"
-        image.save(file_path) # Сохраняем изображение в папку
+        
+        # Используем контекстный менеджер для сохранения и закрытия файла
+        with open(file_path, 'wb') as f:
+            image.save(f, format='PNG')  # Явно указываем формат
+            image.close()  # Закрываем изображение
 
         logger.info(f"Изображение успешно загружено: {image}")
         
