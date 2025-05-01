@@ -16,7 +16,7 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
         'Authorization': os.getenv("RUNPOD_API_KEY")
     }
 
-    host = "https://api.runpod.ai/v2/s5t9qxbuze8zpp"
+    host = "https://api.runpod.ai/v2/6aqbs4lkswywz2"
 
     logger.info(f"Отправка запроса на генерацию...")
 
@@ -64,7 +64,7 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
         await asyncio.sleep(10)
 
     # Когда работа завершена, получаем изображение
-    logger.info(f"Работа по id {job_id} завершена!")
+    logger.info(f"Работа по id {job_id} завершена! Ответ выглядит так: {response_json}")
     try:
         image_data = response_json["output"][0]["base64"]
     except Exception as e:

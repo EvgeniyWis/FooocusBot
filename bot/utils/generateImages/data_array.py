@@ -14,6 +14,11 @@ def add_root_prompt(root_prompt: str):
             "api_name": "img2img2",
             "require_base64": True,
             "prompt": "one man",
+            "loras": [{"model_name": "Pony Realism Slider.safetensors", "weight": 6.00, "enabled": True},
+                      {"model_name": "igbaddie-PN.safetensors", "weight": 1.00, "enabled": True},
+                      {"model_name": "Breast Size Slider.safetensors", "weight": 2.20, "enabled": True},
+                      {"model_name": "Nipple Size Slider_alpha1.0_rank4_noxattn_last.safetensors", "weight": -0.90, "enabled": True}],
+            "negative_prompt": "cartoon, anime, 3d, cgi, illustration, doll-like, overly muscular, chubby, plastic skin, waxy texture, blurry, lowres, jpeg artifacts, extra limbs, extra fingers, distorted proportions, unnatural face, unrealistic anatomy, bad hands, deformed eyes, exaggerated curves, barbie face, uncanny valley, big head, overexposed, underexposed, low-quality shading, unnatural smile",
             "image_prompts": [
                 {
                     "cn_img": base64.b64encode(source).decode('utf-8'),
@@ -29,6 +34,11 @@ def add_root_prompt(root_prompt: str):
             "api_name": "img2img2",
             "require_base64": True,
             "prompt": "one girl",
+            "loras": [{"model_name": "Pony Realism Slider.safetensors", "weight": 6.00, "enabled": True},
+                      {"model_name": "igbaddie-PN.safetensors", "weight": 1.00, "enabled": True},
+                      {"model_name": "Breast Size Slider.safetensors", "weight": 2.20, "enabled": True},
+                      {"model_name": "Nipple Size Slider_alpha1.0_rank4_noxattn_last.safetensors", "weight": -0.90, "enabled": True}],
+            "negative_prompt": "cartoon, anime, 3d, cgi, illustration, doll-like, overly muscular, chubby, plastic skin, waxy texture, blurry, lowres, jpeg artifacts, extra limbs, extra fingers, distorted proportions, unnatural face, unrealistic anatomy, bad hands, deformed eyes, exaggerated curves, barbie face, uncanny valley, big head, overexposed, underexposed, low-quality shading, unnatural smile",
             "image_prompts": [
                 {
                     "cn_img": base64.b64encode(source).decode('utf-8'),
