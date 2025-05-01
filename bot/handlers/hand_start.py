@@ -36,9 +36,11 @@ async def write_prompt(message: types.Message, state: FSMContext):
             await message_for_edit.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT.format(data["folder_name"]))
             await state.set_state(UserState.write_folder_name)
             await state.update_data(images=images)
-
+        else:
+            raise Exception("Произошла ошибка при генерации изображения")
+        
     except Exception as e:
-        await message.answer("Произошла ошибка при генерации изображения")
+        await message.answer(f"Произошла ошибка при генерации изображения")
         await state.clear()
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
     
