@@ -46,12 +46,12 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
         jobs = data["jobs"]
         success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
         error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
-        left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
         progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
+        left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
 
         try:
             await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
-            .format(success_images_count, error_images_count, left_images_count, progress_images_count))
+            .format(success_images_count, error_images_count, progress_images_count, left_images_count))
         except Exception as e:
             pass
 
