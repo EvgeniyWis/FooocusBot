@@ -9,7 +9,8 @@ from aiogram.fsm.context import FSMContext
 
 
 # Функция для генерации изображений с помощью API
-async def generateImage(message: types.Message, data: dict, state: FSMContext, folder_name: str, index: int):
+async def generateImage(message: types.Message, data: dict, state: FSMContext, folder_name: str, 
+    index: int, checkOtherJobs: bool = True):
     # Делаем запрос на генерацию
     headers = {
         "Content-Type": "application/json",
@@ -29,8 +30,9 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
     logger.info(f"Получен id работы: {job_id}")
 
     # Проверяем статус работы, пока она не будет завершена
-    data = await state.get_data()
-    jobs = data["jobs"]
+    if checkOtherJobs:
+        data = await state.get_data()
+        jobs = data["jobs"]
 
     while True:
         response = requests.post(f'{host}/status/{job_id}', headers=headers)
@@ -38,16 +40,17 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
 
         logger.info(f"Получен статус работы c id {job_id}: {response_json['status']}")
 
-        jobs[job_id] = response_json['status']
-        await state.update_data(jobs=jobs)
-            
-        # Получаем стейт и изменяем сообщение
-        data = await state.get_data()
-        jobs = data["jobs"]
-        success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
-        error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
-        progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
-        left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
+        if checkOtherJobs:
+            jobs[job_id] = response_json['status']
+            await state.update_data(jobs=jobs)
+                
+            # Получаем стейт и изменяем сообщение
+            data = await state.get_data()
+            jobs = data["jobs"]
+            success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
+            error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
+            progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
+            left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
 
         try:
             await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT

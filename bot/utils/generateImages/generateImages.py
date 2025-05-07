@@ -1,5 +1,5 @@
+from utils.generateImages.data_array.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.generateImages.generateImage import generateImage
-from utils.generateImages.data_array import add_root_prompt
 from logger import logger
 from aiogram import types
 import asyncio
@@ -9,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 # Функция для генерации изображений с помощью API
 async def generateImages(prompt: str, message: types.Message, state: FSMContext, folder_name: str):
     # Прибавляем к каждому элементу массива корневой промпт
-    data_array = add_root_prompt(prompt)
+    dataArray = getDataArrayWithRootPrompt(prompt)
 
     # Генерируем изображения по всем элементам массива
     jobs = {}
@@ -25,11 +25,11 @@ async def generateImages(prompt: str, message: types.Message, state: FSMContext,
             images.append(image)
             return image, None
         except Exception as e:
-            logger.error(f"Произошла ошибка при генерации изображения: {e}")
+            logger.error(f"Произошла ошибка при генерации изображения во внутренней функции: {e}")
             return None, e
 
     # Создаем список задач
-    tasks = [process_image(index, data) for index, data in enumerate(data_array)]
+    tasks = [process_image(index, data) for index, data in enumerate(dataArray)]
     
     # Запускаем все задачи параллельно
     await asyncio.gather(*tasks)

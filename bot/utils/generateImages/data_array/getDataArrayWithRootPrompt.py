@@ -1,40 +1,9 @@
 import base64
-import os
+from .getFaceSources import *
+from .generateLoras import generateLoras
 
-# Получаем абсолютный путь к файлу
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Базовая папка с изображениями
-base_dir = os.path.join(current_dir, "..", "..", "images", "faceswap")
-
-def read_image(filename):
-    path = os.path.join(base_dir, filename)
-    with open(path, "rb") as f:
-        return f.read()
-
-# Получаем путь к каждому лицу
-evanoir_xo_source = read_image("evanoir.xo.jpg")
-face_nika_saintclair_source = read_image("face nika_saintclair.jpg")
-type_chloemay_source = read_image("type chloemay.jpg.jpeg")
-
-# Функция для генерации массива лор
-def generate_loras(weights: list[int]):
-    loras = [{"model_name": "Pony_Realism_Slider.safetensors", "enabled": True},
-                      {"model_name": "Breast Size Slider.safetensors", "enabled": True},
-                      {"model_name": "Nipple_Size_Slider_alpha1.0_rank4_noxattn_last.safetensors", "enabled": True},
-                      {"model_name": "body_weight_slider_v1.safetensors", "enabled": True},
-                      {"model_name": "StS-Breast-Enlarger-Slider-PonyXL-v0.8.safetensors", "enabled": True},
-                      {"model_name": "igbaddie-PN.safetensors", "enabled": True},
-                      {"model_name": "natural_breasts_v1.safetensors", "enabled": True},
-                      {"model_name": "Hour_Glass_Body_By_Stable_Yogi_PONY0_V1.safetensors", "enabled": True}]
-    for index, weight in enumerate(weights):
-        loras[index]["weight"] = weight
-    return loras
-
-# Функция для прибавления к изначальному промпту каждого элемента массива корневого промпта
-def add_root_prompt(root_prompt: str):
-    # Массив дат с нужными параметрами для запроса
-    data_array = [{
+# Массив дат с нужными параметрами для запроса
+dataArray = [{
         "input": {
             "api_name": "img2img2",
             "require_base64": True,
@@ -43,7 +12,7 @@ def add_root_prompt(root_prompt: str):
 real_beauty, igbaddie, 1girl, 20 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic blue eyes, long voluminous brown hair, natural skin texture, fine pores, detailed body, subtle highlights
 
 Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-            "loras": generate_loras([6.0, 1.6, -0.9, -1.5, 1.5, 1.0, 1.75, 1.0]),
+            "loras": generateLoras([6.0, 1.6, -0.9, -1.5, 1.5, 1.0, 1.75, 1.0]),
             "image_prompts": [
                 {
                     "cn_img": base64.b64encode(evanoir_xo_source).decode('utf-8'),
@@ -65,7 +34,7 @@ Style: realistic photography, high-resolution, Canon DSLR simulation, shallow de
     real_beauty, igbaddie, 1girl, 20 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic blue eyes, long voluminous brown hair, natural skin texture, fine pores, detailed body, subtle highlights
 
     Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-                "loras": generate_loras([6.0, 2, -0.9, -1.5, 1.5, 1.0, 1.70, 1.0]), 
+                "loras": generateLoras([6.0, 2, -0.9, -1.5, 1.5, 1.0, 1.70, 1.0]), 
                 "image_prompts": [
                     {
                         "cn_img": base64.b64encode(face_nika_saintclair_source).decode('utf-8'),
@@ -87,7 +56,7 @@ Style: realistic photography, high-resolution, Canon DSLR simulation, shallow de
 real_beauty, igbaddie, 1girl, 20 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic blue eyes, long voluminous brown hair, natural skin texture, fine pores, detailed body, subtle highlights
 
 Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-                "loras": generate_loras([6.0, 2.3, -0.9, -1.7, 1.8, 1.0, 1, 0.8]),
+                "loras": generateLoras([6.0, 2.3, -0.9, -1.7, 1.8, 1.0, 1, 0.8]),
                 "image_prompts": [
                     {
                         "cn_img": base64.b64encode(type_chloemay_source).decode('utf-8'),
@@ -102,8 +71,9 @@ Style: realistic photography, high-resolution, Canon DSLR simulation, shallow de
         }
 ]
 
-
-    for data in data_array:
+# Функция для прибавления к изначальному промпту каждого элемента массива корневого промпта
+def getDataArrayWithRootPrompt(root_prompt: str):
+    for data in dataArray:
         data['input']['prompt'] = data['input']['prompt'] + " " + root_prompt
 
-    return data_array
+    return dataArray
