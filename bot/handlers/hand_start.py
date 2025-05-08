@@ -65,6 +65,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
         await message.answer(text.GENERATION_ERROR_TEXT)
         await state.clear()
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
+        return
     
     link = await save_images(result, data.get("folder_name"))
 
