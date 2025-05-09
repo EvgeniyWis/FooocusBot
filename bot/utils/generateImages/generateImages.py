@@ -18,10 +18,10 @@ async def generateImages(prompt: str, message: types.Message, state: FSMContext,
     # Инициализируем папку для хранения изображений
     images = []
 
-    async def process_image(index, data):
+    async def process_image(data):
         try:
             logger.info(f"Генерация изображения с изначальным промптом: {data['input']['prompt']}")
-            image = await generateImage(message, data, state, folder_name, index, user_id)
+            image = await generateImage(message, data, state, folder_name, user_id)
             images.append(image)
             return image, None
         except Exception as e:
@@ -29,7 +29,7 @@ async def generateImages(prompt: str, message: types.Message, state: FSMContext,
             return None, e
 
     # Создаем список задач
-    tasks = [process_image(index, data) for index, data in enumerate(dataArray)]
+    tasks = [process_image(data) for data in dataArray]
     
     # Запускаем все задачи параллельно
     await asyncio.gather(*tasks)
