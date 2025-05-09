@@ -3,8 +3,11 @@ from InstanceBot import bot, dp
 import handlers
 import asyncio
 from logger import logger
+import shutil
 
 async def on_startup() -> None:
+    # Удаляем все файлы в папке temp
+    shutil.rmtree("temp")
 
     # Определяем команды и добавляем их в бота
     commands = [

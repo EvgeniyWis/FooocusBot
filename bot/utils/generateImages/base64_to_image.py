@@ -6,7 +6,7 @@ import os
 
 
 # Функция для преобразования изображения из base64 в PIL Image
-async def base64_to_image(image_data: str, folder_name: str, index: int) -> Image.Image:
+async def base64_to_image(image_data: str, folder_name: str, index: int, user_id: int, job_id: int) -> Image.Image:
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
     
@@ -32,8 +32,13 @@ async def base64_to_image(image_data: str, folder_name: str, index: int) -> Imag
         image.verify()
         image = Image.open(io.BytesIO(image_bytes))  # Открываем заново после verify
         
-        os.makedirs("temp", exist_ok=True)
-        file_path = f"temp/{f'{folder_name}_' if folder_name else ""}{index}.png"
+        # Если папка не указана, то значит это тестовая генерация
+        if not folder_name:
+            folder_name = "test"
+
+        save_dir = f"temp/{folder_name}_{user_id}/{job_id}"
+        os.makedirs(save_dir, exist_ok=True)
+        file_path = f"{save_dir}/{index}.png"
         
         # Используем контекстный менеджер для сохранения и закрытия файла
         with open(file_path, 'wb') as f:
@@ -47,5 +52,3 @@ async def base64_to_image(image_data: str, folder_name: str, index: int) -> Imag
         
     except Exception as e:
         print(f"Ошибка при обработке изображения: {str(e)}")
-        print(f"Длина полученных данных: {len(image_data)}")
-        print(f"Первые 20 символов данных: {image_data[:20]}")

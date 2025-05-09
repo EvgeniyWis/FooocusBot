@@ -7,3 +7,19 @@ def generationsAmountKeyboard(dataArrayLen: int):
     [InlineKeyboardButton(text=f'⚡️ Рабочая генерация - {dataArrayLen}', callback_data='generations_amount|all')]])
 
     return kb
+
+
+# Инлайн-клавиатура для выбора одного из изображений
+def selectImageKeyboard(job_id: int):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text='1', callback_data=f'select_image|{job_id}|1'),
+            InlineKeyboardButton(text='2', callback_data=f'select_image|{job_id}|2')
+        ],
+        [
+            InlineKeyboardButton(text='3', callback_data=f'select_image|{job_id}|3'),
+            InlineKeyboardButton(text='4', callback_data=f'select_image|{job_id}|4')
+        ]
+    ])
+
+    return kb
