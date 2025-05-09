@@ -61,7 +61,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
     # Генерируем изображения
     try:
         if is_test_generation:
-            result = [await generateImage(message, dataArray[0], state, None, 0, user_id, False)]
+            result = [await generateImage(message, dataArray[0], state, None, user_id, False)]
         else:
             result = await generateImages(prompt, message_for_edit, state, data["folder_name"], user_id)
 

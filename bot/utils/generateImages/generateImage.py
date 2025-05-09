@@ -11,8 +11,7 @@ import os
 import shutil
 
 # Функция для генерации изображений с помощью API
-async def generateImage(message: types.Message, data: dict, state: FSMContext, folder_name: str, 
-    index: int, user_id: int, checkOtherJobs: bool = True):
+async def generateImage(message: types.Message, data: dict, state: FSMContext, folder_name: str, user_id: int, checkOtherJobs: bool = True):
     # Делаем запрос на генерацию
     headers = {
         "Content-Type": "application/json",

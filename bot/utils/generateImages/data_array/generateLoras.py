@@ -1,7 +1,7 @@
 # Функция для генерации массива лор
 def generateLoras(weights: list[int]):
     loras = [{"model_name": "Pony_Realism_Slider.safetensors", "enabled": True},
-                      {"model_name": "Breast Size Slider.safetensors", "enabled": True},
+                      {"model_name": "Breast_Size_Slider.safetensors", "enabled": True},
                       {"model_name": "Nipple_Size_Slider_alpha1.0_rank4_noxattn_last.safetensors", "enabled": True},
                       {"model_name": "body_weight_slider_v1.safetensors", "enabled": True},
                       {"model_name": "StS-Breast-Enlarger-Slider-PonyXL-v0.8.safetensors", "enabled": True},
