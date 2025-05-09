@@ -4,10 +4,12 @@ import handlers
 import asyncio
 from logger import logger
 import shutil
+import os
 
 async def on_startup() -> None:
     # Удаляем все файлы в папке temp
-    shutil.rmtree("temp")
+    if os.path.exists("temp"):
+        shutil.rmtree("temp")
 
     # Определяем команды и добавляем их в бота
     commands = [

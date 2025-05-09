@@ -68,7 +68,7 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
         await asyncio.sleep(10)
 
     # Когда работа завершена, получаем изображение
-    logger.info(f"Работа по id {job_id} завершена!")
+    logger.info(f"Работа по id {job_id} завершена! Ответ выглядит так: {response_json}")
 
     try:
         images_output = response_json["output"]
