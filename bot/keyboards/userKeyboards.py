@@ -1,10 +1,10 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 # Инлайн-клавиатура для выбора количества генераций
-def generationsAmountKeyboard(dataArrayLen: int):
+def generationsAmountKeyboard():
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='⚙️ Тестовая генерация - 1', callback_data='generations_amount|test')],
-    [InlineKeyboardButton(text=f'⚡️ Рабочая генерация - {dataArrayLen}', callback_data='generations_amount|all')]])
+    [InlineKeyboardButton(text='⚙️ Тестовая генерация', callback_data='generations_amount|test')],
+    [InlineKeyboardButton(text=f'⚡️ Рабочая генерация', callback_data='generations_amount|all')]])
 
     return kb
 
