@@ -4,7 +4,7 @@ import asyncio
 from logger import logger
 from aiogram import types
 from utils import text
-from utils.generateImages.base64_to_image import base64_to_image
+from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
 from keyboards import userKeyboards
 import os
@@ -73,17 +73,17 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
     try:
         images_output = response_json["output"]
         media_group = []
-        base_64_data_array = []
+        base_64_dataArray = []
 
         # Получаем изображения и сохраняем их в массив
         for i, image_output in enumerate(images_output):
             image_data = image_output["base64"]
-            base_64_data = await base64_to_image(image_data, folder_name, i, user_id, job_id)
-            base_64_data_array.append(base_64_data)
+            base_64_data = await base64ToImage(image_data, folder_name, i, user_id, job_id)
+            base_64_dataArray.append(base_64_data)
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
         # Сохраняем изображения в state с индексом
-        await state.update_data(**{f"images_{job_id}": base_64_data_array})
+        await state.update_data(**{f"images_{job_id}": base_64_dataArray})
         
         # Отправляем изображения
         message_with_media_group = await message.answer_media_group(media_group)

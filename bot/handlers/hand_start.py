@@ -2,6 +2,7 @@ from aiogram import types
 from InstanceBot import router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
+from utils.generateImages.dataArray.setting_1.getDataArray import setting1_getDataArray
 from utils.saveImages.saveImage import saveImage
 from utils.saveImages.createFolder import createFolder
 from utils.generateImages.generateImage import generateImage
@@ -10,7 +11,6 @@ from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
 from logger import logger
-from utils.generateImages.data_array.getDataArrayWithRootPrompt import dataArray
 from InstanceBot import bot
 
 
@@ -19,7 +19,7 @@ async def start(message: types.Message, state: FSMContext):
     await state.clear()
 
     await message.answer(text.START_TEXT,  
-    reply_markup=generationsAmountKeyboard(dataArrayLen=len(dataArray)))
+    reply_markup=generationsAmountKeyboard())
     await state.set_state(UserState.write_folder_name)
 
 
@@ -61,9 +61,9 @@ async def write_prompt(message: types.Message, state: FSMContext):
     # Генерируем изображения
     try:
         if is_test_generation:
-            result = [await generateImage(message, dataArray[0], state, None, user_id, False)]
+            result = [await generateImage(message, setting1_getDataArray()[0], state, None, user_id, False)]
         else:
-            result = await generateImages(prompt, message_for_edit, state, data["folder_name"], user_id)
+            result = await generateImages(1, prompt, message_for_edit, state, data["folder_name"], user_id)
 
         if result:
             await message_for_edit.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT)

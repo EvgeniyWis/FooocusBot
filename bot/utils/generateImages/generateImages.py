@@ -1,4 +1,4 @@
-from utils.generateImages.data_array.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
+from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.generateImages.generateImage import generateImage
 from logger import logger
 from aiogram import types
@@ -7,9 +7,9 @@ from aiogram.fsm.context import FSMContext
 
 
 # Функция для генерации изображений с помощью API
-async def generateImages(prompt: str, message: types.Message, state: FSMContext, folder_name: str, user_id: int):
+async def generateImages(setting_number: int, prompt: str, message: types.Message, state: FSMContext, folder_name: str, user_id: int):
     # Прибавляем к каждому элементу массива корневой промпт
-    dataArray = getDataArrayWithRootPrompt(prompt)
+    dataArray = getDataArrayWithRootPrompt(setting_number, prompt)
 
     # Генерируем изображения по всем элементам массива
     jobs = {}
