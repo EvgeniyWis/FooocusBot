@@ -90,7 +90,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     link = await saveImage(chosen_image, image_index, user_id, job_id, folder["id"])
 
     # Отправляем сообщение о сохранении изображения
-    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT.format(model_name, link, folder['webViewLink']))
+    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT.format(link, model_name, folder['webViewLink']))
 
     # Удаляем отправленные изображения из чата
     mediagroup_messages_ids = data[f"mediagroup_messages_ids_{job_id}"]
