@@ -75,8 +75,11 @@ async def generateByData(data: tuple[dict, str], message: types.Message, state: 
         if response_json['status'] == 'COMPLETED':
             break
 
-        elif response_json['status'] == 'FAILED':
-            raise Exception(response_json['error'])
+        elif response_json['status'] in ['FAILED', 'CANCELLED']:
+            if response_json['status'] == 'FAILED':
+                raise Exception(response_json['error'])
+            else:
+                raise Exception("Работа была отменена")
 
         await asyncio.sleep(10)
 
