@@ -6,7 +6,7 @@ from utils.generateImages.dataArray.setting_1.getDataArray import setting1_getDa
 from utils.saveImages.saveImage import saveImage
 from utils.saveImages.createFolder import createFolder
 from utils.generateImages.generateImage import generateImage
-from keyboards.userKeyboards import generationsAmountKeyboard
+from keyboards.userKeyboards import generationsAmountKeyboard, selectSettingKeyboard
 from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
@@ -26,14 +26,26 @@ async def start(message: types.Message, state: FSMContext):
 # Обработка выбора количества генераций
 async def choose_generations_amount(call: types.CallbackQuery, state: FSMContext):
     generations_amount = call.data.split("|")[1]
+    is_test_generation = generations_amount == "test"
     await state.update_data(generations_amount=generations_amount)
 
-    if generations_amount == "all":
-        await call.message.edit_text(text.GET_GENERATIONS_SUCCESS_TEXT)
-        await state.set_state(UserState.write_folder_name)
-    else:
-        await call.message.edit_text(text.GET_FOLDER_NAME_SUCCESS_TEXT)
+    await call.message.edit_text(text.GET_GENERATIONS_SUCCESS_TEXT, 
+    reply_markup=selectSettingKeyboard(is_test_generation))
+
+
+# Обработка выбора настройки
+async def choose_setting(call: types.CallbackQuery, state: FSMContext):
+    setting_number = call.data.split("|")[1]
+    await state.update_data(setting_number=setting_number)
+    data = await state.get_data()
+    generations_amount = data["generations_amount"]
+
+    if generations_amount == "test":
+        await call.message.edit_text(text.GET_SETTINGS_WITH_TEST_GENERATIONS_SUCCESS_TEXT)
         await state.set_state(UserState.write_prompt)
+    else:
+        await call.message.edit_text(text.GET_SETTINGS_WITH_WORK_GENERATIONS_SUCCESS_TEXT)
+        await state.set_state(UserState.write_folder_name)
 
 
 # Обработка ввода названия папки
@@ -50,6 +62,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     data = await state.get_data()
     is_test_generation = data["generations_amount"] == "test"
+    setting_number = data["setting_number"]
     message_for_edit = await message.answer(
     text.TEST_GENERATION_GET_PROMPT_SUCCESS_TEXT if is_test_generation else text.GET_PROMPT_SUCCESS_TEXT)
        
@@ -61,9 +74,9 @@ async def write_prompt(message: types.Message, state: FSMContext):
     # Генерируем изображения
     try:
         if is_test_generation:
-            result = [await generateImage(message, setting1_getDataArray()[0], state, None, user_id, False)]
+            result = [await generateImage(message, setting_number, state, None, user_id, is_test_generation, False)]
         else:
-            result = await generateImages(1, prompt, message_for_edit, state, data["folder_name"], user_id)
+            result = await generateImages(setting_number, prompt, message_for_edit, state, data["folder_name"], user_id, is_test_generation)
 
         if result:
             await message_for_edit.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT)
@@ -113,6 +126,8 @@ def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())
 
     router.callback_query.register(choose_generations_amount, lambda call: call.data.startswith("generations_amount"))
+
+    router.callback_query.register(choose_setting, lambda call: call.data.startswith("select_setting"))
 
     router.message.register(write_folder_name, StateFilter(UserState.write_folder_name))
 
