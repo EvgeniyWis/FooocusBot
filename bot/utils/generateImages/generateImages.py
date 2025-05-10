@@ -7,7 +7,8 @@ from aiogram.fsm.context import FSMContext
 
 
 # Функция для генерации изображений с помощью API
-async def generateImages(setting_number: int, prompt: str, message: types.Message, state: FSMContext, folder_name: str, user_id: int):
+async def generateImages(setting_number: int, prompt: str, message: types.Message, state: FSMContext, 
+    folder_name: str, user_id: int, is_test_generation: bool):
     # Прибавляем к каждому элементу массива корневой промпт
     dataArray = getDataArrayWithRootPrompt(setting_number, prompt)
 
@@ -21,7 +22,7 @@ async def generateImages(setting_number: int, prompt: str, message: types.Messag
     async def process_image(data):
         try:
             logger.info(f"Генерация изображения с изначальным промптом: {data['input']['prompt']}")
-            image = await generateImage(message, data, state, folder_name, user_id)
+            image = await generateImage(message, data, state, folder_name, user_id, is_test_generation)
             images.append(image)
             return image, None
         except Exception as e:

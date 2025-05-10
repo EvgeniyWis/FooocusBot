@@ -1,30 +1,34 @@
 import requests
 import os
 import asyncio
+from config import ENDPOINT_ID
+from .dataArray.getAllDataArrays import getAllDataArrays
+from .dataArray.getDataArrayBySettingNumber import getDataArrayBySettingNumber
 from logger import logger
 from aiogram import types
 from utils import text
 from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
 from keyboards import userKeyboards
-import os
 import shutil
 
-# Функция для генерации изображений с помощью API
-async def generateImage(message: types.Message, data: dict, state: FSMContext, folder_name: str, user_id: int, checkOtherJobs: bool = True):
+# Функция для генерации изображений по объекту данных
+async def generateByData(dataDict: dict, message: types.Message, state: FSMContext, 
+    folder_name: str, user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
     # Делаем запрос на генерацию
     headers = {
         "Content-Type": "application/json",
         'Authorization': os.getenv("RUNPOD_API_KEY")
     }
 
-    host = f"https://api.runpod.ai/v2/{os.getenv('ENDPOINT_ID')}"
-
-    logger.info(f"Отправка запроса на генерацию...")
+    host = f"https://api.runpod.ai/v2/{ENDPOINT_ID}"
+    logger.info(f"Отправка запроса на генерацию: {dataDict}")
 
     # Получаем id работы
-    response = requests.post(f'{host}/run', headers=headers, json=data)
+    response = requests.post(f'{host}/run', headers=headers, json=dataDict)
     response_json = response.json()
+
+    logger.info(f"Ответ на запрос: {response_json}")
     
     job_id = response_json['id']
 
@@ -95,7 +99,7 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
         is_test_generation = data["generations_amount"] == "test"
 
         # Отправляем клавиатуру для выбора изображения
-        await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT, 
+        await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
         reply_markup=userKeyboards.selectImageKeyboard(job_id) if not is_test_generation else None)
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
@@ -105,4 +109,30 @@ async def generateImage(message: types.Message, data: dict, state: FSMContext, f
         
     except Exception as e:
         raise Exception(f"Ошибка при получении изображения: {e}")
+    
+
+# Функция для генерации изображений с помощью API (массив данных)
+async def generateByDataArray(dataArray: list[dict], message: types.Message, state: FSMContext, 
+    folder_name: str, user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
+    # Если это тестовая генерация, то берём первый элемент массива
+    if is_test_generation:
+        dataArray = dataArray[0]
+        await generateByData(dataArray, message, state, folder_name, user_id, setting_number, is_test_generation, checkOtherJobs)
+    else: # Если это не тестовая генерация, то генерируем изображения по всем элементам массива
+        # Запускаем генерацию изображений в параллельном режиме
+        tasks = [generateByData(dataDict, message, state, folder_name, user_id, setting_number, is_test_generation, checkOtherJobs) 
+                for dataDict in dataArray]
+        await asyncio.gather(*tasks)
+
+# Функция для генерации изображений с помощью API (с поддержкой всех настроек, т.е массив массивов данных)
+async def generateImage(message: types.Message, setting_number: str, state: FSMContext, folder_name: str, user_id: int, is_test_generation: bool, checkOtherJobs: bool = True):
+    # Получаем данные по порядковому номеру настройки
+    if setting_number == "all":
+        dataArrays = getAllDataArrays()
+
+        for index, dataArray in enumerate(dataArrays):
+            await generateByDataArray(dataArray, message, state, folder_name, user_id, index + 1, is_test_generation, checkOtherJobs=checkOtherJobs)
+    else:
+        dataArray = getDataArrayBySettingNumber(int(setting_number))
+        await generateByDataArray(dataArray, message, state, folder_name, user_id, setting_number, is_test_generation, checkOtherJobs)
 
