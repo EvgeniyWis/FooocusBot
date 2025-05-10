@@ -1,6 +1,7 @@
 import requests
 import os
 import asyncio
+from utils.saveImages.createFolder import createFolder
 from config import ENDPOINT_ID
 from .dataArray.getAllDataArrays import getAllDataArrays
 from .dataArray.getDataArrayBySettingNumber import getDataArrayBySettingNumber
@@ -13,8 +14,16 @@ from keyboards import userKeyboards
 import shutil
 
 # Функция для генерации изображений по объекту данных
-async def generateByData(dataDict: dict, message: types.Message, state: FSMContext, 
-    folder_name: str, user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
+async def generateByData(data: tuple[dict, str], message: types.Message, state: FSMContext, 
+    user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
+    # Получаем данные и имя модели
+    dataJSON = data[0]
+    model_name = data[1]
+
+    # Создаём папку для сохранения изображений
+    folder = createFolder(model_name)
+    await state.update_data(folder=folder)
+
     # Делаем запрос на генерацию
     headers = {
         "Content-Type": "application/json",
@@ -22,10 +31,10 @@ async def generateByData(dataDict: dict, message: types.Message, state: FSMConte
     }
 
     host = f"https://api.runpod.ai/v2/{ENDPOINT_ID}"
-    logger.info(f"Отправка запроса на генерацию: {dataDict}")
+    logger.info(f"Отправка запроса на генерацию: {dataJSON}")
 
     # Получаем id работы
-    response = requests.post(f'{host}/run', headers=headers, json=dataDict)
+    response = requests.post(f'{host}/run', headers=headers, json=dataJSON)
     response_json = response.json()
 
     logger.info(f"Ответ на запрос: {response_json}")
@@ -82,7 +91,7 @@ async def generateByData(dataDict: dict, message: types.Message, state: FSMConte
         # Получаем изображения и сохраняем их в массив
         for i, image_output in enumerate(images_output):
             image_data = image_output["base64"]
-            base_64_data = await base64ToImage(image_data, folder_name, i, user_id, job_id)
+            base_64_data = await base64ToImage(image_data, model_name, i, user_id, job_id)
             base_64_dataArray.append(base_64_data)
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
@@ -100,7 +109,7 @@ async def generateByData(dataDict: dict, message: types.Message, state: FSMConte
 
         # Отправляем клавиатуру для выбора изображения
         await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
-        reply_markup=userKeyboards.selectImageKeyboard(job_id) if not is_test_generation else None)
+        reply_markup=userKeyboards.selectImageKeyboard(job_id, model_name) if not is_test_generation else None)
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
         if is_test_generation:
@@ -113,26 +122,27 @@ async def generateByData(dataDict: dict, message: types.Message, state: FSMConte
 
 # Функция для генерации изображений с помощью API (массив данных)
 async def generateByDataArray(dataArray: list[dict], message: types.Message, state: FSMContext, 
-    folder_name: str, user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
+    user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
     # Если это тестовая генерация, то берём первый элемент массива
     if is_test_generation:
         dataArray = dataArray[0]
-        await generateByData(dataArray, message, state, folder_name, user_id, setting_number, is_test_generation, checkOtherJobs)
+        await generateByData(dataArray, message, state, user_id, setting_number, is_test_generation, checkOtherJobs)
     else: # Если это не тестовая генерация, то генерируем изображения по всем элементам массива
         # Запускаем генерацию изображений в параллельном режиме
-        tasks = [generateByData(dataDict, message, state, folder_name, user_id, setting_number, is_test_generation, checkOtherJobs) 
+        tasks = [generateByData(dataDict, message, state, user_id, setting_number, is_test_generation, checkOtherJobs) 
                 for dataDict in dataArray]
         await asyncio.gather(*tasks)
 
+
 # Функция для генерации изображений с помощью API (с поддержкой всех настроек, т.е массив массивов данных)
-async def generateImage(message: types.Message, setting_number: str, state: FSMContext, folder_name: str, user_id: int, is_test_generation: bool, checkOtherJobs: bool = True):
+async def generateImage(message: types.Message, setting_number: str, state: FSMContext, user_id: int, is_test_generation: bool, checkOtherJobs: bool = True):
     # Получаем данные по порядковому номеру настройки
     if setting_number == "all":
         dataArrays = getAllDataArrays()
 
         for index, dataArray in enumerate(dataArrays):
-            await generateByDataArray(dataArray, message, state, folder_name, user_id, index + 1, is_test_generation, checkOtherJobs=checkOtherJobs)
+            await generateByDataArray(dataArray, message, state, user_id, index + 1, is_test_generation, checkOtherJobs=checkOtherJobs)
     else:
         dataArray = getDataArrayBySettingNumber(int(setting_number))
-        await generateByDataArray(dataArray, message, state, folder_name, user_id, setting_number, is_test_generation, checkOtherJobs)
+        await generateByDataArray(dataArray, message, state, user_id, setting_number, is_test_generation, checkOtherJobs)
 

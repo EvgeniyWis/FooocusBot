@@ -10,15 +10,15 @@ def generationsAmountKeyboard():
 
 
 # Инлайн-клавиатура для выбора одного из изображений
-def selectImageKeyboard(job_id: int):
+def selectImageKeyboard(job_id: int, model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text='1', callback_data=f'select_image|{job_id}|1'),
-            InlineKeyboardButton(text='2', callback_data=f'select_image|{job_id}|2')
+            InlineKeyboardButton(text='1', callback_data=f'select_image|{job_id}|{model_name}|1'),
+            InlineKeyboardButton(text='2', callback_data=f'select_image|{job_id}|{model_name}|2')
         ],
         [
-            InlineKeyboardButton(text='3', callback_data=f'select_image|{job_id}|3'),
-            InlineKeyboardButton(text='4', callback_data=f'select_image|{job_id}|4')
+            InlineKeyboardButton(text='3', callback_data=f'select_image|{job_id}|{model_name}|3'),
+            InlineKeyboardButton(text='4', callback_data=f'select_image|{job_id}|{model_name}|4')
         ]
     ])
 
