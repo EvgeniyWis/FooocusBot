@@ -2,9 +2,7 @@ from aiogram import types
 from InstanceBot import router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
-from utils.generateImages.dataArray.setting_1.getDataArray import setting1_getDataArray
 from utils.saveImages.saveImage import saveImage
-from utils.saveImages.createFolder import createFolder
 from utils.generateImages.generateImage import generateImage
 from keyboards.userKeyboards import generationsAmountKeyboard, selectSettingKeyboard
 from utils import text
@@ -20,7 +18,6 @@ async def start(message: types.Message, state: FSMContext):
 
     await message.answer(text.START_TEXT,  
     reply_markup=generationsAmountKeyboard())
-    await state.set_state(UserState.write_folder_name)
 
 
 # Обработка выбора количества генераций
@@ -37,22 +34,7 @@ async def choose_generations_amount(call: types.CallbackQuery, state: FSMContext
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
-    data = await state.get_data()
-    generations_amount = data["generations_amount"]
-
-    if generations_amount == "test":
-        await call.message.edit_text(text.GET_SETTINGS_WITH_TEST_GENERATIONS_SUCCESS_TEXT)
-        await state.set_state(UserState.write_prompt)
-    else:
-        await call.message.edit_text(text.GET_SETTINGS_WITH_WORK_GENERATIONS_SUCCESS_TEXT)
-        await state.set_state(UserState.write_folder_name)
-
-
-# Обработка ввода названия папки
-async def write_folder_name(message: types.Message, state: FSMContext):
-    folder_name = message.text
-    await state.update_data(folder_name=folder_name)
-    await message.answer(text.GET_FOLDER_NAME_SUCCESS_TEXT)
+    await call.message.edit_text(text.GET_SETTINGS_WITH_TEST_GENERATIONS_SUCCESS_TEXT)
     await state.set_state(UserState.write_prompt)
 
 
@@ -65,18 +47,13 @@ async def write_prompt(message: types.Message, state: FSMContext):
     setting_number = data["setting_number"]
     message_for_edit = await message.answer(
     text.TEST_GENERATION_GET_PROMPT_SUCCESS_TEXT if is_test_generation else text.GET_PROMPT_SUCCESS_TEXT)
-       
-    if not is_test_generation:
-        # Создаём папку для сохранения изображений
-        folder = createFolder(data["folder_name"])
-        await state.update_data(folder=folder)
 
     # Генерируем изображения
     try:
         if is_test_generation:
             result = [await generateImage(message, setting_number, state, None, user_id, is_test_generation, False)]
         else:
-            result = await generateImages(setting_number, prompt, message_for_edit, state, data["folder_name"], user_id, is_test_generation)
+            result = await generateImages(setting_number, prompt, message_for_edit, state, user_id, is_test_generation)
 
         if result:
             await message_for_edit.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT)
@@ -97,7 +74,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Получаем индекс работы и индекс изображения
     job_id = call.data.split("|")[1]
-    image_index = call.data.split("|")[2]
+    model_name = call.data.split("|")[2]
+    image_index = call.data.split("|")[3]
 
     # Получаем изображения из state
     data = await state.get_data()
@@ -109,10 +87,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Сохраняем изображение
     image_index = int(image_index) - 1
     folder = data["folder"]
-    link = await saveImage(chosen_image, image_index, user_id, job_id, data["folder_name"], folder["id"])
+    link = await saveImage(chosen_image, image_index, user_id, job_id, folder["id"])
 
     # Отправляем сообщение о сохранении изображения
-    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT.format(data["folder_name"], link, folder['webViewLink']))
+    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT.format(model_name, link, folder['webViewLink']))
 
     # Удаляем отправленные изображения из чата
     mediagroup_messages_ids = data[f"mediagroup_messages_ids_{job_id}"]
@@ -128,8 +106,6 @@ def hand_add():
     router.callback_query.register(choose_generations_amount, lambda call: call.data.startswith("generations_amount"))
 
     router.callback_query.register(choose_setting, lambda call: call.data.startswith("select_setting"))
-
-    router.message.register(write_folder_name, StateFilter(UserState.write_folder_name))
 
     router.message.register(write_prompt, StateFilter(UserState.write_prompt))
 

@@ -1,6 +1,6 @@
 # Глобальная функция для генерации данных для запроса
-def generateData(prompt: str, loras: list[dict], advanced_params: dict, base_model_name: str, negative_prompt: str = "", embeddings: list[str] = []):
-    data = {
+def generateData(model_name: str, prompt: str, loras: list[dict], advanced_params: dict, base_config_model_name: str, negative_prompt: str = "", embeddings: list[str] = []):
+    data = [{
         "input": {
             "api_name": "txt2img",
             "require_base64": True,
@@ -9,7 +9,7 @@ def generateData(prompt: str, loras: list[dict], advanced_params: dict, base_mod
             "image_number": 4,
             "advanced_params": advanced_params,
             "negative_prompt": negative_prompt,
-            "base_model_name": base_model_name
+            "base_model_name": base_config_model_name
         }
-    }
+    }, model_name]
     return data
