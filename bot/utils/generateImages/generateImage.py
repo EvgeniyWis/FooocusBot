@@ -143,8 +143,9 @@ async def generateImage(message: types.Message, setting_number: str, state: FSMC
     if setting_number == "all":
         dataArrays = getAllDataArrays()
 
-        for index, dataArray in enumerate(dataArrays):
-            await generateByDataArray(dataArray, message, state, user_id, index + 1, is_test_generation, checkOtherJobs=checkOtherJobs)
+        tasks = [generateByDataArray(dataArray, message, state, user_id, index + 1, is_test_generation, checkOtherJobs=checkOtherJobs) 
+                for index, dataArray in enumerate(dataArrays)]
+        await asyncio.gather(*tasks)
     else:
         dataArray = getDataArrayBySettingNumber(int(setting_number))
         await generateByDataArray(dataArray, message, state, user_id, setting_number, is_test_generation, checkOtherJobs)
