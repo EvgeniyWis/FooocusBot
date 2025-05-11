@@ -6,7 +6,7 @@ import os
 
 
 # Функция для преобразования изображения из base64 в PIL Image
-async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: int, job_id: int) -> Image.Image:
+async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: int, job_id: int, is_test_generation: bool) -> Image.Image:
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
     
@@ -33,7 +33,7 @@ async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: 
         image = Image.open(io.BytesIO(image_bytes))  # Открываем заново после verify
         
         # Если папка не указана, то значит это тестовая генерация
-        if not folder_name:
+        if is_test_generation:
             folder_name = "test"
 
         save_dir = f"temp/{folder_name}_{user_id}/{job_id}"
