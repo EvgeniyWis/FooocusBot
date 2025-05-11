@@ -1,2 +1,2 @@
 # ID эндпоинта для генерации изображений
-ENDPOINT_ID="p11r4t8a9atb5p"
+ENDPOINT_ID="vbkdp29az5u3ml"

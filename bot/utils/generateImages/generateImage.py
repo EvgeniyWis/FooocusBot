@@ -94,7 +94,7 @@ async def generateByData(data: tuple[dict, str], message: types.Message, state: 
         # Получаем изображения и сохраняем их в массив
         for i, image_output in enumerate(images_output):
             image_data = image_output["base64"]
-            base_64_data = await base64ToImage(image_data, model_name, i, user_id, job_id)
+            base_64_data = await base64ToImage(image_data, model_name, i, user_id, job_id, is_test_generation)
             base_64_dataArray.append(base_64_data)
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
