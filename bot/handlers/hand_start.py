@@ -1,5 +1,4 @@
 from aiogram import types
-from InstanceBot import router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
@@ -20,25 +19,32 @@ from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 async def start(message: types.Message, state: FSMContext):
     await state.clear()
 
-    await message.answer(text.START_TEXT,  
-    reply_markup=generationsAmountKeyboard())
+    await message.answer(
+        text.START_TEXT, reply_markup=generationsAmountKeyboard()
+    )
 
 
 # Обработка выбора количества генераций
-async def choose_generations_amount(call: types.CallbackQuery, state: FSMContext):
+async def choose_generations_amount(
+    call: types.CallbackQuery, state: FSMContext
+):
     generations_amount = call.data.split("|")[1]
     is_test_generation = generations_amount == "test"
     await state.update_data(generations_amount=generations_amount)
 
-    await call.message.edit_text(text.GET_GENERATIONS_SUCCESS_TEXT, 
-    reply_markup=selectSettingKeyboard(is_test_generation))
+    await call.message.edit_text(
+        text.GET_GENERATIONS_SUCCESS_TEXT,
+        reply_markup=selectSettingKeyboard(is_test_generation),
+    )
 
 
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
-    await call.message.edit_text(text.GET_SETTINGS_WITH_TEST_GENERATIONS_SUCCESS_TEXT)
+    await call.message.edit_text(
+        text.GET_SETTINGS_WITH_TEST_GENERATIONS_SUCCESS_TEXT
+    )
     await state.set_state(UserState.write_prompt)
 
 
@@ -50,7 +56,10 @@ async def write_prompt(message: types.Message, state: FSMContext):
     is_test_generation = data["generations_amount"] == "test"
     setting_number = data["setting_number"]
     message_for_edit = await message.answer(
-    text.TEST_GENERATION_GET_PROMPT_SUCCESS_TEXT if is_test_generation else text.GET_PROMPT_SUCCESS_TEXT)
+        text.TEST_GENERATION_GET_PROMPT_SUCCESS_TEXT
+        if is_test_generation
+        else text.GET_PROMPT_SUCCESS_TEXT
+    )
 
     # Генерируем изображения
     try:
@@ -71,7 +80,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
             await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
         else:
             raise Exception("Произошла ошибка при генерации изображения")
-        
+
     except Exception as e:
         traceback.print_exc()
         await message.answer(text.GENERATION_ERROR_TEXT)
@@ -96,7 +105,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Получаем выбранное изображение
     chosen_image = images[int(image_index) - 1]
-        
+
     # Сохраняем изображение
     image_index = int(image_index) - 1
     link = await saveImage(chosen_image, user_id, model_name, folder_id)
@@ -157,9 +166,14 @@ async def handle_video_example_buttons(call: types.CallbackQuery):
 def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())
 
-    router.callback_query.register(choose_generations_amount, lambda call: call.data.startswith("generations_amount"))
+    router.callback_query.register(
+        choose_generations_amount,
+        lambda call: call.data.startswith("generations_amount"),
+    )
 
-    router.callback_query.register(choose_setting, lambda call: call.data.startswith("select_setting"))
+    router.callback_query.register(
+        choose_setting, lambda call: call.data.startswith("select_setting")
+    )
 
     router.message.register(write_prompt, StateFilter(UserState.write_prompt))
 
