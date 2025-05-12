@@ -1,10 +1,10 @@
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
-from utils.generateImages.generateImage import generateImage
+from utils.generateImages.generateImage import generateByData
 from logger import logger
 from aiogram import types
 import asyncio
 from aiogram.fsm.context import FSMContext
-
+import traceback
 
 # Функция для генерации изображений с помощью API
 async def generateImages(setting_number: int, prompt: str, message: types.Message, state: FSMContext, 
@@ -12,28 +12,37 @@ async def generateImages(setting_number: int, prompt: str, message: types.Messag
     # Прибавляем к каждому элементу массива корневой промпт
     dataArray = getDataArrayWithRootPrompt(setting_number, prompt)
 
+    logger.info(f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}")
+
     # Генерируем изображения по всем элементам массива
     jobs = {}
     await state.update_data(jobs=jobs)
+    await state.update_data(total_jobs_count=len(dataArray))
 
     # Инициализируем папку для хранения изображений
     images = []
 
-    async def process_image(data):
+    async def process_image(data: tuple[dict, str, str]):
         try:
-            logger.info(f"Генерация изображения с изначальным промптом: {data['input']['prompt']}")
-            image = await generateImage(message, data, state, user_id, is_test_generation)
+            logger.info(f"Генерация изображения с изначальными данными: {data}")
+            image = await generateByData(data["json"], data["model_name"], message, state, user_id, setting_number, data["folder_id"], is_test_generation)
             images.append(image)
             return image, None
         except Exception as e:
+            traceback.print_exc()
             logger.error(f"Произошла ошибка при генерации изображения во внутренней функции: {e}")
             return None, e
 
-    # Создаем список задач
-    tasks = [process_image(data) for data in dataArray]
-    
-    # Запускаем все задачи параллельно
-    await asyncio.gather(*tasks)
+    # Создаем список задач, выполняющихся параллельно
+    tasks = []
+    for data in dataArray:
+        task = asyncio.create_task(process_image(data))
+        tasks.append(task)
+        await asyncio.sleep(10)
+
+    # Ждем выполнения всех задач
+    results = await asyncio.gather(*tasks)
+    images = [result[0] for result in results]
 
     return images
 

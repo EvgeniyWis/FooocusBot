@@ -6,7 +6,7 @@ import os
 
 
 # Функция для преобразования изображения из base64 в PIL Image
-async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: int, job_id: int, is_test_generation: bool) -> Image.Image:
+async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: int,  is_test_generation: bool) -> Image.Image:
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
     
@@ -36,9 +36,9 @@ async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: 
         if is_test_generation:
             folder_name = "test"
 
-        save_dir = f"temp/{folder_name}_{user_id}/{job_id}"
+        save_dir = f"temp/{folder_name}_{user_id}"
         os.makedirs(save_dir, exist_ok=True)
-        file_path = f"{save_dir}/{index}.png"
+        file_path = f"{save_dir}/{index + 1}.png"
         
         # Используем контекстный менеджер для сохранения и закрытия файла
         with open(file_path, 'wb') as f:
