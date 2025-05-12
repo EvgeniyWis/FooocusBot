@@ -2,15 +2,17 @@ from aiogram import types
 from InstanceBot import router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
+from utils.saveImages.getFolderDataByID import getFolderDataByID
+from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.saveImages.saveImage import saveImage
-from utils.generateImages.generateImage import generateImage
+from utils.generateImages.generateImage import generateByData, generateTestImagesByAllSettings
 from keyboards.userKeyboards import generationsAmountKeyboard, selectSettingKeyboard
 from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
 from logger import logger
 from InstanceBot import bot
-
+import traceback
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -51,16 +53,25 @@ async def write_prompt(message: types.Message, state: FSMContext):
     # Генерируем изображения
     try:
         if is_test_generation:
-            result = [await generateImage(message, setting_number, state, user_id, is_test_generation, False)]
+            if setting_number == "all":
+                result = await generateTestImagesByAllSettings(message, state, user_id, is_test_generation, message_for_edit, False)
+            else:
+                # Прибавляем к каждому элементу массива корневой промпт
+                dataArray = getDataArrayWithRootPrompt(int(setting_number), prompt)
+                dataJSON = dataArray[0]["json"]
+                model_name = dataArray[0]["model_name"]
+                folder_id = dataArray[0]["folder_id"]
+                result = [await generateByData(dataJSON, model_name, message, state, user_id, setting_number, folder_id, is_test_generation, False)]
         else:
-            result = await generateImages(setting_number, prompt, message_for_edit, state, user_id, is_test_generation)
+            result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation)
 
         if result:
-            await message_for_edit.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT)
+            await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
         else:
             raise Exception("Произошла ошибка при генерации изображения")
         
     except Exception as e:
+        traceback.print_exc()
         await message.answer(text.GENERATION_ERROR_TEXT)
         await state.clear()
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
@@ -73,30 +84,39 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     user_id = call.from_user.id
 
     # Получаем индекс работы и индекс изображения
-    job_id = call.data.split("|")[1]
-    model_name = call.data.split("|")[2]
-    image_index = call.data.split("|")[3]
+    model_name = call.data.split("|")[1]
+    folder_id = call.data.split("|")[2]
+    image_index = int(call.data.split("|")[3])
 
     # Получаем изображения из state
     data = await state.get_data()
-    images = data[f"images_{job_id}"]
+    images = data[f"images_{model_name}"]
 
     # Получаем выбранное изображение
     chosen_image = images[int(image_index) - 1]
         
     # Сохраняем изображение
     image_index = int(image_index) - 1
-    folder = data["folder"]
-    link = await saveImage(chosen_image, image_index, user_id, job_id, folder["id"])
+    link = await saveImage(chosen_image, user_id, model_name, folder_id)
+
+    # Получаем данные родительской папки
+    folder = getFolderDataByID(folder_id)
+    parent_folder_id = folder['parents'][0]
+    parent_folder = getFolderDataByID(parent_folder_id)
+
+    logger.info(f"Данные папки по id {folder_id}: {folder}")
 
     # Отправляем сообщение о сохранении изображения
-    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT.format(link, model_name, folder['webViewLink']))
+    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT.format(link, model_name, parent_folder['webViewLink']))
 
     # Удаляем отправленные изображения из чата
-    mediagroup_messages_ids = data[f"mediagroup_messages_ids_{job_id}"]
-    chat_id = call.message.chat.id
-    for message_id in mediagroup_messages_ids:
-        await bot.delete_message(chat_id=chat_id, message_id=message_id)
+    try:    
+        mediagroup_messages_ids = data[f"mediagroup_messages_ids_{model_name}"]
+        chat_id = call.message.chat.id
+        for message_id in mediagroup_messages_ids:
+            await bot.delete_message(chat_id=chat_id, message_id=message_id)
+    except:
+        pass
 
 
 # Добавление обработчиков

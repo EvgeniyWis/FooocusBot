@@ -1,10 +1,8 @@
 import requests
 import os
 import asyncio
-from utils.saveImages.createFolder import createFolder
 from config import ENDPOINT_ID
 from .dataArray.getAllDataArrays import getAllDataArrays
-from .dataArray.getDataArrayBySettingNumber import getDataArrayBySettingNumber
 from logger import logger
 from aiogram import types
 from utils import text
@@ -12,18 +10,11 @@ from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
 from keyboards import userKeyboards
 import shutil
+import traceback
 
 # Функция для генерации изображений по объекту данных
-async def generateByData(data: tuple[dict, str], message: types.Message, state: FSMContext, 
-    user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
-    # Получаем данные и имя модели
-    dataJSON = data[0]
-    model_name = data[1]
-
-    # Создаём папку для сохранения изображений
-    folder = createFolder(model_name)
-    await state.update_data(folder=folder)
-
+async def generateByData(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
+    user_id: int, setting_number: str, folder_id: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
     # Делаем запрос на генерацию
     headers = {
         "Content-Type": "application/json",
@@ -45,8 +36,9 @@ async def generateByData(data: tuple[dict, str], message: types.Message, state: 
 
     # Проверяем статус работы, пока она не будет завершена
     if checkOtherJobs:
-        data = await state.get_data()
-        jobs = data["jobs"]
+        stateData = await state.get_data()
+        jobs = stateData["jobs"]
+        total_jobs_count = stateData["total_jobs_count"]
 
     while True:
         response = requests.post(f'{host}/status/{job_id}', headers=headers)
@@ -59,8 +51,8 @@ async def generateByData(data: tuple[dict, str], message: types.Message, state: 
             await state.update_data(jobs=jobs)
                 
             # Получаем стейт и изменяем сообщение
-            data = await state.get_data()
-            jobs = data["jobs"]
+            stateData = await state.get_data()
+            jobs = stateData["jobs"]
             success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
             error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
             progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
@@ -68,7 +60,7 @@ async def generateByData(data: tuple[dict, str], message: types.Message, state: 
 
         try:
             await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
-            .format(success_images_count, error_images_count, progress_images_count, left_images_count))
+            .format(success_images_count, error_images_count, progress_images_count, left_images_count, total_jobs_count - len(jobs)))
         except Exception as e:
             pass
 
@@ -84,35 +76,35 @@ async def generateByData(data: tuple[dict, str], message: types.Message, state: 
         await asyncio.sleep(10)
 
     # Когда работа завершена, получаем изображение
-    logger.info(f"Работа по id {job_id} завершена! Ответ выглядит так: {response_json}")
+    logger.info(f"Работа по id {job_id} завершена!")
 
     try:
         images_output = response_json["output"]
+        
+        if images_output == []:
+            raise Exception("Не удалось сгенерировать изображения")
+
         media_group = []
         base_64_dataArray = []
 
         # Получаем изображения и сохраняем их в массив
         for i, image_output in enumerate(images_output):
             image_data = image_output["base64"]
-            base_64_data = await base64ToImage(image_data, model_name, i, user_id, job_id, is_test_generation)
+            base_64_data = await base64ToImage(image_data, model_name, i, user_id, is_test_generation)
             base_64_dataArray.append(base_64_data)
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
         # Сохраняем изображения в state с индексом
-        await state.update_data(**{f"images_{job_id}": base_64_dataArray})
+        await state.update_data(**{f"images_{model_name}": base_64_dataArray})
         
         # Отправляем изображения
         message_with_media_group = await message.answer_media_group(media_group)
 
-        await state.update_data(**{f"mediagroup_messages_ids_{job_id}": [i.message_id for i in message_with_media_group]})
-
-        # Получаем данные из state, тестовая ли это генерация
-        data = await state.get_data()
-        is_test_generation = data["generations_amount"] == "test"
+        await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
 
         # Отправляем клавиатуру для выбора изображения
         await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
-        reply_markup=userKeyboards.selectImageKeyboard(job_id, model_name) if not is_test_generation else None)
+        reply_markup=userKeyboards.selectImageKeyboard(model_name, folder_id) if not is_test_generation else None)
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
         if is_test_generation:
@@ -123,30 +115,29 @@ async def generateByData(data: tuple[dict, str], message: types.Message, state: 
         raise Exception(f"Ошибка при получении изображения: {e}")
     
 
-# Функция для генерации изображений с помощью API (массив данных)
-async def generateByDataArray(dataArray: list[dict], message: types.Message, state: FSMContext, 
-    user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
-    # Если это тестовая генерация, то берём первый элемент массива
-    if is_test_generation:
-        dataArray = dataArray[0]
-        await generateByData(dataArray, message, state, user_id, setting_number, is_test_generation, checkOtherJobs)
-    else: # Если это не тестовая генерация, то генерируем изображения по всем элементам массива
-        # Запускаем генерацию изображений в параллельном режиме
-        tasks = [generateByData(dataDict, message, state, user_id, setting_number, is_test_generation, checkOtherJobs) 
-                for dataDict in dataArray]
-        await asyncio.gather(*tasks)
+# Функция для тестовой генерации по всем настройкам
+async def generateTestImagesByAllSettings(message: types.Message, state: FSMContext, user_id: int,
+    is_test_generation: bool, message_for_edit: types.Message = None, checkOtherJobs: bool = True):
 
+    dataArrays = getAllDataArrays()
+    settings_numbers_success = []
 
-# Функция для генерации изображений с помощью API (с поддержкой всех настроек, т.е массив массивов данных)
-async def generateImage(message: types.Message, setting_number: str, state: FSMContext, user_id: int, is_test_generation: bool, checkOtherJobs: bool = True):
-    # Получаем данные по порядковому номеру настройки
-    if setting_number == "all":
-        dataArrays = getAllDataArrays()
+    try:
+        for index, dataArray in enumerate(dataArrays):
+            dataJSON = dataArray[0]["json"]  
+            model_name = dataArray[0]["model_name"]
+            folder_id = dataArray[0]["folder_id"]
 
-        tasks = [generateByDataArray(dataArray, message, state, user_id, index + 1, is_test_generation, checkOtherJobs=checkOtherJobs) 
-                for index, dataArray in enumerate(dataArrays)]
-        await asyncio.gather(*tasks)
-    else:
-        dataArray = getDataArrayBySettingNumber(int(setting_number))
-        await generateByDataArray(dataArray, message, state, user_id, setting_number, is_test_generation, checkOtherJobs)
+            await generateByData(dataJSON, model_name, message, state, user_id, index + 1, folder_id, is_test_generation, checkOtherJobs)
 
+            settings_numbers_success.append(index)
+            
+            await message_for_edit.edit_text(text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT
+            .format("✅" if 0 in settings_numbers_success else "❌", 
+            "✅" if 1 in settings_numbers_success else "❌", "✅" if 2 in settings_numbers_success else "❌"))
+
+        return True
+    except Exception as e:
+        traceback.print_exc()
+        logger.error(f"Ошибка при тестовой генерации по всем настройкам: {e}")
+        return False
