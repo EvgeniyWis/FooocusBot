@@ -3,4 +3,5 @@ from utils import text
 from utils.generateImages import generateImages
 from utils.generateImages.dataArray import getDataArrayWithRootPrompt
 from utils.saveImages import saveImage
-from bot.utils.videoExamples.getVideoExamplesData import getVideoExamplesData, getVideoExampleDataByIndex
+from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
+from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex

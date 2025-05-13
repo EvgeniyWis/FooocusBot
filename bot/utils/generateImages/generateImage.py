@@ -8,7 +8,7 @@ from aiogram import types
 from utils import text
 from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
-from bot.keyboards.user import keyboards
+from keyboards.user import keyboards
 import shutil
 import traceback
 
