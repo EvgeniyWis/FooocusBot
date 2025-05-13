@@ -1,21 +1,22 @@
 import asyncio
-import os
 import uuid
+from pathlib import Path
 
-ASSETS_DIR = "./.assets"
-CONTAINER_NAME = "facefusion-cpu"
+SCRIPT_DIR = Path(__file__).parent.parent.parent.parent.parent.absolute()
+ASSETS_DIR = SCRIPT_DIR / "facefusion-docker" / ".assets"
+CONTAINER_NAME = "facefusion-docker-facefusion-cpu-1"
 
 
-async def facefusion_swap(source_path: str, target_path: str) -> str:
+async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     """
     Выполняет подмену лица через FaceFusion внутри Docker-контейнера.
 
-    :param source_path: путь к исходному изображению (с которого взять лицо).
-    :param target_path: путь к целевому изображению (куда вставить лицо).
-    :return: путь к выходному изображению, либо исключение.
+    :param source_filename: путь к исходному изображению относительно папки .assets/ (с которого взять лицо)
+    :param target_filename: путь к целевому изображению относительно папки .assets/  (куда вставить лицо)
+    :return: абсолютный путь к выходному изображению
     """
     output_filename = f"{uuid.uuid4()}_output.jpg"
-    output_path = os.path.join(ASSETS_DIR, output_filename)
+    output_path = ASSETS_DIR / output_filename
 
     docker_cmd = [
         "docker",
@@ -25,9 +26,9 @@ async def facefusion_swap(source_path: str, target_path: str) -> str:
         "facefusion.py",
         "headless-run",
         "--source",
-        f"/facefusion/.assets/{os.path.basename(source_path)}",
+        f"/facefusion/.assets/{source_filename}",
         "--target",
-        f"/facefusion/.assets/{os.path.basename(target_path)}",
+        f"/facefusion/.assets/{target_filename}",
         "--output-path",
         f"/facefusion/.assets/{output_filename}",
     ]
@@ -40,13 +41,27 @@ async def facefusion_swap(source_path: str, target_path: str) -> str:
         )
         stdout, stderr = await process.communicate()
 
+        await asyncio.sleep(1)
+
         if process.returncode != 0:
             raise RuntimeError(f"FaceFusion failed: {stderr.decode().strip()}")
 
-        if not os.path.exists(output_path):
-            raise FileNotFoundError("Выходной файл не найден.")
+        if not output_path.exists():
+            raise FileNotFoundError(
+                f"Файл {output_filename} не найден. Скорее всего проблема произошла с путями",
+            )
 
-        return output_path
+        return str(output_path)
 
     except Exception as e:
-        raise RuntimeError(f"Ошибка FaceFusion: {e}")
+        raise RuntimeError(f"Ошибка FaceFusion: {str(e)}")
+
+
+if __name__ == "__main__":
+    try:
+        result = asyncio.run(
+            facefusion_swap("evanoir.xo.jpg", "face_nika_saintclair.jpg"),
+        )
+        print(f"Успешно! Результат: {result}")
+    except Exception as e:
+        print(f"Ошибка: {e}")
