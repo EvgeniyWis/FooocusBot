@@ -1,1 +1,1 @@
-from keyboards import userKeyboards
+from bot.keyboards.user import keyboards, buttons

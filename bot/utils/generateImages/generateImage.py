@@ -8,7 +8,7 @@ from aiogram import types
 from utils import text
 from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
-from keyboards import userKeyboards
+from bot.keyboards.user import keyboards
 import shutil
 import traceback
 
@@ -104,7 +104,7 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
 
         # Отправляем клавиатуру для выбора изображения
         await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
-        reply_markup=userKeyboards.selectImageKeyboard(model_name, folder_id) if not is_test_generation else None)
+        reply_markup=keyboards.selectImageKeyboard(model_name, folder_id) if not is_test_generation else None)
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
         if is_test_generation:

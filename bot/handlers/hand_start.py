@@ -6,13 +6,14 @@ from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.saveImages.saveImage import saveImage
 from utils.generateImages.generateImage import generateByData, generateTestImagesByAllSettings
-from keyboards.userKeyboards import generationsAmountKeyboard, selectSettingKeyboard
+from bot.keyboards.user.keyboards import generationsAmountKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoExampleKeyboard
 from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
 from logger import logger
 from InstanceBot import bot
 import traceback
+from utils.getKlingTemplatesExamples import getKlingTemplatesExamples
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -107,7 +108,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"Данные папки по id {folder_id}: {folder}")
 
     # Отправляем сообщение о сохранении изображения
-    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT.format(link, model_name, parent_folder['webViewLink']))
+    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT
+    .format(link, model_name, parent_folder['webViewLink']), reply_markup=generateVideoKeyboard())
 
     # Удаляем отправленные изображения из чата
     try:    
@@ -117,6 +119,22 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             await bot.delete_message(chat_id=chat_id, message_id=message_id)
     except:
         pass
+
+
+# Обработка нажатия кнопки "📹 Сгенерировать видео"
+async def start_generate_video(call: types.CallbackQuery):
+    # Получаем id пользователя и удаляем сообщение
+    user_id = call.from_user.id
+    message_id = call.message.message_id
+
+    await bot.delete_message(user_id, message_id)
+
+    # Получаем все видео-шаблоны с их промптами
+    templates_examples = await getKlingTemplatesExamples()
+
+    # Выгружаем видео-примеры вместе с их промптами
+    for prompt, video_path in templates_examples.items():
+        await bot.send_video(user_id, video_path, caption=prompt, reply_markup=videoExampleKeyboard())
 
 
 # Добавление обработчиков
