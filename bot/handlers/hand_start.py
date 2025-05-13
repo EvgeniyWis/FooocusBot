@@ -7,14 +7,14 @@ from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.saveImages.saveImage import saveImage
 from utils.generateImages.generateImage import generateByData, generateTestImagesByAllSettings
-from bot.keyboards.user.keyboards import generationsAmountKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoExampleKeyboard
+from keyboards.user.keyboards import generationsAmountKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoExampleKeyboard
 from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
 from logger import logger
 from InstanceBot import bot
 import traceback
-from bot.utils.videoExamples.getVideoExamplesData import getVideoExamplesData
+from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
