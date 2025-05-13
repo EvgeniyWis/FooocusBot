@@ -2,7 +2,7 @@ from aiogram import types
 from InstanceBot import router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
-from bot.utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
+from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
 from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.saveImages.saveImage import saveImage
