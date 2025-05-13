@@ -2,6 +2,7 @@ from aiogram import types
 from InstanceBot import router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
+from bot.utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
 from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.saveImages.saveImage import saveImage
@@ -13,7 +14,7 @@ from utils.generateImages.generateImages import generateImages
 from logger import logger
 from InstanceBot import bot
 import traceback
-from utils.getKlingTemplatesExamples import getKlingTemplatesExamples
+from bot.utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -130,11 +131,26 @@ async def start_generate_video(call: types.CallbackQuery):
     await bot.delete_message(user_id, message_id)
 
     # Получаем все видео-шаблоны с их промптами
-    templates_examples = await getKlingTemplatesExamples()
+    templates_examples = await getVideoExamplesData()
 
     # Выгружаем видео-примеры вместе с их промптами
-    for prompt, video_path in templates_examples.items():
-        await bot.send_video(user_id, video_path, caption=prompt, reply_markup=videoExampleKeyboard())
+    for index, value in templates_examples.items():
+        await bot.send_video(user_id, value["file"], caption=value["prompt"], reply_markup=videoExampleKeyboard(index))
+
+
+# Обработка нажатия кнопок под видео-примером
+async def handle_video_example_buttons(call: types.CallbackQuery):
+    # Получаем индекс видео-примера и тип кнопки
+    temp = call.data.split("|")
+    index = temp[1]
+    button_type = temp[2]
+
+    # Получаем видео-пример по его индексу
+    video_example_data = await getVideoExampleDataByIndex(index)
+
+    if button_type == "test":
+        pass
+
 
 
 # Добавление обработчиков
@@ -148,3 +164,7 @@ def hand_add():
     router.message.register(write_prompt, StateFilter(UserState.write_prompt))
 
     router.callback_query.register(select_image, lambda call: call.data.startswith("select_image"))
+
+    router.callback_query.register(select_image, lambda call: call.data == "generate_video")
+
+    router.callback_query.register(handle_video_example_buttons, lambda call: call.data.startswith("generate_video"))

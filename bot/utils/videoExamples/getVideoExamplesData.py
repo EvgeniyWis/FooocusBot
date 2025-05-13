@@ -2,7 +2,7 @@ import os
 
 
 # Функция для получения примеров шаблонов для генерации видео с помощью kling
-async def getKlingTemplatesExamples() -> dict:
+async def getVideoExamplesData() -> dict:
     # Путь к папке с видео
     folder_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "videos", "templates_examples")
 
@@ -24,6 +24,6 @@ async def getKlingTemplatesExamples() -> dict:
     # Формируем объект с промптами и видео
     result = {}
     for index, file in enumerate(video_files):
-        result[prompts[index]] = file
+        result[index] = {"file": file, "prompt": prompts[index]}
 
     return result
