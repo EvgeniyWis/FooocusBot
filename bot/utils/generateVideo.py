@@ -1,28 +1,10 @@
 import requests
 import os
-import logging
-import pathlib
-
-# Настройка логирования
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# Создаем форматтер для логов
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Настройка вывода в файл
-file_handler = logging.FileHandler('Logs.log')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-
-# Настройка вывода в консоль
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+from logger import logger
 import asyncio
-import base64
 
 
+# Генерация видео с помощью kling
 async def generateVideo(prompt: str, image: str) -> None:
     try:
         # Формируем тело запроса
@@ -34,7 +16,7 @@ async def generateVideo(prompt: str, image: str) -> None:
             "negative_prompt": "mismatched elements.",
             "cfg_scale": 0.7,
             "version": "kling-v1-6",
-            "image_file": image,
+            "image": image,
             "translate_input": False
         }
 
@@ -73,26 +55,14 @@ async def generateVideo(prompt: str, image: str) -> None:
                 logger.error(f"Ошибка при генерации видео: {json}")
                 return None
 
-            if json['status'] == 'success': # Если статус задания успешный, то выходим из цикла
-                break
+            if json['status'] == 'success': # Если статус задания успешный, то возвращаем ответ
+                # Получаем ссылку на выходное видео
+                logger.info(f"Выходные данные запроса по id {request_id}: {json}")
+                result_url = json['full_response'][0]['url']
+                return result_url
 
             await asyncio.sleep(10)
-
-        # Получаем ссылку на выходное видео
-        result_url = json['full_response']['url']
-        logger.info(f"Ссылка на выходное видео: {result_url}")
-        return result_url
 
     except Exception as e:
         logger.error(f"Ошибка при отправке запроса на генерацию видео: {e}")
         return None
-
-
-if __name__ == "__main__":  
-    image_path = pathlib.Path(__file__).parent.parent.parent / "bot/images/faceswap/evanoir.xo.jpg"
-    with open(image_path, "rb") as image_file:
-        encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
-
-    asyncio.run(generateVideo(
-        "Из лица появляется пиявка, которая начинает проникать в глаз",
-        encoded_image))
