@@ -3,7 +3,7 @@ import uuid
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.parent.parent.parent.parent.absolute()
-ASSETS_DIR = SCRIPT_DIR / "facefusion-docker" / ".assets"
+ASSETS_DIR = SCRIPT_DIR / "facefusion-docker" / ".assets" / "images" / "results"
 CONTAINER_NAME = "facefusion-docker-facefusion-cpu-1"
 
 
@@ -30,7 +30,7 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         "--target",
         f"/facefusion/.assets/{target_filename}",
         "--output-path",
-        f"/facefusion/.assets/{output_filename}",
+        f"/facefusion/.assets/images/results/{output_filename}",
     ]
 
     try:
