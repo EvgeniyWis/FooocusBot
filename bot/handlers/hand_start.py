@@ -1,3 +1,4 @@
+from utils.generateVideo import generateVideo
 from config import TEMP_FOLDER_PATH
 from utils.facefusion.facefusion_swap import facefusion_swap
 from aiogram import types
@@ -161,12 +162,19 @@ async def handle_video_example_buttons(call: types.CallbackQuery):
     temp = call.data.split("|")
     index = temp[1]
     button_type = temp[2]
+    user_id = call.from_user.id
 
-    # Получаем видео-пример по его индексу
+    # Получаем данные видео-примера по его индексу
     video_example_data = await getVideoExampleDataByIndex(index)
+    video_example_prompt = video_example_data["prompt"]
+    video_example_file = video_example_data["file"]
 
+    # Генерируем видео
+    video_url = await generateVideo(video_example_prompt, video_example_file)
+
+    # Отправляем видео
     if button_type == "test":
-        pass
+        await bot.send_video(user_id, video_url, caption=text.GENERATE_VIDEO_SUCCESS_TEXT, reply_markup=videoExampleKeyboard(index, False))
 
 
 

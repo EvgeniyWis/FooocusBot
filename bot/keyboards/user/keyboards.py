@@ -49,11 +49,11 @@ def generateVideoKeyboard():
 
 
 # Инлайн-клавиатура при отправки примера видео с промптом с выбором типа генерации и возможности написания кастомного промпта
-def videoExampleKeyboard(index: str):
+def videoExampleKeyboard(index: str, with_test_generation: bool = True):
     prefix = f"generate_video|{index}"
     
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    getGenerationsAmountButtons(prefix),
+    getGenerationsAmountButtons(prefix, with_test_generation),
     [InlineKeyboardButton(text='✒️ Написать свой промпт', callback_data=f'{prefix}|write_prompt')]])
 
     return kb
