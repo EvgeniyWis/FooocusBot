@@ -39,7 +39,7 @@ async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: 
 
         save_dir = f"{TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
         os.makedirs(save_dir, exist_ok=True)
-        file_path = f"{save_dir}/{index + 1}.png"
+        file_path = f"{save_dir}/{index + 1}.jpg"
         
         # Используем контекстный менеджер для сохранения и закрытия файла
         with open(file_path, 'wb') as f:

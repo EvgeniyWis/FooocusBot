@@ -41,8 +41,13 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
         total_jobs_count = stateData["total_jobs_count"]
 
     while True:
-        response = requests.post(f'{host}/status/{job_id}', headers=headers)
-        response_json = response.json()
+        try:
+            response = requests.post(f'{host}/status/{job_id}', headers=headers)
+            response_json = response.json()
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Ошибка при получении статуса работы (сетевая ошибка): {e}")
+            await asyncio.sleep(10)
+            continue
 
         logger.info(f"Получен статус работы c id {job_id}: {response_json['status']}")
 
@@ -93,20 +98,17 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
             base_64_data = await base64ToImage(image_data, model_name, i, user_id, is_test_generation)
             base_64_dataArray.append(base_64_data)
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
-
-        # Сохраняем изображения в state с индексом
-        # TODO: чекнуть, мб раскомментить
-        # await state.update_data(**{f"images_{model_name}": base_64_dataArray})
         
         # Отправляем изображения
         message_with_media_group = await message.answer_media_group(media_group)
-
-        await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
-
+        
         # Отправляем клавиатуру для выбора изображения
         await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
         reply_markup=keyboards.selectImageKeyboard(model_name, folder_id) if not is_test_generation else None)
 
+        # Сохраняем в стейт данные о медиагруппе, для её удаления
+        await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
+        
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
         if is_test_generation:
             shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")

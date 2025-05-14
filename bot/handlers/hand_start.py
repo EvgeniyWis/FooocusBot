@@ -18,6 +18,8 @@ from InstanceBot import bot
 import traceback
 from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 from InstanceBot import router
+import os
+
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -49,7 +51,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     await call.message.edit_text(
         text.GET_SETTINGS_WITH_TEST_GENERATIONS_SUCCESS_TEXT
     )
-    await state.set_state(UserState.write_prompt)
+    await state.set_state(UserState.write_prompt_for_image)
 
 
 # Обработка ввода промпта
@@ -104,16 +106,27 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     image_index = int(call.data.split("|")[3])
     data = await state.get_data()
 
-    # TODO: чекнуть, мб раскомментить
-    # # Получаем изображения из state
-    # images = data[f"images_{model_name}"]
-
-    # # Получаем выбранное изображение
-    # chosen_image = images[int(image_index) - 1]
+    # Меняем текст на сообщении
+    await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-    result_path = await facefusion_swap(f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg",
-    f"images/faceswap/{model_name}.jpg")
+    faceswap_source_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
+    faceswap_target_path = f"images/faceswap/{model_name}.jpg"
+    logger.info(f"Путь к исходному изображению для замены лица: {faceswap_source_path}")
+    logger.info(f"Путь к целевому изображению для замены лица: {faceswap_target_path}")
+    
+    try:
+        result_path = await facefusion_swap(faceswap_target_path, faceswap_source_path)
+    except Exception as e:
+        traceback.print_exc()
+        await call.message.answer(text.FACE_SWAP_ERROR_TEXT)
+        logger.error(f"Произошла ошибка при замене лица: {e}")
+        return
+
+    logger.info(f"Результат замены лица: {result_path}")
+
+    # Меняем текст на сообщении
+    await call.message.edit_text(text.SAVE_IMAGE_PROGRESS_TEXT)
 
     # Сохраняем изображение
     image_index = int(image_index) - 1
@@ -139,6 +152,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     except:
         pass
 
+    # Удаляем изображение с заменённым лицом
+    os.remove(result_path)
+
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
 async def start_generate_video(call: types.CallbackQuery):
@@ -157,12 +173,11 @@ async def start_generate_video(call: types.CallbackQuery):
 
 
 # Обработка нажатия кнопок под видео-примером
-async def handle_video_example_buttons(call: types.CallbackQuery):
+async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс видео-примера и тип кнопки
     temp = call.data.split("|")
     index = temp[1]
     button_type = temp[2]
-    user_id = call.from_user.id
 
     # Получаем данные видео-примера по его индексу
     video_example_data = await getVideoExampleDataByIndex(index)
@@ -174,7 +189,27 @@ async def handle_video_example_buttons(call: types.CallbackQuery):
 
     # Отправляем видео
     if button_type == "test":
-        await bot.send_video(user_id, video_url, caption=text.GENERATE_VIDEO_SUCCESS_TEXT, reply_markup=videoExampleKeyboard(index, False))
+        await call.message.answer(video_url, caption=text.GENERATE_VIDEO_SUCCESS_TEXT, reply_markup=videoExampleKeyboard(index, False))
+    
+    elif button_type == "write_prompt":
+        await state.update_data(video_example_file=video_example_file)
+        await state.update_data(video_example_index=index)
+        await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT)
+        await state.set_state(UserState.write_prompt_for_video)
+
+
+# Хедлер для обработки ввода кастомного промпта для видео
+async def write_prompt_for_video(message: types.Message, state: FSMContext):
+    # Получаем данные
+    prompt = message.text
+    await state.update_data(prompt_for_video=prompt)
+    data = await state.get_data()
+    video_example_file = data["video_example_file"]
+    index = data["video_example_index"]
+
+    await message.answer_video(video_example_file, 
+    caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(prompt),
+    reply_markup=videoExampleKeyboard(index))
 
 
 
@@ -191,10 +226,12 @@ def hand_add():
         choose_setting, lambda call: call.data.startswith("select_setting")
     )
 
-    router.message.register(write_prompt, StateFilter(UserState.write_prompt))
+    router.message.register(write_prompt, StateFilter(UserState.write_prompt_for_image))
 
     router.callback_query.register(select_image, lambda call: call.data.startswith("select_image"))
 
-    router.callback_query.register(select_image, lambda call: call.data == "generate_video")
+    router.callback_query.register(start_generate_video, lambda call: call.data == "generate_video")
 
     router.callback_query.register(handle_video_example_buttons, lambda call: call.data.startswith("generate_video"))
+
+    router.message.register(write_prompt_for_video, StateFilter(UserState.write_prompt_for_video))

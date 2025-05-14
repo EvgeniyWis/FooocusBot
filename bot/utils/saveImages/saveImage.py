@@ -23,7 +23,7 @@ async def saveImage(image_path: str, user_id: int, folder_name: str, folder_id: 
         files_count = len(results.get('files', []))
 
         # Создаем имя для файла
-        name = f'{files_count + 1}.png'
+        name = f'{files_count + 1}.jpg'
 
         # Создаем метаданные для файла
         file_metadata = {
