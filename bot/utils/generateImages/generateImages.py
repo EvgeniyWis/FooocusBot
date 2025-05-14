@@ -25,7 +25,7 @@ async def generateImages(setting_number: int, prompt: str, message: types.Messag
     async def process_image(data: tuple[dict, str, str]):
         try:
             logger.info(f"Генерация изображения с изначальными данными: {data}")
-            image = await generateByData(data["json"], data["model_name"], message, state, user_id, setting_number, data["folder_id"], is_test_generation)
+            image = await generateByData(data["json"], data["model_name"], message, state, user_id, setting_number, is_test_generation)
             images.append(image)
             return image, None
         except Exception as e:

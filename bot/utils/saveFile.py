@@ -1,20 +1,20 @@
 from googleapiclient.http import MediaFileUpload
 from config import TEMP_FOLDER_PATH
 from logger import logger
-from .auth import service
+from .saveImages.auth import service
 import shutil
 import asyncio
-from .deleteParentFolder import deleteParentFolder
+from .saveImages.deleteParentFolder import deleteParentFolder
 
 
-# Сохранение одного изображения
-async def saveImage(image_path: str, user_id: int, folder_name: str, folder_id: int):
+# Сохранение одного файла
+async def saveFile(file_path: str, user_id: int, folder_name: str, folder_id: int, with_deleting_temp_folder: bool = True):
     try:
         if not folder_id:
             logger.error(f"Некорректный folder_id: {folder_id}")
             raise ValueError("Некорректный folder_id")
 
-        # Получаем кол-во изображений в папке
+        # Получаем кол-во файлов в папке
         results = service.files().list(
             q=f"'{folder_id}' in parents",
             fields="files(id, name)",
@@ -23,7 +23,7 @@ async def saveImage(image_path: str, user_id: int, folder_name: str, folder_id: 
         files_count = len(results.get('files', []))
 
         # Создаем имя для файла
-        name = f'{files_count + 1}.jpg'
+        name = f'{files_count + 1}.{file_path.split(".")[-1]}'
 
         # Создаем метаданные для файла
         file_metadata = {
@@ -31,8 +31,8 @@ async def saveImage(image_path: str, user_id: int, folder_name: str, folder_id: 
                         'parents': [folder_id]
                     }
             
-        # Загружаем изображение
-        media = MediaFileUpload(image_path, resumable=True)
+        # Загружаем файл
+        media = MediaFileUpload(file_path, resumable=True)
         file = service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
         
         # Добавление разрешения на публичный доступ
@@ -45,17 +45,18 @@ async def saveImage(image_path: str, user_id: int, folder_name: str, folder_id: 
             body=permission
         ).execute()
         
-        logger.info(f"Изображение {name} успешно загружено {f'в папку {folder_name}' if folder_name else '!'}")
+        logger.info(f"Файл {name} успешно загружен {f'в папку {folder_name}' if folder_name else '!'}")
         media.stream().close()
 
-        # Удаляем папку с изображениями
-        shutil.rmtree(f"{TEMP_FOLDER_PATH}/{f'{folder_name}_{user_id}' if folder_name else ""}")
+        if with_deleting_temp_folder:
+            # Удаляем папку с файлами
+            shutil.rmtree(f"{TEMP_FOLDER_PATH}/{f'{folder_name}_{user_id}' if folder_name else ""}")
 
-        # Через 1 час удаляем и папку в более верхнем уровне
-        asyncio.create_task(deleteParentFolder(folder_name, user_id))
-        
+            # Через 1 час удаляем и папку в более верхнем уровне
+            asyncio.create_task(deleteParentFolder(folder_name, user_id))
+            
         return file['webViewLink']
 
     except Exception as e:
-        logger.error(f"Ошибка при сохранении изображения: {str(e)}")
+        logger.error(f"Ошибка при сохранении файла: {str(e)}")
         return False

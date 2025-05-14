@@ -1,11 +1,10 @@
 import os
 
-
 # Функция для получения примеров шаблонов для генерации видео с помощью kling
 async def getVideoExamplesData() -> dict:
     # Путь к папке с видео
-    folder_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "videos", "templates_examples")
-
+    folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "videos", "templates_examples")
+    
     # Расширения видеофайлов, которые хотим найти
     video_extensions = {".mp4", ".avi", ".mov", ".mkv", ".flv", ".wmv"}
 
@@ -24,6 +23,6 @@ async def getVideoExamplesData() -> dict:
     # Формируем объект с промптами и видео
     result = {}
     for index, file in enumerate(video_files):
-        result[index] = {"file": file, "prompt": prompts[index]}
+        result[index] = {"file_path": os.path.join(folder_path, file), "prompt": prompts[index]}
 
     return result
