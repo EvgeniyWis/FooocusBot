@@ -3,7 +3,7 @@ from .buttons import getGenerationsAmountButtons
 
 # Инлайн-клавиатура для выбора количества генераций
 def generationsAmountKeyboard():
-    kb = InlineKeyboardMarkup(inline_keyboard=[getGenerationsAmountButtons("generations_amount")])
+    kb = InlineKeyboardMarkup(inline_keyboard=getGenerationsAmountButtons("generations_amount"))
 
     return kb
 

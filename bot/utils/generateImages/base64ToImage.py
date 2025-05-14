@@ -1,6 +1,7 @@
 import base64
 from PIL import Image
 import io
+from config import TEMP_FOLDER_PATH
 from logger import logger
 import os
 
@@ -36,7 +37,7 @@ async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: 
         if is_test_generation:
             folder_name = "test"
 
-        save_dir = f"temp/{folder_name}_{user_id}"
+        save_dir = f"{TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index + 1}.png"
         
