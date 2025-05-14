@@ -5,8 +5,11 @@ import asyncio
 
 
 # Генерация видео с помощью kling
-async def generateVideo(prompt: str, image: str) -> None:
+async def generateVideo(prompt: str, image_path: str) -> None:
     try:
+        # Получаем изображение
+        image = open(image_path, 'rb')
+
         # Формируем тело запроса
         input = {
             "prompt": prompt,

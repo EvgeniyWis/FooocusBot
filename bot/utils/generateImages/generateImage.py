@@ -14,7 +14,7 @@ import traceback
 
 # Функция для генерации изображений по объекту данных
 async def generateByData(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
-    user_id: int, setting_number: str, folder_id: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
+    user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
     # Делаем запрос на генерацию
     headers = {
         "Content-Type": "application/json",
@@ -25,10 +25,22 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
     logger.info(f"Отправка запроса на генерацию: {dataJSON}")
 
     # Получаем id работы
-    response = requests.post(f'{host}/run', headers=headers, json=dataJSON)
-    response_json = response.json()
+    max_attempts = 5
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            response = requests.post(f'{host}/run', headers=headers, json=dataJSON)
+            response_json = response.json()
+            break
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Ошибка при получении статуса работы (сетевая ошибка): {e}, попытка {attempt}/{max_attempts}")
+            if attempt >= max_attempts:
+                raise Exception(f"Не удалось подключиться к серверу после {max_attempts} попыток")
+            await asyncio.sleep(10)
 
     logger.info(f"Ответ на запрос: {response_json}")
+    
     
     job_id = response_json['id']
 
@@ -104,7 +116,7 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
         
         # Отправляем клавиатуру для выбора изображения
         await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
-        reply_markup=keyboards.selectImageKeyboard(model_name, folder_id) if not is_test_generation else None)
+        reply_markup=keyboards.selectImageKeyboard(model_name) if not is_test_generation else None)
 
         # Сохраняем в стейт данные о медиагруппе, для её удаления
         await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
@@ -129,9 +141,10 @@ async def generateTestImagesByAllSettings(message: types.Message, state: FSMCont
         for index, dataArray in enumerate(dataArrays):
             dataJSON = dataArray[0]["json"]  
             model_name = dataArray[0]["model_name"]
-            folder_id = dataArray[0]["folder_id"]
+            picture_folder_id = dataArray[0]["picture_folder_id"]
+            video_folder_id = dataArray[0]["video_folder_id"]
 
-            await generateByData(dataJSON, model_name, message, state, user_id, index + 1, folder_id, is_test_generation, checkOtherJobs)
+            await generateByData(dataJSON, model_name, message, state, user_id, index + 1, picture_folder_id, video_folder_id, is_test_generation, checkOtherJobs)
 
             settings_numbers_success.append(index)
             

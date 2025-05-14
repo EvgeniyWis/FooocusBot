@@ -1,23 +1,23 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from .buttons import getGenerationsAmountButtons
+from .buttons import getGenerationsTypeButtons
 
 # Инлайн-клавиатура для выбора количества генераций
-def generationsAmountKeyboard():
-    kb = InlineKeyboardMarkup(inline_keyboard=getGenerationsAmountButtons("generations_amount"))
+def generationsTypeKeyboard():
+    kb = InlineKeyboardMarkup(inline_keyboard=getGenerationsTypeButtons("generations_type"))
 
     return kb
 
 
 # Инлайн-клавиатура для выбора одного из изображений
-def selectImageKeyboard(model_name: str, folder_id: int):
+def selectImageKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text='1', callback_data=f'select_image|{model_name}|{folder_id}|1'),
-            InlineKeyboardButton(text='2', callback_data=f'select_image|{model_name}|{folder_id}|2')
+            InlineKeyboardButton(text='1', callback_data=f'select_image|{model_name}|1'),
+            InlineKeyboardButton(text='2', callback_data=f'select_image|{model_name}|2')
         ],
         [
-            InlineKeyboardButton(text='3', callback_data=f'select_image|{model_name}|{folder_id}|3'),
-            InlineKeyboardButton(text='4', callback_data=f'select_image|{model_name}|{folder_id}|4')
+            InlineKeyboardButton(text='3', callback_data=f'select_image|{model_name}|3'),
+            InlineKeyboardButton(text='4', callback_data=f'select_image|{model_name}|4')
         ]
     ])
 
@@ -49,11 +49,24 @@ def generateVideoKeyboard():
 
 
 # Инлайн-клавиатура при отправки примера видео с промптом с выбором типа генерации и возможности написания кастомного промпта
-def videoExampleKeyboard(index: str, with_test_generation: bool = True):
+def videoExampleKeyboard(index: str, with_test_generation: bool = True, with_write_prompt: bool = True):
     prefix = f"generate_video|{index}"
+
+    inline_keyboard = getGenerationsTypeButtons(prefix, with_test_generation)
+
+    if with_write_prompt:
+        inline_keyboard.append([InlineKeyboardButton(text='✒️ Написать свой промпт', callback_data=f'{prefix}|write_prompt')])
     
+    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+    return kb
+
+
+# Инлайн-клавиатура для выбора корректности генерации видео
+def videoCorrectnessKeyboard():
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    getGenerationsAmountButtons(prefix, with_test_generation),
-    [InlineKeyboardButton(text='✒️ Написать свой промпт', callback_data=f'{prefix}|write_prompt')]])
+        [InlineKeyboardButton(text='✅ Сохранить видео', callback_data='video_correctness|correct'),
+        InlineKeyboardButton(text='❌ Перегенерировать видео', callback_data='video_correctness|incorrect')]
+    ])
 
     return kb

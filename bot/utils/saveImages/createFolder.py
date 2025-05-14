@@ -23,16 +23,16 @@ def createFolder(folder_name: str) -> tuple[str, str]:
         body=permission
     ).execute()
 
-    # Создание вложенной папки "picture"
-    folder_metadata = {
-        'name': "picture", 
+    # Создание вложенной папки
+    nested_folder_name = "videos"
+    nested_folder_metadata = {
+        'name': nested_folder_name, 
         'mimeType': 'application/vnd.google-apps.folder',
         'parents': [folder['id']]
     }
-    folder_picture = service.files().create(body=folder_metadata, fields='id,webViewLink').execute()
+    nested_folder = service.files().create(body=nested_folder_metadata, fields='id,webViewLink').execute()
     
-    
-    logger.info(f"Папка {folder_name} создана с ID: {folder_picture['id']}")
+    logger.info(f"Папка {folder_name} создана с ID: {folder['id']}")
     logger.info(f"Ссылка на папку: {folder['webViewLink']}")
 
-    return folder_picture['id'], folder_picture['webViewLink']
+    return folder['id'], nested_folder['webViewLink']
