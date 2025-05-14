@@ -55,13 +55,3 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
 
     except Exception as e:
         raise RuntimeError(f"Ошибка FaceFusion: {str(e)}")
-
-
-if __name__ == "__main__":
-    try:
-        result = asyncio.run(
-            facefusion_swap("evanoir.xo.jpg", "face_nika_saintclair.jpg"),
-        )
-        print(f"Успешно! Результат: {result}")
-    except Exception as e:
-        print(f"Ошибка: {e}")

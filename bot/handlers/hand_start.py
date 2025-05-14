@@ -1,3 +1,5 @@
+from config import TEMP_FOLDER_PATH
+from utils.facefusion.facefusion_swap import facefusion_swap
 from aiogram import types
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -14,6 +16,7 @@ from logger import logger
 from InstanceBot import bot
 import traceback
 from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
+from InstanceBot import router
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -98,17 +101,22 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     model_name = call.data.split("|")[1]
     folder_id = call.data.split("|")[2]
     image_index = int(call.data.split("|")[3])
-
-    # Получаем изображения из state
     data = await state.get_data()
-    images = data[f"images_{model_name}"]
 
-    # Получаем выбранное изображение
-    chosen_image = images[int(image_index) - 1]
+    # TODO: чекнуть, мб раскомментить
+    # # Получаем изображения из state
+    # images = data[f"images_{model_name}"]
+
+    # # Получаем выбранное изображение
+    # chosen_image = images[int(image_index) - 1]
+
+    # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
+    result_path = await facefusion_swap(f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg",
+    f"images/faceswap/{model_name}.jpg")
 
     # Сохраняем изображение
     image_index = int(image_index) - 1
-    link = await saveImage(chosen_image, user_id, model_name, folder_id)
+    link = await saveImage(result_path, user_id, model_name, folder_id)
 
     # Получаем данные родительской папки
     folder = getFolderDataByID(folder_id)

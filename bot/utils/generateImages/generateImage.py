@@ -1,7 +1,7 @@
 import requests
 import os
 import asyncio
-from config import ENDPOINT_ID
+from config import ENDPOINT_ID, TEMP_FOLDER_PATH
 from .dataArray.getAllDataArrays import getAllDataArrays
 from logger import logger
 from aiogram import types
@@ -95,7 +95,8 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
         # Сохраняем изображения в state с индексом
-        await state.update_data(**{f"images_{model_name}": base_64_dataArray})
+        # TODO: чекнуть, мб раскомментить
+        # await state.update_data(**{f"images_{model_name}": base_64_dataArray})
         
         # Отправляем изображения
         message_with_media_group = await message.answer_media_group(media_group)
@@ -108,7 +109,7 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
         if is_test_generation:
-            shutil.rmtree(f"temp/test_{user_id}")
+            shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")
             return
         
     except Exception as e:

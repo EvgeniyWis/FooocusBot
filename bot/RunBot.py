@@ -1,4 +1,5 @@
 from aiogram.types import BotCommand
+from config import TEMP_FOLDER_PATH
 from InstanceBot import bot, dp
 import handlers
 import asyncio
@@ -8,8 +9,8 @@ import os
 
 async def on_startup() -> None:
     # Удаляем все файлы в папке temp
-    if os.path.exists("temp"):
-        shutil.rmtree("temp")
+    if os.path.exists(TEMP_FOLDER_PATH):
+        shutil.rmtree(TEMP_FOLDER_PATH)
 
     # Определяем команды и добавляем их в бота
     commands = [
