@@ -12,6 +12,10 @@ async def on_startup() -> None:
     if os.path.exists(TEMP_FOLDER_PATH):
         shutil.rmtree(TEMP_FOLDER_PATH)
 
+    # Удаляем папку temp
+    if os.path.exists("FocuuusBot/temp"):
+        shutil.rmtree("FocuuusBot/temp")
+
     # Определяем команды и добавляем их в бота
     commands = [
         BotCommand(command='/start', description='Перезапустить бота'),
