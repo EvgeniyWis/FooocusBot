@@ -66,7 +66,7 @@ def videoExampleKeyboard(index: str, with_test_generation: bool = True, with_wri
 def videoCorrectnessKeyboard():
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text='✅ Сохранить видео', callback_data='video_correctness|correct'),
-        InlineKeyboardButton(text='❌ Перегенерировать видео', callback_data='video_correctness|incorrect')]
+        InlineKeyboardButton(text='❌ Перегенерировать видео', callback_data='generate_video')]
     ])
 
     return kb

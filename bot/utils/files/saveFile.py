@@ -1,22 +1,37 @@
 from googleapiclient.http import MediaFileUpload
 from config import TEMP_FOLDER_PATH
 from logger import logger
-from .saveImages.auth import service
+from ..saveImages.auth import service
 import shutil
 import asyncio
-from .saveImages.deleteParentFolder import deleteParentFolder
+from ..saveImages.deleteParentFolder import deleteParentFolder
+from ..saveImages.createFolder import createFolder
 
 
 # Сохранение одного файла
-async def saveFile(file_path: str, user_id: int, folder_name: str, folder_id: int, with_deleting_temp_folder: bool = True):
+async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folder_id: int, current_date: str, with_deleting_temp_folder: bool = True):
     try:
-        if not folder_id:
-            logger.error(f"Некорректный folder_id: {folder_id}")
-            raise ValueError("Некорректный folder_id")
+        if not initial_folder_id:
+            logger.error(f"Некорректный initial_folder_id: {initial_folder_id}")
+            raise ValueError("Некорректный initial_folder_id")
+
+        # Проверяем есть ли папка с сегодняшней датой
+        results = service.files().list(
+            q=f"'{str(initial_folder_id)}' in parents and name = '{current_date}'",
+            fields="files(id, name)",
+            pageSize=1000
+        ).execute()
+
+        # Если папка с сегодняшней датой есть, то получаем её id
+        if results.get('files', []):
+            date_folder_id = results.get('files', [])[0].get('id')
+        else: # Если папки с сегодняшней датой нет, то создаём её
+            date_folder_id, date_folder_link = createFolder(current_date, initial_folder_id)
+            logger.info(f"Полученный folder_id для папки с датой: {date_folder_id} и ссылка на папку: {date_folder_link}")
 
         # Получаем кол-во файлов в папке
         results = service.files().list(
-            q=f"'{folder_id}' in parents",
+            q=f"'{str(date_folder_id)}' in parents",
             fields="files(id, name)",
             pageSize=1000
         ).execute()
@@ -28,7 +43,7 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, folder_id: in
         # Создаем метаданные для файла
         file_metadata = {
                         'name': name,
-                        'parents': [folder_id]
+                        'parents': [date_folder_id]
                     }
             
         # Загружаем файл
@@ -45,7 +60,7 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, folder_id: in
             body=permission
         ).execute()
         
-        logger.info(f"Файл {name} успешно загружен {f'в папку {folder_name}' if folder_name else '!'}")
+        logger.info(f"Файл {name} успешно загружен {f'в папку {folder_name}' if folder_name else '!'}: {file['webViewLink']}")
         media.stream().close()
 
         if with_deleting_temp_folder:

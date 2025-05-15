@@ -5,12 +5,13 @@ from config import ENDPOINT_ID, TEMP_FOLDER_PATH
 from .dataArray.getAllDataArrays import getAllDataArrays
 from logger import logger
 from aiogram import types
-from utils import text
+from utils.text import text
 from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
 from keyboards.user import keyboards
 import shutil
 import traceback
+
 
 # Функция для генерации изображений по объекту данных
 async def generateByData(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
@@ -40,7 +41,6 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
             await asyncio.sleep(10)
 
     logger.info(f"Ответ на запрос: {response_json}")
-    
     
     job_id = response_json['id']
 
