@@ -79,9 +79,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
                 dataArray = getDataArrayWithRootPrompt(int(setting_number), prompt)
                 dataJSON = dataArray[0]["json"]
                 model_name = dataArray[0]["model_name"]
-                picture_folder_id = dataArray[0]["picture_folder_id"]
-                video_folder_id = dataArray[0]["video_folder_id"]
-                result = [await generateByData(dataJSON, model_name, message, state, user_id, setting_number, picture_folder_id, video_folder_id, is_test_generation, False)]
+                result = [await generateByData(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation, False)]
         else:
             result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation)
 

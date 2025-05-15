@@ -93,7 +93,7 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
         await asyncio.sleep(10)
 
     # Когда работа завершена, получаем изображение
-    logger.info(f"Работа по id {job_id} завершена!")
+    logger.info(f"Работа по id {job_id} завершена! Ответ: {response_json}")
 
     try:
         images_output = response_json["output"]
@@ -150,7 +150,7 @@ async def generateTestImagesByAllSettings(message: types.Message, state: FSMCont
             
             await message_for_edit.edit_text(text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT
             .format("✅" if 0 in settings_numbers_success else "❌", 
-            "✅" if 1 in settings_numbers_success else "❌", "✅" if 2 in settings_numbers_success else "❌"))
+            "✅" if 1 in settings_numbers_success else "❌", "✅" if 2 in settings_numbers_success else "❌", "✅" if 3 in settings_numbers_success else "❌"))
 
         return True
     except Exception as e:
