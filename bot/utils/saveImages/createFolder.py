@@ -2,7 +2,7 @@ from .auth import service
 from logger import logger
 
 # Создание папки
-def createFolder(folder_name: str, parent_folder_id: str = None, with_nested_folder: bool = False) -> tuple[str, str]:
+async def createFolder(folder_name: str, nested_folder_name: str = None, parent_folder_id: str = None) -> tuple[str, str]:
     # Создание метаданных для новой папки
     folder_metadata = {
         'name': folder_name,  # Имя вашей папки
@@ -25,9 +25,8 @@ def createFolder(folder_name: str, parent_folder_id: str = None, with_nested_fol
         body=permission
     ).execute()
 
-    if with_nested_folder:
+    if nested_folder_name:
         # Создание вложенной папки
-        nested_folder_name = "videos"
         nested_folder_metadata = {
             'name': nested_folder_name, 
             'mimeType': 'application/vnd.google-apps.folder',

@@ -28,7 +28,7 @@ def selectImageKeyboard(model_name: str):
 def selectSettingKeyboard(is_test_generation: bool):
     inline_keyboard = []
 
-    for i in range(1, 4):
+    for i in range(1, 5):
         inline_keyboard.append([InlineKeyboardButton(text=f'Настройка {i}', callback_data=f'select_setting|{i}')])
     
     # Если тестовая генерация, то добавляем кнопку "Все настройки"
