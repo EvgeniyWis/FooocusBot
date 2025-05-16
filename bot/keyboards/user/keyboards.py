@@ -25,15 +25,13 @@ def selectImageKeyboard(model_name: str):
 
 
 # Инлайн-клавиатура для выбора настройки
-def selectSettingKeyboard(is_test_generation: bool):
+def selectSettingKeyboard():
     inline_keyboard = []
 
     for i in range(1, 5):
         inline_keyboard.append([InlineKeyboardButton(text=f'Настройка {i}', callback_data=f'select_setting|{i}')])
     
-    # Если тестовая генерация, то добавляем кнопку "Все настройки"
-    if is_test_generation:
-        inline_keyboard.append([InlineKeyboardButton(text='Все настройки', callback_data='select_setting|all')])
+    inline_keyboard.append([InlineKeyboardButton(text='Все настройки', callback_data='select_setting|all')])
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 

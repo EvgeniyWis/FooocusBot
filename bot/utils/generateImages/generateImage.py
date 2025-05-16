@@ -1,12 +1,9 @@
-from .dataArray.getAllDataArrays import getAllDataArrays
-from logger import logger
 from aiogram import types
 from utils import text
 from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
 from keyboards.user import keyboards
 import shutil
-import traceback
 import asyncio
 from ..jobs.getJobID import getJobID
 from ..jobs.checkJobStatus import checkJobStatus
@@ -15,13 +12,13 @@ from .upscaleImage import upscaleImage
 
 
 # Функция для генерации изображений по объекту данных
-async def generateByData(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
-    user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
+async def generateImage(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
+    user_id: int, setting_number: str, is_test_generation: bool = False):
     # Делаем запрос на генерацию и получаем id работы
     job_id = await getJobID(dataJSON)
 
     # Проверяем статус работы
-    response_json = await checkJobStatus(job_id, checkOtherJobs, state, message)
+    response_json = await checkJobStatus(job_id, state, message, is_test_generation)
 
     try:
         images_output = response_json["output"]
@@ -47,7 +44,7 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
         message_with_media_group = await message.answer_media_group(media_group)
         
         # Отправляем клавиатуру для выбора изображения
-        await message.answer(text.SELECT_IMAGE_TEXT if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
+        await message.answer(text.SELECT_IMAGE_TEXT.format(model_name) if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
         reply_markup=keyboards.selectImageKeyboard(model_name) if not is_test_generation else None)
 
         # Сохраняем в стейт данные о медиагруппе, для её удаления
@@ -60,30 +57,3 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
         
     except Exception as e:
         raise Exception(f"Ошибка при получении изображения: {e}")
-    
-
-# Функция для тестовой генерации по всем настройкам
-async def generateTestImagesByAllSettings(message: types.Message, state: FSMContext, user_id: int,
-    is_test_generation: bool, message_for_edit: types.Message = None, checkOtherJobs: bool = True):
-
-    dataArrays = getAllDataArrays()
-    settings_numbers_success = []
-
-    try:
-        for index, dataArray in enumerate(dataArrays):
-            dataJSON = dataArray[0]["json"]  
-            model_name = dataArray[0]["model_name"]
-
-            await generateByData(dataJSON, model_name, message, state, user_id, index + 1, is_test_generation, checkOtherJobs)
-
-            settings_numbers_success.append(index)
-            
-            await message_for_edit.edit_text(text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT
-            .format("✅" if 0 in settings_numbers_success else "❌", 
-            "✅" if 1 in settings_numbers_success else "❌", "✅" if 2 in settings_numbers_success else "❌", "✅" if 3 in settings_numbers_success else "❌"))
-
-        return True
-    except Exception as e:
-        traceback.print_exc()
-        logger.error(f"Ошибка при тестовой генерации по всем настройкам: {e}")
-        return False
