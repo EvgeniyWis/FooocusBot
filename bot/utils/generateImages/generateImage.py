@@ -1,7 +1,3 @@
-import requests
-import os
-import asyncio
-from config import ENDPOINT_ID, TEMP_FOLDER_PATH
 from .dataArray.getAllDataArrays import getAllDataArrays
 from logger import logger
 from aiogram import types
@@ -11,40 +7,18 @@ from aiogram.fsm.context import FSMContext
 from keyboards.user import keyboards
 import shutil
 import traceback
+import asyncio
+from ..jobs.getJobID import getJobID
+from ..jobs.checkJobStatus import checkJobStatus
+from config import TEMP_FOLDER_PATH
+from .upscaleImage import upscaleImage
 
 
 # Функция для генерации изображений по объекту данных
 async def generateByData(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
     user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
-    # Делаем запрос на генерацию
-    headers = {
-        "Content-Type": "application/json",
-        'Authorization': os.getenv("RUNPOD_API_KEY")
-    }
-
-    host = f"https://api.runpod.ai/v2/{ENDPOINT_ID}"
-    logger.info(f"Отправка запроса на генерацию: {dataJSON}")
-
-    # Получаем id работы
-    max_attempts = 5
-    attempt = 0
-    while True:
-        attempt += 1
-        try:
-            response = requests.post(f'{host}/run', headers=headers, json=dataJSON)
-            response_json = response.json()
-            break
-        except requests.exceptions.ConnectionError as e:
-            logger.error(f"Ошибка при получении статуса работы (сетевая ошибка): {e}, попытка {attempt}/{max_attempts}")
-            if attempt >= max_attempts:
-                raise Exception(f"Не удалось подключиться к серверу после {max_attempts} попыток")
-            await asyncio.sleep(10)
-
-    logger.info(f"Ответ на запрос: {response_json}")
-    
-    job_id = response_json['id']
-
-    logger.info(f"Получен id работы: {job_id}")
+    # Делаем запрос на генерацию и получаем id работы
+    job_id = await getJobID(dataJSON)
 
     # Проверяем статус работы, пока она не будет завершена
     if checkOtherJobs:
@@ -52,48 +26,29 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
         jobs = stateData["jobs"]
         total_jobs_count = stateData["total_jobs_count"]
 
-    while True:
-        try:
-            response = requests.post(f'{host}/status/{job_id}', headers=headers)
-            response_json = response.json()
-        except requests.exceptions.ConnectionError as e:
-            logger.error(f"Ошибка при получении статуса работы (сетевая ошибка): {e}")
-            await asyncio.sleep(10)
-            continue
+    # Внутренняя функция для проверки статуса работы
+    def create_callback(jobs_param, total_jobs_count_param):
+        async def callback(status):
+            if checkOtherJobs:
+                jobs_param[job_id] = status
+                await state.update_data(jobs=jobs_param)
+                    
+                # Получаем стейт и изменяем сообщение
+                success_images_count = len([job for job in jobs_param.values() if job == 'COMPLETED'])
+                error_images_count = len([job for job in jobs_param.values() if job == 'FAILED'])
+                progress_images_count = len([job for job in jobs_param.values() if job == 'IN_PROGRESS'])
+                left_images_count = len([job for job in jobs_param.values() if job == 'IN_QUEUE'])
 
-        logger.info(f"Получен статус работы c id {job_id}: {response_json['status']}")
-
-        if checkOtherJobs:
-            jobs[job_id] = response_json['status']
-            await state.update_data(jobs=jobs)
-                
-            # Получаем стейт и изменяем сообщение
-            stateData = await state.get_data()
-            jobs = stateData["jobs"]
-            success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
-            error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
-            progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
-            left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
-
-        try:
-            await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
-            .format(success_images_count, error_images_count, progress_images_count, left_images_count, total_jobs_count - len(jobs)))
-        except Exception as e:
-            pass
-
-        if response_json['status'] == 'COMPLETED':
-            break
-
-        elif response_json['status'] in ['FAILED', 'CANCELLED']:
-            if response_json['status'] == 'FAILED':
-                raise Exception(response_json['error'])
-            else:
-                raise Exception("Работа была отменена")
-
-        await asyncio.sleep(10)
-
-    # Когда работа завершена, получаем изображение
-    logger.info(f"Работа по id {job_id} завершена! Ответ: {response_json}")
+            try:
+                await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
+                .format(success_images_count, error_images_count, progress_images_count, left_images_count, total_jobs_count_param - len(jobs_param)))
+            except Exception as e:
+                logger.error(f"Ошибка при изменении сообщения: {e}")
+        return callback
+    
+    # Проверяем статус работы
+    callback = create_callback(jobs, total_jobs_count) if checkOtherJobs else None
+    response_json = await checkJobStatus(job_id, callback)
 
     try:
         images_output = response_json["output"]
@@ -104,10 +59,14 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
         media_group = []
         base_64_dataArray = []
 
-        # Получаем изображения и сохраняем их в массив
-        for i, image_output in enumerate(images_output):
-            image_data = image_output["base64"]
-            base_64_data = await base64ToImage(image_data, model_name, i, user_id, is_test_generation)
+        # Создаем список задач для параллельного upscale
+        upscale_tasks = [upscaleImage(image["base64"]) for image in images_output]
+        # Выполняем все задачи параллельно
+        upscaled_images = await asyncio.gather(*upscale_tasks)
+
+        # Обрабатываем результаты
+        for i, upscale_image_data in enumerate(upscaled_images):
+            base_64_data = await base64ToImage(upscale_image_data, model_name, i, user_id, is_test_generation)
             base_64_dataArray.append(base_64_data)
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
         
