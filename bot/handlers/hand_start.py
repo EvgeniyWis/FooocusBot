@@ -1,3 +1,4 @@
+from utils import retryOperation
 from utils.generateImages.dataArray.getDataArrayBySettingNumber import getDataArrayBySettingNumber
 from utils.videos.generateVideo import generateVideo
 from utils.facefusion.facefusion_swap import facefusion_swap
@@ -10,7 +11,7 @@ from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArr
 from utils.files.saveFile import saveFile
 from utils.generateImages.generateImage import generateByData, generateTestImagesByAllSettings
 from keyboards.user.keyboards import generationsTypeKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoCorrectnessKeyboard, videoExampleKeyboard
-from utils.text import text
+from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
 from logger import logger
@@ -90,7 +91,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
 
     except Exception as e:
         traceback.print_exc()
-        await message.answer(text.GENERATION_ERROR_TEXT)
+        await message.answer(text.GENERATION_IMAGE_ERROR_TEXT)
         await state.clear()
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
         return
@@ -128,20 +129,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"Путь к исходному изображению для замены лица: {faceswap_target_path}")
     logger.info(f"Путь к целевому изображению для замены лица: {faceswap_source_path}")
 
-    max_attempts = 5
-    attempt = 0
-    while True:
-        attempt += 1
-        try:
-            result_path = await facefusion_swap(faceswap_source_path, faceswap_target_path)
-            break
-        except Exception as e:
-            traceback.print_exc()
-            logger.error(f"Произошла ошибка при замене лица: {e}")
-            if attempt >= max_attempts:
-                await call.message.answer(text.FACE_SWAP_ERROR_TEXT)
-                raise Exception(f"Не удалось сделать генерацию лица после {max_attempts} попыток")
-            await asyncio.sleep(20)
+    result_path = await retryOperation(facefusion_swap, 5, 2, faceswap_source_path, faceswap_target_path)
 
     logger.info(f"Результат замены лица: {result_path}")
 
@@ -166,9 +154,12 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     logger.info(f"Данные папки по id {picture_folder_id}: {folder}")
 
+    # Удаляем текущее сообщение
+    await bot.delete_message(user_id, call.message.message_id)
+
     # Отправляем сообщение о сохранении изображения
-    await call.message.edit_text(text.SAVE_IMAGES_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink']), reply_markup=generateVideoKeyboard())
+    await call.message.answer(text.SAVE_IMAGES_SUCCESS_TEXT
+    .format(link, model_name, parent_folder['webViewLink']), reply_markup=generateVideoKeyboard(model_name))
 
     # Удаляем отправленные изображения из чата
     try:    
@@ -185,6 +176,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
 async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
+    # Получаем название модели
+    model_name = call.data.split("|")[1]
+
     # Получаем id пользователя и удаляем сообщение
     user_id = call.from_user.id
     message_id = call.message.message_id
@@ -197,7 +191,7 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
         os.remove(stateData["video_path"])
 
     # Отправляем сообщение для выбора видео-примеров
-    await call.message.answer(text.SELECT_VIDEO_EXAMPLE_TEXT)
+    await call.message.answer(text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name))
 
     # Получаем все видео-шаблоны с их промптами
     templates_examples = await getVideoExamplesData()
@@ -208,8 +202,8 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
         video = types.FSInputFile(value["file_path"])
         video_example_message = await call.message.answer_video(
             video=video,
-            caption=value["prompt"],
-            reply_markup=videoExampleKeyboard(index)
+            caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, value["prompt"]),
+            reply_markup=videoExampleKeyboard(index, model_name)
         )
         video_examples_messages_ids.append(video_example_message.message_id)
         await state.update_data(video_examples_messages_ids=video_examples_messages_ids)
@@ -220,12 +214,12 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Получаем индекс видео-примера и тип кнопки
     temp = call.data.split("|")
     index = int(temp[1])
-    button_type = temp[2]
+    model_name = temp[2]
+    button_type = temp[3]
     user_id = call.from_user.id
 
     # Получаем название модели и url изображения
     data = await state.get_data()
-    model_name = data["model_name"]
     image_url = data["image_url"]
 
     # Получаем данные видео-примера по его индексу
@@ -260,28 +254,38 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     if button_type == "write_prompt":
         await state.update_data(video_example_file_path=video_example_file_path)
         await state.update_data(video_example_index=index)
-        await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT)
+        await state.update_data(model_name=model_name)
+        await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name))
         await state.set_state(UserState.write_prompt_for_video)
         return
     
     # Отправляем сообщение под генерацию видео
-    await call.message.answer(text.GENERATE_VIDEO_PROGRESS_TEXT)
+    message_for_delete = await call.message.answer(text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name))
 
     # Генерируем видео
-    video_path = await generateVideo(video_example_prompt, image_url)
+    try:
+        video_path = await generateVideo(video_example_prompt, image_url)
+    except Exception as e:
+        traceback.print_exc()
+        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(e))
+        logger.error(f"Произошла ошибка при генерации видео: {e}")
+        return
     
     # Сохраняем видео в стейт
     await state.update_data(video_path=video_path)
 
+    # Удаляем сообщение про генерацию видео
+    await bot.delete_message(user_id, message_for_delete.message_id)
+
     # Отправляем видео
     video = types.FSInputFile(video_path)
     if button_type == "test":
-        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT, 
-        reply_markup=videoExampleKeyboard(index, False))
+        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
+        reply_markup=videoExampleKeyboard(index, model_name, False))
 
     elif button_type == "work":
         await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=videoCorrectnessKeyboard())
+        reply_markup=videoCorrectnessKeyboard(model_name))
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -296,8 +300,8 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     # Отправляем видео
     video = types.FSInputFile(video_example_file_path)
     await message.answer_video(video, 
-    caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(prompt),
-    reply_markup=videoExampleKeyboard(index, with_write_prompt=False))
+    caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(data["model_name"], prompt),
+    reply_markup=videoExampleKeyboard(index, data["model_name"], with_write_prompt=False))
 
 
 # Обработка нажатия на кнопки корректности видео
@@ -305,12 +309,12 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
     # Получаем тип кнопки
     temp = call.data.split("|")
     button_type = temp[1]
+    model_name = temp[2]
 
     # Получаем данные
     data = await state.get_data()
     video_path = data["video_path"]
     user_id = call.from_user.id
-    model_name = data["model_name"]
     video_folder_id = data["video_folder_id"]
     now = datetime.now().strftime("%Y-%m-%d")
 
@@ -319,7 +323,7 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         await bot.delete_message(user_id, call.message.message_id)
 
         # Отправляем сообщение о начале сохранения видео
-        message_for_edit = await call.message.answer(text.SAVE_VIDEO_PROGRESS_TEXT)
+        message_for_edit = await call.message.answer(text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name))
 
         # Сохраняем видео
         link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
@@ -337,7 +341,7 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
 
         # Отправляем сообщение о сохранении видео
         await message_for_edit.edit_text(text.SAVE_VIDEO_SUCCESS_TEXT
-        .format(link, model_name, parent_folder['webViewLink']), reply_markup=generateVideoKeyboard())
+        .format(link, model_name, parent_folder['webViewLink']))
 
         # Удаляем видео из папки temp/videos
         os.remove(video_path)
@@ -360,7 +364,7 @@ def hand_add():
 
     router.callback_query.register(select_image, lambda call: call.data.startswith("select_image"))
 
-    router.callback_query.register(start_generate_video, lambda call: call.data == "generate_video")
+    router.callback_query.register(start_generate_video, lambda call: call.data.startswith("start_generate_video"))
 
     router.callback_query.register(handle_video_example_buttons, lambda call: call.data.startswith("generate_video"))
 

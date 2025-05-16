@@ -1,7 +1,7 @@
 from .dataArray.getAllDataArrays import getAllDataArrays
 from logger import logger
 from aiogram import types
-from utils.text import text
+from utils import text
 from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
 from keyboards.user import keyboards
@@ -20,35 +20,8 @@ async def generateByData(dataJSON: dict, model_name: str, message: types.Message
     # Делаем запрос на генерацию и получаем id работы
     job_id = await getJobID(dataJSON)
 
-    # Проверяем статус работы, пока она не будет завершена
-    if checkOtherJobs:
-        stateData = await state.get_data()
-        jobs = stateData["jobs"]
-        total_jobs_count = stateData["total_jobs_count"]
-
-    # Внутренняя функция для проверки статуса работы
-    def create_callback(jobs_param, total_jobs_count_param):
-        async def callback(status):
-            if checkOtherJobs:
-                jobs_param[job_id] = status
-                await state.update_data(jobs=jobs_param)
-                    
-                # Получаем стейт и изменяем сообщение
-                success_images_count = len([job for job in jobs_param.values() if job == 'COMPLETED'])
-                error_images_count = len([job for job in jobs_param.values() if job == 'FAILED'])
-                progress_images_count = len([job for job in jobs_param.values() if job == 'IN_PROGRESS'])
-                left_images_count = len([job for job in jobs_param.values() if job == 'IN_QUEUE'])
-
-            try:
-                await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
-                .format(success_images_count, error_images_count, progress_images_count, left_images_count, total_jobs_count_param - len(jobs_param)))
-            except Exception as e:
-                logger.error(f"Ошибка при изменении сообщения: {e}")
-        return callback
-    
     # Проверяем статус работы
-    callback = create_callback(jobs, total_jobs_count) if checkOtherJobs else None
-    response_json = await checkJobStatus(job_id, callback)
+    response_json = await checkJobStatus(job_id, checkOtherJobs, state, message)
 
     try:
         images_output = response_json["output"]
