@@ -100,10 +100,8 @@ async def generateTestImagesByAllSettings(message: types.Message, state: FSMCont
         for index, dataArray in enumerate(dataArrays):
             dataJSON = dataArray[0]["json"]  
             model_name = dataArray[0]["model_name"]
-            picture_folder_id = dataArray[0]["picture_folder_id"]
-            video_folder_id = dataArray[0]["video_folder_id"]
 
-            await generateByData(dataJSON, model_name, message, state, user_id, index + 1, picture_folder_id, video_folder_id, is_test_generation, checkOtherJobs)
+            await generateByData(dataJSON, model_name, message, state, user_id, index + 1, is_test_generation, checkOtherJobs)
 
             settings_numbers_success.append(index)
             
