@@ -41,16 +41,16 @@ def selectSettingKeyboard(is_test_generation: bool):
 
 
 # Инлайн-клавиатура для генерации видео
-def generateVideoKeyboard():
+def generateVideoKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='📹 Сгенерировать видео', callback_data='generate_video')]])
+    [InlineKeyboardButton(text='📹 Сгенерировать видео', callback_data=f'start_generate_video|{model_name}')]])
 
     return kb
 
 
 # Инлайн-клавиатура при отправки примера видео с промптом с выбором типа генерации и возможности написания кастомного промпта
-def videoExampleKeyboard(index: str, with_test_generation: bool = True, with_write_prompt: bool = True):
-    prefix = f"generate_video|{index}"
+def videoExampleKeyboard(index: str, model_name: str, with_test_generation: bool = True, with_write_prompt: bool = True):
+    prefix = f"generate_video|{index}|{model_name}"
 
     inline_keyboard = getGenerationsTypeButtons(prefix, with_test_generation)
 
@@ -63,10 +63,10 @@ def videoExampleKeyboard(index: str, with_test_generation: bool = True, with_wri
 
 
 # Инлайн-клавиатура для выбора корректности генерации видео
-def videoCorrectnessKeyboard():
+def videoCorrectnessKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='✅ Сохранить видео', callback_data='video_correctness|correct'),
-        InlineKeyboardButton(text='❌ Перегенерировать видео', callback_data='generate_video')]
+        [InlineKeyboardButton(text='✅ Сохранить видео', callback_data=f'video_correctness|correct|{model_name}'),
+        InlineKeyboardButton(text='❌ Перегенерировать видео', callback_data=f'generate_video|{model_name}')]
     ])
 
     return kb

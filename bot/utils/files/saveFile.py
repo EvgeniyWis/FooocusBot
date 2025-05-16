@@ -1,4 +1,5 @@
-from googleapiclient.http import MediaFileUpload
+from utils.retryOperation import retryOperation
+from utils.files.uploadFile import uploadFile
 from config import TEMP_FOLDER_PATH
 from logger import logger
 from ..saveImages.auth import service
@@ -6,7 +7,6 @@ import shutil
 import asyncio
 from ..saveImages.deleteParentFolder import deleteParentFolder
 from ..saveImages.createFolder import createFolder
-
 
 # Сохранение одного файла
 async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folder_id: int, current_date: str, with_deleting_temp_folder: bool = True):
@@ -26,7 +26,7 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
         if results.get('files', []):
             date_folder_id = results.get('files', [])[0].get('id')
         else: # Если папки с сегодняшней датой нет, то создаём её
-            date_folder_id, date_folder_link = createFolder(current_date, initial_folder_id)
+            date_folder_id, date_folder_link = await createFolder(current_date, None, initial_folder_id)
             logger.info(f"Полученный folder_id для папки с датой: {date_folder_id} и ссылка на папку: {date_folder_link}")
 
         # Получаем кол-во файлов в папке
@@ -47,21 +47,7 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
                     }
             
         # Загружаем файл
-        media = MediaFileUpload(file_path, resumable=True)
-        file = service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
-        
-        # Добавление разрешения на публичный доступ
-        permission = {
-            'type': 'anyone',
-            'role': 'reader'
-        }
-        service.permissions().create(
-            fileId=file['id'],
-            body=permission
-        ).execute()
-        
-        logger.info(f"Файл {name} успешно загружен {f'в папку {folder_name}' if folder_name else '!'}: {file['webViewLink']}")
-        media.stream().close()
+        file = await retryOperation(uploadFile, 3, 2, file_path, file_metadata, name, folder_name)
 
         if with_deleting_temp_folder:
             # Удаляем папку с файлами

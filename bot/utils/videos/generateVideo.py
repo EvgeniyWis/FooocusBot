@@ -69,11 +69,10 @@ async def generateVideo(prompt: str, image_url: str) -> None:
                 response = requests.get(url_status_endpoint, headers=headers)
                 json = response.json()
 
-                logger.info(f"Статус задания с id {request_id}: {json['status']}")
+                logger.info(f"Статус задания на генерацию видео с id {request_id}: {json['status']}")
 
                 if json['status'] == 'error':
-                    logger.error(f"Ошибка при генерации видео: {json}")
-                    return None
+                    raise Exception(f"Ошибка при генерации видео: {json['result'][0]}")
 
                 elif json['status'] == 'success': # Если статус задания успешный, то возвращаем ответ
                     # Получаем ссылку на выходное видео
@@ -85,16 +84,16 @@ async def generateVideo(prompt: str, image_url: str) -> None:
                     video_path = await downloadVideo(result_url)
                     if not video_path:
                         logger.error(f"Не удалось скачать видео: {result_url}")
-                        return None
+                        raise Exception("Не удалось скачать видео")
                         
                     return video_path
                 
             except Exception as e:
                 logger.error(f"Ошибка при получении статуса задания: {e}")
-                return None
+                raise e
 
             await asyncio.sleep(10)
 
     except Exception as e:
         logger.error(f"Ошибка при отправке запроса на генерацию видео: {e}")
-        return None
+        raise e
