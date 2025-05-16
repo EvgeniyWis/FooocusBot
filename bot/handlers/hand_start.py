@@ -9,7 +9,8 @@ from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataBy
 from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.files.saveFile import saveFile
-from utils.generateImages.generateImage import generateByData, generateTestImagesByAllSettings
+from utils.generateImages.generateImage import generateImage
+from utils.generateImages.generateImagesByAllSettings import generateImagesByAllSettings
 from keyboards.user.keyboards import generationsTypeKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoCorrectnessKeyboard, videoExampleKeyboard
 from utils import text
 from states import UserState
@@ -38,12 +39,11 @@ async def choose_generations_type(
     call: types.CallbackQuery, state: FSMContext
 ):
     generations_type = call.data.split("|")[1]
-    is_test_generation = generations_type == "test"
     await state.update_data(generations_type=generations_type)
 
     await call.message.edit_text(
         text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=selectSettingKeyboard(is_test_generation),
+        reply_markup=selectSettingKeyboard(),
     )
 
 
@@ -64,25 +64,26 @@ async def write_prompt(message: types.Message, state: FSMContext):
     data = await state.get_data()
     is_test_generation = data["generations_type"] == "test"
     setting_number = data["setting_number"]
-    message_for_edit = await message.answer(
-        text.TEST_GENERATION_GET_PROMPT_SUCCESS_TEXT
-        if is_test_generation
-        else text.GET_PROMPT_SUCCESS_TEXT
-    )
 
     # Генерируем изображения
     try:
         if is_test_generation:
             if setting_number == "all":
-                result = await generateTestImagesByAllSettings(message, state, user_id, is_test_generation, message_for_edit, False)
+                result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
             else:
                 # Прибавляем к каждому элементу массива корневой промпт
                 dataArray = getDataArrayWithRootPrompt(int(setting_number), prompt)
                 dataJSON = dataArray[0]["json"]
                 model_name = dataArray[0]["model_name"]
-                result = [await generateByData(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation, False)]
+                result = [await generateImage(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation)]
         else:
-            result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation)
+            if setting_number == "all":
+                result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
+            else:
+                message_for_edit = await message.answer(
+                    text.GET_PROMPT_SUCCESS_TEXT
+                )
+                result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation)
 
         if result:
             await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
@@ -108,10 +109,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Получаем данные из стейта
     stateData = await state.get_data()
-    setting_number = int(stateData["setting_number"])
+    setting_number = stateData["setting_number"]
 
     # Получаем данные генерации по названию модели
-    dataArray = getDataArrayBySettingNumber(setting_number)
+    dataArray = getDataArrayBySettingNumber(int(setting_number))
     data = next((data for data in dataArray if data["model_name"] == model_name), None)
     picture_folder_id = data["picture_folder_id"]
     video_folder_id = data["video_folder_id"]

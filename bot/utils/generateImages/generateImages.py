@@ -1,5 +1,5 @@
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
-from utils.generateImages.generateImage import generateByData
+from utils.generateImages.generateImage import generateImage
 from logger import logger
 from aiogram import types
 import asyncio
@@ -14,18 +14,18 @@ async def generateImages(setting_number: int, prompt: str, message: types.Messag
 
     logger.info(f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}")
 
-    # Генерируем изображения по всем элементам массива
+    # Обновляем стейт
     jobs = {}
     await state.update_data(jobs=jobs)
     await state.update_data(total_jobs_count=len(dataArray))
-
+    
     # Инициализируем папку для хранения изображений
     images = []
 
     async def process_image(data: tuple[dict, str, str]):
         try:
             logger.info(f"Генерация изображения с изначальными данными: {data}")
-            image = await generateByData(data["json"], data["model_name"], message, state, user_id, setting_number, is_test_generation)
+            image = await generateImage(data["json"], data["model_name"], message, state, user_id, setting_number, is_test_generation)
             images.append(image)
             return image, None
         except Exception as e:

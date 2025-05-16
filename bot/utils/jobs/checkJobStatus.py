@@ -7,12 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram import types
 
 # Функция для получения статуса работы
-async def checkJobStatus(job_id: str, checkOtherJobs: bool = False, state: FSMContext = None, message: types.Message = None):
-    if checkOtherJobs:
-        stateData = await state.get_data()
-        jobs = stateData["jobs"]
-        total_jobs_count = stateData["total_jobs_count"]
-
+async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.Message = None, is_test_generation: bool = False):
     while True:
         try:
             response = requests.post(f'{RUNPOD_HOST}/status/{job_id}', headers=RUNPOD_HEADERS)
@@ -24,7 +19,10 @@ async def checkJobStatus(job_id: str, checkOtherJobs: bool = False, state: FSMCo
 
         logger.info(f"Получен статус работы c id {job_id}: {response_json['status']}")
 
-        if checkOtherJobs:
+        if state and message and not is_test_generation:
+            stateData = await state.get_data()
+            jobs = stateData["jobs"]
+            total_jobs_count = stateData["total_jobs_count"]
             jobs[job_id] = response_json['status']
             await state.update_data(jobs=jobs)
                 
