@@ -9,12 +9,17 @@ async def getJobID(dataJSON: dict):
     logger.info(f"Отправка запроса на генерацию...")
 
     # Получаем id работы
-    max_attempts = 5
+    max_attempts = 10
     attempt = 0
     while True:
         attempt += 1
         try:
-            response = requests.post(f'{RUNPOD_HOST}/run', headers=RUNPOD_HEADERS, json=dataJSON)
+            response = requests.post(
+                f'{RUNPOD_HOST}/run', 
+                headers=RUNPOD_HEADERS, 
+                json=dataJSON,
+                timeout=(10, 30)  # (connect timeout, read timeout)
+            )
             logger.info(f"Статус код ответа: {response.status_code}")
             logger.info(f"Тело ответа: {response.text}")
             
@@ -28,11 +33,12 @@ async def getJobID(dataJSON: dict):
                 logger.error(f"Ошибка при парсинге JSON ответа: {e}, тело ответа: {response.text}")
                 raise Exception("Сервер вернул невалидный JSON")
                 
-        except requests.exceptions.ConnectionError as e:
+        except Exception as e:
             logger.error(f"Ошибка при получении статуса работы (сетевая ошибка): {e}, попытка {attempt}/{max_attempts}")
             if attempt >= max_attempts:
                 raise Exception(f"Не удалось подключиться к серверу после {max_attempts} попыток")
-            await asyncio.sleep(10)
+            # Экспоненциальное увеличение задержки между попытками
+            await asyncio.sleep(min(30, 2 ** attempt))
 
     logger.info(f"Ответ на запрос: {response_json}")
     

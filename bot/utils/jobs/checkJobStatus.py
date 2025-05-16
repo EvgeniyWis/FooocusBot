@@ -11,8 +11,8 @@ async def checkJobStatus(job_id: str, inner_callback: Callable[[], None] = None)
         try:
             response = requests.post(f'{RUNPOD_HOST}/status/{job_id}', headers=RUNPOD_HEADERS)
             response_json = response.json()
-        except requests.exceptions.ConnectionError as e:
-            logger.error(f"Ошибка при получении статуса работы (сетевая ошибка): {e}")
+        except Exception as e:
+            logger.error(f"Ошибка при получении статуса работы: {e}")
             await asyncio.sleep(10)
             continue
 
