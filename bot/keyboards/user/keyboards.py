@@ -38,6 +38,25 @@ def selectSettingKeyboard():
     return kb
 
 
+# Клавиатура для выбора режима написания промпта
+def writePromptTypeKeyboard():
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='1️⃣ Один промпт для всех моделей', callback_data='write_prompt_type|one')],
+        [InlineKeyboardButton(text='✨ Уникальный промпт для каждой модели', callback_data='write_prompt_type|unique')]
+    ])
+
+    return kb
+
+
+# Клавиатура для подтверждения написания уникального промпта для следующей модели
+def confirmWriteUniquePromptForNextModelKeyboard():
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='✍️ Написать промпт', callback_data='confirm_write_unique_prompt_for_next_model')]
+    ])
+
+    return kb
+
+
 # Инлайн-клавиатура для генерации видео
 def generateVideoKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[

@@ -6,7 +6,7 @@ def getFolderDataByID(folder_id: str):
     try:
         folder = service.files().get(
             fileId=folder_id,
-            fields='webViewLink, parents'
+            fields='webViewLink, parents, id'
         ).execute()
         return folder
     except Exception as e:

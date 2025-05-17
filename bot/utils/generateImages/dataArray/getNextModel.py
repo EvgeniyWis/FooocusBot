@@ -1,0 +1,42 @@
+from utils.generateImages.dataArray.getAllDataArrays import getAllDataArrays
+from utils.generateImages.dataArray.getDataArrayBySettingNumber import getDataArrayBySettingNumber
+from aiogram.fsm.context import FSMContext
+
+
+# Функция для получения следующей модели в настройке
+async def getNextModelInSetting(current_model: str, dataArrayBySettingNumber: list[dict]):
+    for index, dataArray in enumerate(dataArrayBySettingNumber):
+        if current_model == dataArray["model_name"]:
+            return dataArrayBySettingNumber[index + 1]["model_name"]
+    
+
+# Функция для получения следующей модели
+async def getNextModel(current_model: str, setting_number: str, state: FSMContext):
+    if setting_number == "all":
+        # Получаем все настройки
+        dataArrays = getAllDataArrays()
+
+        # Получаем текущую настройку
+        data = await state.get_data()
+        current_setting_number = data["current_setting_number_for_unique_prompt"]
+
+        dataArrayBySettingNumber = dataArrays[current_setting_number - 1]
+            
+        # Если текущая модель является последней в настройке, то получаем первую модель в следующей настройке
+        if current_model in dataArrayBySettingNumber[-1]:
+            if current_setting_number == len(dataArrays): # Если текущая настройка является последней, то False
+                return False
+            else: # Если текущая настройка не является последней, то получаем первую модель в следующей настройке
+                next_setting_number = int(current_setting_number) + 1
+                await state.update_data(current_setting_number_for_unique_prompt=next_setting_number)
+                dataArraysByNextSettingNumber = getDataArrayBySettingNumber(next_setting_number)
+                return dataArraysByNextSettingNumber[0]["model_name"]
+        else: # Если текущая модель не является последней в настройке, то получаем следующую модель в настройке
+            return await getNextModelInSetting(current_model, dataArrayBySettingNumber)
+    else:
+        # Получаем данные по номеру настройки
+        dataArrayBySettingNumber = getDataArrayBySettingNumber(int(setting_number))
+
+        return await getNextModelInSetting(current_model, dataArrayBySettingNumber)
+    
+    return None

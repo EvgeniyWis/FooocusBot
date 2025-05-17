@@ -4,7 +4,7 @@ from aiogram import types
 from utils import text
 from aiogram.fsm.context import FSMContext
 import traceback
-from .generateImage import generateImage
+from .generateImageBlock import generateImageBlock
 import asyncio
 
 # Функция для генерации изображений по всем настройкам
@@ -25,7 +25,7 @@ async def generateImagesByAllSettings(message: types.Message, state: FSMContext,
 
     async def process_generation(dataJSON, model_name, index):
         async with semaphore:
-            await generateImage(dataJSON, model_name, message_with_generations_status, state, user_id, index + 1, is_test_generation)
+            await generateImageBlock(dataJSON, model_name, message_with_generations_status, state, user_id, index + 1, is_test_generation)
 
     try:
         for index, dataArray in enumerate(dataArrays):

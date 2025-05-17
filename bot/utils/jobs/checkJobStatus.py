@@ -21,23 +21,25 @@ async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.M
 
         if state and message and not is_test_generation:
             stateData = await state.get_data()
-            jobs = stateData["jobs"]
-            total_jobs_count = stateData["total_jobs_count"]
-            jobs[job_id] = response_json['status']
-            await state.update_data(jobs=jobs)
-                
-            # Получаем стейт и изменяем сообщение
-            success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
-            error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
-            progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
-            left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
 
-            try:
-                await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
-                .format(success_images_count, error_images_count, progress_images_count, left_images_count, 
-                    total_jobs_count - len(jobs)))
-            except Exception as e:
-                logger.error(f"Ошибка при изменении сообщения: {e}")
+            if "jobs" in stateData:
+                jobs = stateData["jobs"]
+                total_jobs_count = stateData["total_jobs_count"]
+                jobs[job_id] = response_json['status']
+                await state.update_data(jobs=jobs)
+                
+                # Получаем стейт и изменяем сообщение
+                success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
+                error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
+                progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
+                left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
+
+                try:
+                    await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
+                    .format(success_images_count, error_images_count, progress_images_count, left_images_count, 
+                        total_jobs_count - len(jobs)))
+                except Exception as e:
+                    logger.error(f"Ошибка при изменении сообщения: {e}")
 
         if response_json['status'] == 'COMPLETED':
             break
