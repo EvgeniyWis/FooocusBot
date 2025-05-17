@@ -1,3 +1,6 @@
+from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
+from utils.generateImages.dataArray.getNextModel import getNextModel
+from utils.generateImages.dataArray.getAllDataArrays import getAllDataArrays
 from utils import retryOperation
 from utils.generateImages.dataArray.getDataArrayBySettingNumber import getDataArrayBySettingNumber
 from utils.videos.generateVideo import generateVideo
@@ -9,9 +12,9 @@ from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataBy
 from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.files.saveFile import saveFile
-from utils.generateImages.generateImage import generateImage
+from utils.generateImages.generateImageBlock import generateImageBlock
 from utils.generateImages.generateImagesByAllSettings import generateImagesByAllSettings
-from keyboards.user.keyboards import generationsTypeKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoCorrectnessKeyboard, videoExampleKeyboard
+from keyboards.user.keyboards import generationsTypeKeyboard, writePromptTypeKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoCorrectnessKeyboard, videoExampleKeyboard, confirmWriteUniquePromptForNextModelKeyboard
 from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
@@ -21,7 +24,6 @@ import traceback
 from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 from InstanceBot import router
 import os
-import asyncio
 from datetime import datetime
 
 
@@ -51,11 +53,53 @@ async def choose_generations_type(
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
-    await call.message.edit_text(
-        text.GET_SETTINGS_WITH_TEST_GENERATIONS_SUCCESS_TEXT
-    )
-    await state.set_state(UserState.write_prompt_for_image)
+    data = await state.get_data()
+    generations_type = data["generations_type"]
 
+    if generations_type == "test":
+        await call.message.edit_text(
+            text.GET_SETTINGS_SUCCESS_TEXT
+        )
+        await state.set_state(UserState.write_prompt_for_images)
+
+    elif generations_type == "work":
+        await call.message.edit_text(
+            text.CHOOSE_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
+            reply_markup=writePromptTypeKeyboard()
+        )
+
+
+# Обработка выбора режима написания промпта
+async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
+    # Получаем данные
+    writePrompt_type = call.data.split("|")[1]
+    await state.update_data(writePrompt_type=writePrompt_type)
+
+    if writePrompt_type == "one":
+        await call.message.edit_text(text.GET_SETTINGS_SUCCESS_TEXT)
+        await state.set_state(UserState.write_prompt_for_images)
+    else:
+        # Получаем данные
+        stateData = await state.get_data()
+        setting_number = stateData["setting_number"]
+
+        if setting_number == "all":
+            # Получаем все настройки
+            dataArrays = getAllDataArrays()
+
+            # Инициализируем начальные данные
+            model_name = dataArrays[0][0]["model_name"]
+            await state.update_data(current_setting_number_for_unique_prompt=1)
+            await state.set_state(UserState.write_prompt_for_model)
+        else:
+            # Получаем данные по настройке
+            dataArray = getDataArrayBySettingNumber(int(setting_number))
+            model_name = dataArray[0]["model_name"]
+            await state.update_data(current_setting_number_for_unique_prompt=int(setting_number))
+
+        await call.message.edit_text(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name))
+        await state.update_data(current_model_for_unique_prompt=model_name)
+        await state.set_state(UserState.write_prompt_for_model)
 
 # Обработка ввода промпта
 async def write_prompt(message: types.Message, state: FSMContext):
@@ -75,7 +119,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
                 dataArray = getDataArrayWithRootPrompt(int(setting_number), prompt)
                 dataJSON = dataArray[0]["json"]
                 model_name = dataArray[0]["model_name"]
-                result = [await generateImage(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation)]
+                result = [await generateImageBlock(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation)]
         else:
             if setting_number == "all":
                 result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
@@ -96,6 +140,58 @@ async def write_prompt(message: types.Message, state: FSMContext):
         await state.clear()
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
         return
+            
+
+# Обработка ввода промпта для конкретной модели
+async def write_prompt_for_model(message: types.Message, state: FSMContext):
+    # Получаем данные
+    data = await state.get_data()
+    prompt = message.text
+    model_name = data["current_model_for_unique_prompt"]
+    setting_number = data["current_setting_number_for_unique_prompt"]
+    user_id = message.from_user.id
+
+    # Отправляем сообщение о начале генерации
+    message_for_edit = await message.answer(text.GENERATE_IMAGE_PROGRESS_TEXT.format(model_name))
+
+    # Получаем данные генерации по названию модели
+    data = await getDataByModelName(model_name)
+
+    # Прибавляем к каждому элементу массива корневой промпт
+    data["json"]['input']['prompt'] += " " + prompt
+
+    # Генерируем изображения
+    result = await generateImageBlock(data["json"], model_name, message_for_edit, state, user_id, setting_number, False)
+
+    if result:
+        await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
+    else:
+        raise Exception("Произошла ошибка при генерации изображения")
+    
+    # Получаем следующую модель
+    next_model = await getNextModel(model_name, setting_number, state)
+
+    # Если следующая модель не найдена, то завершаем генерацию
+    if not next_model:
+        await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
+        await state.clear()
+        return
+
+    # Просим пользователя отправить промпт для следующей модели
+    await message.answer(text.WRITE_PROMPT_FOR_MODEL_TEXT.format(next_model), 
+    reply_markup=confirmWriteUniquePromptForNextModelKeyboard())
+    await state.update_data(current_model_for_unique_prompt=next_model)
+
+
+# Обработка нажатия кнопки "✅ Написать промпт" для подтверждения написания уникального промпта для следующей модели
+async def confirm_write_unique_prompt_for_next_model(call: types.CallbackQuery, state: FSMContext):
+    # Получаем данные
+    data = await state.get_data()
+    next_model = data["current_model_for_unique_prompt"]
+
+    # Отправляем сообщение для ввода промпта
+    await call.message.edit_text(text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model))
+    await state.set_state(UserState.write_prompt_for_model)
 
 
 # Обработка выбора изображения
@@ -122,7 +218,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(video_folder_id=video_folder_id)
 
     # Меняем текст на сообщении
-    await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index))
+    await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
     faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -135,7 +231,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"Результат замены лица: {result_path}")
 
     # Меняем текст на сообщении
-    await call.message.edit_text(text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index))
+    await call.message.edit_text(text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name))
 
     # Сохраняем изображение
     image_index = int(image_index) - 1
@@ -192,7 +288,9 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
         os.remove(stateData["video_path"])
 
     # Отправляем сообщение для выбора видео-примеров
-    await call.message.answer(text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name))
+    select_video_example_message = await call.message.answer(text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name))
+
+    await state.update_data(select_video_example_message_id=select_video_example_message.message_id)
 
     # Получаем все видео-шаблоны с их промптами
     templates_examples = await getVideoExamplesData()
@@ -222,6 +320,12 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Получаем название модели и url изображения
     data = await state.get_data()
     image_url = data["image_url"]
+
+    # Удаляем сообщение с выбором видео-примера
+    try:
+        await bot.delete_message(user_id, int(data["select_video_example_message_id"]))
+    except Exception as e:
+        logger.error(f"Произошла ошибка при удалении сообщения с id {data['select_video_example_message_id']}: {e}")
 
     # Получаем данные видео-примера по его индексу
     video_example_data = await getVideoExampleDataByIndex(index)
@@ -340,8 +444,11 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
 
         logger.info(f"Данные папки по id {video_folder_id}: {folder}")
 
+        # Удаляем сообщение про генерацию видео
+        await bot.delete_message(user_id, message_for_edit.message_id)
+
         # Отправляем сообщение о сохранении видео
-        await message_for_edit.edit_text(text.SAVE_VIDEO_SUCCESS_TEXT
+        await message_for_edit.answer(text.SAVE_VIDEO_SUCCESS_TEXT
         .format(link, model_name, parent_folder['webViewLink']))
 
         # Удаляем видео из папки temp/videos
@@ -361,7 +468,15 @@ def hand_add():
         choose_setting, lambda call: call.data.startswith("select_setting")
     )
 
-    router.message.register(write_prompt, StateFilter(UserState.write_prompt_for_image))
+    router.callback_query.register(
+        choose_writePrompt_type, lambda call: call.data.startswith("write_prompt_type")
+    )
+
+    router.message.register(write_prompt, StateFilter(UserState.write_prompt_for_images))
+
+    router.message.register(write_prompt_for_model, StateFilter(UserState.write_prompt_for_model))
+
+    router.callback_query.register(confirm_write_unique_prompt_for_next_model, lambda call: call.data.startswith("confirm_write_unique_prompt_for_next_model"))
 
     router.callback_query.register(select_image, lambda call: call.data.startswith("select_image"))
 
