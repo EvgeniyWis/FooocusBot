@@ -25,7 +25,8 @@ async def generateImagesByAllSettings(message: types.Message, state: FSMContext,
     # Создаём сообщение с прогрессом генерации изображений
     message_with_generations_status = await message.answer(text.GET_PROMPT_SUCCESS_TEXT)
 
-    await message_with_generations_status.pin()
+    if not is_test_generation:
+        await message_with_generations_status.pin()
 
     async def process_generation(dataJSON, model_name, index):
         async with semaphore:
@@ -65,6 +66,8 @@ async def generateImagesByAllSettings(message: types.Message, state: FSMContext,
         await message_with_generations_status.unpin()
         return True
     except Exception as e:
+        await message_with_settings.unpin() 
+        await message_with_generations_status.unpin()
         traceback.print_exc()
         logger.error(f"Ошибка при тестовой генерации по всем настройкам: {e}")
         return False

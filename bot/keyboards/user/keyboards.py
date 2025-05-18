@@ -87,3 +87,14 @@ def videoCorrectnessKeyboard(model_name: str):
     ])
 
     return kb
+
+
+# Клавиатура для тестирования с другими настройками
+def testGenerationImagesKeyboard(setting_number: str):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='🔄 Сгенерировать с другими настройками', callback_data='generations_type|test|prompt_exist')],
+        [InlineKeyboardButton(text='✍️ Изменить промпт', callback_data=f'select_setting|{setting_number}')],
+        [InlineKeyboardButton(text='◀️ Назад', callback_data='generations_type|test')]
+    ])
+
+    return kb
