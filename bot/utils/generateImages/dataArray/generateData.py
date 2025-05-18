@@ -1,5 +1,5 @@
 # Глобальная функция для генерации данных для запроса
-def generateData(model_name: str, picture_folder_id: str, video_folder_id: str, prompt: str, loras: list[dict], advanced_params: dict, base_config_model_name: str, negative_prompt: str = "", embeddings: list[str] = []):
+def generateData(model_name: str, picture_folder_id: str, video_folder_id: str, prompt: str, loras: list[dict], base_config_model_name: str, negative_prompt: str = "", embeddings: list[str] = []):
     data = {"json": {
         "input": {
             "api_name": "txt2img",
@@ -7,9 +7,11 @@ def generateData(model_name: str, picture_folder_id: str, video_folder_id: str, 
             "prompt": f"{', '.join(embeddings)} {prompt}",
             "loras": loras,
             "image_number": 4,
-            "advanced_params": advanced_params,
+            "advanced_params": {"sampler_name": "euler_ancestral", "overwrite_step": 60},
             "negative_prompt": negative_prompt,
-            "base_model_name": base_config_model_name
+            "base_model_name": base_config_model_name,
+            "style_selections": [],
+            "guidance_scale": 3.5,
         }
     }, "model_name": model_name, "picture_folder_id": picture_folder_id, "video_folder_id": video_folder_id}
     return data

@@ -49,7 +49,7 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             upscale_message = await message.edit_text(text.UPSCALE_IMAGES_PROGRESS_TEXT.format(model_name))
 
         # Создаем список задач для параллельного upscale
-        upscale_tasks = [upscaleImage(image["base64"]) for image in images_output]
+        upscale_tasks = [upscaleImage(image["base64"], dataJSON["input"]["negative_prompt"], dataJSON["input"]["base_model_name"]) for image in images_output]
         # Выполняем все задачи параллельно
         upscaled_images = await asyncio.gather(*upscale_tasks)
 
