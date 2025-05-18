@@ -454,8 +454,8 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
 
 
 # DEV: Функция для получения file_id видео В Telegram
-async def get_file_id(message: types.Message):
-    await message.answer(message.video.file_id)
+# async def get_file_id(message: types.Message):
+#     await message.answer(message.video.file_id)
 
 
 # Добавление обработчиков
@@ -493,4 +493,4 @@ def hand_add():
     lambda call: call.data.startswith("video_correctness"))
 
     # DEV: Получение file_id видео
-    router.message.register(get_file_id)
+    # router.message.register(get_file_id)
