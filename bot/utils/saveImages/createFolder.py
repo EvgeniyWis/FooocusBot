@@ -2,7 +2,7 @@ from .auth import service
 from logger import logger
 
 # Создание папки
-async def createFolder(folder_name: str, nested_folder_name: str = None, parent_folder_id: str = None) -> tuple[str, str]:
+async def createFolder(folder_name: str, nested_folder_names: list[str] = None, parent_folder_id: str = None) -> tuple[str, str]:
     # Создание метаданных для новой папки
     folder_metadata = {
         'name': folder_name,  # Имя вашей папки
@@ -32,19 +32,24 @@ async def createFolder(folder_name: str, nested_folder_name: str = None, parent_
         supportsAllDrives=True
     ).execute()
 
-    if nested_folder_name:
-        # Создание вложенной папки
-        nested_folder_metadata = {
-            'name': nested_folder_name, 
-            'mimeType': 'application/vnd.google-apps.folder',
-            'parents': [folder['id']]
-        }
-        nested_folder = service.files().create(body=nested_folder_metadata, fields='id,webViewLink').execute()
-        
-        logger.info(f"Папка {folder_name} создана с ID: {folder['id']}")
-        logger.info(f"Ссылка на папку: {folder['webViewLink']}")
+    if nested_folder_names:
+        nested_folders_array = []
 
-        return folder['id'], nested_folder['webViewLink']
+        for nested_folder_name in nested_folder_names:
+            # Создание вложенной папки
+            nested_folder_metadata = {
+                'name': nested_folder_name, 
+                'mimeType': 'application/vnd.google-apps.folder',
+                'parents': [folder['id']]
+            }
+            nested_folder = service.files().create(body=nested_folder_metadata, fields='id,webViewLink').execute()
+            
+            nested_folders_array.append({
+                'id': nested_folder['id'],
+                'webViewLink': nested_folder['webViewLink']
+            })
+
+        return nested_folders_array
     else:
         return folder['id'], folder['webViewLink']
     
