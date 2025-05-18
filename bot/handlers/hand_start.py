@@ -1,3 +1,4 @@
+from utils.handlers.generateImagesInHandler import generateImagesInHandler
 from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
 from utils.generateImages.dataArray.getNextModel import getNextModel
 from utils.generateImages.dataArray.getAllDataArrays import getAllDataArrays
@@ -14,7 +15,7 @@ from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArr
 from utils.files.saveFile import saveFile
 from utils.generateImages.generateImageBlock import generateImageBlock
 from utils.generateImages.generateImagesByAllSettings import generateImagesByAllSettings
-from keyboards.user.keyboards import generationsTypeKeyboard, writePromptTypeKeyboard, selectSettingKeyboard, generateVideoKeyboard, videoCorrectnessKeyboard, videoExampleKeyboard, confirmWriteUniquePromptForNextModelKeyboard
+from keyboards.user import keyboards
 from utils import text
 from states import UserState
 from utils.generateImages.generateImages import generateImages
@@ -32,7 +33,7 @@ async def start(message: types.Message, state: FSMContext):
     await state.clear()
 
     await message.answer(
-        text.START_TEXT, reply_markup=generationsTypeKeyboard()
+        text.START_TEXT, reply_markup=keyboards.generationsTypeKeyboard()
     )
 
 
@@ -43,9 +44,16 @@ async def choose_generations_type(
     generations_type = call.data.split("|")[1]
     await state.update_data(generations_type=generations_type)
 
+    try:
+        prompt_exist = bool(call.data.split("|")[2])
+    except:
+        prompt_exist = False
+    
+    await state.update_data(prompt_exist=prompt_exist)
+
     await call.message.edit_text(
         text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=selectSettingKeyboard(),
+        reply_markup=keyboards.selectSettingKeyboard(),
     )
 
 
@@ -55,17 +63,29 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(setting_number=setting_number)
     data = await state.get_data()
     generations_type = data["generations_type"]
+    prompt_exist = data["prompt_exist"]
 
     if generations_type == "test":
-        await call.message.edit_text(
-            text.GET_SETTINGS_SUCCESS_TEXT
-        )
-        await state.set_state(UserState.write_prompt_for_images)
+        if prompt_exist:
+            prompt = data["prompt"]
+            user_id = call.from_user.id
+            is_test_generation = generations_type == "test"
+            setting_number = setting_number
+
+            # Удаляем сообщение с выбором настройки
+            await bot.delete_message(user_id, call.message.message_id)
+
+            await generateImagesInHandler(prompt, call.message, state, user_id, is_test_generation, setting_number)
+        else:
+            await call.message.edit_text(
+                text.GET_SETTINGS_SUCCESS_TEXT
+            )
+            await state.set_state(UserState.write_prompt_for_images)
 
     elif generations_type == "work":
         await call.message.edit_text(
             text.CHOOSE_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
-            reply_markup=writePromptTypeKeyboard()
+            reply_markup=keyboards.writePromptTypeKeyboard()
         )
 
 
@@ -108,49 +128,9 @@ async def write_prompt(message: types.Message, state: FSMContext):
     data = await state.get_data()
     is_test_generation = data["generations_type"] == "test"
     setting_number = data["setting_number"]
+    await state.update_data(prompt=prompt)
 
-    # Генерируем изображения
-    try:
-        if is_test_generation:
-            if setting_number == "all":
-                result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
-            else:
-                # Отправляем сообщение о получении промпта
-                message_for_edit = await message.answer(
-                    text.GET_PROMPT_SUCCESS_TEXT
-                )
-                await message_for_edit.pin()
-                # Прибавляем к каждому элементу массива корневой промпт
-                dataArray = getDataArrayWithRootPrompt(int(setting_number), prompt)
-                dataJSON = dataArray[0]["json"]
-                model_name = dataArray[0]["model_name"]
-                result = [await generateImageBlock(dataJSON, model_name, message_for_edit, state, user_id, setting_number, is_test_generation)]
-        else:
-            if setting_number == "all":
-                result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
-            else:
-                message_for_edit = await message.answer(
-                    text.GET_PROMPT_SUCCESS_TEXT
-                )
-                await message_for_edit.pin()
-                result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation)
-
-        await message_for_edit.unpin()
-        stateData = await state.get_data()
-        if result:
-            if "stop_generation" not in stateData:
-                await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
-        else:
-            if "stop_generation" not in stateData:
-                raise Exception("Произошла ошибка при генерации изображения")
-
-    except Exception as e:
-        await message_for_edit.unpin()
-        traceback.print_exc()
-        await message.answer(text.GENERATION_IMAGE_ERROR_TEXT)
-        await state.clear()
-        logger.error(f"Произошла ошибка при генерации изображения: {e}")
-        return
+    await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
             
 
 # Обработка ввода промпта для конкретной модели
@@ -187,7 +167,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
 
     # Просим пользователя отправить промпт для следующей модели
     await message.answer(text.WRITE_PROMPT_FOR_MODEL_TEXT.format(next_model), 
-    reply_markup=confirmWriteUniquePromptForNextModelKeyboard())
+    reply_markup=keyboards.confirmWriteUniquePromptForNextModelKeyboard())
     await state.update_data(current_model_for_unique_prompt=next_model)
 
 
@@ -261,7 +241,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Отправляем сообщение о сохранении изображения
     await call.message.answer(text.SAVE_IMAGES_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink']), reply_markup=generateVideoKeyboard(model_name))
+    .format(link, model_name, parent_folder['webViewLink']), reply_markup=keyboards.generateVideoKeyboard(model_name))
 
     # Удаляем отправленные изображения из чата
     stateData = await state.get_data()
@@ -307,7 +287,7 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
         video_example_message = await call.message.answer_video(
             video=value["file_id"],
             caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, value["prompt"]),
-            reply_markup=videoExampleKeyboard(index, model_name)
+            reply_markup=keyboards.videoExampleKeyboard(index, model_name)
         )
         video_examples_messages_ids.append(video_example_message.message_id)
         await state.update_data(video_examples_messages_ids=video_examples_messages_ids)
@@ -395,11 +375,11 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     video = types.FSInputFile(video_path)
     if button_type == "test":
         await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=videoExampleKeyboard(index, model_name, False))
+        reply_markup=keyboards.videoExampleKeyboard(index, model_name, False))
 
     elif button_type == "work":
         await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=videoCorrectnessKeyboard(model_name))
+        reply_markup=keyboards.videoCorrectnessKeyboard(model_name))
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -414,7 +394,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     # Отправляем видео
     await message.answer_video(video_example_file_id, 
     caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(data["model_name"], prompt),
-    reply_markup=videoExampleKeyboard(index, data["model_name"], with_write_prompt=False))
+    reply_markup=keyboards.videoExampleKeyboard(index, data["model_name"], with_write_prompt=False))
 
 
 # Обработка нажатия на кнопки корректности видео
