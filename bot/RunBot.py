@@ -16,18 +16,19 @@ async def on_startup() -> None:
     if os.path.exists("FocuuusBot/temp"):
         shutil.rmtree("FocuuusBot/temp")
 
-    # Определяем команды и добавляем их в бота
-    commands = [
-        BotCommand(command='/start', description='Перезапустить бота'),
-    ]
-
-    await bot.set_my_commands(commands)
-
     handlers.hand_start.hand_add()
     
     bot_info = await bot.get_me()
 
     await bot.delete_webhook(drop_pending_updates=True)
+
+    # Определяем команды и добавляем их в бота
+    commands = [
+        BotCommand(command='/start', description='Перезапустить бота'),
+        BotCommand(command='/stop', description='Остановить генерацию'),
+    ]
+
+    await bot.set_my_commands(commands)
 
     logger.info(f'Бот запущен - @{bot_info.username}')
 

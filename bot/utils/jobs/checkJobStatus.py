@@ -9,15 +9,21 @@ from aiogram import types
 # Функция для получения статуса работы
 async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.Message = None, is_test_generation: bool = False):
     while True:
+        if state:
+            data = await state.get_data()
+            if "stop_generation" in data:
+                if data["stop_generation"]:
+                    raise Exception("Генерация остановлена")
+        
         try:
             response = requests.post(f'{RUNPOD_HOST}/status/{job_id}', headers=RUNPOD_HEADERS)
             response_json = response.json()
+            
+            logger.info(f"Получен статус работы c id {job_id}: {response_json['status']}")
         except Exception as e:
-            logger.error(f"Ошибка при получении статуса работы: {e}")
+            logger.error(f"Ошибка при получении статуса работы: {e} \nОтвет: {response_json}")
             await asyncio.sleep(10)
             continue
-
-        logger.info(f"Получен статус работы c id {job_id}: {response_json['status']}")
 
         if state and message and not is_test_generation:
             stateData = await state.get_data()

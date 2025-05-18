@@ -9,15 +9,15 @@ def generationsTypeKeyboard():
 
 
 # Инлайн-клавиатура для выбора одного из изображений
-def selectImageKeyboard(model_name: str):
+def selectImageKeyboard(model_name: str, setting_number: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text='1', callback_data=f'select_image|{model_name}|1'),
-            InlineKeyboardButton(text='2', callback_data=f'select_image|{model_name}|2')
+            InlineKeyboardButton(text='1', callback_data=f'select_image|{model_name}|{setting_number}|1'),
+            InlineKeyboardButton(text='2', callback_data=f'select_image|{model_name}|{setting_number}|2')
         ],
         [
-            InlineKeyboardButton(text='3', callback_data=f'select_image|{model_name}|3'),
-            InlineKeyboardButton(text='4', callback_data=f'select_image|{model_name}|4')
+            InlineKeyboardButton(text='3', callback_data=f'select_image|{model_name}|{setting_number}|3'),
+            InlineKeyboardButton(text='4', callback_data=f'select_image|{model_name}|{setting_number}|4')
         ]
     ])
 
@@ -83,7 +83,7 @@ def videoExampleKeyboard(index: str, model_name: str, with_test_generation: bool
 def videoCorrectnessKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text='✅ Сохранить видео', callback_data=f'video_correctness|correct|{model_name}'),
-        InlineKeyboardButton(text='❌ Перегенерировать видео', callback_data=f'generate_video|{model_name}')]
+        InlineKeyboardButton(text='❌ Перегенерировать видео', callback_data=f'start_generate_video|{model_name}')]
     ])
 
     return kb

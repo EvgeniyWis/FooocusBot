@@ -11,4 +11,4 @@ async def retryOperation(operation, max_attempts=3, delay=2, *args):
                 raise e
             logger.warning(f"Попытка {attempt + 1} не удалась: {str(e)}. Повторная попытка через {delay} сек.")
             await asyncio.sleep(delay)
-            delay *= 2
+            delay *= 1.5

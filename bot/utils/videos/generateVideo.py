@@ -72,7 +72,7 @@ async def generateVideo(prompt: str, image_url: str) -> None:
                 logger.info(f"Статус задания на генерацию видео с id {request_id}: {json['status']}")
 
                 if json['status'] == 'error':
-                    raise Exception(f"Ошибка при генерации видео: {json['result'][0]}")
+                    raise Exception(json['result'][0])
 
                 elif json['status'] == 'success': # Если статус задания успешный, то возвращаем ответ
                     # Получаем ссылку на выходное видео

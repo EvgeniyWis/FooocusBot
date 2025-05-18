@@ -25,7 +25,7 @@ from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 from InstanceBot import router
 import os
 from datetime import datetime
-
+from aiogram.filters import Command
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -115,11 +115,15 @@ async def write_prompt(message: types.Message, state: FSMContext):
             if setting_number == "all":
                 result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
             else:
+                # Отправляем сообщение о получении промпта
+                message_for_edit = await message.answer(
+                    text.GET_PROMPT_SUCCESS_TEXT
+                )
                 # Прибавляем к каждому элементу массива корневой промпт
                 dataArray = getDataArrayWithRootPrompt(int(setting_number), prompt)
                 dataJSON = dataArray[0]["json"]
                 model_name = dataArray[0]["model_name"]
-                result = [await generateImageBlock(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation)]
+                result = [await generateImageBlock(dataJSON, model_name, message_for_edit, state, user_id, setting_number, is_test_generation)]
         else:
             if setting_number == "all":
                 result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
@@ -129,10 +133,13 @@ async def write_prompt(message: types.Message, state: FSMContext):
                 )
                 result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation)
 
+        stateData = await state.get_data()
         if result:
-            await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
+            if "stop_generation" not in stateData:
+                await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
         else:
-            raise Exception("Произошла ошибка при генерации изображения")
+            if "stop_generation" not in stateData:
+                raise Exception("Произошла ошибка при генерации изображения")
 
     except Exception as e:
         traceback.print_exc()
@@ -148,7 +155,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     data = await state.get_data()
     prompt = message.text
     model_name = data["current_model_for_unique_prompt"]
-    setting_number = data["current_setting_number_for_unique_prompt"]
+    setting_number = data["setting_number"]
     user_id = message.from_user.id
 
     # Отправляем сообщение о начале генерации
@@ -161,15 +168,12 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     data["json"]['input']['prompt'] += " " + prompt
 
     # Генерируем изображения
-    result = await generateImageBlock(data["json"], model_name, message_for_edit, state, user_id, setting_number, False)
-
-    if result:
-        await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
-    else:
-        raise Exception("Произошла ошибка при генерации изображения")
+    await generateImageBlock(data["json"], model_name, message_for_edit, state, user_id, setting_number, False)
     
     # Получаем следующую модель
     next_model = await getNextModel(model_name, setting_number, state)
+
+    logger.info(f"Следующая модель: {next_model}")
 
     # Если следующая модель не найдена, то завершаем генерацию
     if not next_model:
@@ -201,11 +205,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Получаем индекс работы и индекс изображения
     model_name = call.data.split("|")[1]
-    image_index = int(call.data.split("|")[2])
-
-    # Получаем данные из стейта
-    stateData = await state.get_data()
-    setting_number = stateData["setting_number"]
+    setting_number = call.data.split("|")[2]
+    image_index = int(call.data.split("|")[3])
 
     # Получаем данные генерации по названию модели
     dataArray = getDataArrayBySettingNumber(int(setting_number))
@@ -259,6 +260,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     .format(link, model_name, parent_folder['webViewLink']), reply_markup=generateVideoKeyboard(model_name))
 
     # Удаляем отправленные изображения из чата
+    stateData = await state.get_data()
     try:    
         mediagroup_messages_ids = stateData[f"mediagroup_messages_ids_{model_name}"]
         chat_id = call.message.chat.id
@@ -368,11 +370,15 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
     # Генерируем видео
     try:
-        video_path = await retryOperation(generateVideo, 5, 2, video_example_prompt, image_url)
+        video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
     except Exception as e:
+        # Удаляем сообщение про генерацию видео
+        await bot.delete_message(user_id, message_for_delete.message_id)
+
+        # Отправляем сообщение об ошибке
         traceback.print_exc()
-        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(e))
-        logger.error(f"Произошла ошибка при генерации видео: {e}")
+        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
+        logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
         return
     
     # Сохраняем видео в стейт
@@ -453,6 +459,12 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         os.remove(video_path)
 
 
+# Обработка команды /stop   
+async def stop_generation(message: types.Message, state: FSMContext):
+    await state.update_data(stop_generation=True)
+    await message.answer(text.STOP_GENERATION_TEXT)
+
+
 # DEV: Функция для получения file_id видео В Telegram
 # async def get_file_id(message: types.Message):
 #     await message.answer(message.video.file_id)
@@ -461,6 +473,8 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
 # Добавление обработчиков
 def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())
+
+    router.message.register(stop_generation, Command("stop"))
 
     router.callback_query.register(
         choose_generations_type,
