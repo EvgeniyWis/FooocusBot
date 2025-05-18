@@ -20,8 +20,12 @@ async def generateImagesByAllSettings(message: types.Message, state: FSMContext,
     message_with_settings = await message.answer(text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT
     .format("❌", "❌", "❌", "❌"))
 
+    await message_with_settings.pin()
+
     # Создаём сообщение с прогрессом генерации изображений
     message_with_generations_status = await message.answer(text.GET_PROMPT_SUCCESS_TEXT)
+
+    await message_with_generations_status.pin()
 
     async def process_generation(dataJSON, model_name, index):
         async with semaphore:
@@ -57,6 +61,8 @@ async def generateImagesByAllSettings(message: types.Message, state: FSMContext,
             .format("✅" if 0 in settings_numbers_success else "❌", 
             "✅" if 1 in settings_numbers_success else "❌", "✅" if 2 in settings_numbers_success else "❌", "✅" if 3 in settings_numbers_success else "❌"))
 
+        await message_with_settings.unpin() 
+        await message_with_generations_status.unpin()
         return True
     except Exception as e:
         traceback.print_exc()
