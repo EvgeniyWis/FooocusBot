@@ -2,17 +2,6 @@ import os
 
 # Функция для получения примеров шаблонов для генерации видео с помощью kling
 async def getVideoExamplesData() -> dict:
-    # Путь к папке с видео
-    folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "videos", "templates_examples")
-    
-    # Расширения видеофайлов, которые хотим найти
-    video_extensions = {".mp4", ".avi", ".mov", ".mkv", ".flv", ".wmv"}
-
-    # Получаем список всех файлов в папке с нужными расширениями
-    video_files = [f for f in os.listdir(folder_path)
-                if os.path.isfile(os.path.join(folder_path, f)) and
-                os.path.splitext(f)[1].lower() in video_extensions]
-
     # Формируем массив из промптов
     prompts = [
     "Her hips move vigorously and powerfully from side to side in a single horizontal plane, with wide and dynamic amplitude, creating strong, expressive motion entirely focused in the lower body.Her arms are placed behind her back, with wrists not visible in the frame.Her upper body stays stable and composed, highlighting the contrast between the intense hip motion and the stillness above.The focus is on the powerful, energetic hip movement contrasted with the static upper body and concealed arm position.Eyes open, soft smile with lips closed, slight head tilt.", 
@@ -20,13 +9,21 @@ async def getVideoExamplesData() -> dict:
     "The woman performs an energetic, sensual dance with her legs confidently spread apart. Her hips snap and sway in wide, rhythmic motions, while her torso and chest roll with bold, expressive movement. Her hands stay in place. She maintains a teasing, seductive smile and an inviting gaze. The camera stays fixed, capturing her full-body motion under soft, warm lighting, emphasizing the power and fluidity of her performance.",
     "The woman performs an energetic, sensual dance with her legs confidently spread apart. Her hips snap and sway in wide, rhythmic motions, while her torso and chest roll with bold, expressive movement. Her hands stay in place. She maintains a teasing, seductive smile and an inviting gaze. The camera stays fixed, capturing her full-body motion under soft, warm lighting, emphasizing the power and fluidity of her performance."]
 
+    # Формируем массив из file_id видео
+    video_ids = [
+        "BAACAgIAAxkBAAPraCmALgLMyj3hYfhAZxMcUu_xNBIAAg1rAAI_q1BJH4l_Wztt8bg2BA",
+        "BAACAgIAAxkBAAPuaCmALgPZpRy-MD_wDhnchrOWV2cAAhBrAAI_q1BJ0GEn22fOOnA2BA",
+        "BAACAgIAAxkBAAPtaCmALtvwc4-Sp_7FPBBjyqqLfXoAAg9rAAI_q1BJRM5-AAETncrMNgQ",
+        "BAACAgIAAxkBAAPsaCmALqx-5jWYl6G2gjf5Y4HuvBoAAg5rAAI_q1BJ_6h6PvF9cqE2BA"
+    ]
+
     # Если длина массива промптов и длина массива видео не равны, то выводим ошибку
-    if len(prompts) != len(video_files):
+    if len(prompts) != len(video_ids):
         raise ValueError("Длина массива промптов и длина массива видео не равны")
 
     # Формируем объект с промптами и видео
     result = {}
-    for index, file in enumerate(video_files):
-        result[index] = {"file_path": os.path.join(folder_path, file), "prompt": prompts[index]}
+    for index, video_id in enumerate(video_ids):
+        result[index] = {"file_id": video_id, "prompt": prompts[index]}
 
     return result

@@ -298,9 +298,8 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Выгружаем видео-примеры вместе с их промптами
     video_examples_messages_ids = []
     for index, value in templates_examples.items():
-        video = types.FSInputFile(value["file_path"])
         video_example_message = await call.message.answer_video(
-            video=video,
+            video=value["file_id"],
             caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, value["prompt"]),
             reply_markup=videoExampleKeyboard(index, model_name)
         )
@@ -338,8 +337,8 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     video_example_prompt = custom_prompt if custom_prompt else video_example_data["prompt"]
 
     # Получаем путь к видео-примеру
-    video_example_file_path = video_example_data["file_path"]
-    await state.update_data(video_example_file_path=video_example_file_path)
+    video_example_file_id = video_example_data["file_id"]
+    await state.update_data(video_example_file_id=video_example_file_id)
 
     # Удаляем сообщения с видео-примерами
     video_examples_messages_ids = data["video_examples_messages_ids"]
@@ -357,7 +356,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
     # Если кнопка "Написать промпт", то отправляем сообщение для ввода кастомного промпта
     if button_type == "write_prompt":
-        await state.update_data(video_example_file_path=video_example_file_path)
+        await state.update_data(video_example_file_id=video_example_file_id)
         await state.update_data(video_example_index=index)
         await state.update_data(model_name=model_name)
         await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name))
@@ -369,7 +368,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
     # Генерируем видео
     try:
-        video_path = await generateVideo(video_example_prompt, image_url)
+        video_path = await retryOperation(generateVideo, 5, 2, video_example_prompt, image_url)
     except Exception as e:
         traceback.print_exc()
         await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(e))
@@ -399,12 +398,11 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     prompt = message.text
     await state.update_data(prompt_for_video=prompt)
     data = await state.get_data()
-    video_example_file_path = data["video_example_file_path"]
+    video_example_file_id = data["video_example_file_id"]
     index = data["video_example_index"]
 
     # Отправляем видео
-    video = types.FSInputFile(video_example_file_path)
-    await message.answer_video(video, 
+    await message.answer_video(video_example_file_id, 
     caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(data["model_name"], prompt),
     reply_markup=videoExampleKeyboard(index, data["model_name"], with_write_prompt=False))
 
@@ -455,6 +453,11 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         os.remove(video_path)
 
 
+# DEV: Функция для получения file_id видео В Telegram
+async def get_file_id(message: types.Message):
+    await message.answer(message.video.file_id)
+
+
 # Добавление обработчиков
 def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())
@@ -488,3 +491,6 @@ def hand_add():
 
     router.callback_query.register(handle_video_correctness_buttons, 
     lambda call: call.data.startswith("video_correctness"))
+
+    # DEV: Получение file_id видео
+    router.message.register(get_file_id)
