@@ -3,7 +3,7 @@ from ..jobs.checkJobStatus import checkJobStatus
 from logger import logger
 
 # Функция для upscale сгенерированного изображения
-async def upscaleImage(input_image: str) -> str:
+async def upscaleImage(input_image: str, negative_prompt: str, base_config_model_name: str) -> str:
     # Логирование
     logger.info(f"Делаем upscale для изображения...")
 
@@ -14,7 +14,11 @@ async def upscaleImage(input_image: str) -> str:
             "require_base64": True,
             "uov_method": "Upscale (1.5x)",
             "input_image": input_image,
-            "advanced_params": {"guidance_scale": 3.5, "sampler_name": "euler_ancestral", "overwrite_step": 30},
+            "advanced_params": {"sampler_name": "euler_ancestral", "overwrite_step": 60},
+            "style_selections": [],
+            "guidance_scale": 3.5,
+            "negative_prompt": negative_prompt,
+            "base_model_name": base_config_model_name
         }
     }
 
