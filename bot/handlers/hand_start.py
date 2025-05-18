@@ -76,6 +76,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
             await bot.delete_message(user_id, call.message.message_id)
 
             await generateImagesInHandler(prompt, call.message, state, user_id, is_test_generation, setting_number)
+
+            await state.update_data(prompt_exist=False)
         else:
             await call.message.edit_text(
                 text.GET_SETTINGS_SUCCESS_TEXT
