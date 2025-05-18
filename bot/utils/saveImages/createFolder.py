@@ -13,16 +13,23 @@ async def createFolder(folder_name: str, nested_folder_name: str = None, parent_
         folder_metadata['parents'] = [parent_folder_id]
 
     # Создание папки
-    folder = service.files().create(body=folder_metadata, fields='id,webViewLink').execute()
+    folder = service.files().create(
+        body=folder_metadata,
+        fields='id,webViewLink',
+        supportsAllDrives=True
+    ).execute()
 
-    # Добавление разрешения на публичный доступ
+    # Установка публичного доступа
     permission = {
         'type': 'anyone',
-        'role': 'reader'
+        'role': 'reader',
+        'allowFileDiscovery': True
     }
     service.permissions().create(
         fileId=folder.get('id'),
-        body=permission
+        body=permission,
+        fields='id',
+        supportsAllDrives=True
     ).execute()
 
     if nested_folder_name:
