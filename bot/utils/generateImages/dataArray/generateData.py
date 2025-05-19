@@ -12,6 +12,7 @@ def generateData(model_name: str, picture_folder_id: str, video_folder_id: str, 
             "base_model_name": base_config_model_name,
             "style_selections": [],
             "guidance_scale": 3.5,
+            "aspect_ratios_selection": "720*1280"
         }
     }, "model_name": model_name, "picture_folder_id": picture_folder_id, "video_folder_id": video_folder_id}
     return data
