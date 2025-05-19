@@ -38,6 +38,7 @@ async def generateImages(setting_number: int, prompt: str, message: types.Messag
     for data in dataArray:
         task = asyncio.create_task(process_image(data))
         tasks.append(task)
+        await asyncio.sleep(20)
 
     # Ждем выполнения всех задач
     results = await asyncio.gather(*tasks)
