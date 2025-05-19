@@ -12,6 +12,8 @@ from config import TEMP_FOLDER_PATH
 from .upscaleImage import upscaleImage
 from InstanceBot import bot
 from logger import logger
+from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
+
 
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
@@ -46,7 +48,7 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
         # Обновляем сообщение о начале upscale
         stateData = await state.get_data()
         if "current_model_for_unique_prompt" in stateData:
-            upscale_message = await message.edit_text(text.UPSCALE_IMAGES_PROGRESS_TEXT.format(model_name))
+            upscale_message = await message.edit_text(text.UPSCALE_IMAGES_PROGRESS_TEXT.format(model_name, model_name_index))
 
         # Создаем список задач для параллельного upscale
         upscale_tasks = [upscaleImage(image["base64"], dataJSON["input"]["negative_prompt"], dataJSON["input"]["base_model_name"]) for image in images_output]
@@ -72,8 +74,11 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
         if setting_number == "all":
             setting_number = stateData["current_setting_number_for_unique_prompt"]
 
+        # Получаем индекс модели
+        model_name_index = getModelNameIndex(model_name)
+
         # Отправляем клавиатуру для выбора изображения
-        await message.answer(text.SELECT_IMAGE_TEXT.format(model_name) if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
+        await message.answer(text.SELECT_IMAGE_TEXT.format(model_name, model_name_index) if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
         reply_markup=keyboards.selectImageKeyboard(model_name, setting_number) if not is_test_generation else keyboards.testGenerationImagesKeyboard(setting_number) if stateData["setting_number"] != "all" else None)
 
         # Сохраняем в стейт данные о медиагруппе, для её удаления

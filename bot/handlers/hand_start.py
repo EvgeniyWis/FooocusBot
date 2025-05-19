@@ -11,14 +11,11 @@ from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
 from utils.saveImages.getFolderDataByID import getFolderDataByID
-from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from utils.files.saveFile import saveFile
 from utils.generateImages.generateImageBlock import generateImageBlock
-from utils.generateImages.generateImagesByAllSettings import generateImagesByAllSettings
 from keyboards.user import keyboards
 from utils import text
 from states import UserState
-from utils.generateImages.generateImages import generateImages
 from logger import logger
 from InstanceBot import bot
 import traceback
@@ -27,6 +24,8 @@ from InstanceBot import router
 import os
 from datetime import datetime
 from aiogram.filters import Command
+from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
+
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -119,7 +118,10 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
             model_name = dataArray[0]["model_name"]
             await state.update_data(current_setting_number_for_unique_prompt=int(setting_number))
 
-        await call.message.edit_text(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name))
+        # Получаем индекс модели
+        model_name_index = getModelNameIndex(model_name)
+
+        await call.message.edit_text(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name, model_name_index))
         await state.update_data(current_model_for_unique_prompt=model_name)
         await state.set_state(UserState.write_prompt_for_model)
 
@@ -144,8 +146,11 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     setting_number = data["setting_number"]
     user_id = message.from_user.id
 
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+
     # Отправляем сообщение о начале генерации
-    message_for_edit = await message.answer(text.GENERATE_IMAGE_PROGRESS_TEXT.format(model_name))
+    message_for_edit = await message.answer(text.GENERATE_IMAGE_PROGRESS_TEXT.format(model_name, model_name_index))
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -167,8 +172,11 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
         await state.clear()
         return
 
+    # Получаем индекс следующей модели
+    next_model_index = getModelNameIndex(next_model)
+
     # Просим пользователя отправить промпт для следующей модели
-    await message.answer(text.WRITE_PROMPT_FOR_MODEL_TEXT.format(next_model), 
+    await message.answer(text.WRITE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index), 
     reply_markup=keyboards.confirmWriteUniquePromptForNextModelKeyboard())
     await state.update_data(current_model_for_unique_prompt=next_model)
 
@@ -179,8 +187,11 @@ async def confirm_write_unique_prompt_for_next_model(call: types.CallbackQuery, 
     data = await state.get_data()
     next_model = data["current_model_for_unique_prompt"]
 
+    # Получаем индекс следующей модели
+    next_model_index = getModelNameIndex(next_model)
+
     # Отправляем сообщение для ввода промпта
-    await call.message.edit_text(text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model))
+    await call.message.edit_text(text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index))
     await state.set_state(UserState.write_prompt_for_model)
 
 
@@ -204,8 +215,11 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(model_name=model_name)
     await state.update_data(video_folder_id=video_folder_id)
 
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+
     # Меняем текст на сообщении
-    await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name))
+    await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
     faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -218,7 +232,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"Результат замены лица: {result_path}")
 
     # Меняем текст на сообщении
-    await call.message.edit_text(text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name))
+    await call.message.edit_text(text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Сохраняем изображение
     image_index = int(image_index) - 1
@@ -243,7 +257,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Отправляем сообщение о сохранении изображения
     await call.message.answer(text.SAVE_IMAGES_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink']), reply_markup=keyboards.generateVideoKeyboard(model_name))
+    .format(link, model_name, parent_folder['webViewLink'], model_name_index), reply_markup=keyboards.generateVideoKeyboard(model_name))
 
     # Удаляем отправленные изображения из чата
     stateData = await state.get_data()
@@ -275,8 +289,11 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     if "video_path" in stateData:
         os.remove(stateData["video_path"])
 
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+
     # Отправляем сообщение для выбора видео-примеров
-    select_video_example_message = await call.message.answer(text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name))
+    select_video_example_message = await call.message.answer(text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index))
 
     await state.update_data(select_video_example_message_id=select_video_example_message.message_id)
 
@@ -288,7 +305,7 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     for index, value in templates_examples.items():
         video_example_message = await call.message.answer_video(
             video=value["file_id"],
-            caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, value["prompt"]),
+            caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
             reply_markup=keyboards.videoExampleKeyboard(index, model_name)
         )
         video_examples_messages_ids.append(video_example_message.message_id)
@@ -342,17 +359,20 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     except Exception as e:
         logger.error(f"Произошла ошибка при удалении сообщения с id {call.message.message_id}: {e}")
 
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+
     # Если кнопка "Написать промпт", то отправляем сообщение для ввода кастомного промпта
     if button_type == "write_prompt":
         await state.update_data(video_example_file_id=video_example_file_id)
         await state.update_data(video_example_index=index)
         await state.update_data(model_name=model_name)
-        await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name))
+        await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name, model_name_index))
         await state.set_state(UserState.write_prompt_for_video)
         return
     
     # Отправляем сообщение под генерацию видео
-    message_for_delete = await call.message.answer(text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name))
+    message_for_delete = await call.message.answer(text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
     # Генерируем видео
     try:
@@ -380,7 +400,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         reply_markup=keyboards.videoExampleKeyboard(index, model_name, False))
 
     elif button_type == "work":
-        await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name), 
+        await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
         reply_markup=keyboards.videoCorrectnessKeyboard(model_name))
 
 
@@ -418,7 +438,7 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         await bot.delete_message(user_id, call.message.message_id)
 
         # Отправляем сообщение о начале сохранения видео
-        message_for_edit = await call.message.answer(text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name))
+        message_for_edit = await call.message.answer(text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
         # Сохраняем видео
         link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
@@ -437,9 +457,12 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         # Удаляем сообщение про генерацию видео
         await bot.delete_message(user_id, message_for_edit.message_id)
 
+        # Получаем индекс модели
+        model_name_index = getModelNameIndex(model_name)
+
         # Отправляем сообщение о сохранении видео
         await message_for_edit.answer(text.SAVE_VIDEO_SUCCESS_TEXT
-        .format(link, model_name, parent_folder['webViewLink']))
+        .format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
         # Удаляем видео из папки temp/videos
         os.remove(video_path)
