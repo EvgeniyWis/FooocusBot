@@ -253,7 +253,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
 
     # Сохраняем изображения по этому же пути
-    await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
+    await base64ToImage(images_output_base64, model_name, image_index, user_id, False)
 
     # Меняем текст на сообщении о начале faceswap
     await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
