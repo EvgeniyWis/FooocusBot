@@ -10,16 +10,16 @@ def generationsTypeKeyboard():
 
 # Инлайн-клавиатура для выбора одного из изображений
 def selectImageKeyboard(model_name: str, setting_number: str):
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text='1', callback_data=f'select_image|{model_name}|{setting_number}|1'),
-            InlineKeyboardButton(text='2', callback_data=f'select_image|{model_name}|{setting_number}|2')
-        ],
-        [
-            InlineKeyboardButton(text='3', callback_data=f'select_image|{model_name}|{setting_number}|3'),
-            InlineKeyboardButton(text='4', callback_data=f'select_image|{model_name}|{setting_number}|4')
-        ]
-    ])
+    inline_keyboard = []
+
+    for i in range(1, 5, 2):
+        inline_keyboard.append([
+            InlineKeyboardButton(text=f'{i}', callback_data=f'select_image|{model_name}|{setting_number}|{i}'),
+            InlineKeyboardButton(text=f'{i+1}', callback_data=f'select_image|{model_name}|{setting_number}|{i+1}')
+        ])
+
+    inline_keyboard.append([InlineKeyboardButton(text='🔄 Перегенерировать', callback_data=f'select_image|{model_name}|{setting_number}|regenerate')])
+    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
 

@@ -7,7 +7,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram import types
 
 # Функция для получения статуса работы
-async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.Message = None, is_test_generation: bool = False):
+async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.Message = None, 
+    is_test_generation: bool = False, checkOtherJobs: bool = True):
     while True:
         if state:
             data = await state.get_data()
@@ -25,7 +26,7 @@ async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.M
             await asyncio.sleep(10)
             continue
 
-        if state and message and not is_test_generation:
+        if state and message and not is_test_generation and checkOtherJobs:
             stateData = await state.get_data()
 
             if "jobs" in stateData:
