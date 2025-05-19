@@ -253,13 +253,13 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
 
     # Сохраняем изображения по этому же пути
-    image_path = base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
+    await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
 
     # Меняем текст на сообщении о начале faceswap
     await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-    faceswap_target_path = image_path
+    faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
     faceswap_source_path = f"images/faceswap/{model_name}.jpg"
     logger.info(f"Путь к исходному изображению для замены лица: {faceswap_target_path}")
     logger.info(f"Путь к целевому изображению для замены лица: {faceswap_source_path}")
