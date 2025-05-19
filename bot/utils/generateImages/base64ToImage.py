@@ -7,7 +7,7 @@ import os
 
 
 # Функция для преобразования изображения из base64 в PIL Image
-async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: int,  is_test_generation: bool) -> Image.Image:
+async def base64ToImage(image_data: str, folder_name: str, index: int, user_id: int, is_test_generation: bool) -> Image.Image:
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
     

@@ -25,7 +25,11 @@ import os
 from datetime import datetime
 from aiogram.filters import Command
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
-
+from utils.generateImages.upscaleImage import upscaleImage
+from config import TEMP_FOLDER_PATH
+from PIL import Image
+from utils.generateImages.ImageTobase64 import imageToBase64
+from utils.generateImages.base64ToImage import base64ToImage
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -218,11 +222,31 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
-    # Меняем текст на сообщении
+    # Меняем текст на сообщении о начале upscale
+    await call.message.edit_text(text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+
+    # Получаем само изображение по пути
+    image_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
+    image = Image.open(image_path)
+    image_base64 = imageToBase64(image)
+
+    # Получаем негатив промпт
+    negative_prompt = data["json"]["input"]["negative_prompt"]
+    
+    # Получаем базовую модель   
+    base_model = data["json"]["input"]["base_model_name"]
+    
+    # Делаем upscale изображения
+    images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
+
+    # Сохраняем изображения по этому же пути
+    image_path = base64ToImage(images_output_base64, model_name, image_index - 1, user_id, False)
+
+    # Меняем текст на сообщении о начале faceswap
     await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-    faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
+    faceswap_target_path = image_path
     faceswap_source_path = f"images/faceswap/{model_name}.jpg"
     logger.info(f"Путь к исходному изображению для замены лица: {faceswap_target_path}")
     logger.info(f"Путь к целевому изображению для замены лица: {faceswap_source_path}")
