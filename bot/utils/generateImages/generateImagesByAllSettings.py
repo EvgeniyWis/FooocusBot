@@ -14,7 +14,7 @@ async def generateImagesByAllSettings(message: types.Message, state: FSMContext,
     # Получаем все настройки
     dataArrays = getAllDataArrays()
     settings_numbers_success = []
-    semaphore = asyncio.Semaphore(3)
+    semaphore = asyncio.Semaphore(5)
 
     # Создаём сообщение с прогрессом генерации настроек
     message_with_settings = await message.answer(text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT
