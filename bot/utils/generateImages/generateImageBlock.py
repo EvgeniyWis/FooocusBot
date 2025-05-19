@@ -13,7 +13,7 @@ from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
-    user_id: int, setting_number: str, is_test_generation: bool = False):
+    user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
     # Получаем данные из стейта
     stateData = await state.get_data()
     stop_generation = stateData.get("stop_generation", False)
@@ -25,7 +25,7 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
     job_id = await getJobID(dataJSON)
 
     # Проверяем статус работы
-    response_json = await checkJobStatus(job_id, state, message, is_test_generation)
+    response_json = await checkJobStatus(job_id, state, message, is_test_generation, checkOtherJobs)
 
     try:
         images_output = response_json["output"]

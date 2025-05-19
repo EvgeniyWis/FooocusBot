@@ -129,6 +129,7 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(current_model_for_unique_prompt=model_name)
         await state.set_state(UserState.write_prompt_for_model)
 
+
 # Обработка ввода промпта
 async def write_prompt(message: types.Message, state: FSMContext):
     prompt = message.text
@@ -207,8 +208,23 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс работы и индекс изображения
     model_name = call.data.split("|")[1]
     setting_number = call.data.split("|")[2]
-    image_index = int(call.data.split("|")[3])
+    image_index = call.data.split("|")[3]
 
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+
+    # Если индекс изображения равен "regenerate", то перегенерируем изображение
+    if image_index == "regenerate":
+        stateData = await state.get_data()
+        is_test_generation = stateData["generations_type"] == "test"
+
+        # Отправляем сообщение о перегенерации изображения
+        await call.message.edit_text(text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
+
+        # Получаем данные генерации по названию модели
+        data = await getDataByModelName(model_name)
+        return await generateImageBlock(data["json"], model_name, call.message, state, user_id, setting_number, is_test_generation, False)
+    
     # Получаем данные генерации по названию модели
     dataArray = getDataArrayBySettingNumber(int(setting_number))
     data = next((data for data in dataArray if data["model_name"] == model_name), None)
@@ -218,9 +234,6 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Сохраняем название модели и id папки для видео
     await state.update_data(model_name=model_name)
     await state.update_data(video_folder_id=video_folder_id)
-
-    # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
 
     # Меняем текст на сообщении о начале upscale
     await call.message.edit_text(text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
@@ -240,7 +253,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
 
     # Сохраняем изображения по этому же пути
-    image_path = base64ToImage(images_output_base64, model_name, image_index - 1, user_id, False)
+    image_path = base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
 
     # Меняем текст на сообщении о начале faceswap
     await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
