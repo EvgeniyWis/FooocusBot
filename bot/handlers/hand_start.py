@@ -282,14 +282,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         logger.info(f"Список генераций для замены лица: {faceswap_generate_models}")
 
-        if len(faceswap_generate_models) == 1:
-            faceswap_generate_models.append(None)
-        else:
-            if None in faceswap_generate_models:
-                faceswap_generate_models.remove(None)
-
-        # Если в списке генераций настала очередь этой модели, то запускаем генерацию (максимум - 2 генерации одновременно)
-        if model_name == faceswap_generate_models[0] or model_name == faceswap_generate_models[1]:
+        # Если в списке генераций настала очередь этой модели, то запускаем генерацию
+        if model_name == faceswap_generate_models[0]:
             await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
             result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
             break
