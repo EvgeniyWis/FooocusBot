@@ -285,7 +285,15 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         # Если в списке генераций настала очередь этой модели, то запускаем генерацию
         if model_name == faceswap_generate_models[0]:
             await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
-            result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
+            
+            try:
+                result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
+            except Exception as e:
+                result_path = None
+                logger.error(f"Произошла ошибка при замене лица: {e}")
+                await call.message.answer(text.FACE_SWAP_ERROR_TEXT.format(model_name, e))
+                break
+
             break
 
         await asyncio.sleep(10)
@@ -294,6 +302,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     stateData = await state.get_data()
     stateData["faceswap_generate_models"].remove(model_name)
     await state.update_data(faceswap_models=stateData["faceswap_generate_models"])
+
+    # Если результат замены лица не найден, то завершаем генерацию
+    if not result_path:
+        return
 
     logger.info(f"Результат замены лица: {result_path}")
 

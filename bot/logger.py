@@ -9,7 +9,7 @@ logger.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Создаем директорию для логов если её нет
-log_dir = '/FocuuusBotFolder/logs'
+log_dir = '/FocuuusBotFolder'
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
