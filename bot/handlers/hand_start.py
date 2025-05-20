@@ -30,6 +30,8 @@ from config import TEMP_FOLDER_PATH
 from PIL import Image
 from utils.generateImages.ImageTobase64 import imageToBase64
 from utils.generateImages.base64ToImage import base64ToImage
+import asyncio
+
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
@@ -255,8 +257,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Сохраняем изображения по этому же пути
     await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
 
-    # Меняем текст на сообщении о начале faceswap
-    await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+    # Меняем текст на сообщении об очереди на замену лица
+    await call.message.edit_text(text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
     faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -264,7 +266,40 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"Путь к исходному изображению для замены лица: {faceswap_target_path}")
     logger.info(f"Путь к целевому изображению для замены лица: {faceswap_source_path}")
 
-    result_path = await retryOperation(facefusion_swap, 5, 2, faceswap_source_path, faceswap_target_path)
+    # Если стейта для сохранения моделей и их изображений для faceswap ещё нет, то создаём его
+    stateData = await state.get_data()
+    if "faceswap_generate_models" not in stateData:
+        await state.update_data(faceswap_generate_models=[model_name])
+    else:
+        # Добавляем в стейт путь к изображению для faceswap
+        stateData["faceswap_generate_models"].append(model_name)
+        await state.update_data(faceswap_generate_models=stateData["faceswap_generate_models"])
+
+    # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
+    while True:
+        stateData = await state.get_data()
+        faceswap_generate_models = stateData["faceswap_generate_models"]
+
+        logger.info(f"Список генераций для замены лица: {faceswap_generate_models}")
+
+        if len(faceswap_generate_models) == 1:
+            faceswap_generate_models.append(None)
+        else:
+            if None in faceswap_generate_models:
+                faceswap_generate_models.remove(None)
+
+        # Если в списке генераций настала очередь этой модели, то запускаем генерацию (максимум - 2 генерации одновременно)
+        if model_name == faceswap_generate_models[0] or model_name == faceswap_generate_models[1]:
+            await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+            result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
+            break
+
+        await asyncio.sleep(10)
+
+    # После генерации удаляем модель из стейта
+    stateData = await state.get_data()
+    stateData["faceswap_generate_models"].remove(model_name)
+    await state.update_data(faceswap_models=stateData["faceswap_generate_models"])
 
     logger.info(f"Результат замены лица: {result_path}")
 
