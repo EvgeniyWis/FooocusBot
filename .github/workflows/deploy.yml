@@ -28,7 +28,8 @@ jobs:
       - name: Deploy to server
         run: |
           ssh root@45.80.68.81 << 'EOF'
-          cd /FocuuusBotfolder/FocuuusBot
+          cd ..
+          cd FocuuusBotFolder/FocuuusBot
           git pull origin master
           sudo systemctl restart focuuusbot.service
           EOF
