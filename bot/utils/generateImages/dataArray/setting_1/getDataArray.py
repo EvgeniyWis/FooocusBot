@@ -58,7 +58,7 @@ def setting1_getDataArray():
         real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)).
 
         Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-        [2, 1.00, -0.90, -0.85, 2.50, 1.00, 1.00, 0.80]),
+        [2, 1.00, -0.90, -0.85, 1.80, 1.00, 0.54, 0.80]),
 
         setting1_generateData("giablake.xo", "1HQqiAIFC9o43hgeCQg2OKxaw70p-_ShT", "1PGOqC0qFNCsj35arZnz1iTMR6PItusrM", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
@@ -82,7 +82,7 @@ def setting1_getDataArray():
         real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), hips, hourglass body.
 
         Style: Instagram photo style, vibrant and warm filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), bright sun light from window to body. """,
-        [2, 0.00, -0.90, -1.70, 3.40, 1.00, 2.00, 0.80]),
+        [2, 0.10, -0.90, -1.70, 3.00, 1.00, 1.80, 0.80]),
 
         setting1_generateData("skylalure", "1VOIxoZOEu94vO60v7RORYwXxwmYNyVRt", "1tOtCWNhS4HSNoXeql7TUe4ZPwSIO-lWD", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
@@ -110,7 +110,7 @@ def setting1_getDataArray():
         real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, thin lips, realistic green eyes, long voluminous brown hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), ((big wide hips)), hourglass body.
 
         Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard, ((((bright lightning face))))""",
-        [2, 1.00, -0.90, -1.70, 1.55, 1.00, 3.40, 1.00]),
+        [2, 1.00, -0.90, -1.70, 1.55, 1.00, 3.00, 1.00]),
 
         setting1_generateData("lexalennix", "1ep2RT3ZoxgcLYbkFS_3Vepnk8QWRhbNO", "1ZkLEJe88qTbY-VkHFrPCv94VWMYoBEtO", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
@@ -145,7 +145,7 @@ def setting1_getDataArray():
         real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, plump lips, realistic blue eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), big wide hips, hourglass body.
 
         Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard.""",
-        [2, 0.50, -0.90, 0.35, 2.05, 1.00, 0.95, 1.00]),
+        [2, 0.50, -0.90, 0.35, 1.70, 1.00, 0.95, 1.00]),
 
         setting1_generateData("adelinedior", "15sxf1borQ55h9YgAzTGv7SuJdgas5wwW", "12jyke3mZadunB52QEWnkSEAZSYd1IDMG", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
