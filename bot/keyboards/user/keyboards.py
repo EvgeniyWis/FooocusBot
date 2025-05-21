@@ -128,7 +128,7 @@ def randomizerKeyboard(current_variables: list[str]):
 def stopInputValuesForVariableKeyboard():
     kb = ReplyKeyboardMarkup(keyboard=[
         [KeyboardButton(text='🚫 Остановить ввод значений')]
-    ], resize_keyboard=True, one_time_keyboard=True)
+    ], resize_keyboard=True, is_persistent=False)
 
     return kb
 
@@ -141,4 +141,15 @@ def variableActionKeyboard(variable_name: str):
         [InlineKeyboardButton(text='❌ Удалить переменную', callback_data=f'randomizer|variable|delete_variable|{variable_name}')]
     ])
 
+    return kb
+
+
+# Клавиатура со всеми значениями переменной в рандомайзере для их удаления
+def deleteValuesForVariableKeyboard(values: list[str], variable_name: str):
+    kb = InlineKeyboardMarkup(inline_keyboard=[])
+
+    for value in values:
+        kb.inline_keyboard.append([InlineKeyboardButton(text=value, callback_data=f'randomizer|delete_value|{variable_name}|{value}')])
+
+    kb.inline_keyboard.append([InlineKeyboardButton(text='🔙 Назад', callback_data=f'randomizer|delete_value|back')])
     return kb
