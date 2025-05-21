@@ -17,3 +17,6 @@ RUNPOD_HEADERS = {
 
 # URL для запросов на Runpod
 RUNPOD_HOST = f"https://api.runpod.ai/v2/{ENDPOINT_ID}"
+
+# ID чата разработчика
+DEV_CHAT_ID = 1979922062

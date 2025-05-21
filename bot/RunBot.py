@@ -6,6 +6,7 @@ import asyncio
 from logger import logger
 import shutil
 import os
+from config import DEV_CHAT_ID
 
 async def on_startup() -> None:
     # Удаляем все файлы в папке temp
@@ -33,6 +34,9 @@ async def on_startup() -> None:
     logger.info(f'Бот запущен - @{bot_info.username}')
 
     await dp.start_polling(bot, skip_updates=True)
+
+    # Отправка DEV сообщения разработчику
+    await bot.send_message(DEV_CHAT_ID, "Бот запущен ✅")
 
 
 if __name__ == "__main__":
