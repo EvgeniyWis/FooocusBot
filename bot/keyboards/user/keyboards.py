@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from .buttons import getGenerationsTypeButtons
 
 # Инлайн-клавиатура для выбора количества генераций
@@ -106,5 +106,28 @@ def onePromptGenerationChooseTypeKeyboard():
         [InlineKeyboardButton(text='⚖️ Статичный промпт', callback_data='one_prompt_generation_type|static')],
         [InlineKeyboardButton(text='🎲 Использовать рандомайзер', callback_data='one_prompt_generation_type|random')]
     ])
+
+    return kb
+
+
+# Клавиатура для выбора переменных в рандомайзере
+def randomizerKeyboard(current_variables: list[str]):
+    inline_keyboard = []
+
+    for variable in current_variables:
+        inline_keyboard.append([InlineKeyboardButton(text=variable, callback_data=f'randomizer|{variable}')])
+
+    inline_keyboard.append([InlineKeyboardButton(text='➕ Добавить переменную', callback_data='randomizer|add_variable')])
+
+    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+    return kb
+
+
+# Репли-клавиатура для остановки ввода значений для переменных в рандомайзере
+def stopInputValuesForVariableKeyboard():
+    kb = ReplyKeyboardMarkup(keyboard=[
+        [KeyboardButton(text='🚫 Остановить ввод значений')]
+    ], resize_keyboard=True, one_time_keyboard=True)
 
     return kb
