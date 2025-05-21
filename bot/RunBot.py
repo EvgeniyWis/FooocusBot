@@ -17,7 +17,11 @@ async def on_startup() -> None:
     if os.path.exists("FocuuusBot/temp"):
         shutil.rmtree("FocuuusBot/temp")
 
-    handlers.hand_start.hand_add()
+    # Добавляем обработчики
+    handlers.hand_commands.hand_add()
+    handlers.hand_startGeneration.hand_add()
+    handlers.hand_randomizer.hand_add()
+    handlers.hand_videoGeneration.hand_add()
     
     bot_info = await bot.get_me()
 

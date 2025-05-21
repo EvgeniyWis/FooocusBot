@@ -131,3 +131,14 @@ def stopInputValuesForVariableKeyboard():
     ], resize_keyboard=True, one_time_keyboard=True)
 
     return kb
+
+
+# Клавиатура для выбора действия с переменной в рандомайзере
+def variableActionKeyboard(variable_name: str):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='➕ Добавить значения', callback_data=f'randomizer|variable|add_values|{variable_name}')],
+        [InlineKeyboardButton(text='🗑️ Удалить значение', callback_data=f'randomizer|variable|delete_values|{variable_name}')],
+        [InlineKeyboardButton(text='❌ Удалить переменную', callback_data=f'randomizer|variable|delete_variable|{variable_name}')]
+    ])
+
+    return kb
