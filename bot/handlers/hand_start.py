@@ -103,8 +103,7 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(writePrompt_type=writePrompt_type)
 
     if writePrompt_type == "one":
-        await call.message.edit_text(text.GET_SETTINGS_SUCCESS_TEXT)
-        await state.set_state(UserState.write_prompt_for_images)
+        await call.message.edit_text(text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT, reply_markup=keyboards.onePromptGenerationChooseTypeKeyboard())
     else:
         # Получаем данные
         stateData = await state.get_data()
@@ -130,6 +129,19 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
         await call.message.edit_text(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name, model_name_index))
         await state.update_data(current_model_for_unique_prompt=model_name)
         await state.set_state(UserState.write_prompt_for_model)
+
+
+# Обработка выбора режима при генерации с одним промптом
+async def chooseOnePromptGenerationType(call: types.CallbackQuery, state: FSMContext):
+    one_prompt_generation_type = call.data.split("|")[1]
+
+    if one_prompt_generation_type == "static":
+        await call.message.edit_text(text.GET_STATIC_PROMPT_TYPE_SUCCESS_TEXT)
+        await state.set_state(UserState.write_prompt_for_images)
+
+    elif one_prompt_generation_type == "random":
+        await call.message.edit_text(text.GET_RANDOM_PROMPT_TYPE_SUCCESS_TEXT)
+        await state.set_state(UserState.write_variable_for_randomizer)
 
 
 # Обработка ввода промпта
@@ -574,6 +586,10 @@ def hand_add():
 
     router.callback_query.register(
         choose_writePrompt_type, lambda call: call.data.startswith("write_prompt_type")
+    )
+
+    router.callback_query.register(
+        chooseOnePromptGenerationType, lambda call: call.data.startswith("one_prompt_generation_type")
     )
 
     router.message.register(write_prompt, StateFilter(UserState.write_prompt_for_images))

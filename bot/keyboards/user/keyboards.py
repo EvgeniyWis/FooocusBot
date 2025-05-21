@@ -98,3 +98,13 @@ def testGenerationImagesKeyboard(setting_number: str):
     ])
 
     return kb
+
+
+# Клавиатура для выбора режима при генерации с одним промптом
+def onePromptGenerationChooseTypeKeyboard():
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='⚖️ Статичный промпт', callback_data='one_prompt_generation_type|static')],
+        [InlineKeyboardButton(text='🎲 Использовать рандомайзер', callback_data='one_prompt_generation_type|random')]
+    ])
+
+    return kb
