@@ -33,6 +33,9 @@ async def on_startup() -> None:
 
     logger.info(f'Бот запущен - @{bot_info.username}')
 
+    # Отправка DEV сообщения разработчику
+    await bot.send_message(DEV_CHAT_ID, "Бот запущен ✅")
+
     await dp.start_polling(bot, skip_updates=True)
 
     # Отправка DEV сообщения разработчику
