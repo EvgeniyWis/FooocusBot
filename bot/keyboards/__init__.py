@@ -1,1 +1,3 @@
-from keyboards.user import keyboards, buttons
+from keyboards.startGeneration import keyboards as start_generation_keyboards
+from keyboards.randomizer import keyboards as randomizer_keyboards
+from keyboards.videoGeneration import keyboards as video_generation_keyboards

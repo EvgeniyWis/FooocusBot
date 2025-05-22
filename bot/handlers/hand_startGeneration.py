@@ -11,9 +11,9 @@ from aiogram.fsm.context import FSMContext
 from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.files.saveFile import saveFile
 from utils.generateImages.generateImageBlock import generateImageBlock
-from keyboards.user import keyboards
+from keyboards import start_generation_keyboards, randomizer_keyboards
 from utils import text
-from states import UserState
+from states.UserState import StartGenerationState
 from logger import logger
 from InstanceBot import bot
 from InstanceBot import router
@@ -44,7 +44,7 @@ async def choose_generations_type(
 
     await call.message.edit_text(
         text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=keyboards.selectSettingKeyboard(),
+        reply_markup=start_generation_keyboards.selectSettingKeyboard(),
     )
 
 
@@ -73,12 +73,12 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
             await call.message.edit_text(
                 text.GET_SETTINGS_SUCCESS_TEXT
             )
-            await state.set_state(UserState.write_prompt_for_images)
+            await state.set_state(StartGenerationState.write_prompt_for_images)
 
     elif generations_type == "work":
         await call.message.edit_text(
             text.CHOOSE_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
-            reply_markup=keyboards.writePromptTypeKeyboard()
+            reply_markup=start_generation_keyboards.writePromptTypeKeyboard()
         )
 
 
@@ -89,7 +89,8 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(writePrompt_type=writePrompt_type)
 
     if writePrompt_type == "one":
-        await call.message.edit_text(text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT, reply_markup=keyboards.onePromptGenerationChooseTypeKeyboard())
+        await call.message.edit_text(text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT, 
+        reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard())
     else:
         # Получаем данные
         stateData = await state.get_data()
@@ -102,7 +103,7 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
             # Инициализируем начальные данные
             model_name = dataArrays[0][0]["model_name"]
             await state.update_data(current_setting_number_for_unique_prompt=1)
-            await state.set_state(UserState.write_prompt_for_model)
+            await state.set_state(StartGenerationState.write_prompt_for_model)
         else:
             # Получаем данные по настройке
             dataArray = getDataArrayBySettingNumber(int(setting_number))
@@ -114,7 +115,7 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
 
         await call.message.edit_text(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name, model_name_index))
         await state.update_data(current_model_for_unique_prompt=model_name)
-        await state.set_state(UserState.write_prompt_for_model)
+        await state.set_state(StartGenerationState.write_prompt_for_model)
 
 
 # Обработка выбора режима при генерации с одним промптом
@@ -123,11 +124,11 @@ async def chooseOnePromptGenerationType(call: types.CallbackQuery, state: FSMCon
 
     if one_prompt_generation_type == "static":
         await call.message.edit_text(text.GET_STATIC_PROMPT_TYPE_SUCCESS_TEXT)
-        await state.set_state(UserState.write_prompt_for_images)
+        await state.set_state(StartGenerationState.write_prompt_for_images)
 
     elif one_prompt_generation_type == "random":
         await call.message.edit_text(text.GET_RANDOM_PROMPT_TYPE_SUCCESS_TEXT, 
-        reply_markup=keyboards.randomizerKeyboard([]))
+        reply_markup=randomizer_keyboards.randomizerKeyboard([]))
 
 
 # Обработка ввода промпта
@@ -182,7 +183,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
 
     # Просим пользователя отправить промпт для следующей модели
     await message.answer(text.WRITE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index), 
-    reply_markup=keyboards.confirmWriteUniquePromptForNextModelKeyboard())
+    reply_markup=start_generation_keyboards.confirmWriteUniquePromptForNextModelKeyboard())
     await state.update_data(current_model_for_unique_prompt=next_model)
 
 
@@ -197,7 +198,7 @@ async def confirm_write_unique_prompt_for_next_model(call: types.CallbackQuery, 
 
     # Отправляем сообщение для ввода промпта
     await call.message.edit_text(text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index))
-    await state.set_state(UserState.write_prompt_for_model)
+    await state.set_state(StartGenerationState.write_prompt_for_model)
 
 
 # Обработка выбора изображения
@@ -333,7 +334,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Отправляем сообщение о сохранении изображения
     await call.message.answer(text.SAVE_IMAGES_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink'], model_name_index), reply_markup=keyboards.generateVideoKeyboard(model_name))
+    .format(link, model_name, parent_folder['webViewLink'], model_name_index), 
+    reply_markup=start_generation_keyboards.generateVideoKeyboard(model_name))
 
     # Удаляем отправленные изображения из чата
     stateData = await state.get_data()
@@ -368,9 +370,9 @@ def hand_add():
         chooseOnePromptGenerationType, lambda call: call.data.startswith("one_prompt_generation_type")
     )
 
-    router.message.register(write_prompt, StateFilter(UserState.write_prompt_for_images))
+    router.message.register(write_prompt, StateFilter(StartGenerationState.write_prompt_for_images))
 
-    router.message.register(write_prompt_for_model, StateFilter(UserState.write_prompt_for_model))
+    router.message.register(write_prompt_for_model, StateFilter(StartGenerationState.write_prompt_for_model))
 
     router.callback_query.register(confirm_write_unique_prompt_for_next_model, lambda call: call.data.startswith("confirm_write_unique_prompt_for_next_model"))
 

@@ -3,7 +3,7 @@ from utils.generateImages.getReferenceImage import getReferenceImage
 from utils import text
 from utils.generateImages.base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
-from keyboards.user import keyboards
+from keyboards import start_generation_keyboards
 import shutil
 from ..jobs.getJobID import getJobID
 from ..jobs.checkJobStatus import checkJobStatus
@@ -58,7 +58,7 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
 
         # Отправляем клавиатуру для выбора изображения
         await message.answer(text.SELECT_IMAGE_TEXT.format(model_name, model_name_index) if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
-        reply_markup=keyboards.selectImageKeyboard(model_name, setting_number) if not is_test_generation else keyboards.testGenerationImagesKeyboard(setting_number) if stateData["setting_number"] != "all" else None)
+        reply_markup=start_generation_keyboards.selectImageKeyboard(model_name, setting_number) if not is_test_generation else start_generation_keyboards.testGenerationImagesKeyboard(setting_number) if stateData["setting_number"] != "all" else None)
 
         # Сохраняем в стейт данные о медиагруппе, для её удаления
         await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
