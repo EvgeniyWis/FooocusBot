@@ -51,7 +51,7 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Выгружаем видео-примеры вместе с их промптами
     video_examples_messages_ids = []
     for index, value in templates_examples.items():
-        video_example_message = await editMessageOrAnswer_video(
+        video_example_message = await call.message.answer_video(
             video=value["file_id"],
             caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
             reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name)
@@ -147,11 +147,11 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Отправляем видео
     video = types.FSInputFile(video_path)
     if button_type == "test":
-        await editMessageOrAnswer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
+        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
         reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name, False))
 
     elif button_type == "work":
-        await editMessageOrAnswer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
+        await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
         reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
 
 
