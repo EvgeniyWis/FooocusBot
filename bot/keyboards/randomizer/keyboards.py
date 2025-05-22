@@ -7,9 +7,17 @@ def randomizerKeyboard(current_variables: list[str]):
     for variable in current_variables:
         inline_keyboard.append([InlineKeyboardButton(text=variable, callback_data=f'randomizer|{variable}')])
 
-    inline_keyboard.append([InlineKeyboardButton(text='➕ Добавить переменную', callback_data='randomizer|add_variable')])
+    inline_keyboard.append(
+        [InlineKeyboardButton(text='➕ Добавить переменную', callback_data='randomizer|add_variable')]
+    )
 
-    inline_keyboard.append([InlineKeyboardButton(text='✒️ Основной промпт', callback_data='randomizer|prompt')])
+    inline_keyboard.append(
+        [InlineKeyboardButton(text='✒️ Основной промпт', callback_data='randomizer|prompt')]
+    )
+
+    inline_keyboard.append(
+        [InlineKeyboardButton(text='⚡️ Начать генерацию', callback_data='randomizer|start_generation')]
+    )   
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 

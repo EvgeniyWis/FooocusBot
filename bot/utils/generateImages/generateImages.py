@@ -1,4 +1,5 @@
 from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
+from utils.generateImages.dataArray.getDataArrayByRandomizer import getDataArrayByRandomizer
 from utils.generateImages.generateImageBlock import generateImageBlock
 from logger import logger
 from aiogram import types
@@ -8,9 +9,12 @@ import traceback
 
 # Функция для генерации изображений с помощью API
 async def generateImages(setting_number: int, prompt: str, message: types.Message, state: FSMContext, 
-    user_id: int, is_test_generation: bool):
-    # Прибавляем к каждому элементу массива корневой промпт
-    dataArray = getDataArrayWithRootPrompt(setting_number, prompt)
+    user_id: int, is_test_generation: bool, with_randomizer: bool = False):
+    if not with_randomizer:
+        # Прибавляем к каждому элементу массива корневой промпт
+        dataArray = getDataArrayWithRootPrompt(setting_number, prompt)
+    else:
+        dataArray = await getDataArrayByRandomizer(state)
 
     logger.info(f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}")
 
