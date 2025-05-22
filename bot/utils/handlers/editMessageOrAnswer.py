@@ -5,8 +5,10 @@ from logger import logger
 async def editMessageOrAnswer(
         call: types.CallbackQuery, text: str, reply_markup = None):
     try:
-        await call.message.edit_text(text, reply_markup=reply_markup)
+        message = await call.message.edit_text(text, reply_markup=reply_markup)
     except Exception as e:
         logger.error(f"Ошибка при редактировании сообщения: {e}")
-        await call.message.answer(text, reply_markup=reply_markup)
+        message = await call.message.answer(text, reply_markup=reply_markup)
+        
+    return message
 
