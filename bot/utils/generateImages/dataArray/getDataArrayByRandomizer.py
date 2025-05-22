@@ -1,5 +1,5 @@
 from aiogram.fsm.context import FSMContext
-from .getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
+from .getDataArrayBySettingNumber import getDataArrayBySettingNumber
 import random
 from logger import logger
 
@@ -8,12 +8,11 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     # Получаем массив данных
     stateData = await state.get_data()
 
-    # Получаем переменные рандомайзера и основной промпт
-    prompt_for_randomizer = stateData["prompt_for_randomizer"]
+    # Получаем переменные рандомайзера
     variable_names_for_randomizer = stateData["variable_names_for_randomizer"]
 
-    # Применяем основной промпт к промптам массива данных
-    dataArray = getDataArrayWithRootPrompt(setting_number, prompt_for_randomizer)
+    # Получаем массив данных
+    dataArray = getDataArrayBySettingNumber(setting_number)
 
     # Проходимся по всем промптам для каждой переменной рандомайзера и применяем её к промпу
     for data in dataArray:
