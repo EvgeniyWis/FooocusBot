@@ -42,7 +42,7 @@ async def choose_generations_type(
     
     await state.update_data(prompt_exist=prompt_exist)
 
-    await call.message.edit_text(
+    await call.message.answer(
         text.GET_GENERATIONS_SUCCESS_TEXT,
         reply_markup=start_generation_keyboards.selectSettingKeyboard(),
     )
@@ -70,13 +70,13 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
 
             await state.update_data(prompt_exist=False)
         else:
-            await call.message.edit_text(
+            await call.message.answer(
                 text.GET_SETTINGS_SUCCESS_TEXT
             )
             await state.set_state(StartGenerationState.write_prompt_for_images)
 
     elif generations_type == "work":
-        await call.message.edit_text(
+        await call.message.answer(
             text.CHOOSE_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
             reply_markup=start_generation_keyboards.writePromptTypeKeyboard()
         )
@@ -89,7 +89,7 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(writePrompt_type=writePrompt_type)
 
     if writePrompt_type == "one":
-        await call.message.edit_text(text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT, 
+        await call.message.answer(text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT, 
         reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard())
     else:
         # Получаем данные
@@ -113,7 +113,7 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
         # Получаем индекс модели
         model_name_index = getModelNameIndex(model_name)
 
-        await call.message.edit_text(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name, model_name_index))
+        await call.message.answer(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name, model_name_index))
         await state.update_data(current_model_for_unique_prompt=model_name)
         await state.set_state(StartGenerationState.write_prompt_for_model)
 
@@ -123,11 +123,11 @@ async def chooseOnePromptGenerationType(call: types.CallbackQuery, state: FSMCon
     one_prompt_generation_type = call.data.split("|")[1]
 
     if one_prompt_generation_type == "static":
-        await call.message.edit_text(text.GET_STATIC_PROMPT_TYPE_SUCCESS_TEXT)
+        await call.message.answer(text.GET_STATIC_PROMPT_TYPE_SUCCESS_TEXT)
         await state.set_state(StartGenerationState.write_prompt_for_images)
 
     elif one_prompt_generation_type == "random":
-        await call.message.edit_text(text.GET_RANDOM_PROMPT_TYPE_SUCCESS_TEXT, 
+        await call.message.answer(text.GET_RANDOM_PROMPT_TYPE_SUCCESS_TEXT, 
         reply_markup=randomizer_keyboards.randomizerKeyboard([]))
 
 
@@ -197,7 +197,7 @@ async def confirm_write_unique_prompt_for_next_model(call: types.CallbackQuery, 
     next_model_index = getModelNameIndex(next_model)
 
     # Отправляем сообщение для ввода промпта
-    await call.message.edit_text(text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index))
+    await call.message.answer(text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index))
     await state.set_state(StartGenerationState.write_prompt_for_model)
 
 
@@ -220,7 +220,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         is_test_generation = stateData["generations_type"] == "test"
 
         # Отправляем сообщение о перегенерации изображения
-        await call.message.edit_text(text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
+        await call.message.answer(text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
 
         # Получаем данные генерации по названию модели
         data = await getDataByModelName(model_name)
@@ -237,7 +237,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(video_folder_id=video_folder_id)
 
     # Меняем текст на сообщении о начале upscale
-    await call.message.edit_text(text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+    await call.message.answer(text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Получаем само изображение по пути
     image_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
@@ -257,7 +257,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
 
     # Меняем текст на сообщении об очереди на замену лица
-    await call.message.edit_text(text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
+    await call.message.answer(text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
     faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -283,7 +283,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Если в списке генераций настала очередь этой модели, то запускаем генерацию
         if model_name == faceswap_generate_models[0]:
-            await call.message.edit_text(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+            await call.message.answer(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
             
             try:
                 result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
@@ -309,7 +309,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"Результат замены лица: {result_path}")
 
     # Меняем текст на сообщении
-    await call.message.edit_text(text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+    await call.message.answer(text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Сохраняем изображение
     image_index = int(image_index) - 1
