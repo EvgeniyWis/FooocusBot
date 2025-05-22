@@ -8,8 +8,10 @@ from logger import logger
 import traceback
 from utils.generateImages.generateImages import generateImages
 
+
 # Функция для генерации изображения в зависимости от настроек
-async def generateImagesInHandler(prompt: str, message: types.Message, state: FSMContext, user_id: int, is_test_generation: bool, setting_number: str):
+async def generateImagesInHandler(prompt: str, message: types.Message, state: FSMContext,
+    user_id: int, is_test_generation: bool, setting_number: str, with_randomizer: bool = False):
     # Генерируем изображения
     try:
         if is_test_generation:
@@ -33,7 +35,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                     text.GET_PROMPT_SUCCESS_TEXT
                 )
                 await message_for_edit.pin()
-                result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation)
+                result = await generateImages(int(setting_number), prompt, message_for_edit, state, user_id, is_test_generation, with_randomizer)
                 await message_for_edit.unpin()
                 
         stateData = await state.get_data()

@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from utils.handlers.generateImagesInHandler import generateImagesInHandler
 from keyboards import randomizer_keyboards
 from utils import text
 from states.UserState import RandomizerState
@@ -26,6 +27,27 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
         else:
             await call.message.edit_text(text.MAIN_PROMPT_FOR_RANDOMIZER_ALREADY_WRITTEN_TEXT.format(data["prompt_for_randomizer"]), 
             reply_markup=randomizer_keyboards.mainPromptForRandomizerKeyboard())
+
+    # Если была выбрана кнопка "⚡️ Начать генерацию"
+    elif action == "start_generation":
+        data = await state.get_data()
+
+        # Если нету промпта для рандомайзера, то отправляем сообщение с ошибкой
+        if "prompt_for_randomizer" not in data:
+            await call.answer(text.PROMPT_FOR_RANDOMIZER_NOT_WRITTEN_TEXT, show_alert=True)
+            return
+
+        # Если нету переменных для рандомайзера, то отправляем сообщение с ошибкой
+        if "variable_names_for_randomizer" not in data:
+            await call.answer(text.VARIABLES_FOR_RANDOMIZER_NOT_WRITTEN_TEXT, show_alert=True)
+            return
+        
+        else:
+            prompt = data["prompt_for_randomizer"]
+            user_id = call.from_user.id
+            is_test_generation = data["generations_type"] == "test"
+            setting_number = data["setting_number"]
+            await generateImagesInHandler(prompt, call.message, state, user_id, is_test_generation, setting_number, True)
 
     else:
         variable_name = action
@@ -71,7 +93,7 @@ async def handle_main_prompt_for_randomizer_buttons(call: types.CallbackQuery, s
 async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMContext):
     # Получаем данные
     action = call.data.split("|")[1]
-    variable_name = call.data.split("|")[2]
+    data = await state.get_data()
 
     # Если была выбрана кнопка "🔙 Назад"
     if action == "back":
@@ -79,6 +101,7 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
         reply_markup=randomizer_keyboards.randomizerKeyboard(data["variable_names_for_randomizer"]))
         return
 
+    variable_name = call.data.split("|")[2]
     # Если была выбрана кнопка "➕ Добавить значения"
     if action == "add_values":
         await call.message.answer(text.ADD_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name))
@@ -86,7 +109,6 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
 
     # Если была выбрана кнопка "🗑️ Удалить значение"
     elif action == "delete_values":
-        data = await state.get_data()
         variable_name_values = f"randomizer_{variable_name}_values"
         values = data[variable_name_values]
 
@@ -112,8 +134,8 @@ async def handle_delete_value_for_variable_buttons(call: types.CallbackQuery, st
         return
     
     # Получаем данные
-    variable_name = call.data.split("|")[2]
-    value = call.data.split("|")[3]
+    variable_name = call.data.split("|")[1]
+    value = call.data.split("|")[2]
     variable_name_values = f"randomizer_{variable_name}_values"
     values = data[variable_name_values]
     values.remove(value)
