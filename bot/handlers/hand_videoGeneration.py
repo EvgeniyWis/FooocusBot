@@ -17,6 +17,7 @@ from InstanceBot import router
 import os
 from datetime import datetime
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
+from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -39,7 +40,8 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение для выбора видео-примеров
-    select_video_example_message = await call.message.answer(text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index))
+    select_video_example_message = await editMessageOrAnswer(
+        call,text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index))
 
     await state.update_data(select_video_example_message_id=select_video_example_message.message_id)
 
@@ -49,7 +51,7 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Выгружаем видео-примеры вместе с их промптами
     video_examples_messages_ids = []
     for index, value in templates_examples.items():
-        video_example_message = await call.message.answer_video(
+        video_example_message = await editMessageOrAnswer_video(
             video=value["file_id"],
             caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
             reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name)
@@ -113,12 +115,14 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         await state.update_data(video_example_file_id=video_example_file_id)
         await state.update_data(video_example_index=index)
         await state.update_data(model_name=model_name)
-        await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name, model_name_index))
+        await editMessageOrAnswer(
+        call,text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name, model_name_index))
         await state.set_state(StartGenerationState.write_prompt_for_video)
         return
     
     # Отправляем сообщение под генерацию видео
-    message_for_delete = await call.message.answer(text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
+    message_for_delete = await editMessageOrAnswer(
+        call,text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
     # Генерируем видео
     try:
@@ -129,7 +133,8 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
         # Отправляем сообщение об ошибке
         traceback.print_exc()
-        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
+        await editMessageOrAnswer(
+        call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
         logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
         return
     
@@ -142,11 +147,11 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Отправляем видео
     video = types.FSInputFile(video_path)
     if button_type == "test":
-        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
+        await editMessageOrAnswer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
         reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name, False))
 
     elif button_type == "work":
-        await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
+        await editMessageOrAnswer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
         reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
 
 
@@ -184,13 +189,15 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         await bot.delete_message(user_id, call.message.message_id)
 
         # Отправляем сообщение о начале сохранения видео
-        message_for_edit = await call.message.answer(text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
+        message_for_edit = await editMessageOrAnswer(
+        call,text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
         # Сохраняем видео
         link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
 
         if not link:
-            await call.message.answer(text.SAVE_FILE_ERROR_TEXT)
+            await editMessageOrAnswer(
+        call,text.SAVE_FILE_ERROR_TEXT)
             return
         
         # Получаем данные родительской папки

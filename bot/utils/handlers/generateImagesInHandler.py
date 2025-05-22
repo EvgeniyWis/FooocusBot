@@ -1,3 +1,4 @@
+from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
 from utils.generateImages.generateImagesByAllSettings import generateImagesByAllSettings
 from utils.generateImages.generateImageBlock import generateImageBlock
 from aiogram import types
@@ -7,7 +8,7 @@ from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArr
 from logger import logger
 import traceback
 from utils.generateImages.generateImages import generateImages
-
+from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 
 # Функция для генерации изображения в зависимости от настроек
 async def generateImagesInHandler(prompt: str, message: types.Message, state: FSMContext,
@@ -28,7 +29,26 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 model_name = dataArray[0]["model_name"]
                 result = [await generateImageBlock(dataJSON, model_name, message_for_edit, state, user_id, setting_number, is_test_generation)]
         else:
-            if setting_number == "all":
+            stateData = await state.get_data()
+
+            if "model_name_for_generation" in stateData:
+                model_name = stateData["model_name_for_generation"]
+
+                # Получаем порядковый номер модели
+                model_name_index = getModelNameIndex(model_name)
+
+                # Отправляем сообщение о генерации изображений по имени модели
+                await message.answer(text.GENERATE_IMAGES_BY_MODEL_NAME_TEXT.format(model_name, model_name_index))
+
+                # Получаем данные о модели
+                dataArray = await getDataByModelName(model_name)
+                dataJSON = dataArray["json"]
+
+                # Генерируем изображения
+                await generateImageBlock(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation)
+                return
+            
+            elif setting_number == "all":
                 result = await generateImagesByAllSettings(message, state, user_id, is_test_generation, True)
             else:
                 message_for_edit = await message.answer(

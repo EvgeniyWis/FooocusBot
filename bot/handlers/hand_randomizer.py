@@ -6,6 +6,7 @@ from keyboards import randomizer_keyboards
 from utils import text
 from states.UserState import RandomizerState
 from InstanceBot import router
+from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
 
 
 # Обработка кнопок в меню 
@@ -14,7 +15,8 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
     
     # Если была выбрана кнопка "➕ Добавить переменную"
     if action == "add_variable":
-        await call.message.answer(text.ADD_VARIABLE_FOR_RANDOMIZER_TEXT)
+        await editMessageOrAnswer(
+        call,text.ADD_VARIABLE_FOR_RANDOMIZER_TEXT)
         await state.set_state(RandomizerState.write_variable_for_randomizer)
 
     # Если была выбрана кнопка "⚡️ Начать генерацию"
@@ -35,7 +37,8 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
     else:
         variable_name = action
         await state.update_data(selected_variable_name=variable_name)
-        await call.message.answer(text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name), 
+        await editMessageOrAnswer(
+        call,text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name), 
         reply_markup=randomizer_keyboards.variableActionKeyboard(variable_name))
 
 
@@ -47,14 +50,16 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
 
     # Если была выбрана кнопка "🔙 Назад"
     if action == "back":
-        await call.message.answer(text.RANDOMIZER_MENU_TEXT, 
+        await editMessageOrAnswer(
+        call,text.RANDOMIZER_MENU_TEXT, 
         reply_markup=randomizer_keyboards.randomizerKeyboard(data["variable_names_for_randomizer"]))
         return
 
     variable_name = call.data.split("|")[2]
     # Если была выбрана кнопка "➕ Добавить значения"
     if action == "add_values":
-        await call.message.answer(text.ADD_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name))
+        await editMessageOrAnswer(
+        call,text.ADD_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name))
         await state.set_state(RandomizerState.write_value_for_variable_for_randomizer)
 
     # Если была выбрана кнопка "🗑️ Удалить значение"
@@ -62,7 +67,8 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
         variable_name_values = f"randomizer_{variable_name}_values"
         values = data[variable_name_values]
 
-        await call.message.answer(text.DELETE_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name), 
+        await editMessageOrAnswer(
+        call,text.DELETE_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name), 
         reply_markup=randomizer_keyboards.deleteValuesForVariableKeyboard(values, variable_name))
 
     # Если была выбрана кнопка "❌ Удалить переменную"
@@ -70,7 +76,8 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
         data = await state.get_data()
         data["variable_names_for_randomizer"].remove(variable_name)
         await state.update_data(**data)
-        await call.message.answer(text.RANDOMIZER_MENU_TEXT, 
+        await editMessageOrAnswer(
+        call,text.RANDOMIZER_MENU_TEXT, 
         reply_markup=randomizer_keyboards.randomizerKeyboard(data["variable_names_for_randomizer"]))
         
 
@@ -79,7 +86,8 @@ async def handle_delete_value_for_variable_buttons(call: types.CallbackQuery, st
     # Если была выбрана кнопка "🔙 Назад"
     data = await state.get_data()
     if call.data == "randomizer_delete_value|back":
-        await call.message.answer(text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(data["selected_variable_name"]), 
+        await editMessageOrAnswer(
+        call,text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(data["selected_variable_name"]), 
         reply_markup=randomizer_keyboards.variableActionKeyboard(data["selected_variable_name"]))
         return
     
@@ -94,7 +102,8 @@ async def handle_delete_value_for_variable_buttons(call: types.CallbackQuery, st
     await state.update_data(**{variable_name_values: values})
 
     # Отправляем сообщение с обновленной клавиатурой
-    await call.message.answer(text.DELETE_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name), 
+    await editMessageOrAnswer(
+        call,text.DELETE_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name), 
         reply_markup=randomizer_keyboards.deleteValuesForVariableKeyboard(values, variable_name))
     
 
