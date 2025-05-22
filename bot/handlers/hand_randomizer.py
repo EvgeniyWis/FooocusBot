@@ -17,25 +17,9 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
         await call.message.edit_text(text.ADD_VARIABLE_FOR_RANDOMIZER_TEXT)
         await state.set_state(RandomizerState.write_variable_for_randomizer)
 
-    # Если была выбрана кнопка "✒️ Основной промпт"
-    elif action == "prompt":
-        data = await state.get_data()
-        
-        if "prompt_for_randomizer" not in data:
-            await call.message.edit_text(text.WRITE_MAIN_PROMPT_FOR_RANDOMIZER_TEXT)
-            await state.set_state(RandomizerState.write_prompt_for_randomizer)
-        else:
-            await call.message.edit_text(text.MAIN_PROMPT_FOR_RANDOMIZER_ALREADY_WRITTEN_TEXT.format(data["prompt_for_randomizer"]), 
-            reply_markup=randomizer_keyboards.mainPromptForRandomizerKeyboard())
-
     # Если была выбрана кнопка "⚡️ Начать генерацию"
     elif action == "start_generation":
         data = await state.get_data()
-
-        # Если нету промпта для рандомайзера, то отправляем сообщение с ошибкой
-        if "prompt_for_randomizer" not in data:
-            await call.answer(text.PROMPT_FOR_RANDOMIZER_NOT_WRITTEN_TEXT, show_alert=True)
-            return
 
         # Если нету переменных для рандомайзера, то отправляем сообщение с ошибкой
         if "variable_names_for_randomizer" not in data:
@@ -43,50 +27,16 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
             return
         
         else:
-            prompt = data["prompt_for_randomizer"]
             user_id = call.from_user.id
             is_test_generation = data["generations_type"] == "test"
             setting_number = data["setting_number"]
-            await generateImagesInHandler(prompt, call.message, state, user_id, is_test_generation, setting_number, True)
+            await generateImagesInHandler("", call.message, state, user_id, is_test_generation, setting_number, True)
 
     else:
         variable_name = action
         await state.update_data(selected_variable_name=variable_name)
         await call.message.edit_text(text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name), 
         reply_markup=randomizer_keyboards.variableActionKeyboard(variable_name))
-
-
-# Обработка ввода основного промпта для рандомайзера
-async def write_prompt_for_randomizer(message: types.Message, state: FSMContext):
-    # Получаем данные
-    prompt = message.text
-
-    # Обновляем стейт
-    await state.update_data(prompt_for_randomizer=prompt)
-
-    await message.answer(text.GET_PROMPT_FOR_RANDOMIZER_SUCCESS_TEXT.format(prompt),
-                        reply_markup=randomizer_keyboards.mainPromptForRandomizerKeyboard())
-
-    await state.set_state(None)
-
-
-# Обработка нажатия кнопок основного промпта для рандомайзера
-async def handle_main_prompt_for_randomizer_buttons(call: types.CallbackQuery, state: FSMContext):
-    # Получаем данные
-    action = call.data.split("|")[1]
-    data = await state.get_data()
-
-    if action == "change":
-        await call.message.edit_text(text.WRITE_MAIN_PROMPT_FOR_RANDOMIZER_TEXT)
-        await state.set_state(RandomizerState.write_prompt_for_randomizer)
-    elif action == "back":
-        if "variable_names_for_randomizer" not in data:
-            variable_names = []
-        else:
-            variable_names = data["variable_names_for_randomizer"]
-
-        await call.message.edit_text(text.RANDOMIZER_MENU_TEXT, 
-        reply_markup=randomizer_keyboards.randomizerKeyboard(variable_names))
 
 
 # Обработка нажатия кнопок в меню действий с переменной
@@ -128,7 +78,7 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
 async def handle_delete_value_for_variable_buttons(call: types.CallbackQuery, state: FSMContext):
     # Если была выбрана кнопка "🔙 Назад"
     data = await state.get_data()
-    if call.data == "randomizer|delete_value|back":
+    if call.data == "randomizer_delete_value|back":
         await call.message.edit_text(text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(data["selected_variable_name"]), 
         reply_markup=randomizer_keyboards.variableActionKeyboard(data["selected_variable_name"]))
         return
@@ -204,9 +154,6 @@ async def write_value_for_variable_for_randomizer(message: types.Message, state:
 
 # Добавление обработчиков
 def hand_add():
-    
-    router.callback_query.register(handle_main_prompt_for_randomizer_buttons, lambda call: call.data.startswith("randomizer_prompt"))
-
     router.callback_query.register(handle_variable_action_buttons, lambda call: call.data.startswith("randomizer_variable"))
     
     router.callback_query.register(handle_delete_value_for_variable_buttons, lambda call: call.data.startswith("randomizer_delete_value"))
@@ -216,5 +163,3 @@ def hand_add():
     router.message.register(write_variable_for_randomizer, StateFilter(RandomizerState.write_variable_for_randomizer))
 
     router.message.register(write_value_for_variable_for_randomizer, StateFilter(RandomizerState.write_value_for_variable_for_randomizer))
-
-    router.message.register(write_prompt_for_randomizer, StateFilter(RandomizerState.write_prompt_for_randomizer))

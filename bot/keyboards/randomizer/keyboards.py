@@ -12,10 +12,6 @@ def randomizerKeyboard(current_variables: list[str]):
     )
 
     inline_keyboard.append(
-        [InlineKeyboardButton(text='✒️ Основной промпт', callback_data='randomizer|prompt')]
-    )
-
-    inline_keyboard.append(
         [InlineKeyboardButton(text='⚡️ Начать генерацию', callback_data='randomizer|start_generation')]
     )   
 
@@ -53,14 +49,4 @@ def deleteValuesForVariableKeyboard(values: list[str], variable_name: str):
         kb.inline_keyboard.append([InlineKeyboardButton(text=value, callback_data=f'randomizer_delete_value|{variable_name}|{value}')])
 
     kb.inline_keyboard.append([InlineKeyboardButton(text='🔙 Назад', callback_data=f'randomizer_delete_value|back')])
-    return kb
-
-
-# Клавиатура для основного промпта для рандомайзера
-def mainPromptForRandomizerKeyboard():
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='✍️ Изменить промпт', callback_data='randomizer_prompt|change')],
-        [InlineKeyboardButton(text='🔙 Назад', callback_data='randomizer_prompt|back')]
-    ])
-
     return kb
