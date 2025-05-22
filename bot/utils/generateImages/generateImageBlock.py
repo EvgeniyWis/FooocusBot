@@ -19,6 +19,10 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
     stop_generation = stateData.get("stop_generation", False)
 
     if stop_generation:
+        try:
+            message.unpin()
+        except:
+            pass
         raise Exception("Генерация остановлена")
 
     # Делаем запрос на генерацию и получаем id работы
