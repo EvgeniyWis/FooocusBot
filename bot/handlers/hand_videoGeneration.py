@@ -6,9 +6,9 @@ from aiogram.fsm.context import FSMContext
 from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
 from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.files.saveFile import saveFile
-from keyboards.user import keyboards
+from keyboards import video_generation_keyboards
 from utils import text
-from states import UserState
+from states import StartGenerationState
 from logger import logger
 from InstanceBot import bot
 import traceback
@@ -52,7 +52,7 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
         video_example_message = await call.message.answer_video(
             video=value["file_id"],
             caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
-            reply_markup=keyboards.videoExampleKeyboard(index, model_name)
+            reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name)
         )
         video_examples_messages_ids.append(video_example_message.message_id)
         await state.update_data(video_examples_messages_ids=video_examples_messages_ids)
@@ -114,7 +114,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         await state.update_data(video_example_index=index)
         await state.update_data(model_name=model_name)
         await call.message.answer(text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name, model_name_index))
-        await state.set_state(UserState.write_prompt_for_video)
+        await state.set_state(StartGenerationState.write_prompt_for_video)
         return
     
     # Отправляем сообщение под генерацию видео
@@ -143,11 +143,11 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     video = types.FSInputFile(video_path)
     if button_type == "test":
         await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=keyboards.videoExampleKeyboard(index, model_name, False))
+        reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name, False))
 
     elif button_type == "work":
         await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
-        reply_markup=keyboards.videoCorrectnessKeyboard(model_name))
+        reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -162,7 +162,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     # Отправляем видео
     await message.answer_video(video_example_file_id, 
     caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(data["model_name"], prompt),
-    reply_markup=keyboards.videoExampleKeyboard(index, data["model_name"], with_write_prompt=False))
+    reply_markup=video_generation_keyboards.videoExampleKeyboard(index, data["model_name"], with_write_prompt=False))
 
 
 # Обработка нажатия на кнопки корректности видео
@@ -220,7 +220,7 @@ def hand_add():
 
     router.callback_query.register(handle_video_example_buttons, lambda call: call.data.startswith("generate_video"))
 
-    router.message.register(write_prompt_for_video, StateFilter(UserState.write_prompt_for_video))
+    router.message.register(write_prompt_for_video, StateFilter(StartGenerationState.write_prompt_for_video))
 
     router.callback_query.register(handle_video_correctness_buttons, 
     lambda call: call.data.startswith("video_correctness"))
