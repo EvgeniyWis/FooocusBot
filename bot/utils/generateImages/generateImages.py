@@ -14,7 +14,7 @@ async def generateImages(setting_number: int, prompt: str, message: types.Messag
         # Прибавляем к каждому элементу массива корневой промпт
         dataArray = getDataArrayWithRootPrompt(setting_number, prompt)
     else:
-        dataArray = await getDataArrayByRandomizer(state)
+        dataArray = await getDataArrayByRandomizer(state, setting_number)
 
     logger.info(f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}")
 

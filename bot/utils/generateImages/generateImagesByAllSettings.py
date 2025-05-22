@@ -6,15 +6,21 @@ from aiogram.fsm.context import FSMContext
 import traceback
 from .generateImageBlock import generateImageBlock
 import asyncio
+from .dataArray.getDataArrayByRandomizer import getDataArrayByRandomizer
+
 
 # Функция для генерации изображений по всем настройкам
 async def generateImagesByAllSettings(message: types.Message, state: FSMContext, user_id: int,
-    is_test_generation: bool):
+    is_test_generation: bool, with_randomizer: bool = False):
 
     # Получаем все настройки
     dataArrays = getAllDataArrays()
     settings_numbers_success = []
     semaphore = asyncio.Semaphore(5)
+
+    # Добавляем рандомные значения к промпу
+    if with_randomizer:
+        dataArrays = [await getDataArrayByRandomizer(state, index + 1) for index, dataArray in enumerate(dataArrays)]
 
     # Создаём сообщение с прогрессом генерации настроек
     message_with_settings = await message.answer(text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT

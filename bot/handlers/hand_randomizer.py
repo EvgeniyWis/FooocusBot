@@ -198,7 +198,7 @@ async def write_value_for_variable_for_randomizer(message: types.Message, state:
         data[variable_name_values].append(value)
         await state.update_data(**{variable_name_values: data[variable_name_values]})
 
-    await message.answer(text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name))
+    await message.answer(text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(value, variable_name))
     await state.set_state(RandomizerState.write_value_for_variable_for_randomizer)
 
 
