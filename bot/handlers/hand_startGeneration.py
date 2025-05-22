@@ -11,7 +11,7 @@ from aiogram.fsm.context import FSMContext
 from utils.saveImages.getFolderDataByID import getFolderDataByID
 from utils.files.saveFile import saveFile
 from utils.generateImages.generateImageBlock import generateImageBlock
-from keyboards import start_generation_keyboards, randomizer_keyboards
+from keyboards import start_generation_keyboards, randomizer_keyboards, video_generation_keyboards
 from utils import text
 from states.UserState import StartGenerationState
 from logger import logger
@@ -26,6 +26,8 @@ from PIL import Image
 from utils.generateImages.ImageTobase64 import imageToBase64
 from utils.generateImages.base64ToImage import base64ToImage
 import asyncio
+from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
+from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 
 
 # Обработка выбора количества генераций
@@ -42,7 +44,8 @@ async def choose_generations_type(
     
     await state.update_data(prompt_exist=prompt_exist)
 
-    await call.message.answer(
+    await editMessageOrAnswer(
+        call,
         text.GET_GENERATIONS_SUCCESS_TEXT,
         reply_markup=start_generation_keyboards.selectSettingKeyboard(),
     )
@@ -50,12 +53,23 @@ async def choose_generations_type(
 
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
+    # Если выбрана конкретная модель, то просим ввести название модели
+    if call.data == 'select_setting|specific_model':
+        await editMessageOrAnswer(
+            call,
+            text.WRITE_MODEL_NAME_TEXT
+        )
+        await state.set_state(StartGenerationState.write_model_name_for_generation)
+        return 
+
+    # Если выбрана другая настройка, то продолжаем генерацию
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
     data = await state.get_data()
     generations_type = data["generations_type"]
     prompt_exist = data["prompt_exist"]
-
+    
+    # Если выбрана настройка для теста, то продолжаем генерацию в тестовом режиме
     if generations_type == "test":
         if prompt_exist:
             prompt = data["prompt"]
@@ -70,13 +84,16 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
 
             await state.update_data(prompt_exist=False)
         else:
-            await call.message.answer(
+            await editMessageOrAnswer(
+        call,
                 text.GET_SETTINGS_SUCCESS_TEXT
             )
             await state.set_state(StartGenerationState.write_prompt_for_images)
 
+    # Если выбрана настройка для работы, то продолжаем генерацию в рабочем режиме
     elif generations_type == "work":
-        await call.message.answer(
+        await editMessageOrAnswer(
+        call,
             text.CHOOSE_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
             reply_markup=start_generation_keyboards.writePromptTypeKeyboard()
         )
@@ -89,8 +106,10 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(writePrompt_type=writePrompt_type)
 
     if writePrompt_type == "one":
-        await call.message.answer(text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT, 
+        await editMessageOrAnswer(
+        call,text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT, 
         reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard())
+        
     else:
         # Получаем данные
         stateData = await state.get_data()
@@ -113,7 +132,8 @@ async def choose_writePrompt_type(call: types.CallbackQuery, state: FSMContext):
         # Получаем индекс модели
         model_name_index = getModelNameIndex(model_name)
 
-        await call.message.answer(text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name, model_name_index))
+        await editMessageOrAnswer(
+        call,text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(model_name, model_name_index))
         await state.update_data(current_model_for_unique_prompt=model_name)
         await state.set_state(StartGenerationState.write_prompt_for_model)
 
@@ -123,23 +143,34 @@ async def chooseOnePromptGenerationType(call: types.CallbackQuery, state: FSMCon
     one_prompt_generation_type = call.data.split("|")[1]
 
     if one_prompt_generation_type == "static":
-        await call.message.answer(text.GET_STATIC_PROMPT_TYPE_SUCCESS_TEXT)
+        await editMessageOrAnswer(
+        call,text.GET_STATIC_PROMPT_TYPE_SUCCESS_TEXT)
         await state.set_state(StartGenerationState.write_prompt_for_images)
 
     elif one_prompt_generation_type == "random":
-        await call.message.answer(text.GET_RANDOM_PROMPT_TYPE_SUCCESS_TEXT, 
+        await editMessageOrAnswer(
+        call,text.GET_RANDOM_PROMPT_TYPE_SUCCESS_TEXT, 
         reply_markup=randomizer_keyboards.randomizerKeyboard([]))
 
 
 # Обработка ввода промпта
 async def write_prompt(message: types.Message, state: FSMContext):
+    # Получаем данные
     prompt = message.text
     user_id = message.from_user.id
     data = await state.get_data()
     is_test_generation = data["generations_type"] == "test"
-    setting_number = data["setting_number"]
+
+    # Если в стейте есть номер настройки, то используем его, иначе получаем номер настройки по названию модели
+    if "setting_number" in data:
+        setting_number = data["setting_number"]
+    else:
+        model_name = data["model_name_for_generation"]
+        setting_number = getSettingNumberByModelName(model_name)
+
     await state.update_data(prompt=prompt)
 
+    # Генерируем изображения
     await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
             
 
@@ -197,7 +228,8 @@ async def confirm_write_unique_prompt_for_next_model(call: types.CallbackQuery, 
     next_model_index = getModelNameIndex(next_model)
 
     # Отправляем сообщение для ввода промпта
-    await call.message.answer(text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index))
+    await editMessageOrAnswer(
+        call,text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index))
     await state.set_state(StartGenerationState.write_prompt_for_model)
 
 
@@ -220,7 +252,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         is_test_generation = stateData["generations_type"] == "test"
 
         # Отправляем сообщение о перегенерации изображения
-        await call.message.answer(text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
+        await editMessageOrAnswer(
+        call,text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
 
         # Получаем данные генерации по названию модели
         data = await getDataByModelName(model_name)
@@ -237,7 +270,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(video_folder_id=video_folder_id)
 
     # Меняем текст на сообщении о начале upscale
-    await call.message.answer(text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+    await editMessageOrAnswer(
+        call,text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Получаем само изображение по пути
     image_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
@@ -257,7 +291,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
 
     # Меняем текст на сообщении об очереди на замену лица
-    await call.message.answer(text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
+    await editMessageOrAnswer(
+        call,text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
     faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -283,14 +318,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Если в списке генераций настала очередь этой модели, то запускаем генерацию
         if model_name == faceswap_generate_models[0]:
-            await call.message.answer(text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+            await editMessageOrAnswer(
+        call,text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
             
             try:
                 result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
             except Exception as e:
                 result_path = None
                 logger.error(f"Произошла ошибка при замене лица: {e}")
-                await call.message.answer(text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
+                await editMessageOrAnswer(
+        call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
                 break
 
             break
@@ -309,7 +346,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"Результат замены лица: {result_path}")
 
     # Меняем текст на сообщении
-    await call.message.answer(text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+    await editMessageOrAnswer(
+        call,text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Сохраняем изображение
     image_index = int(image_index) - 1
@@ -317,7 +355,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     link = await saveFile(result_path, user_id, model_name, picture_folder_id, now)
 
     if not link:
-        await call.message.answer(text.SAVE_FILE_ERROR_TEXT)
+        await editMessageOrAnswer(
+        call,text.SAVE_FILE_ERROR_TEXT)
         return
 
     await state.update_data(image_url=link)
@@ -333,9 +372,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     await bot.delete_message(user_id, call.message.message_id)
 
     # Отправляем сообщение о сохранении изображения
-    await call.message.answer(text.SAVE_IMAGES_SUCCESS_TEXT
+    await editMessageOrAnswer(
+        call,text.SAVE_IMAGES_SUCCESS_TEXT
     .format(link, model_name, parent_folder['webViewLink'], model_name_index), 
-    reply_markup=start_generation_keyboards.generateVideoKeyboard(model_name))
+    reply_markup=video_generation_keyboards.generateVideoKeyboard(model_name))
 
     # Удаляем отправленные изображения из чата
     stateData = await state.get_data()
@@ -349,6 +389,20 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Удаляем изображение с заменённым лицом
     os.remove(result_path)
+
+
+# Обработка ввода названия модели для генерации
+async def write_model_name_for_generation(message: types.Message, state: FSMContext):
+    model_name = message.text
+    await state.update_data(model_name_for_generation=model_name)
+
+    # Если такой модели не существует, то просим ввести другое название
+    if not await getDataByModelName(model_name):
+        await message.answer(text.MODEL_NOT_FOUND_TEXT)
+        return
+
+    await message.answer(text.GET_MODEL_NAME_SUCCESS_TEXT)
+    await state.set_state(StartGenerationState.write_prompt_for_images)
 
 
 # Добавление обработчиков
@@ -377,3 +431,5 @@ def hand_add():
     router.callback_query.register(confirm_write_unique_prompt_for_next_model, lambda call: call.data.startswith("confirm_write_unique_prompt_for_next_model"))
 
     router.callback_query.register(select_image, lambda call: call.data.startswith("select_image"))
+
+    router.message.register(write_model_name_for_generation, StateFilter(StartGenerationState.write_model_name_for_generation))

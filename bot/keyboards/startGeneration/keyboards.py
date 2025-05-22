@@ -33,6 +33,9 @@ def selectSettingKeyboard():
     
     inline_keyboard.append([InlineKeyboardButton(text='Все настройки', callback_data='select_setting|all')])
 
+    # Генерация конкретной модели
+    inline_keyboard.append([InlineKeyboardButton(text='🔄 Генерация конкретной модели', callback_data='select_setting|specific_model')])
+
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
