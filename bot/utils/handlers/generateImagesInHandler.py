@@ -29,7 +29,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 result = [await generateImageBlock(dataJSON, model_name, message_for_edit, state, user_id, setting_number, is_test_generation)]
         else:
             if setting_number == "all":
-                result = await generateImagesByAllSettings(message, state, user_id, is_test_generation)
+                result = await generateImagesByAllSettings(message, state, user_id, is_test_generation, True)
             else:
                 message_for_edit = await message.answer(
                     text.GET_PROMPT_SUCCESS_TEXT

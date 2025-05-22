@@ -4,10 +4,9 @@ import random
 from logger import logger
 
 # Функция для применения переменных рандомайзера к промптам массива данных
-async def getDataArrayByRandomizer(state: FSMContext):
+async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     # Получаем массив данных
     stateData = await state.get_data()
-    setting_number = int(stateData["setting_number"])
 
     # Получаем переменные рандомайзера и основной промпт
     prompt_for_randomizer = stateData["prompt_for_randomizer"]
@@ -26,7 +25,7 @@ async def getDataArrayByRandomizer(state: FSMContext):
             random_variable_value = random.choice(variable_values)
 
             # Применяем значение переменной к промпу
-            data["json"]["input"]["prompt"] += " " + f"{variable_name}: {random_variable_value}"
+            data["json"]["input"]["prompt"] += " " + f"{variable_name}: {random_variable_value};"
 
     logger.info(f"Массив данных после применения переменных рандомайзера: {dataArray}")
     # Возвращаем массив данных
