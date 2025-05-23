@@ -47,7 +47,7 @@ async def choose_generations_type(
     await editMessageOrAnswer(
         call,
         text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=start_generation_keyboards.selectSettingKeyboard(),
+        reply_markup=start_generation_keyboards.selectSettingKeyboard(is_test_generation=generations_type == "test"),
     )
 
 
