@@ -7,7 +7,7 @@ def setting3_getDataArray():
         setting3_generateData("carolinehazel.xo", "1vP4VHWGIDq0I40dNMx_DlxMRhTD2Mve", "1iirj-hzKdN7row5ZB80VxCSYB10G5qGH", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-        [-1.50, 1.30, 1.00, 3.00, 0.25, -1.70]),
+        [-1.50, 1.30, 1.00, 3.00, 0.25, -1.70], 8),
 
         setting3_generateData("kirapreslyn", "1sA4mt0Gtv_AGjz_Je7iJHatGFbBGWA_Y", "1E05SPbl1TkAnQNehnfcK1y8XlN7qGxGn", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 

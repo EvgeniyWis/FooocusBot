@@ -17,7 +17,7 @@ def setting4_getDataArray():
         setting4_generateData("karine_montclair", "1MRc7lF1OiupndMj4lHSDQ7wSKiXBbe_k", "1_RoPB5QiYXvL7HWkTaC2BLjG4_a5D2ae", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
         real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, ash-blonde hair, long hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, blue eyes.""",
-        [2, 1.40, 0.50, 1.00, 2.50, 2.00, -0.70, 0.35]),
+        [2, 1.40, 0.50, 1.00, 2.50, 2.00, -0.70, 0.35], 8),
 
         setting4_generateData("oliviarouxlyn", "1-N7aIBrVjRpSDwuN6sJyQeiZ6RTcDxcQ", "1WVJ_dWpCKQyJy7iTH5vlCcOFpR_HlTYu", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
@@ -122,7 +122,7 @@ def setting4_getDataArray():
         setting4_generateData("eleonora.lolly", "1mqIItS1IQzPL1IcstIv3oO3QoCMGrXX0", "1l7Dij2dgasDSmFY0wMXg0aGN9uZ0R7aH", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
         real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, highlighted black hair, long straight hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, high height, ((extra-tan skin)), skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist))""",
-        [2, 1.20, -1.70, 2.50, 1.00, 2.00, -0.70, 0.35, 0, 1.75]),
+        [2, 1.20, -1.70, 2.50, 1.00, 2.00, -0.70, 0.35, 0, 1.75], 8),
 
         setting4_generateData("wendy_rosemont", "1XkPj8R6joT6whZBBOoyX5wj5cNxz8uKs", "184SBebZkI2xNljKciofLrgG3GAEqsQLr", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
@@ -137,12 +137,12 @@ def setting4_getDataArray():
         setting4_generateData("jennifer_harrington.xo", "1FTjC7pajtr72EfsrLn6aX-MeNbrlBB9U", "1UJBxC7WsyIkDoqhIeCR9xbDqydZHTdDZ", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
         real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, highlighted black hair, long straight hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, high height, ((extra-tan skin)), skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist)), slightly smiling, smirk""",
-        [2, 3.10, -1.70, 1.30, 1.00, 2.00, -0.70, 0.35, 0, 1.55]),
+        [2, 3.10, -1.70, 1.30, 1.00, 2.00, -0.70, 0.35, 0, 1.55], 8),
 
         setting4_generateData("jessie_valemont", "1z7Bvex1G7qcn30zBfadgLKnrah72mvjb", "1FH1KBjO4-GJouSQdTLZnoNJx400ed11x", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
         real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, highlighted platinum hair, long straight platinum white hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, high height, ((extra-tan skin)), skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist)), slightly smiling, smirk""",
-        [2, 3.10, -1.70, 1.55, 1.00, 2.00, -0.70, 0.35, 0, 0.15]),
+        [2, 3.10, -1.70, 1.55, 1.00, 2.00, -0.70, 0.35, 0, 0.15], 8),
 
         setting4_generateData("jessieveroux", "1QzjT0KXBG-01bmhQ_XEhwvl1w_3FytpK", "1sEOC1ubaj9qP7mZYDUGpx-qxwTGgRAex", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
@@ -152,7 +152,7 @@ def setting4_getDataArray():
         setting4_generateData("viviengloww", "1QzjT0KXBG-01bmhQ_XEhwvl1w_3FytpK", "1sEOC1ubaj9qP7mZYDUGpx-qxwTGgRAex", """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
         real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, highlighted black hair, long straight black hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, high height, ((extra-tan skin)), skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist)), slightly smiling, smirk""",
-        [2, 1.75, -0.40, 1.45, 1.00, 2.00, -0.70, 0.35, 0, 0.75])
+        [2, 1.75, -0.40, 1.45, 1.00, 2.00, -0.70, 0.35, 0, 0.75], 8)
     ]
 
     return dataArray
