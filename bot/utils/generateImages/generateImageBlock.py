@@ -62,12 +62,12 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
         model_name_index = getModelNameIndex(model_name)
 
         # Получаем данные модели
-        model_data = getDataByModelName(model_name)
+        model_data = await getDataByModelName(model_name)
 
         # Отправляем клавиатуру для выбора изображения
         await message.answer(text.SELECT_IMAGE_TEXT.format(model_name, model_name_index) if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
-        reply_markup=start_generation_keyboards.selectImageKeyboard(model_name, setting_number, model_data["image_number"]) 
-        if not is_test_generation else start_generation_keyboards.testGenerationImagesKeyboard(setting_number, model_data["image_number"]) if stateData["setting_number"] != "all" else None)
+        reply_markup=start_generation_keyboards.selectImageKeyboard(model_name, setting_number, model_data["json"]["input"]["image_number"]) 
+        if not is_test_generation else start_generation_keyboards.testGenerationImagesKeyboard(setting_number) if stateData["setting_number"] != "all" else None)
 
         # Сохраняем в стейт данные о медиагруппе, для её удаления
         await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
