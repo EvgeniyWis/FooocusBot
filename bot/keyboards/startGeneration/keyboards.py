@@ -9,10 +9,10 @@ def generationsTypeKeyboard():
 
 
 # Инлайн-клавиатура для выбора одного из изображений
-def selectImageKeyboard(model_name: str, setting_number: str):
+def selectImageKeyboard(model_name: str, setting_number: str, image_number: int):
     inline_keyboard = []
 
-    for i in range(1, 5, 2):
+    for i in range(1, image_number + 1, 2):
         inline_keyboard.append([
             InlineKeyboardButton(text=f'{i}', callback_data=f'select_image|{model_name}|{setting_number}|{i}'),
             InlineKeyboardButton(text=f'{i+1}', callback_data=f'select_image|{model_name}|{setting_number}|{i+1}')
