@@ -1,4 +1,4 @@
-from bot.config import DEVELOPMENT_MODE
+from config import DEVELOPMENT_MODE
 
 # Функция для получения примеров шаблонов для генерации видео с помощью kling
 async def getVideoExamplesData() -> dict:
