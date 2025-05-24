@@ -20,3 +20,6 @@ RUNPOD_HOST = f"https://api.runpod.ai/v2/{ENDPOINT_ID}"
 
 # ID чата разработчика
 DEV_CHAT_ID = 1979922062
+
+# Устанавливаем режим разработки
+DEVELOPMENT_MODE = True
