@@ -7,7 +7,7 @@ async def editMessageOrAnswer(
     try:
         message = await call.message.edit_text(text, reply_markup=reply_markup)
     except Exception as e:
-        logger.error(f"Ошибка при редактировании сообщения: {e}")
+        logger.warning(f"Ошибка при редактировании сообщения: {e}")
         message = await call.message.answer(text, reply_markup=reply_markup)
         
     return message

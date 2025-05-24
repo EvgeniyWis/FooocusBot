@@ -1,7 +1,7 @@
 import requests
-from utils.files.downloadFromGoogleDrive import downloadFromGoogleDrive
+from utils.googleDrive.files.downloadFromGoogleDrive import downloadFromGoogleDrive
 from logger import logger
-from utils.files.getGoogleDriveFileID import getGoogleDriveFileID
+from utils.googleDrive.files.getGoogleDriveFileID import getGoogleDriveFileID
 import os
 import asyncio
 from utils.videos.downloadVideo import downloadVideo
