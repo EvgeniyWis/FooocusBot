@@ -4,7 +4,7 @@ from .base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
 from ..jobs.getJobID import getJobID
 from ..jobs.checkJobStatus import checkJobStatus
-from .sendImageBlock import sendImageBlock
+from ..handlers.sendImageBlock import sendImageBlock
 
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 

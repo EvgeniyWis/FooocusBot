@@ -1,6 +1,6 @@
 from aiogram.fsm.context import FSMContext
 import asyncio
-from utils.generateImages.sendImageBlock import sendImageBlock
+from .sendImageBlock import sendImageBlock
 from aiogram import types
 from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 from logger import logger

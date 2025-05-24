@@ -9,9 +9,13 @@ from logger import logger
 import traceback
 from utils.generateImages.generateImages import generateImages
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
+import asyncio
+from keyboards import video_generation_keyboards
+
 
 # Функция для генерации изображения в зависимости от настроек
 async def generateImagesInHandler(prompt: str, message: types.Message, state: FSMContext,
+                                  
     user_id: int, is_test_generation: bool, setting_number: str, with_randomizer: bool = False):
     # Генерируем изображения
     try:
@@ -61,7 +65,17 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
         stateData = await state.get_data()
         if result:
             if "stop_generation" not in stateData:
-                await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
+                media_groups_for_generation = stateData["media_groups_for_generation"]
+                
+                # Ждём когда список медиа групп для генерации станет пустым
+                while len(media_groups_for_generation) > 0:
+                    stateData = await state.get_data()
+                    media_groups_for_generation = stateData["media_groups_for_generation"]
+                    await asyncio.sleep(5)
+
+                # И только после этого отправляем сообщение о успешной генерации с возможностью начать генерацию видео
+                await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 
+                reply_markup=video_generation_keyboards.generateVideoKeyboard())
         else:
             if "stop_generation" not in stateData:
                 raise Exception("Произошла ошибка при генерации изображения")

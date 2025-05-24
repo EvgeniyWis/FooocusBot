@@ -1,4 +1,4 @@
-from .auth import service
+from ..auth import service
 from logger import logger
 
 # Функция для получения данных папки по её id
