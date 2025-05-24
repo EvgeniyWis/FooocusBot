@@ -1,4 +1,4 @@
-from ..googleDriveFolders.auth import service
+from utils.googleDrive.auth import service
 from googleapiclient.http import MediaFileUpload
 from logger import logger   
 

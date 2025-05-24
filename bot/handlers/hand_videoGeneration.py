@@ -22,8 +22,17 @@ from utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
 async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
-    # Получаем название модели
-    model_name = call.data.split("|")[1]
+    # Получаем название модели, которая стоит первой в очереди
+    stateData = await state.get_data()
+    model_data = stateData["images_urls"][0]
+    model_name = list(model_data.keys())[0]
+
+    # Делаем ссылку
+    image_url = model_data[model_name]
+    image_id = image_url.split("/")[5]
+    image_url = f"https://drive.google.com/uc?export=view&id={image_id}"
+
+    logger.info(f"Для генерации видео выбрана модель: {model_name} и url изображения: {image_url}")
 
     # Получаем id пользователя и удаляем сообщение
     user_id = call.from_user.id
@@ -40,8 +49,9 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение для выбора видео-примеров
-    select_video_example_message = await editMessageOrAnswer(
-        call,text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index))
+    select_video_example_message = await call.message.answer_photo(
+        photo=image_url,
+        caption=text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index))
 
     await state.update_data(select_video_example_message_id=select_video_example_message.message_id)
 

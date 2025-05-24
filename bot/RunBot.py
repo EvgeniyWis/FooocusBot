@@ -17,9 +17,12 @@ async def on_startup() -> None:
     if os.path.exists("FocuuusBot/temp"):
         shutil.rmtree("FocuuusBot/temp")
 
-    # Удаляем папку results для facefusion-docker
+    # Удаляем содержимое папки results для facefusion-docker
     if os.path.exists("facefusion-docker/.assets/images/results"):
-        shutil.rmtree("facefusion-docker/.assets/images/results")
+        for file in os.listdir("facefusion-docker/.assets/images/results"):
+            file_path = os.path.join("facefusion-docker/.assets/images/results", file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
     # Добавляем обработчики
     handlers.hand_commands.hand_add()

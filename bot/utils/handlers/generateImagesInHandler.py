@@ -17,6 +17,10 @@ from keyboards import video_generation_keyboards
 async def generateImagesInHandler(prompt: str, message: types.Message, state: FSMContext,
                                   
     user_id: int, is_test_generation: bool, setting_number: str, with_randomizer: bool = False):
+    # Инициализируем стейт
+    await state.update_data(models_for_generation_queue=[])
+    await state.update_data(sent_images_count=0)
+
     # Генерируем изображения
     try:
         if is_test_generation:
@@ -65,13 +69,15 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
         stateData = await state.get_data()
         if result:
             if "stop_generation" not in stateData:
-                media_groups_for_generation = stateData["media_groups_for_generation"]
+                sent_images_count = stateData["sent_images_count"]
+                success_images_count = stateData["success_images_count"]
                 
-                # Ждём когда список медиа групп для генерации станет пустым
-                while len(media_groups_for_generation) > 0:
+                # Ждём когда список моделей для генерации станет пустым
+                while sent_images_count < success_images_count:
                     stateData = await state.get_data()
-                    media_groups_for_generation = stateData["media_groups_for_generation"]
-                    await asyncio.sleep(5)
+                    sent_images_count = stateData["sent_images_count"]
+                    success_images_count = stateData["success_images_count"]
+                    await asyncio.sleep(10)
 
                 # И только после этого отправляем сообщение о успешной генерации с возможностью начать генерацию видео
                 await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 
