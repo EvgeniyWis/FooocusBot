@@ -45,4 +45,4 @@ async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext
     # Удаляем блок изображений из очереди
     await state.update_data(media_groups_for_generation=media_groups_for_generation[1:])
 
-    return model_name["result"]
+    return model_name
