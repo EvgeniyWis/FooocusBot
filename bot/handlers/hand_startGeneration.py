@@ -28,6 +28,7 @@ from utils.generateImages.base64ToImage import base64ToImage
 import asyncio
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
 from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
+from utils.handlers.waitForImageBlocksGenetion import waitForImageBlocksGeneration
 
 
 # Обработка выбора количества генераций
@@ -242,6 +243,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     model_name = call.data.split("|")[1]
     setting_number = call.data.split("|")[2]
     image_index = call.data.split("|")[3]
+
+    # Отправляем следующее изображение (ждём пока появится следующий блок изображений в очереди и отправляем его)
+    asyncio.create_task(waitForImageBlocksGeneration(call.message, state))
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
