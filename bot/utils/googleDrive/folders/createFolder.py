@@ -1,5 +1,4 @@
-from .auth import service
-from logger import logger
+from ..auth import service
 
 # Создание папки
 async def createFolder(folder_name: str, nested_folder_names: list[str] = None, parent_folder_id: str = None) -> tuple[str, str]:

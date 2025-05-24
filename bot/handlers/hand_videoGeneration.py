@@ -4,8 +4,6 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
-from utils.saveImages.getFolderDataByID import getFolderDataByID
-from utils.files.saveFile import saveFile
 from keyboards import video_generation_keyboards
 from utils import text
 from states import StartGenerationState
@@ -18,6 +16,8 @@ import os
 from datetime import datetime
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
+from utils.googleDrive.files.saveFile import saveFile
+from utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"

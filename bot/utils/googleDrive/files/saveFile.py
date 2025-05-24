@@ -1,12 +1,12 @@
 from utils.retryOperation import retryOperation
-from utils.files.uploadFile import uploadFile
 from config import TEMP_FOLDER_PATH
 from logger import logger
-from ..saveImages.auth import service
 import shutil
 import asyncio
-from ..saveImages.deleteParentFolder import deleteParentFolder
-from ..saveImages.createFolder import createFolder
+from ..folders.deleteParentFolder import deleteParentFolder
+from ..folders.createFolder import createFolder
+from utils.googleDrive.auth import service
+from .uploadFile import uploadFile
 
 # Сохранение одного файла
 async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folder_id: int, current_date: str, with_deleting_temp_folder: bool = True):

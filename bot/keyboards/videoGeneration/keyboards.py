@@ -2,9 +2,9 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 # Инлайн-клавиатура для генерации видео
-def generateVideoKeyboard(model_name: str):
+def generateVideoKeyboard():
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='📹 Сгенерировать видео', callback_data=f'start_generate_video|{model_name}')]])
+    [InlineKeyboardButton(text='📹 Начать генерацию видео', callback_data=f'start_generate_video')]])
 
     return kb
 

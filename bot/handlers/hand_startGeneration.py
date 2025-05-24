@@ -8,10 +8,8 @@ from utils.facefusion.facefusion_swap import facefusion_swap
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from utils.saveImages.getFolderDataByID import getFolderDataByID
-from utils.files.saveFile import saveFile
 from utils.generateImages.generateImageBlock import generateImageBlock
-from keyboards import start_generation_keyboards, randomizer_keyboards, video_generation_keyboards
+from keyboards import start_generation_keyboards, randomizer_keyboards
 from utils import text
 from states.UserState import StartGenerationState
 from logger import logger
@@ -29,6 +27,8 @@ import asyncio
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
 from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 from utils.handlers.waitForImageBlocksGenetion import waitForImageBlocksGeneration
+from utils.googleDrive.files.saveFile import saveFile
+from utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 
 
 # Обработка выбора количества генераций
@@ -363,7 +363,13 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         call,text.SAVE_FILE_ERROR_TEXT)
         return
 
-    await state.update_data(image_url=link)
+    # Сохраняем ссылку на изображение в стейт вместе с именем модели
+    dataForUpdate = {f"{model_name}": link}
+    if "images_urls" not in stateData:
+        await state.update_data(images_urls=[dataForUpdate])
+    else:
+        stateData["images_urls"].append(dataForUpdate)
+        await state.update_data(images_urls=stateData["images_urls"])
 
     # Получаем данные родительской папки
     folder = getFolderDataByID(picture_folder_id)
@@ -378,8 +384,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Отправляем сообщение о сохранении изображения
     await editMessageOrAnswer(
         call,text.SAVE_IMAGES_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink'], model_name_index), 
-    reply_markup=video_generation_keyboards.generateVideoKeyboard(model_name))
+    .format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
     # Удаляем отправленные изображения из чата
     stateData = await state.get_data()
