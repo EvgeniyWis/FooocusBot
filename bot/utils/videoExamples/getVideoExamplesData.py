@@ -1,4 +1,4 @@
-import os
+from bot.config import DEVELOPMENT_MODE
 
 # Функция для получения примеров шаблонов для генерации видео с помощью kling
 async def getVideoExamplesData() -> dict:
@@ -12,15 +12,24 @@ async def getVideoExamplesData() -> dict:
     "Eyes open, soft smile with lips closed, slight head tilt. Hips move actively in a rhythmic, fluid motion, creating an energetic and dynamic dance, with the movement focused on the waist and lower body. Hands firmly resting on her waist, staying still and in place. Posture is confident and relaxed, expression calm and natural, maintaining a controlled and lively dance. Close-up shot, soft, natural lighting with balanced warmth, ensuring no overexposure."]
 
     # Формируем массив из file_id видео
-    video_ids = [
-        "BAACAgIAAxkBAAPraCmALgLMyj3hYfhAZxMcUu_xNBIAAg1rAAI_q1BJH4l_Wztt8bg2BA",
+    if DEVELOPMENT_MODE:
+        video_ids = [
+            "BAACAgIAAxkBAAK3nWgyCpXl79L5peVJ5dnsGnmozlvVAAINawACP6tQSZWtaZ9qiyFCNgQ",
+            "BAACAgIAAxkBAAK3nmgyCpX48oVWcv9CR5478XLG2OXCAAIQawACP6tQSX0FEkOg-TfRNgQ",
+            "BAACAgIAAxkBAAK3oGgyCpV6vQW9r7ox2AfiAAHp-18XiAACDmsAAj-rUEleOThVyLTJPjYE",
+            "BAACAgIAAxkBAAK3oWgyCpVZuhCRPFaVq5QeQp6TRh7OAAIocAACihNRSWVwUNXKu2cbNgQ",
+            "BAACAgIAAxkBAAK3n2gyCpVz_IvRxDlcV8BZ0EGWQlIiAAIPawACP6tQSciFMwnTz-roNgQ",
+            "BAACAgIAAxkBAAK3omgyCpU3DRy7cRMowbxGWB4x4J6EAAIvcAACihNRScLPI7SUpqb2NgQ"
+        ]
+    else:
+       video_ids = [
+            "BAACAgIAAxkBAAPraCmALgLMyj3hYfhAZxMcUu_xNBIAAg1rAAI_q1BJH4l_Wztt8bg2BA",
         "BAACAgIAAxkBAAPuaCmALgPZpRy-MD_wDhnchrOWV2cAAhBrAAI_q1BJ0GEn22fOOnA2BA",
         "BAACAgIAAxkBAAPtaCmALtvwc4-Sp_7FPBBjyqqLfXoAAg9rAAI_q1BJRM5-AAETncrMNgQ",
         "BAACAgIAAxkBAAPsaCmALqx-5jWYl6G2gjf5Y4HuvBoAAg5rAAI_q1BJ_6h6PvF9cqE2BA",
         "BAACAgIAAxkBAAID1GgpwxspBCUUICk5wBxEfyMOvcHAAAIocAACihNRSZ3p6zpuo9SgNgQ",
-        "BAACAgIAAxkBAAID1mgpw1gqEtclVWECyTUzoVml2TxMAAIvcAACihNRSeTSS095gh1lNgQ"
-    ]
-
+            "BAACAgIAAxkBAAID1mgpw1gqEtclVWECyTUzoVml2TxMAAIvcAACihNRSZ3p6zpuo9SgNgQ"
+        ]
     # Если длина массива промптов и длина массива видео не равны, то выводим ошибку
     if len(prompts) != len(video_ids):
         raise ValueError("Длина массива промптов и длина массива видео не равны")
