@@ -417,6 +417,11 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         if next_model_name and not stateData["specific_model"]:
             # Удаляем модель из очереди генерации
             stateData = await state.get_data()
+            next_model_name = await next_model_name
+            
+            if not next_model_name:
+                return
+            
             logger.info(f"Удаляем модель из очереди генерации: {next_model_name} из списка: {stateData['models_for_generation_queue']}")
             stateData["models_for_generation_queue"].remove(next_model_name)
             await state.update_data(models_for_generation_queue=stateData["models_for_generation_queue"])

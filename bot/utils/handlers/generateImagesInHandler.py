@@ -68,7 +68,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 
         stateData = await state.get_data()
         if result:
-            if "stop_generation" not in stateData:
+            if "stop_generation" not in stateData and not is_test_generation:
                 sent_images_count = stateData["sent_images_count"]
                 success_images_count = stateData["success_images_count"]
                 
@@ -79,9 +79,9 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                     success_images_count = stateData["success_images_count"]
                     await asyncio.sleep(10)
 
-                # И только после этого отправляем сообщение о успешной генерации с возможностью начать генерацию видео
-                await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 
-                reply_markup=video_generation_keyboards.generateVideoKeyboard())
+            # И только после этого отправляем сообщение о успешной генерации с возможностью начать генерацию видео
+            await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 
+            reply_markup=video_generation_keyboards.generateVideoKeyboard())
         else:
             if "stop_generation" not in stateData:
                 raise Exception("Произошла ошибка при генерации изображения")
