@@ -47,10 +47,17 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
         #     base_64_dataArray.append(base_64_data)
         #     media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
-        # Если изображение первое в очереди, то отправляем его и инициализуем стейт
+        # Если изображение первое в очереди, то отправляем его и инициализуем стейт (либо если это изображение, которое перегенерируется)
         stateData = await state.get_data()
-        if stateData["media_groups_for_generation"] == None:
-            await state.update_data(media_groups_for_generation=[])
+        if stateData["media_groups_for_generation"] == None or model_name in stateData["regenerate_images"]:
+            # Обновляем стейт
+            if stateData["media_groups_for_generation"] == None:
+                await state.update_data(media_groups_for_generation=[])
+
+            # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
+            elif model_name in stateData["regenerate_images"]:
+                stateData["regenerate_images"].remove(model_name)
+                await state.update_data(regenerate_images=stateData["regenerate_images"])
 
             # Отправляем изображение
             await sendImageBlock(message, state, media_group, model_name, setting_number, is_test_generation)

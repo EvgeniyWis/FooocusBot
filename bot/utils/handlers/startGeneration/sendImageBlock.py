@@ -38,6 +38,7 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
     await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
     
     # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-    if is_test_generation:
-        shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")
-        return
+    # TODO: раскомментировать
+    # if is_test_generation:
+    #     shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")
+    #     return

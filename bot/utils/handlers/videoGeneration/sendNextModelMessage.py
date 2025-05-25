@@ -32,9 +32,10 @@ async def sendNextModelMessage(state: FSMContext, call: types.CallbackQuery, mod
     await state.update_data(image_url=image_url)
 
     # Удаляем видео из папки temp/videos, если оно есть
-    stateData = await state.get_data()
-    if "video_path" in stateData:
-        os.remove(stateData["video_path"])
+    # TODO: раскомментировать
+    # stateData = await state.get_data()
+    # if "video_path" in stateData:
+    #     os.remove(stateData["video_path"])
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)

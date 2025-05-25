@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from ..editMessageOrAnswer import editMessageOrAnswer
 from ... import text
 from ...generateImages.dataArray import getModelNameIndex, getDataByModelName
+from ...handlers.appendDataToStateArray import appendDataToStateArray
 
 
 # Функция для перегенерации изображения
@@ -20,6 +21,9 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     # Отправляем сообщение о перегенерации изображения
     await editMessageOrAnswer(
     call, text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
+
+    # Добавляем модель в массив перегенируемых изображений
+    await appendDataToStateArray(state, "regenerate_images", model_name)
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
