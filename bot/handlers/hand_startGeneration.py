@@ -344,7 +344,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
             # Меняем текст на сообщении
             await editMessageOrAnswer(
-                call, text.FACE_SWAP_SUCCESS_TEXT.format(model_name, model_name_index))  
+                call, text.FACE_SWAP_SUCCESS_TEXT.format(model_name, model_name_index),
+                reply_markup=start_generation_keyboards.saveImagesKeyboard() if stateData["specific_model"] else None)
 
             # Добавляем в стейт то, сколько отправленных изображений
             stateData["finally_sent_generated_images_count"] += 1

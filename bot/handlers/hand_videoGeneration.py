@@ -231,7 +231,9 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         call,text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
         # Сохраняем видео
-        link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
+        # TODO: раскомментировать
+        # link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
+        link = "https://drive.google.com/drive/folders/18V64itY-c07U43aZb09mdzgVU9UGa242"
 
         if not link:
             await editMessageOrAnswer(
@@ -262,7 +264,7 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         await state.update_data(saved_images_count=stateData["saved_images_count"])
 
         # Если это было последнее видео, то отправляем сообщение о заканчивании генерации
-        if stateData["saved_images_count"] == stateData["saved_videos_count"] + 1:
+        if stateData["saved_images_count"] == stateData["saved_videos_count"] + 1 and not stateData["specific_model"]:
             await call.message.answer(text.SAVING_VIDEOS_SUCCESS_TEXT)
 
 

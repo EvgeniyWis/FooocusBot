@@ -14,6 +14,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
     user_id: int, is_test_generation: bool, setting_number: str, with_randomizer: bool = False):
     # Инициализируем стейт
     await state.update_data(models_for_generation_queue=[])
+    await state.update_data(regenerate_images=[])
     await state.update_data(will_be_sent_generated_images_count=0)
     await state.update_data(finally_sent_generated_images_count=0)
     await state.update_data(total_images_count=0)
@@ -68,9 +69,11 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 await message_for_edit.unpin()
                 
         stateData = await state.get_data()
-        if result:
-            if "stop_generation" not in stateData and not is_test_generation:
-                finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
+
+        if not is_test_generation:
+            if result:
+                if "stop_generation" not in stateData:
+                    finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
                 total_images_count = stateData["total_images_count"]
                 
                 # Ждём когда список моделей для генерации станет пустым
@@ -80,18 +83,18 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                     total_images_count = stateData["total_images_count"]
                     await asyncio.sleep(10)
 
-            # Очищаем список медиагрупп
-            await state.update_data(media_groups_for_generation=None)
+                # Очищаем список медиагрупп
+                await state.update_data(media_groups_for_generation=None)
 
-            # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
-            await message.answer(text.GENERATE_IMAGES_SUCCESS_TEXT, 
-            reply_markup=start_generation_keyboards.saveImagesKeyboard())
+                # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
+                await message.answer(text.GENERATE_IMAGES_SUCCESS_TEXT, 
+                reply_markup=start_generation_keyboards.saveImagesKeyboard())
 
-            # Ставим, что начался 2 этап
-            await state.update_data(generation_step=2)
-        else:
-            if "stop_generation" not in stateData:
-                raise Exception("Произошла ошибка при генерации изображения")
+                # Ставим, что начался 2 этап
+                await state.update_data(generation_step=2)
+            else:
+                if "stop_generation" not in stateData:
+                    raise Exception("Произошла ошибка при генерации изображения")
 
     except Exception as e:
         try:
