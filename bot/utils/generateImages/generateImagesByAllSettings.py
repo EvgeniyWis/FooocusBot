@@ -1,7 +1,7 @@
 from .dataArray.getAllDataArrays import getAllDataArrays
 from logger import logger
 from aiogram import types
-from utils import text
+from .. import text
 from aiogram.fsm.context import FSMContext
 import traceback
 from .generateImageBlock import generateImageBlock

@@ -1,11 +1,11 @@
-from utils import retryOperation
+from ... import retryOperation
 from config import TEMP_FOLDER_PATH
 from logger import logger
 import shutil
 import asyncio
 from ..folders.deleteParentFolder import deleteParentFolder
 from ..folders.createFolder import createFolder
-from utils.googleDrive.auth import service
+from ..auth import service
 from .uploadFile import uploadFile
 
 # Сохранение одного файла
