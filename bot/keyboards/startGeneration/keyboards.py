@@ -80,3 +80,22 @@ def onePromptGenerationChooseTypeKeyboard():
     ])
 
     return kb
+
+
+# Инлайн-клавиатура для перехода к этапу сохранения изображений
+def saveImagesKeyboard():
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='💾 Этап сохранения изображений', callback_data=f'save_images')]])
+
+    return kb
+
+
+# Инлайн-клавиатура при выборе для сохранения изображения
+def saveImageKeyboard(model_name: str, setting_number: str):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text='💾 Сохранить изображение', callback_data=f'save_image|{model_name}')],
+    [InlineKeyboardButton(text='🔄 Перегенерировать', callback_data=f'select_image|{model_name}|{setting_number}|regenerate')]
+    ])
+
+    return kb
+
