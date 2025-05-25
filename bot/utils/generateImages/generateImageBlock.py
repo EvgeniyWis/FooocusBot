@@ -20,17 +20,18 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             pass
         raise Exception("Генерация остановлена")
 
-    # Делаем запрос на генерацию и получаем id работы
-    job_id = await getJobID(dataJSON)
+    # TODO: раскомментировать
+    # # Делаем запрос на генерацию и получаем id работы
+    # job_id = await getJobID(dataJSON)
 
-    # Проверяем статус работы
-    response_json = await checkJobStatus(job_id, state, message, is_test_generation, checkOtherJobs)
+    # # Проверяем статус работы
+    # response_json = await checkJobStatus(job_id, state, message, is_test_generation, checkOtherJobs)
 
     try:
-        images_output = response_json["output"]
+        # images_output = response_json["output"]
         
-        if images_output == []:
-            raise Exception("Не удалось сгенерировать изображения")
+        # if images_output == []:
+        #     raise Exception("Не удалось сгенерировать изображения")
 
         media_group = []
         base_64_dataArray = []
@@ -41,10 +42,10 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(reference_image)))
 
         # Обрабатываем результаты
-        for i, image_data in enumerate(images_output):
-            base_64_data = await base64ToImage(image_data["base64"], model_name, i, user_id, is_test_generation)
-            base_64_dataArray.append(base_64_data)
-            media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
+        # for i, image_data in enumerate(images_output):
+        #     base_64_data = await base64ToImage(image_data["base64"], model_name, i, user_id, is_test_generation)
+        #     base_64_dataArray.append(base_64_data)
+        #     media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
         # Если изображение первое в очереди, то отправляем его и инициализуем стейт
         stateData = await state.get_data()

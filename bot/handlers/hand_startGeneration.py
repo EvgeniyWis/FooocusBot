@@ -413,7 +413,9 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
 
     # Сохраняем изображение
     now = datetime.now().strftime("%Y-%m-%d")
-    link = await saveFile(result_path, user_id, model_name, model_data["picture_folder_id"], now)
+    # TODO: раскомментировать
+    # link = await saveFile(result_path, user_id, model_name, model_data["picture_folder_id"], now)
+    link = "https://drive.google.com/file/d/1dSkG6TsDFK3Tp0LlMDkTqyWZpsvnvvg0/view?usp=drivesdk"
 
     if not link:
         await editMessageOrAnswer(
@@ -457,7 +459,7 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(saved_images_count=stateData["saved_images_count"])
 
     # Если это была последняя модель в сеансе, то отправляем сообщение о третьем этапе
-    if stateData["finally_sent_generated_images_count"] == stateData["saved_images_count"]:
+    if stateData["finally_sent_generated_images_count"] >= stateData["saved_images_count"]:
         await call.message.answer(text.SAVING_IMAGES_SUCCESS_TEXT, 
         reply_markup=video_generation_keyboards.generateVideoKeyboard())
 

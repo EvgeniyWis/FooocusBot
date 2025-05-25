@@ -21,8 +21,14 @@ from datetime import datetime
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
 async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
+    temp = call.data.split("|")
+    if len(temp) == 2:
+        model_name = temp[1]
+    else:
+        model_name = None
+
     # Отправляем сообщение для первой модели
-    await sendNextModelMessage(state, call)
+    await sendNextModelMessage(state, call, model_name)
 
 
 # Обработка нажатия кнопок режима генерации видео
@@ -100,13 +106,15 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         video_example_prompt = video_example_data["prompt"]
 
     # Удаляем сообщения с видео-примерами
-    video_examples_messages_ids = data["video_examples_messages_ids"]
-    for message_id in video_examples_messages_ids:
-        try:
-            await bot.delete_message(user_id, int(message_id))
-        except Exception as e:
-            logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
-            
+    if "video_examples_messages_ids" in data:
+        video_examples_messages_ids = data["video_examples_messages_ids"]
+
+        for message_id in video_examples_messages_ids:
+            try:
+                await bot.delete_message(user_id, int(message_id))
+            except Exception as e:
+                logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
+                
     # Удаляем текущее сообщение
     try:
         await bot.delete_message(user_id, call.message.message_id)
@@ -128,19 +136,27 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Отправляем следующую модель
     await sendNextModelMessage(state, call)
 
-    # Генерируем видео
-    try:
-        video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
-    except Exception as e:
-        # Удаляем сообщение про генерацию видео
-        await bot.delete_message(user_id, message_for_delete.message_id)
+    # Добавляем повторно дату в стейт
+    dataForUpdate = {f"{model_name}": image_url}
+    stateData["saved_images_urls"].append(dataForUpdate)
+    await state.update_data(saved_images_urls=stateData["saved_images_urls"])
 
-        # Отправляем сообщение об ошибке
-        traceback.print_exc()
-        await editMessageOrAnswer(
-        call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
-        logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
-        return
+    # Генерируем видео
+    # TODO: убрать заглушку
+    # try:
+    #     video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
+    # except Exception as e:
+    #     # Удаляем сообщение про генерацию видео
+    #     await bot.delete_message(user_id, message_for_delete.message_id)
+
+    #     # Отправляем сообщение об ошибке
+    #     traceback.print_exc()
+    #     await editMessageOrAnswer(
+    #     call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
+    #     logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
+    #     return
+
+    video_path = "FocuuusBot/video.mp4"
     
     # Сохраняем видео в стейт
     await state.update_data(video_path=video_path)
@@ -151,8 +167,13 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Отправляем видео
     video = types.FSInputFile(video_path)
     if button_type == "test":
+        if len(temp) == 4:
+            prefix = f"generate_video|{index}|{model_name}"
+        else:
+            prefix = f"generate_video|{model_name}"
+
         await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=video_generation_keyboards.videoExampleKeyboard(f"generate_video|{index}|{model_name}", False))
+        reply_markup=video_generation_keyboards.videoExampleKeyboard(prefix, False))
 
     elif button_type == "work":
         await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
@@ -197,6 +218,11 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         # Удаляем текущее сообщение
         await bot.delete_message(user_id, call.message.message_id)
 
+        # Удаляем из очереди текущую модель
+        stateData = await state.get_data()
+        stateData["saved_images_urls"].pop(0)
+        await state.update_data(saved_images_urls=stateData["saved_images_urls"])
+
         # Получаем индекс модели
         model_name_index = getModelNameIndex(model_name)
 
@@ -227,7 +253,8 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         .format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
         # Удаляем видео из папки temp/videos
-        os.remove(video_path)
+        # TODO: раскомментировать
+        # os.remove(video_path)
 
         # Добавляем в стейт, сколько видео сгенерилось
         stateData = await state.get_data()
