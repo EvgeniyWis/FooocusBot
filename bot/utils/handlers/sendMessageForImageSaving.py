@@ -10,6 +10,12 @@ from keyboards import start_generation_keyboards
 async def sendMessageForImageSaving(call: types.CallbackQuery, state: FSMContext):
     # Получаем название модели, которая стоит первой в очереди
     stateData = await state.get_data()
+    generated_images = stateData["generated_images"]
+
+    # Если следующего изображения нет, то ничего не делаем
+    if len(generated_images) == 0:
+        return
+    
     model_data = stateData["generated_images"][0]
     model_name = list(model_data.keys())[0]
     result_path = model_data[model_name]

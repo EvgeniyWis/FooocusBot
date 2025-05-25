@@ -17,6 +17,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
     await state.update_data(models_for_generation_queue=[])
     await state.update_data(will_be_sent_generated_images_count=0)
     await state.update_data(finally_sent_generated_images_count=0)
+    await state.update_data(media_groups_for_generation=[])
 
     # Генерируем изображения
     try:
@@ -70,11 +71,14 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 total_images_count = stateData["total_images_count"]
                 
                 # Ждём когда список моделей для генерации станет пустым
-                while finally_sent_generated_images_count >= total_images_count:
+                while finally_sent_generated_images_count < total_images_count:
                     stateData = await state.get_data()
                     finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
                     total_images_count = stateData["total_images_count"]
                     await asyncio.sleep(10)
+
+            # Очищаем список медиагрупп
+            await state.update_data(media_groups_for_generation=[])
 
             # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
             await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 
