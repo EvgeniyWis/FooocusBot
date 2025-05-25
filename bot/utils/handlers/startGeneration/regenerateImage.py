@@ -1,9 +1,9 @@
-from ..generateImages import generateImageBlock
+from ...generateImages import generateImageBlock
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from .editMessageOrAnswer import editMessageOrAnswer
-from .. import text
-from ..generateImages.dataArray import getModelNameIndex, getDataByModelName
+from ..editMessageOrAnswer import editMessageOrAnswer
+from ... import text
+from ...generateImages.dataArray import getModelNameIndex, getDataByModelName
 
 
 # Функция для перегенерации изображения

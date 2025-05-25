@@ -1,8 +1,8 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from ..generateImages import getReferenceImage
-from ..generateImages.dataArray import getSettingNumberByModelName, getModelNameIndex
-from .. import text
+from ...generateImages import getReferenceImage
+from ...generateImages.dataArray import getSettingNumberByModelName, getModelNameIndex
+from ... import text
 from keyboards import start_generation_keyboards
 
 

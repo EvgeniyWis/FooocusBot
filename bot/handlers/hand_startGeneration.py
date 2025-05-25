@@ -192,7 +192,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
 
     # Если следующая модель не найдена, то завершаем генерацию
     if not next_model:
-        await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
+        await message.answer(text.GENERATE_IMAGES_SUCCESS_TEXT)
         await state.clear()
         return
 
@@ -331,22 +331,29 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         # logger.info(f"Результат замены лица: {result_path}")
 
         # Добавляем result_path в стейт
-        # TODO: удалить потом этот result path и раскомментировать нормальный
-        result_path = f"FocuuusBot/bot/assets/reference_images/abrilberries.jpeg"
-        updateData = {f"{model_name}": result_path}
-        await appendDataToStateArray(state, "generated_images", updateData)
 
-        stateData = await state.get_data()
-        logger.info(f"Список сгенерируемых изображений для сохранения: {stateData["generated_images"]}")
+        if stateData["generation_step"] == 1:
+            # TODO: удалить потом этот result path и раскомментировать нормальный
+            result_path = f"FocuuusBot/bot/assets/reference_images/abrilberries.jpeg"
+            updateData = {f"{model_name}": result_path}
+            await appendDataToStateArray(state, "generated_images", updateData)
 
-        # Меняем текст на сообщении
-        await editMessageOrAnswer(
-            call, text.FACE_SWAP_SUCCESS_TEXT.format(model_name, model_name_index))  
+            stateData = await state.get_data()
+            logger.info(f"Список сгенерируемых изображений для сохранения: {stateData["generated_images"]}")
 
-        # Добавляем в стейт то, сколько отправленных изображений
-        stateData["finally_sent_generated_images_count"] += 1
-        await state.update_data(finally_sent_generated_images_count=stateData["finally_sent_generated_images_count"])
-        
+            # Меняем текст на сообщении
+            await editMessageOrAnswer(
+                call, text.FACE_SWAP_SUCCESS_TEXT.format(model_name, model_name_index))  
+
+            # Добавляем в стейт то, сколько отправленных изображений
+            stateData["finally_sent_generated_images_count"] += 1
+            await state.update_data(finally_sent_generated_images_count=stateData["finally_sent_generated_images_count"])
+
+        elif stateData["generation_step"] == 2:
+            await call.message.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT, 
+            reply_markup=start_generation_keyboards.saveImagesKeyboard())
+
+
     except Exception as e:
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
         await editMessageOrAnswer(
@@ -450,7 +457,7 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
 
     # Если это была последняя модель в сеансе, то отправляем сообщение о третьем этапе
     if stateData["finally_sent_generated_images_count"] == stateData["saved_images_count"]:
-        await call.message.answer(text.SAVING_IMAGE_SUCCESS_TEXT, 
+        await call.message.answer(text.SAVING_IMAGES_SUCCESS_TEXT, 
         reply_markup=video_generation_keyboards.generateVideoKeyboard())
 
 
