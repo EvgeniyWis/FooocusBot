@@ -1,14 +1,10 @@
-from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
-from utils.generateImages.generateImagesByAllSettings import generateImagesByAllSettings
-from utils.generateImages.generateImageBlock import generateImageBlock
+from utils.generateImages.dataArray import getDataByModelName, getDataArrayWithRootPrompt, getModelNameIndex
+from utils.generateImages import generateImagesByAllSettings, generateImageBlock, generateImages
+from utils import text
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from utils import text
-from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from logger import logger
 import traceback
-from utils.generateImages.generateImages import generateImages
-from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 import asyncio
 from keyboards import start_generation_keyboards
 
@@ -77,7 +73,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 total_images_count = success_images_count + progress_images_count + queue_images_count
                 
                 # Ждём когда список моделей для генерации станет пустым
-                while finally_sent_generated_images_count < total_images_count:
+                while finally_sent_generated_images_count >= total_images_count:
                     stateData = await state.get_data()
                     finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
                     success_images_count = stateData["success_images_count"]

@@ -1,38 +1,22 @@
 import datetime
 import os
-from utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
-from utils.googleDrive.files.saveFile import saveFile
-from utils.generateImages.getReferenceImage import getReferenceImage
-from utils.handlers.generateImagesInHandler import generateImagesInHandler
-from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
-from utils.generateImages.dataArray.getNextModel import getNextModel
-from utils.generateImages.dataArray.getAllDataArrays import getAllDataArrays
-from utils import retryOperation
-from utils.generateImages.dataArray.getDataArrayBySettingNumber import getDataArrayBySettingNumber
-from utils.facefusion.facefusion_swap import facefusion_swap
+from utils.googleDrive.folders import getFolderDataByID
+from utils.googleDrive.files import saveFile
+from utils.handlers import appendDataToStateArray, sendMessageForImageSaving, generateImagesInHandler, editMessageOrAnswer, waitForImageBlocksGeneration, regenerateImage
+from utils import retryOperation, text
+from utils.generateImages.dataArray import getDataByModelName, getNextModel, getDataArrayBySettingNumber, getAllDataArrays, getModelNameIndex, getSettingNumberByModelName
+from utils.facefusion import facefusion_swap
+from utils.generateImages import generateImageBlock, base64ToImage, imageToBase64, upscaleImage
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from utils.generateImages.generateImageBlock import generateImageBlock
 from keyboards import start_generation_keyboards, randomizer_keyboards
-from utils import text
 from states.UserState import StartGenerationState
 from logger import logger
-from InstanceBot import bot
-from InstanceBot import router
-from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
-from utils.generateImages.upscaleImage import upscaleImage
+from InstanceBot import bot, router
 from config import TEMP_FOLDER_PATH
 from PIL import Image
-from utils.generateImages.ImageTobase64 import imageToBase64
-from utils.generateImages.base64ToImage import base64ToImage
 import asyncio
-from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
-from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
-from utils.handlers.waitForImageBlocksGenetion import waitForImageBlocksGeneration
-from utils.handlers.regenerateImage import regenerateImage
-from utils.handlers.appendDataToStateArray import appendDataToStateArray
-
 
 # Обработка выбора количества генераций
 async def choose_generations_type(
@@ -383,101 +367,79 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
 # Обработка нажатия кнопки "💾 Этап сохранения изображений"
 async def save_images(call: types.CallbackQuery, state: FSMContext):
-    # Получаем название модели, которая стоит первой в очереди
-    stateData = await state.get_data()
-    model_data = stateData["generated_images"][0]
-    model_name = list(model_data.keys())[0]
-    result_path = model_data[model_name]
-
-    # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
-
-    # Получаем референсное изображение и добавляем его в медиагруппу
-    media_group = []
-    reference_image = await getReferenceImage(model_name)
-    if reference_image:
-        media_group.append(types.InputMediaPhoto(media=types.FSInputFile(reference_image)))
-
-    # Добавляем итоговое изображение в медиагруппу
-    media_group.append(types.InputMediaPhoto(media=types.FSInputFile(result_path)))
-
-    # Отправляем медиагруппу
-    await call.message.answer_media_group(media_group)
-
-    # Получаем номер настройки
-    setting_number = getSettingNumberByModelName(model_name)
-
-    # Отправляем сообщение к референсному фото и итоговому изображению
-    await call.message.answer(
-        text.START_SAVE_IMAGE_TEXT.format(model_name, model_name_index), 
-        reply_markup=start_generation_keyboards.saveImageKeyboard(model_name, setting_number))
+    await sendMessageForImageSaving(call, state)
     
 
 # Обработка нажатия кнопок для сохранения изображения
 async def save_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем данные
     temp = call.data.split("|")
-    action = temp[0]
     model_name = temp[1]
 
-    if action == "save_image":
-        # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
-        
-        # Получаем id пользователя
-        user_id = call.from_user.id
-        
-        # Меняем текст на сообщении
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+    
+    # Получаем id пользователя
+    user_id = call.from_user.id
+    
+    # Меняем текст на сообщении
+    await editMessageOrAnswer(
+        call,text.SAVE_IMAGE_PROGRESS_TEXT.format(model_name, model_name_index))
+    
+    # Получаем название модели, которая стоит первой в очереди
+    stateData = await state.get_data()
+    result_path = stateData["generated_images"][0]
+
+    # Удаляем изображение из очереди
+    stateData["generated_images"].pop(0)
+    await state.update_data(generated_images=stateData["generated_images"])
+
+    # Выдаём следующую модель
+    await sendMessageForImageSaving(call, state)
+
+    # Получаем данные модели
+    model_data = await getDataByModelName(model_name)
+
+    # Сохраняем изображение
+    image_index = int(image_index) - 1
+    now = datetime.now().strftime("%Y-%m-%d")
+    link = await saveFile(result_path, user_id, model_name, model_data["picture_folder_id"], now)
+
+    if not link:
         await editMessageOrAnswer(
-            call,text.SAVE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
-        
-        # Получаем название модели, которая стоит первой в очереди
-        stateData = await state.get_data()
-        result_path = stateData["generated_images"][0]
+        call,text.SAVE_FILE_ERROR_TEXT)
+        return
 
-        # Получаем данные модели
-        model_data = await getDataByModelName(model_name)
+    # Сохраняем ссылку на изображение в стейт вместе с именем модели
+    dataForUpdate = {f"{model_name}": link}
+    await appendDataToStateArray(state, "saved_images_urls", dataForUpdate)
 
-        # Сохраняем изображение
-        image_index = int(image_index) - 1
-        now = datetime.now().strftime("%Y-%m-%d")
-        link = await saveFile(result_path, user_id, model_name, model_data["picture_folder_id"], now)
+    # Получаем данные родительской папки
+    folder = getFolderDataByID(model_data["picture_folder_id"])
+    parent_folder_id = folder['parents'][0]
+    parent_folder = getFolderDataByID(parent_folder_id)
 
-        if not link:
-            await editMessageOrAnswer(
-            call,text.SAVE_FILE_ERROR_TEXT)
-            return
+    logger.info(f"Данные папки по id {model_data['picture_folder_id']}: {folder}")
 
-        # Сохраняем ссылку на изображение в стейт вместе с именем модели
-        dataForUpdate = {f"{model_name}": link}
-        await appendDataToStateArray(state, "saved_images_urls", dataForUpdate)
+    # Удаляем текущее сообщение
+    await bot.delete_message(user_id, call.message.message_id)
 
-        # Получаем данные родительской папки
-        folder = getFolderDataByID(model_data["picture_folder_id"])
-        parent_folder_id = folder['parents'][0]
-        parent_folder = getFolderDataByID(parent_folder_id)
+    # Отправляем сообщение о сохранении изображения
+    await editMessageOrAnswer(
+        call,text.SAVE_IMAGES_SUCCESS_TEXT
+    .format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
-        logger.info(f"Данные папки по id {model_data['picture_folder_id']}: {folder}")
+    # Удаляем отправленные изображения из чата
+    try:    
+        mediagroup_messages_ids = stateData[f"mediagroup_messages_ids_{model_name}"]
+        chat_id = call.message.chat.id
+        for message_id in mediagroup_messages_ids:
+            await bot.delete_message(chat_id=chat_id, message_id=message_id)
+    except Exception as e:
+        logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
 
-        # Удаляем текущее сообщение
-        await bot.delete_message(user_id, call.message.message_id)
-
-        # Отправляем сообщение о сохранении изображения
-        await editMessageOrAnswer(
-            call,text.SAVE_IMAGES_SUCCESS_TEXT
-        .format(link, model_name, parent_folder['webViewLink'], model_name_index))
-
-        # Удаляем отправленные изображения из чата
-        try:    
-            mediagroup_messages_ids = stateData[f"mediagroup_messages_ids_{model_name}"]
-            chat_id = call.message.chat.id
-            for message_id in mediagroup_messages_ids:
-                await bot.delete_message(chat_id=chat_id, message_id=message_id)
-        except Exception as e:
-            logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
-
-        # Удаляем изображение с заменённым лицом
-        os.remove(result_path)
+    # Удаляем изображение с заменённым лицом
+    os.remove(result_path)
 
 
 # Обработка ввода названия модели для генерации
