@@ -11,7 +11,6 @@ from keyboards import start_generation_keyboards
 
 # Функция для генерации изображения в зависимости от настроек
 async def generateImagesInHandler(prompt: str, message: types.Message, state: FSMContext,
-                                  
     user_id: int, is_test_generation: bool, setting_number: str, with_randomizer: bool = False):
     # Инициализируем стейт
     await state.update_data(models_for_generation_queue=[])
@@ -19,6 +18,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
     await state.update_data(finally_sent_generated_images_count=0)
     await state.update_data(total_images_count=0)
     await state.update_data(saved_images_count=0)
+    await state.update_data(saved_videos_count=0)
     await state.update_data(media_groups_for_generation=None)
     await state.update_data(generation_step=1)
 

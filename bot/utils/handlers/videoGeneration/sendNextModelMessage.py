@@ -2,18 +2,24 @@ from aiogram.fsm.context import FSMContext
 from ...generateImages.dataArray import getModelNameIndex
 from logger import logger
 from aiogram import types
-from InstanceBot import bot
 import os
 from ... import text
 from keyboards import video_generation_keyboards
 
 
 # Функция для отправки сообщения для генерации видео для следующей модели
-async def sendNextModelMessage(state: FSMContext, call: types.CallbackQuery):
+async def sendNextModelMessage(state: FSMContext, call: types.CallbackQuery, model_name: str = None):
     # Получаем название модели, которая стоит первой в очереди
     stateData = await state.get_data()
+
+    # Если нет изображений, то выходим
+    if len(stateData["saved_images_urls"]) == 0:
+        return
+    
     model_data = stateData["saved_images_urls"][0]
-    model_name = list(model_data.keys())[0]
+    
+    if not model_name:
+        model_name = list(model_data.keys())[0]
 
     # Делаем ссылку
     image_url = model_data[model_name]
@@ -24,12 +30,6 @@ async def sendNextModelMessage(state: FSMContext, call: types.CallbackQuery):
     logger.info(f"Для генерации видео выбрана модель: {model_name} и url изображения: {image_url}")
 
     await state.update_data(image_url=image_url)
-
-    # Получаем id пользователя и удаляем сообщение
-    user_id = call.from_user.id
-    message_id = call.message.message_id
-
-    await bot.delete_message(user_id, message_id)
 
     # Удаляем видео из папки temp/videos, если оно есть
     stateData = await state.get_data()

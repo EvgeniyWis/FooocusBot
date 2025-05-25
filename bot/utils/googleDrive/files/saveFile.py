@@ -51,7 +51,8 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
 
         if with_deleting_temp_folder:
             # Удаляем папку с файлами
-            shutil.rmtree(f"{TEMP_FOLDER_PATH}/{f'{folder_name}_{user_id}' if folder_name else ""}")
+            # TODO: раскомментировать
+            # shutil.rmtree(f"{TEMP_FOLDER_PATH}/{f'{folder_name}_{user_id}' if folder_name else ""}")
 
             # Через 1 час удаляем и папку в более верхнем уровне
             asyncio.create_task(deleteParentFolder(folder_name, user_id))
