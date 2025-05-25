@@ -1,7 +1,8 @@
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from utils.handlers import generateImagesInHandler, editMessageOrAnswer
+from utils.handlers.startGeneration import generateImagesInHandler
+from utils.handlers import editMessageOrAnswer
 from keyboards import randomizer_keyboards
 from utils import text
 from states.UserState import RandomizerState
