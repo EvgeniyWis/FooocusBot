@@ -84,7 +84,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     except Exception as e:
         logger.error(f"Произошла ошибка при удалении сообщения с id {data['select_video_example_message_id']}: {e}")
 
-    if len(temp) == 3:
+    if len(temp) == 4:
         # Получаем данные видео-примера по его индексу
         video_example_data = await getVideoExampleDataByIndex(index)
 
