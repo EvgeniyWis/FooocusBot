@@ -1,3 +1,4 @@
+from utils.handlers.videoGeneration import sendNextModelMessage
 from utils import retryOperation, text
 from utils.videos import generateVideo
 from utils.videoExamples import getVideoExampleDataByIndex, getVideoExamplesData
@@ -20,42 +21,8 @@ from datetime import datetime
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
 async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
-    # Получаем название модели, которая стоит первой в очереди
-    stateData = await state.get_data()
-    model_data = stateData["saved_images_urls"][0]
-    model_name = list(model_data.keys())[0]
-
-    # Делаем ссылку
-    image_url = model_data[model_name]
-    logger.info(f"Изначальный image_url: {image_url}")
-    image_id = image_url.split("id=")[1]
-    image_url = f"https://drive.google.com/uc?export=view&id={image_id}"
-
-    logger.info(f"Для генерации видео выбрана модель: {model_name} и url изображения: {image_url}")
-
-    await state.update_data(image_url=image_url)
-
-    # Получаем id пользователя и удаляем сообщение
-    user_id = call.from_user.id
-    message_id = call.message.message_id
-
-    await bot.delete_message(user_id, message_id)
-
-    # Удаляем видео из папки temp/videos, если оно есть
-    stateData = await state.get_data()
-    if "video_path" in stateData:
-        os.remove(stateData["video_path"])
-
-    # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
-
-    # Отправляем сообщение для выбора видео-примеров
-    select_video_example_message = await call.message.answer_photo(
-        photo=image_url,
-        caption=text.SELECT_VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index), 
-        reply_markup=video_generation_keyboards.videoGenerationModeKeyboard(model_name))
-
-    await state.update_data(select_video_example_message_id=select_video_example_message.message_id)
+    # Отправляем сообщение для первой модели
+    await sendNextModelMessage(state, call)
 
 
 # Обработка нажатия кнопок режима генерации видео
@@ -97,7 +64,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Получаем индекс видео-примера и тип кнопки
     temp = call.data.split("|")
 
-    if len(temp) == 3:
+    if len(temp) == 4:
         index = int(temp[1])
         model_name = temp[2]
         button_type = temp[3]
@@ -149,9 +116,17 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
     
-    # Отправляем сообщение под генерацию видео
+    # Отправляем сообщение про генерацию видео
     message_for_delete = await editMessageOrAnswer(
         call,text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
+    
+    # Удаляем из очереди текущую модель
+    stateData = await state.get_data()
+    stateData["saved_images_urls"].pop(0)
+    await state.update_data(saved_images_urls=stateData["saved_images_urls"])
+    
+    # Отправляем следующую модель
+    await sendNextModelMessage(state, call)
 
     # Генерируем видео
     try:
@@ -194,9 +169,13 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
 
     # Отправляем видео
     model_name = data["model_name_for_video_generation"]
+
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+    
     await message.answer_photo(
     photo=image_url,
-    caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(model_name, prompt),
+    caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index, prompt),
     reply_markup=video_generation_keyboards.videoExampleKeyboard(f"generate_video|{model_name}"))
 
 
@@ -217,6 +196,9 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
     if button_type == "correct":
         # Удаляем текущее сообщение
         await bot.delete_message(user_id, call.message.message_id)
+
+        # Получаем индекс модели
+        model_name_index = getModelNameIndex(model_name)
 
         # Отправляем сообщение о начале сохранения видео
         message_for_edit = await editMessageOrAnswer(
@@ -240,15 +222,21 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         # Удаляем сообщение про генерацию видео
         await bot.delete_message(user_id, message_for_edit.message_id)
 
-        # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
-
         # Отправляем сообщение о сохранении видео
         await message_for_edit.answer(text.SAVE_VIDEO_SUCCESS_TEXT
         .format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
         # Удаляем видео из папки temp/videos
         os.remove(video_path)
+
+        # Добавляем в стейт, сколько видео сгенерилось
+        stateData = await state.get_data()
+        stateData["saved_videos_count"] += 1
+        await state.update_data(saved_images_count=stateData["saved_images_count"])
+
+        # Если это было последнее видео, то отправляем сообщение о заканчивании генерации
+        if stateData["saved_images_count"] == stateData["saved_videos_count"] + 1:
+            await call.message.answer(text.SAVING_VIDEOS_SUCCESS_TEXT)
 
 
 # Добавление обработчиков

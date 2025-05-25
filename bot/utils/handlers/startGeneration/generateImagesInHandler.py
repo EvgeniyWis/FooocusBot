@@ -1,6 +1,6 @@
-from ..generateImages.dataArray import getDataByModelName, getDataArrayWithRootPrompt, getModelNameIndex
-from ..generateImages import generateImagesByAllSettings, generateImageBlock, generateImages
-from .. import text
+from ...generateImages.dataArray import getDataByModelName, getDataArrayWithRootPrompt, getModelNameIndex
+from ...generateImages import generateImagesByAllSettings, generateImageBlock, generateImages
+from ... import text
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
@@ -20,6 +20,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
     await state.update_data(total_images_count=0)
     await state.update_data(saved_images_count=0)
     await state.update_data(media_groups_for_generation=None)
+    await state.update_data(generation_step=1)
 
     # Генерируем изображения
     try:
@@ -83,8 +84,11 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
             await state.update_data(media_groups_for_generation=None)
 
             # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
-            await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 
+            await message.answer(text.GENERATE_IMAGES_SUCCESS_TEXT, 
             reply_markup=start_generation_keyboards.saveImagesKeyboard())
+
+            # Ставим, что начался 2 этап
+            await state.update_data(generation_step=2)
         else:
             if "stop_generation" not in stateData:
                 raise Exception("Произошла ошибка при генерации изображения")

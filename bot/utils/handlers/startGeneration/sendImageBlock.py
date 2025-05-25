@@ -1,10 +1,10 @@
 from aiogram import types
-from .. import text
+from ... import text
 from aiogram.fsm.context import FSMContext
 from keyboards import start_generation_keyboards
 import shutil
 from config import TEMP_FOLDER_PATH
-from ..generateImages.dataArray import getModelNameIndex, getDataByModelName
+from ...generateImages.dataArray import getModelNameIndex, getDataByModelName
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
