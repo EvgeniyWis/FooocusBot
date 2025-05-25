@@ -1,23 +1,21 @@
-from utils import retryOperation
-from utils.videos.generateVideo import generateVideo
+from utils import retryOperation, text
+from utils.videos import generateVideo
+from utils.videoExamples import getVideoExampleDataByIndex, getVideoExamplesData
+from utils.generateImages.dataArray import getModelNameIndex
+from utils.handlers import editMessageOrAnswer
+from utils.googleDrive.files import saveFile
+from utils.googleDrive.folders import getFolderDataByID
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from utils.videoExamples.getVideoExampleDataByIndex import getVideoExampleDataByIndex
 from keyboards import video_generation_keyboards
-from utils import text
 from states import StartGenerationState
 from logger import logger
 from InstanceBot import bot
 import traceback
-from utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 from InstanceBot import router
 import os
 from datetime import datetime
-from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
-from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
-from utils.googleDrive.files.saveFile import saveFile
-from utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"

@@ -1,10 +1,9 @@
 import requests
-from utils.googleDrive.files.downloadFromGoogleDrive import downloadFromGoogleDrive
+from utils.googleDrive.files import downloadFromGoogleDrive, getGoogleDriveFileID
 from logger import logger
-from utils.googleDrive.files.getGoogleDriveFileID import getGoogleDriveFileID
 import os
 import asyncio
-from utils.videos.downloadVideo import downloadVideo
+from utils.videos import downloadVideo
 
 
 # Генерация видео с помощью kling

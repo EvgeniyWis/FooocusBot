@@ -2,7 +2,7 @@ from aiogram.fsm.context import FSMContext
 import asyncio
 from .sendImageBlock import sendImageBlock
 from aiogram import types
-from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
+from utils.generateImages.dataArray import getSettingNumberByModelName
 from logger import logger
 
 

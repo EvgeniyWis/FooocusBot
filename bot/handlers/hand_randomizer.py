@@ -1,13 +1,11 @@
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from utils.handlers.generateImagesInHandler import generateImagesInHandler
+from utils.handlers import generateImagesInHandler, editMessageOrAnswer
 from keyboards import randomizer_keyboards
 from utils import text
 from states.UserState import RandomizerState
 from InstanceBot import router
-from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
-
 
 # Обработка кнопок в меню 
 async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext):

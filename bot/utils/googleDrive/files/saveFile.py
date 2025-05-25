@@ -1,4 +1,4 @@
-from utils.retryOperation import retryOperation
+from utils import retryOperation
 from config import TEMP_FOLDER_PATH
 from logger import logger
 import shutil
