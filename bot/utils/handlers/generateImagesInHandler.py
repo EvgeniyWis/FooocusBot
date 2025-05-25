@@ -1,6 +1,6 @@
-from utils.generateImages.dataArray import getDataByModelName, getDataArrayWithRootPrompt, getModelNameIndex
-from utils.generateImages import generateImagesByAllSettings, generateImageBlock, generateImages
-from utils import text
+from ..generateImages.dataArray import getDataByModelName, getDataArrayWithRootPrompt, getModelNameIndex
+from ..generateImages import generateImagesByAllSettings, generateImageBlock, generateImages
+from .. import text
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
@@ -67,18 +67,13 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
         if result:
             if "stop_generation" not in stateData and not is_test_generation:
                 finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
-                success_images_count = stateData["success_images_count"]
-                progress_images_count = stateData["progress_images_count"]
-                queue_images_count = stateData["queue_images_count"]
-                total_images_count = success_images_count + progress_images_count + queue_images_count
+                total_images_count = stateData["total_images_count"]
                 
                 # Ждём когда список моделей для генерации станет пустым
                 while finally_sent_generated_images_count >= total_images_count:
                     stateData = await state.get_data()
                     finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
-                    success_images_count = stateData["success_images_count"]
-                    progress_images_count = stateData["progress_images_count"]
-                    queue_images_count = stateData["queue_images_count"]
+                    total_images_count = stateData["total_images_count"]
                     await asyncio.sleep(10)
 
             # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений

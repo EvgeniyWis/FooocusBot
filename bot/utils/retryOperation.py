@@ -1,5 +1,6 @@
 import asyncio
 from logger import logger
+import traceback
 
 # Функция для повторной операции
 async def retryOperation(operation, max_attempts=3, delay=2, *args):
@@ -7,6 +8,7 @@ async def retryOperation(operation, max_attempts=3, delay=2, *args):
         try:
             return await operation(*args)
         except Exception as e:
+            traceback.print_exc()
             if attempt == max_attempts - 1:
                 raise e
             logger.warning(f"Попытка {attempt + 1} не удалась: {str(e)}. Повторная попытка через {delay} сек.")

@@ -1,4 +1,4 @@
-from utils.generateImages.dataArray import getAllDataArrays
+from .getAllDataArrays import getAllDataArrays
 
 # Функция для получения номера настройки по названию модели
 def getSettingNumberByModelName(model_name: str):

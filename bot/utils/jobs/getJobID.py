@@ -1,6 +1,6 @@
 from logger import logger
-from utils import retryOperation
-from utils.jobs import sendRunRequest
+from .. import retryOperation
+from .sendRunRequest import sendRunRequest
 
 
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы

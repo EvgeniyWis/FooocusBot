@@ -1,4 +1,5 @@
-from utils.generateImages.dataArray import getAllDataArrays, getDataArrayBySettingNumber
+from .getAllDataArrays import getAllDataArrays
+from .getDataArrayBySettingNumber import getDataArrayBySettingNumber
 from aiogram.fsm.context import FSMContext
 from logger import logger
 

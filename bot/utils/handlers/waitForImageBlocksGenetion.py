@@ -2,7 +2,7 @@ from aiogram.fsm.context import FSMContext
 import asyncio
 from .sendImageBlock import sendImageBlock
 from aiogram import types
-from utils.generateImages.dataArray import getSettingNumberByModelName
+from ..generateImages.dataArray import getSettingNumberByModelName
 from logger import logger
 
 
@@ -18,9 +18,7 @@ async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext
         if len(media_groups_for_generation) > 0:
             break
 
-        total_images_count = stateData["success_images_count"] + stateData["progress_images_count"] + stateData["queue_images_count"]
-
-        if stateData["will_be_sent_generated_images_count"] == total_images_count:
+        if stateData["will_be_sent_generated_images_count"] == stateData["total_images_count"]:
             return False
 
         await asyncio.sleep(5)
