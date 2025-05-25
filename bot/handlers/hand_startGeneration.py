@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 from utils.googleDrive.folders import getFolderDataByID
 from utils.googleDrive.files import saveFile
@@ -263,86 +263,90 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(model_name=model_name)
         await state.update_data(video_folder_id=video_folder_id)
 
-        # Меняем текст на сообщении о начале upscale
-        await editMessageOrAnswer(
-            call,text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+        # # Меняем текст на сообщении о начале upscale
+        # await editMessageOrAnswer(
+        #     call,text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
-        # Получаем само изображение по пути
-        image_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
-        image = Image.open(image_path)
-        image_base64 = imageToBase64(image)
+        # # Получаем само изображение по пути
+        # image_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
+        # image = Image.open(image_path)
+        # image_base64 = imageToBase64(image)
 
-        # Получаем негатив промпт
-        negative_prompt = data["json"]["input"]["negative_prompt"]
+        # # Получаем негатив промпт
+        # negative_prompt = data["json"]["input"]["negative_prompt"]
         
-        # Получаем базовую модель   
-        base_model = data["json"]["input"]["base_model_name"]
+        # # Получаем базовую модель   
+        # base_model = data["json"]["input"]["base_model_name"]
         
-        # Делаем upscale изображения
-        images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
+        # # Делаем upscale изображения
+        # images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
 
-        # Сохраняем изображения по этому же пути
-        await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
+        # # Сохраняем изображения по этому же пути
+        # await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
 
-        # Меняем текст на сообщении об очереди на замену лица
-        await editMessageOrAnswer(
-            call,text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
+        # # Меняем текст на сообщении об очереди на замену лица
+        # await editMessageOrAnswer(
+        #     call,text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
 
-        # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-        faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
-        faceswap_source_path = f"images/faceswap/{model_name}.jpg"
-        logger.info(f"Путь к исходному изображению для замены лица: {faceswap_target_path}")
-        logger.info(f"Путь к целевому изображению для замены лица: {faceswap_source_path}")
+        # # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
+        # faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
+        # faceswap_source_path = f"images/faceswap/{model_name}.jpg"
+        # logger.info(f"Путь к исходному изображению для замены лица: {faceswap_target_path}")
+        # logger.info(f"Путь к целевому изображению для замены лица: {faceswap_source_path}")
 
-        # Добавляем в стейт путь к изображению для faceswap
-        await appendDataToStateArray(state, "faceswap_generate_models", model_name)
+        # # Добавляем в стейт путь к изображению для faceswap
+        # await appendDataToStateArray(state, "faceswap_generate_models", model_name)
 
-        # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
-        while True:
-            stateData = await state.get_data()
-            faceswap_generate_models = stateData["faceswap_generate_models"]
+        # # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
+        # while True:
+        #     stateData = await state.get_data()
+        #     faceswap_generate_models = stateData["faceswap_generate_models"]
 
-            logger.info(f"Список генераций для замены лица: {faceswap_generate_models}")
+        #     logger.info(f"Список генераций для замены лица: {faceswap_generate_models}")
 
-            # Если в списке генераций настала очередь этой модели, то запускаем генерацию
-            if model_name == faceswap_generate_models[0]:
-                await editMessageOrAnswer(
-            call,text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
+        #     # Если в списке генераций настала очередь этой модели, то запускаем генерацию
+        #     if model_name == faceswap_generate_models[0]:
+        #         await editMessageOrAnswer(
+        #     call,text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
                 
-                try:
-                    result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
-                except Exception as e:
-                    result_path = None
-                    logger.error(f"Произошла ошибка при замене лица: {e}")
-                    await editMessageOrAnswer(
-            call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
-                    break
+        #         try:
+        #             result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
+        #         except Exception as e:
+        #             result_path = None
+        #             logger.error(f"Произошла ошибка при замене лица: {e}")
+        #             await editMessageOrAnswer(
+        #     call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
+        #             break
 
-                break
+        #         break
 
-            await asyncio.sleep(10)
+        #     await asyncio.sleep(10)
 
-        # После генерации удаляем модель из стейта
-        stateData = await state.get_data()
-        stateData["faceswap_generate_models"].remove(model_name)
-        await state.update_data(faceswap_models=stateData["faceswap_generate_models"])
+        # # После генерации удаляем модель из стейта
+        # stateData = await state.get_data()
+        # stateData["faceswap_generate_models"].remove(model_name)
+        # await state.update_data(faceswap_models=stateData["faceswap_generate_models"])
 
-        # Если результат замены лица не найден, то завершаем генерацию
-        if not result_path:
-            return
+        # # Если результат замены лица не найден, то завершаем генерацию
+        # if not result_path:
+        #     return
 
-        logger.info(f"Результат замены лица: {result_path}")
+        # logger.info(f"Результат замены лица: {result_path}")
 
         # Добавляем result_path в стейт
+        # TODO: удалить потом этот result path и раскомментировать нормальный
+        result_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
         updateData = {f"{model_name}": result_path}
         await appendDataToStateArray(state, "generated_images", updateData)
+
+        stateData = await state.get_data()
+        logger.info(f"Список сгенерируемых изображений для сохранения: {stateData["generated_images"]}")
 
         # Меняем текст на сообщении
         await editMessageOrAnswer(
             call, text.FACE_SWAP_SUCCESS_TEXT.format(model_name, model_name_index))  
 
         # Добавляем в стейт то, сколько отправленных изображений
-        stateData = await state.get_data()
         stateData["finally_sent_generated_images_count"] += 1
         await state.update_data(finally_sent_generated_images_count=stateData["finally_sent_generated_images_count"])
         
@@ -388,7 +392,9 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     
     # Получаем название модели, которая стоит первой в очереди
     stateData = await state.get_data()
-    result_path = stateData["generated_images"][0]
+    model_data = stateData["generated_images"][0]
+    model_name = list(model_data.keys())[0]
+    result_path = model_data[model_name]
 
     # Удаляем изображение из очереди
     stateData["generated_images"].pop(0)
@@ -401,7 +407,6 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     model_data = await getDataByModelName(model_name)
 
     # Сохраняем изображение
-    image_index = int(image_index) - 1
     now = datetime.now().strftime("%Y-%m-%d")
     link = await saveFile(result_path, user_id, model_name, model_data["picture_folder_id"], now)
 
@@ -410,8 +415,11 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
         call,text.SAVE_FILE_ERROR_TEXT)
         return
 
+    # Делаем ссылку корректной
+    image_id = link.split("/")[5]
+    image_url = f"https://drive.google.com/uc?export=view&id={image_id}"
     # Сохраняем ссылку на изображение в стейт вместе с именем модели
-    dataForUpdate = {f"{model_name}": link}
+    dataForUpdate = {f"{model_name}": image_url}
     await appendDataToStateArray(state, "saved_images_urls", dataForUpdate)
 
     # Получаем данные родительской папки
@@ -425,9 +433,9 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     await bot.delete_message(user_id, call.message.message_id)
 
     # Отправляем сообщение о сохранении изображения
-    await editMessageOrAnswer(
-        call,text.SAVE_IMAGES_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink'], model_name_index))
+    await call.message.answer_photo(
+        image_url,
+        text.SAVE_IMAGES_SUCCESS_TEXT.format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
     # Удаляем отправленные изображения из чата
     try:    
@@ -437,9 +445,6 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
             await bot.delete_message(chat_id=chat_id, message_id=message_id)
     except Exception as e:
         logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
-
-    # Удаляем изображение с заменённым лицом
-    os.remove(result_path)
 
 
 # Обработка ввода названия модели для генерации
