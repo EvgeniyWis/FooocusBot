@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
+
 # Инлайн-клавиатура для генерации видео
 def generateVideoKeyboard():
     kb = InlineKeyboardMarkup(inline_keyboard=[

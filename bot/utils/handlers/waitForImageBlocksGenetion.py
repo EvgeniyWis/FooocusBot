@@ -18,7 +18,9 @@ async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext
         if len(media_groups_for_generation) > 0:
             break
 
-        if stateData["sent_images_count"] == stateData["success_images_count"]:
+        total_images_count = stateData["success_images_count"] + stateData["progress_images_count"] + stateData["queue_images_count"]
+
+        if stateData["will_be_sent_generated_images_count"] == total_images_count:
             return False
 
         await asyncio.sleep(5)

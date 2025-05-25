@@ -56,9 +56,8 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             
         else: # Если изображение не первое в очереди, то добавляем его в стейт и оно отправится только после подтверждения генерации у прошлого изображения
             dataForUpdate = {f"{model_name}": media_group}
-            media_groups_for_generation = stateData["media_groups_for_generation"]
-            media_groups_for_generation.append(dataForUpdate)
-            await state.update_data(media_groups_for_generation=media_groups_for_generation)
+            stateData["media_groups_for_generation"].append(dataForUpdate)
+            await state.update_data(media_groups_for_generation=stateData["media_groups_for_generation"])
         
         return True
         

@@ -10,7 +10,7 @@ import traceback
 from utils.generateImages.generateImages import generateImages
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 import asyncio
-from keyboards import video_generation_keyboards
+from keyboards import start_generation_keyboards
 
 
 # Функция для генерации изображения в зависимости от настроек
@@ -19,7 +19,8 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
     user_id: int, is_test_generation: bool, setting_number: str, with_randomizer: bool = False):
     # Инициализируем стейт
     await state.update_data(models_for_generation_queue=[])
-    await state.update_data(sent_images_count=0)
+    await state.update_data(will_be_sent_generated_images_count=0)
+    await state.update_data(finally_sent_generated_images_count=0)
 
     # Генерируем изображения
     try:
@@ -69,19 +70,24 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
         stateData = await state.get_data()
         if result:
             if "stop_generation" not in stateData and not is_test_generation:
-                sent_images_count = stateData["sent_images_count"]
+                finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
                 success_images_count = stateData["success_images_count"]
+                progress_images_count = stateData["progress_images_count"]
+                queue_images_count = stateData["queue_images_count"]
+                total_images_count = success_images_count + progress_images_count + queue_images_count
                 
                 # Ждём когда список моделей для генерации станет пустым
-                while sent_images_count < success_images_count:
+                while finally_sent_generated_images_count < total_images_count:
                     stateData = await state.get_data()
-                    sent_images_count = stateData["sent_images_count"]
+                    finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
                     success_images_count = stateData["success_images_count"]
+                    progress_images_count = stateData["progress_images_count"]
+                    queue_images_count = stateData["queue_images_count"]
                     await asyncio.sleep(10)
 
-            # И только после этого отправляем сообщение о успешной генерации с возможностью начать генерацию видео
+            # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
             await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 
-            reply_markup=video_generation_keyboards.generateVideoKeyboard())
+            reply_markup=start_generation_keyboards.saveImagesKeyboard())
         else:
             if "stop_generation" not in stateData:
                 raise Exception("Произошла ошибка при генерации изображения")

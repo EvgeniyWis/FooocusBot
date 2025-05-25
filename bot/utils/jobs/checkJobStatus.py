@@ -44,6 +44,8 @@ async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.M
 
                 # Добавляем в стейт то, сколько готовых изображений
                 await state.update_data(success_images_count=success_images_count)
+                await state.update_data(progress_images_count=progress_images_count)
+                await state.update_data(queue_images_count=queue_images_count)
 
                 try:
                     await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
