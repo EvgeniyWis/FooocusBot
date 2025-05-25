@@ -17,7 +17,9 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
     await state.update_data(models_for_generation_queue=[])
     await state.update_data(will_be_sent_generated_images_count=0)
     await state.update_data(finally_sent_generated_images_count=0)
-    await state.update_data(media_groups_for_generation=[])
+    await state.update_data(total_images_count=0)
+    await state.update_data(saved_images_count=0)
+    await state.update_data(media_groups_for_generation=None)
 
     # Генерируем изображения
     try:
@@ -78,7 +80,7 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                     await asyncio.sleep(10)
 
             # Очищаем список медиагрупп
-            await state.update_data(media_groups_for_generation=[])
+            await state.update_data(media_groups_for_generation=None)
 
             # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
             await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT, 

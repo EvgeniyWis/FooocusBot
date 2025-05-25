@@ -27,7 +27,8 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
 
     # Делаем ссылку
     image_url = model_data[model_name]
-    image_id = image_url.split("/")[5]
+    logger.info(f"Изначальный image_url: {image_url}")
+    image_id = image_url.split("id=")[1]
     image_url = f"https://drive.google.com/uc?export=view&id={image_id}"
 
     logger.info(f"Для генерации видео выбрана модель: {model_name} и url изображения: {image_url}")

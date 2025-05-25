@@ -11,7 +11,11 @@ async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext
     # Ждём пока появится следующий блок изображений в очереди
     while True:
         stateData = await state.get_data()
-        media_groups_for_generation = stateData["media_groups_for_generation"]
+
+        if not stateData["media_groups_for_generation"]:
+            media_groups_for_generation = []
+        else:
+            media_groups_for_generation = stateData["media_groups_for_generation"]
 
         logger.info(f"Модели для генерации: {[list(i.keys())[0] for i in media_groups_for_generation]}")
 

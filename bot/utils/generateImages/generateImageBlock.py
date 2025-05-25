@@ -48,7 +48,9 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
 
         # Если изображение первое в очереди, то отправляем его и инициализуем стейт
         stateData = await state.get_data()
-        if not len(stateData["media_groups_for_generation"]):
+        if stateData["media_groups_for_generation"] == None:
+            await state.update_data(media_groups_for_generation=[])
+
             # Отправляем изображение
             await sendImageBlock(message, state, media_group, model_name, setting_number, is_test_generation)
             
