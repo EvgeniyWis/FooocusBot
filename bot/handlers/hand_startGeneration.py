@@ -1,21 +1,18 @@
 from datetime import datetime
-import os
 from utils.googleDrive.folders import getFolderDataByID
 from utils.googleDrive.files import saveFile
 from utils.handlers import appendDataToStateArray, sendMessageForImageSaving, generateImagesInHandler, editMessageOrAnswer, waitForImageBlocksGeneration, regenerateImage
-from utils import retryOperation, text
+from utils import text
 from utils.generateImages.dataArray import getDataByModelName, getNextModel, getDataArrayBySettingNumber, getAllDataArrays, getModelNameIndex, getSettingNumberByModelName
-from utils.facefusion import facefusion_swap
-from utils.generateImages import generateImageBlock, base64ToImage, imageToBase64, upscaleImage
+from utils.generateImages import generateImageBlock
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from keyboards import start_generation_keyboards, randomizer_keyboards
+from keyboards import start_generation_keyboards, randomizer_keyboards, video_generation_keyboards
 from states.UserState import StartGenerationState
 from logger import logger
 from InstanceBot import bot, router
 from config import TEMP_FOLDER_PATH
-from PIL import Image
 import asyncio
 
 # Обработка выбора количества генераций
@@ -335,7 +332,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Добавляем result_path в стейт
         # TODO: удалить потом этот result path и раскомментировать нормальный
-        result_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
+        result_path = f"FocuuusBot/bot/assets/reference_images/abrilberries.jpeg"
         updateData = {f"{model_name}": result_path}
         await appendDataToStateArray(state, "generated_images", updateData)
 
@@ -445,6 +442,16 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
             await bot.delete_message(chat_id=chat_id, message_id=message_id)
     except Exception as e:
         logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
+
+    # Добавляем в стейт то, сколько сохранённых изображений
+    stateData = await state.get_data()
+    stateData["saved_images_count"] += 1
+    await state.update_data(saved_images_count=stateData["saved_images_count"])
+
+    # Если это была последняя модель в сеансе, то отправляем сообщение о третьем этапе
+    if stateData["finally_sent_generated_images_count"] == stateData["saved_images_count"]:
+        await call.message.answer(text.SAVING_IMAGE_SUCCESS_TEXT, 
+        reply_markup=video_generation_keyboards.generateVideoKeyboard())
 
 
 # Обработка ввода названия модели для генерации
