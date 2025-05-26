@@ -3,7 +3,10 @@ from .buttons import getGenerationsTypeButtons
 
 # Инлайн-клавиатура для выбора количества генераций
 def generationsTypeKeyboard():
-    kb = InlineKeyboardMarkup(inline_keyboard=getGenerationsTypeButtons("generations_type"))
+    inline_keyboard = getGenerationsTypeButtons("generations_type")
+    inline_keyboard.append([InlineKeyboardButton(text=f'📹 Сгенерировать видео из изображения', callback_data='generateVideoFromImage')])
+
+    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
 

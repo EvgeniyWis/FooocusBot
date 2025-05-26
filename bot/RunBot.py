@@ -24,6 +24,9 @@ async def on_startup() -> None:
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
+    # Создаём temp папку
+    os.makedirs("FocuuusBot/temp/images", exist_ok=True)
+
     # Добавляем обработчики
     handlers.hand_commands.hand_add()
     handlers.hand_startGeneration.hand_add()
