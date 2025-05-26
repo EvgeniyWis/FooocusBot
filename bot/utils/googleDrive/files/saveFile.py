@@ -7,6 +7,8 @@ from ..folders.deleteParentFolder import deleteParentFolder
 from ..folders.createFolder import createFolder
 from ..auth import service
 from .uploadFile import uploadFile
+from config import MOCK_MODE
+
 
 # Сохранение одного файла
 async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folder_id: int, current_date: str, with_deleting_temp_folder: bool = True):
@@ -51,8 +53,8 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
 
         if with_deleting_temp_folder:
             # Удаляем папку с файлами
-            # TODO: раскомментировать
-            # shutil.rmtree(f"{TEMP_FOLDER_PATH}/{f'{folder_name}_{user_id}' if folder_name else ""}")
+            if not MOCK_MODE:
+                shutil.rmtree(f"{TEMP_FOLDER_PATH}/{f'{folder_name}_{user_id}' if folder_name else ""}")
 
             # Через 1 час удаляем и папку в более верхнем уровне
             asyncio.create_task(deleteParentFolder(folder_name, user_id))

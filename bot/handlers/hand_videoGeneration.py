@@ -17,6 +17,7 @@ import traceback
 from InstanceBot import router
 import os
 from datetime import datetime
+from config import MOCK_MODE
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -142,21 +143,22 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     await state.update_data(saved_images_urls=stateData["saved_images_urls"])
 
     # Генерируем видео
-    # TODO: убрать заглушку
-    # try:
-    #     video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
-    # except Exception as e:
-    #     # Удаляем сообщение про генерацию видео
-    #     await bot.delete_message(user_id, message_for_delete.message_id)
+    if MOCK_MODE:
+        video_path = "FocuuusBot/video.mp4"
+    else:
+        try:
+            video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
+        except Exception as e:
+                
+            # Удаляем сообщение про генерацию видео
+            await bot.delete_message(user_id, message_for_delete.message_id)
 
-    #     # Отправляем сообщение об ошибке
-    #     traceback.print_exc()
-    #     await editMessageOrAnswer(
-    #     call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
-    #     logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
-    #     return
-
-    video_path = "FocuuusBot/video.mp4"
+            # Отправляем сообщение об ошибке
+            traceback.print_exc()
+            await editMessageOrAnswer(
+            call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
+            logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
+            return
     
     # Сохраняем видео в стейт
     await state.update_data(video_path=video_path)
@@ -231,9 +233,10 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         call,text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
         # Сохраняем видео
-        # TODO: раскомментировать
-        # link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
-        link = "https://drive.google.com/drive/folders/18V64itY-c07U43aZb09mdzgVU9UGa242"
+        if not MOCK_MODE:
+            link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
+        else:
+            link = "https://drive.google.com/drive/folders/18V64itY-c07U43aZb09mdzgVU9UGa242"
 
         if not link:
             await editMessageOrAnswer(
@@ -255,8 +258,8 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         .format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
         # Удаляем видео из папки temp/videos
-        # TODO: раскомментировать
-        # os.remove(video_path)
+        if not MOCK_MODE:
+            os.remove(video_path)
 
         # Добавляем в стейт, сколько видео сгенерилось
         stateData = await state.get_data()

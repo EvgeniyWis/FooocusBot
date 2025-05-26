@@ -23,3 +23,6 @@ DEV_CHAT_ID = 1979922062
 
 # Устанавливаем режим разработки
 DEVELOPMENT_MODE = True
+
+# Устанавливаем режим с моками
+MOCK_MODE = True
