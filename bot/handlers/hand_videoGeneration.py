@@ -25,12 +25,6 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Получаем название модели
     model_name = call.data.split("|")[1]
 
-    # Получаем id пользователя и удаляем сообщение
-    user_id = call.from_user.id
-    message_id = call.message.message_id
-
-    await bot.delete_message(user_id, message_id)
-
     # Удаляем видео из папки temp/videos, если оно есть
     stateData = await state.get_data()
     if "video_path" in stateData:
