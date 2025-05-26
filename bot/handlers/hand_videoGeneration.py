@@ -1,3 +1,5 @@
+from utils.handlers import increaseCountInState
+from utils.handlers import appendDataToStateArray
 from assets.mocks.links import MOCK_LINK_FOR_SAVE_VIDEO
 from utils.handlers.videoGeneration import sendNextModelMessage
 from utils import retryOperation, text
@@ -162,25 +164,25 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
             return
     
     # Сохраняем видео в стейт
-    await state.update_data(video_path=video_path)
+    await appendDataToStateArray(state, "generated_video_paths", video_path)
 
-    # Удаляем сообщение про генерацию видео
-    await bot.delete_message(user_id, message_for_delete.message_id)
+    # # Удаляем сообщение про генерацию видео
+    # await bot.delete_message(user_id, message_for_delete.message_id)
 
-    # Отправляем видео
-    video = types.FSInputFile(video_path)
-    if button_type == "test":
-        if len(temp) == 4:
-            prefix = f"generate_video|{index}|{model_name}"
-        else:
-            prefix = f"generate_video|{model_name}"
+    # # Отправляем видео
+    # video = types.FSInputFile(video_path)
+    # if button_type == "test":
+    #     if len(temp) == 4:
+    #         prefix = f"generate_video|{index}|{model_name}"
+    #     else:
+    #         prefix = f"generate_video|{model_name}"
 
-        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=video_generation_keyboards.videoExampleKeyboard(prefix, False))
+    #     await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
+    #     reply_markup=video_generation_keyboards.videoExampleKeyboard(prefix, False))
 
-    elif button_type == "work":
-        await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
-        reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
+    # elif button_type == "work":
+    #     await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
+    #     reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -263,9 +265,7 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
             os.remove(video_path)
 
         # Добавляем в стейт, сколько видео сгенерилось
-        stateData = await state.get_data()
-        stateData["saved_videos_count"] += 1
-        await state.update_data(saved_images_count=stateData["saved_images_count"])
+        await increaseCountInState(state, "saved_videos_count")
 
         # Если это было последнее видео, то отправляем сообщение о заканчивании генерации
         if stateData["saved_images_count"] == stateData["saved_videos_count"] + 1 and not stateData["specific_model"]:

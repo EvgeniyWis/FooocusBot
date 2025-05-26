@@ -1,4 +1,5 @@
 from datetime import datetime
+from utils.handlers import increaseCountInState
 from assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
 from utils.googleDrive.files import saveFile
 from utils import retryOperation
@@ -254,9 +255,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     
     try:
         # Добавляем в стейт то, сколько отправленных изображений
-        stateData = await state.get_data()
-        stateData["will_be_sent_generated_images_count"] += 1
-        await state.update_data(will_be_sent_generated_images_count=stateData["will_be_sent_generated_images_count"])
+        await increaseCountInState(state, "will_be_sent_generated_images_count")
 
         # Получаем данные генерации по названию модели
         dataArray = getDataArrayBySettingNumber(int(setting_number))
@@ -354,8 +353,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 reply_markup=start_generation_keyboards.saveImagesKeyboard() if stateData["specific_model"] else None)
 
             # Добавляем в стейт то, сколько отправленных изображений
-            stateData["finally_sent_generated_images_count"] += 1
-            await state.update_data(finally_sent_generated_images_count=stateData["finally_sent_generated_images_count"])
+            await increaseCountInState(state, "finally_sent_generated_images_count")
 
         elif stateData["generation_step"] == 2:
             await call.message.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT, 
@@ -462,9 +460,7 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
         logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
 
     # Добавляем в стейт то, сколько сохранённых изображений
-    stateData = await state.get_data()
-    stateData["saved_images_count"] += 1
-    await state.update_data(saved_images_count=stateData["saved_images_count"])
+    await increaseCountInState(state, "saved_images_count")
 
     # Если это была последняя модель в сеансе, то отправляем сообщение о третьем этапе
     if stateData["finally_sent_generated_images_count"] >= stateData["saved_images_count"]:
