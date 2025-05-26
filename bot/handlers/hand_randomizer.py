@@ -7,6 +7,7 @@ from utils import text
 from states.UserState import RandomizerState
 from InstanceBot import router
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
+from logger import logger
 
 
 # Обработка кнопок в меню 
@@ -131,34 +132,38 @@ async def write_variable_for_randomizer(message: types.Message, state: FSMContex
 
 # Обработка ввода значения для переменной
 async def write_value_for_variable_for_randomizer(message: types.Message, state: FSMContext):
-    # Получаем данные
-    data = await state.get_data()
-    all_variable_names = data["variable_names_for_randomizer"]
-    variable_name = all_variable_names[-1]
-    variable_name_values = f"randomizer_{variable_name}_values"
+    try:
+        # Получаем данные
+        data = await state.get_data()
+        all_variable_names = data["variable_names_for_randomizer"]
+        variable_name = all_variable_names[-1]
+        variable_name_values = f"randomizer_{variable_name}_values"
 
-    # Если пользователь нажал на кнопку "🚫 Остановить ввод значений", то прекращаем ввод значений для переменной
-    if message.text == "🚫 Остановить ввод значений":
-        if "selected_variable_name" in data:
-            await message.answer(text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(data["selected_variable_name"]), 
-            reply_markup=randomizer_keyboards.variableActionKeyboard(data["selected_variable_name"]))
-        else:
-            await message.answer(text.RANDOMIZER_MENU_TEXT, 
-            reply_markup=randomizer_keyboards.randomizerKeyboard(all_variable_names))
-        return
-    
-    # Получаем значение в ином случае
-    value = message.text
-    
-    # Если переменной ещё нет в стейте, то создаём её
-    if variable_name_values not in data:
-        await state.update_data(**{variable_name_values: [value]})
-    else: # Если переменная уже есть в стейте, то добавляем значение в список
-        data[variable_name_values].append(value)
-        await state.update_data(**{variable_name_values: data[variable_name_values]})
+        # Если пользователь нажал на кнопку "🚫 Остановить ввод значений", то прекращаем ввод значений для переменной
+        if message.text == "🚫 Остановить ввод значений":
+            if "selected_variable_name" in data:
+                await message.answer(text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(data["selected_variable_name"]), 
+                reply_markup=randomizer_keyboards.variableActionKeyboard(data["selected_variable_name"]))
+            else:
+                await message.answer(text.RANDOMIZER_MENU_TEXT, 
+                reply_markup=randomizer_keyboards.randomizerKeyboard(all_variable_names))
+            return
+        
+        # Получаем значение в ином случае
+        value = message.text
+        
+        # Если переменной ещё нет в стейте, то создаём её
+        if variable_name_values not in data:
+            await state.update_data(**{variable_name_values: [value]})
+        else: # Если переменная уже есть в стейте, то добавляем значение в список
+            data[variable_name_values].append(value)
+            await state.update_data(**{variable_name_values: data[variable_name_values]})
 
-    await message.answer(text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(value, variable_name))
-    await state.set_state(RandomizerState.write_value_for_variable_for_randomizer)
+        await message.answer(text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(value, variable_name))
+        await state.set_state(RandomizerState.write_value_for_variable_for_randomizer)
+
+    except Exception as e:
+        logger.error(f"Ошибка при отправке значения для рандомайзера: {e}")
 
 
 # Добавление обработчиков
