@@ -115,9 +115,9 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         await state.update_data(video_example_file_id=video_example_file_id)
         await state.update_data(video_example_index=index)
         await state.update_data(model_name=model_name)
+        await state.set_state(StartGenerationState.write_prompt_for_video)
         await editMessageOrAnswer(
         call,text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name, model_name_index))
-        await state.set_state(StartGenerationState.write_prompt_for_video)
         return
     
     # Отправляем сообщение под генерацию видео
@@ -163,6 +163,8 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     data = await state.get_data()
     video_example_file_id = data["video_example_file_id"]
     index = data["video_example_index"]
+
+    logger.info(f"Получен промпт для генерации видео: {prompt}")
 
     # Отправляем видео
     await message.answer_video(video_example_file_id, 
