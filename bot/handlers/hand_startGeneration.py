@@ -23,7 +23,7 @@ from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 from utils.generateImages.upscaleImage import upscaleImage
 from config import TEMP_FOLDER_PATH
 from PIL import Image
-from utils.generateImages.ImageToBase64 import imageToBase64
+from utils.generateImages.ImageTobase64 import imageToBase64
 from utils.generateImages.base64ToImage import base64ToImage
 import asyncio
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
