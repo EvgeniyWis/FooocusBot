@@ -182,6 +182,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     model_name = data["current_model_for_unique_prompt"]
     setting_number = data["setting_number"]
     user_id = message.from_user.id
+    await state.update_data(prompt_for_images=prompt)
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
@@ -257,6 +258,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Получаем данные генерации по названию модели
         data = await getDataByModelName(model_name)
+
+        # Прибавляем к каждому элементу массива корневой промпт
+        data["json"]['input']['prompt'] += " " + stateData["prompt_for_images"]
+
         return await generateImageBlock(data["json"], model_name, call.message, state, user_id, setting_number, is_test_generation, False)
     
     # Получаем данные генерации по названию модели
