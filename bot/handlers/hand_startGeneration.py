@@ -1,4 +1,5 @@
 from datetime import datetime
+from assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
 from utils.googleDrive.files import saveFile
 from utils import retryOperation
 from utils.facefusion import facefusion_swap
@@ -317,7 +318,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                         result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
                     except Exception as e:
                         result_path = None
-                        logger.error(f"Произошла ошибка при замене лица: {e}")
+                        logger.error(f"Произошла ошибка при замене лица у модели {model_name} с индексом {model_name_index}: {e}")
                         await editMessageOrAnswer(
                 call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
                         break
@@ -337,7 +338,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
             logger.info(f"Результат замены лица: {result_path}")
         else:
-            result_path = f"FocuuusBot/bot/assets/reference_images/abrilberries.jpeg"
+            result_path = f"FocuuusBot/bot/assets/mocks/mock_image.jpg"
 
         if stateData["generation_step"] == 1:
             # Добавляем result_path в стейт
@@ -422,7 +423,7 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     if not MOCK_MODE:
         link = await saveFile(result_path, user_id, model_name, model_data["picture_folder_id"], now)
     else:
-        link = "https://drive.google.com/file/d/1dSkG6TsDFK3Tp0LlMDkTqyWZpsvnvvg0/view?usp=drivesdk"
+        link = MOCK_LINK_FOR_SAVE_IMAGE
 
     if not link:
         await editMessageOrAnswer(

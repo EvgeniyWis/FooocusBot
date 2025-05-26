@@ -1,3 +1,4 @@
+from assets.mocks.links import MOCK_LINK_FOR_SAVE_VIDEO
 from utils.handlers.videoGeneration import sendNextModelMessage
 from utils import retryOperation, text
 from utils.videos import generateVideo
@@ -144,7 +145,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
     # Генерируем видео
     if MOCK_MODE:
-        video_path = "FocuuusBot/video.mp4"
+        video_path = "FocuuusBot/bot/assets/mocks/mock_video.mp4"
     else:
         try:
             video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
@@ -236,7 +237,7 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         if not MOCK_MODE:
             link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
         else:
-            link = "https://drive.google.com/drive/folders/18V64itY-c07U43aZb09mdzgVU9UGa242"
+            link = MOCK_LINK_FOR_SAVE_VIDEO
 
         if not link:
             await editMessageOrAnswer(
