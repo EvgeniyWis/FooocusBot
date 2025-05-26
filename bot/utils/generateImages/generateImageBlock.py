@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from ..jobs.getJobID import getJobID
 from ..jobs.checkJobStatus import checkJobStatus
 from ..handlers.startGeneration.sendImageBlock import sendImageBlock
+from config import MOCK_MODE
 
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
@@ -20,18 +21,19 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             pass
         raise Exception("Генерация остановлена")
 
-    # TODO: раскомментировать
-    # # Делаем запрос на генерацию и получаем id работы
-    # job_id = await getJobID(dataJSON)
+    if not MOCK_MODE:
+        # Делаем запрос на генерацию и получаем id работы
+        job_id = await getJobID(dataJSON)
 
-    # # Проверяем статус работы
-    # response_json = await checkJobStatus(job_id, state, message, is_test_generation, checkOtherJobs)
+        # Проверяем статус работы
+        response_json = await checkJobStatus(job_id, state, message, is_test_generation, checkOtherJobs)
 
     try:
-        # images_output = response_json["output"]
-        
-        # if images_output == []:
-        #     raise Exception("Не удалось сгенерировать изображения")
+        if not MOCK_MODE:
+            images_output = response_json["output"]
+            
+            if images_output == []:
+                raise Exception("Не удалось сгенерировать изображения")
 
         media_group = []
         base_64_dataArray = []
@@ -42,10 +44,11 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(reference_image)))
 
         # Обрабатываем результаты
-        # for i, image_data in enumerate(images_output):
-        #     base_64_data = await base64ToImage(image_data["base64"], model_name, i, user_id, is_test_generation)
-        #     base_64_dataArray.append(base_64_data)
-        #     media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
+        if not MOCK_MODE:
+            for i, image_data in enumerate(images_output):
+                base_64_data = await base64ToImage(image_data["base64"], model_name, i, user_id, is_test_generation)
+                base_64_dataArray.append(base_64_data)
+                media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
         # Если изображение первое в очереди, то отправляем его и инициализуем стейт (либо если это изображение, которое перегенерируется)
         stateData = await state.get_data()

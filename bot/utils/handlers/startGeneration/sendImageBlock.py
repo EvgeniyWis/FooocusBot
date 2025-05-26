@@ -5,6 +5,7 @@ from keyboards import start_generation_keyboards
 import shutil
 from config import TEMP_FOLDER_PATH
 from ...generateImages.dataArray import getModelNameIndex, getDataByModelName
+from config import MOCK_MODE
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
@@ -38,7 +39,6 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
     await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
     
     # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-    # TODO: раскомментировать
-    # if is_test_generation:
-    #     shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")
-    #     return
+    if is_test_generation and not MOCK_MODE:
+        shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")
+        return
