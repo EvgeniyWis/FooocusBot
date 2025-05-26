@@ -222,6 +222,65 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         os.remove(video_path)
 
 
+# Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"
+async def start_generateVideoFromImage(call: types.CallbackQuery, state: FSMContext):
+    await call.message.edit_text(text.SEND_IMAGE_FOR_VIDEO_GENERATION)
+    await state.set_state(StartGenerationState.send_image_for_video_generation)
+
+
+# Обработка присылания изображения для генерации видео и запроса на присылания промпта
+async def write_prompt_for_videoGenerationFromImage(message: types.Message, state: FSMContext):
+    # Проверяем, есть ли изображение в сообщении
+    if not message.photo:
+        await message.answer(text.NO_IMAGE_FOR_VIDEO_GENERATION_ERROR_TEXT)
+        return
+
+    # Получаем file_id самого большого изображения
+    photo = message.photo[-1]
+    await state.update_data(image_file_id_for_videoGenerationFromImage=photo.file_id)
+
+    # Просим пользователя ввести промпт для генерации видео
+    await message.answer(text.WRITE_PROMPT_FOR_VIDEO_GENERATION_FOR_IMAGE_TEXT)
+    await state.set_state(StartGenerationState.write_prompt_for_videoGenerationFromImage)
+
+
+# Хендлер для обработки промпта для генерации видео из изображения
+async def handle_prompt_for_videoGenerationFromImage(message: types.Message, state: FSMContext):
+    prompt = message.text
+    await state.update_data(prompt_for_videoGenerationFromImage=prompt)
+    data = await state.get_data()
+    image_file_id = data.get("image_file_id_for_videoGenerationFromImage")
+
+    if not image_file_id:
+        await message.answer(text.NO_IMAGE_FOR_VIDEO_GENERATION_ERROR_TEXT)
+        return
+
+    # Сохраняем сообщение о прогрессе
+    await message.answer(text.GENERATE_VIDEO_FROM_IMAGE_PROGRESS_TEXT)
+
+    try:
+        # Скачиваем изображение (file_id) и получаем путь к файлу
+        # Для этого используем bot.download_file и сохраняем во временную папку
+        file = await bot.get_file(image_file_id)
+        file_path = file.file_path
+        temp_path = f"FocuuusBot/temp/images/{image_file_id}.jpg"
+        await bot.download_file(file_path, temp_path)
+
+        # Генерируем видео
+        video_path = await retryOperation(generateVideo, 10, 1.5, prompt, None, temp_path)
+        await state.update_data(video_path=video_path)
+
+        video = types.FSInputFile(video_path)
+        await message.answer_video(video=video, caption=text.GENERATE_VIDEO_FROM_IMAGE_SUCCESS_TEXT)
+
+        # Удаляем временное изображение
+        os.remove(temp_path)
+    except Exception as e:
+        traceback.print_exc()
+        await message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format("", e))
+        logger.error(f"Ошибка при генерации видео из изображения: {e}")
+
+
 # Добавление обработчиков
 def hand_add():
     router.callback_query.register(start_generate_video, lambda call: call.data.startswith("start_generate_video"))
@@ -232,3 +291,13 @@ def hand_add():
 
     router.callback_query.register(handle_video_correctness_buttons, 
     lambda call: call.data.startswith("video_correctness"))
+
+    router.callback_query.register(
+        start_generateVideoFromImage,
+        lambda call: call.data == "generateVideoFromImage",
+    )
+
+    router.message.register(write_prompt_for_videoGenerationFromImage, 
+    StateFilter(StartGenerationState.send_image_for_video_generation))
+
+    router.message.register(handle_prompt_for_videoGenerationFromImage, StateFilter(StartGenerationState.write_prompt_for_videoGenerationFromImage))

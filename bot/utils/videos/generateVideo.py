@@ -8,19 +8,20 @@ from utils.videos.downloadVideo import downloadVideo
 
 
 # Генерация видео с помощью kling
-async def generateVideo(prompt: str, image_url: str) -> None:
+async def generateVideo(prompt: str, image_url: str = None, image_path: str = None) -> None:
     try:
-        # Получаем id изображения
-        image_id = getGoogleDriveFileID(image_url)
-        if not image_id:
-            logger.error("Не удалось получить id изображения")
-            return None
+        if image_url:
+            # Получаем id изображения
+            image_id = getGoogleDriveFileID(image_url)
+            if not image_id:
+                logger.error("Не удалось получить id изображения")
+                return None
 
-        # Скачиваем изображение
-        image_path = await downloadFromGoogleDrive(image_url, image_id)
-        if not image_path:
-            logger.error("Не удалось скачать изображение")
-            return None
+            # Скачиваем изображение
+            image_path = await downloadFromGoogleDrive(image_url, image_id)
+            if not image_path:
+                logger.error("Не удалось скачать изображение")
+                return None
 
         # Формируем данные запроса
         data = {
