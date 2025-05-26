@@ -166,9 +166,12 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
 
     logger.info(f"Получен промпт для генерации видео: {prompt}")
 
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(data["model_name"])
+
     # Отправляем видео
     await message.answer_video(video_example_file_id, 
-    caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(data["model_name"], prompt),
+    caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(data["model_name"], model_name_index, prompt),
     reply_markup=video_generation_keyboards.videoExampleKeyboard(index, data["model_name"], with_write_prompt=False))
 
 
@@ -189,6 +192,9 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
     if button_type == "correct":
         # Удаляем текущее сообщение
         await bot.delete_message(user_id, call.message.message_id)
+
+        # Получаем индекс модели
+        model_name_index = getModelNameIndex(model_name)
 
         # Отправляем сообщение о начале сохранения видео
         message_for_edit = await editMessageOrAnswer(
@@ -211,9 +217,6 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
 
         # Удаляем сообщение про генерацию видео
         await bot.delete_message(user_id, message_for_edit.message_id)
-
-        # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
 
         # Отправляем сообщение о сохранении видео
         await message_for_edit.answer(text.SAVE_VIDEO_SUCCESS_TEXT
