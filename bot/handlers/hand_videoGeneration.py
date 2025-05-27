@@ -19,6 +19,8 @@ from datetime import datetime
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
 import asyncio
+from utils.handlers.videoGeneration.saveVideo import saveVideo
+from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -65,7 +67,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
     # Получаем название модели и url изображения
     data = await state.get_data()
-    image_url = data["image_url"]
+    image_url = data[f"{model_name}_image_url"]
 
     # Удаляем сообщение с выбором видео-примера
     try:
@@ -187,50 +189,10 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
     # Получаем данные
     data = await state.get_data()
     video_path = data["video_path"]
-    user_id = call.from_user.id
     video_folder_id = data["video_folder_id"]
-    now = datetime.now().strftime("%Y-%m-%d")
 
     if button_type == "correct":
-        # Удаляем текущее сообщение
-        await bot.delete_message(user_id, call.message.message_id)
-
-        # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
-
-        # Отправляем сообщение о начале сохранения видео
-        message_for_edit = await editMessageOrAnswer(
-        call,text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
-
-        # Сохраняем видео
-        link = await saveFile(video_path, user_id, model_name, video_folder_id, now, False)
-
-        if not link:
-            await editMessageOrAnswer(
-        call,text.SAVE_FILE_ERROR_TEXT)
-            return
-        
-        # Получаем данные родительской папки
-        folder = getFolderDataByID(video_folder_id)
-        parent_folder_id = folder['parents'][0]
-        parent_folder = getFolderDataByID(parent_folder_id)
-
-        logger.info(f"Данные папки по id {video_folder_id}: {folder}")
-
-        # Удаляем сообщение про генерацию видео
-        await bot.delete_message(user_id, message_for_edit.message_id)
-
-        # Отправляем сообщение о сохранении видео
-        await message_for_edit.answer(text.SAVE_VIDEO_SUCCESS_TEXT
-        .format(link, model_name, parent_folder['webViewLink'], model_name_index))
-
-        # Удаляем видео из папки temp/videos
-        try:
-            await asyncio.sleep(1)  # Добавляем небольшую задержку
-            os.remove(video_path)
-        except Exception as e:
-            logger.error(f"Ошибка при удалении временного видео-файла {video_path}: {e}")
-            # Продолжаем выполнение, даже если не удалось удалить файл
+        await saveVideo(video_path, model_name, video_folder_id, call.message)
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"
@@ -284,12 +246,36 @@ async def handle_prompt_for_videoGenerationFromImage(message: types.Message, sta
         video = types.FSInputFile(video_path)
         await message.answer_video(video=video, caption=text.GENERATE_VIDEO_FROM_IMAGE_SUCCESS_TEXT)
 
+        # Спрашиваем, в папку какой модели сохранить видео
+        await message.answer(text.ASK_FOR_MODEL_NAME_FOR_VIDEO_GENERATION_FROM_IMAGE_TEXT)
+        await state.set_state(StartGenerationState.ask_for_model_name_for_video_generation_from_image)
+
         # Удаляем временное изображение
         os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
         await message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format("", e))
         logger.error(f"Ошибка при генерации видео из изображения: {e}")
+
+
+# Хендлер для обработки ввода имени модели для сохранения видео
+async def handle_model_name_for_video_generation_from_image(message: types.Message, state: FSMContext):
+    # Получаем данные по имени модели
+    model_name = message.text
+
+    # Если такой модели не существует, то просим ввести другое название
+    if not await getDataByModelName(model_name):
+        await message.answer(text.MODEL_NOT_FOUND_TEXT)
+        return
+    
+    model_data = await getDataByModelName(model_name)
+    video_folder_id = model_data["video_folder_id"]
+
+    stateData = await state.get_data()
+    video_path = stateData["video_path"]
+    
+    await state.update_data(model_name_for_video_generation_from_image=model_name)
+    await saveVideo(video_path, model_name, video_folder_id, message)
 
 
 # Добавление обработчиков
@@ -312,3 +298,5 @@ def hand_add():
     StateFilter(StartGenerationState.send_image_for_video_generation))
 
     router.message.register(handle_prompt_for_videoGenerationFromImage, StateFilter(StartGenerationState.write_prompt_for_videoGenerationFromImage))
+
+    router.message.register(handle_model_name_for_video_generation_from_image, StateFilter(StartGenerationState.ask_for_model_name_for_video_generation_from_image))

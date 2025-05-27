@@ -366,7 +366,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         call,text.SAVE_FILE_ERROR_TEXT)
         return
 
-    await state.update_data(image_url=link)
+    dataForUpdate = {f"{model_name}_image_url": link}
+    await state.update_data(dataForUpdate)
 
     # Получаем данные родительской папки
     folder = getFolderDataByID(picture_folder_id)

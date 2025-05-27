@@ -7,6 +7,7 @@ class StartGenerationState(StatesGroup):
     write_model_name_for_generation = State()
     send_image_for_video_generation = State()
     write_prompt_for_videoGenerationFromImage = State()
+    ask_for_model_name_for_video_generation_from_image = State()
 
 class RandomizerState(StatesGroup):
     write_variable_for_randomizer = State()
