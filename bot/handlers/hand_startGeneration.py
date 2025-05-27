@@ -28,6 +28,7 @@ from utils.generateImages.base64ToImage import base64ToImage
 import asyncio
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
 from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
+import traceback
 
 
 # Обработка выбора количества генераций
@@ -360,6 +361,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     link = await saveFile(result_path, user_id, model_name, picture_folder_id, now)
 
     if not link:
+        traceback.print_exc()
         await editMessageOrAnswer(
         call,text.SAVE_FILE_ERROR_TEXT)
         return
