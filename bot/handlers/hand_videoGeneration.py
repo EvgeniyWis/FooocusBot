@@ -18,6 +18,7 @@ import os
 from datetime import datetime
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
+import asyncio
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -147,6 +148,14 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
         reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
 
+    # Удаляем видео из папки temp/videos
+    try:
+        await asyncio.sleep(1)  # Добавляем небольшую задержку
+        os.remove(video_path)
+    except Exception as e:
+        logger.error(f"Ошибка при удалении временного видео-файла {video_path}: {e}")
+        # Продолжаем выполнение, даже если не удалось удалить файл
+
 
 # Хедлер для обработки ввода кастомного промпта для видео
 async def write_prompt_for_video(message: types.Message, state: FSMContext):
@@ -216,7 +225,12 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
         .format(link, model_name, parent_folder['webViewLink'], model_name_index))
 
         # Удаляем видео из папки temp/videos
-        os.remove(video_path)
+        try:
+            await asyncio.sleep(1)  # Добавляем небольшую задержку
+            os.remove(video_path)
+        except Exception as e:
+            logger.error(f"Ошибка при удалении временного видео-файла {video_path}: {e}")
+            # Продолжаем выполнение, даже если не удалось удалить файл
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"
