@@ -161,6 +161,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     data = await state.get_data()
     is_test_generation = data["generations_type"] == "test"
+    await state.update_data(prompt_for_images=prompt)
 
     # Если в стейте есть номер настройки, то используем его, иначе получаем номер настройки по названию модели
     if "setting_number" in data:
@@ -183,7 +184,6 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     model_name = data["current_model_for_unique_prompt"]
     setting_number = data["setting_number"]
     user_id = message.from_user.id
-    await state.update_data(prompt_for_images=prompt)
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
