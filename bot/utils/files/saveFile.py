@@ -47,7 +47,7 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
                     }
             
         # Загружаем файл
-        file = await retryOperation(uploadFile, 3, 2, file_path, file_metadata, name, folder_name)
+        file = await retryOperation(uploadFile, 10, 2, file_path, file_metadata, name, folder_name)
 
         if with_deleting_temp_folder:
             # Удаляем папку с файлами
