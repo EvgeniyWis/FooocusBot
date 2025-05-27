@@ -20,7 +20,9 @@ import traceback
 from InstanceBot import router
 import os
 from datetime import datetime
+import asyncio
 from config import MOCK_MODE
+from utils.handlers.startGeneration.waitStateArrayReplenishment import waitStateArrayReplenishment
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -182,7 +184,8 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
             return
     
     # Сохраняем видео в стейт
-    await appendDataToStateArray(state, "generated_video_paths", video_path)
+    dataForUpdate = {f"{model_name}": video_path}
+    await appendDataToStateArray(state, "generated_video_paths", dataForUpdate)
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -274,10 +277,14 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
 
 # Хендлер для сохранения видео
 async def start_save_video(call: types.CallbackQuery, state: FSMContext):
+    # Ждём пока появится следующее сгенерированное видео в очереди
+    # TODO: добавить здесь имена стейтов, чтобы он выходил из цикла
+    generated_video_paths = await waitStateArrayReplenishment(state, "generated_video_paths")
+
     # Получаем первую модель в очереди
     stateData = await state.get_data()
-    model_name = list(stateData["generated_video_paths"][0].keys())[0]
-    video_path = stateData["generated_video_paths"][0][model_name]
+    model_name = list(generated_video_paths[0].keys())[0]
+    video_path = generated_video_paths[0][model_name]
 
     # Получаем тип генерации
     type_for_video_generation = stateData["type_for_video_generation"]
@@ -318,4 +325,4 @@ def hand_add():
     router.callback_query.register(handle_video_correctness_buttons, 
     lambda call: call.data.startswith("video_correctness"))
 
-    router.callback_query.register(start_save_video, lambda call: call.datа == "start_save_video")
+    router.callback_query.register(start_save_video, lambda call: call.data == "start_save_video")
