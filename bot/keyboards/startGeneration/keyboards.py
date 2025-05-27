@@ -93,9 +93,8 @@ def saveImagesKeyboard():
 # Инлайн-клавиатура при выборе для сохранения изображения
 def saveImageKeyboard(model_name: str, setting_number: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    # TODO: потом добавить кнопку "Перегенерировать"
     [InlineKeyboardButton(text='💾 Сохранить изображение', callback_data=f'save_image|{model_name}')],
-    # [InlineKeyboardButton(text='🔄 Перегенерировать', callback_data=f'select_image|{model_name}|{setting_number}|regenerate')]
+    [InlineKeyboardButton(text='🔄 Перегенерировать', callback_data=f'select_image|{model_name}|{setting_number}|regenerate')]
     ])
 
     return kb
