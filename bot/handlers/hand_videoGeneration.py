@@ -51,22 +51,23 @@ async def handle_video_generation_mode_buttons(call: types.CallbackQuery, state:
         call,text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(model_name, model_name_index))
         await state.set_state(StartGenerationState.write_prompt_for_video)
         return
-    
-    # Если выбран режим "Использовать заготовленные примеры", то отправляем сообщение с видео-примерами
-    elif mode == "use_examples":
-        # Получаем все видео-шаблоны с их промптами
-        templates_examples = await getVideoExamplesData()
 
-        # Выгружаем видео-примеры вместе с их промптами
-        video_examples_messages_ids = []
-        for index, value in templates_examples.items():
-            video_example_message = await call.message.answer_video(
-                video=value["file_id"],
-                caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
-                reply_markup=video_generation_keyboards.videoExampleKeyboard(f"generate_video|{index}|{model_name}")
-            )
-            video_examples_messages_ids.append(video_example_message.message_id)
-            await state.update_data(video_examples_messages_ids=video_examples_messages_ids)
+    # TODO: режим генерации видео с видео-примерами временно отключен
+    # Если выбран режим "Использовать заготовленные примеры", то отправляем сообщение с видео-примерами
+    # elif mode == "use_examples":
+    #     # Получаем все видео-шаблоны с их промптами
+    #     templates_examples = await getVideoExamplesData()
+
+    #     # Выгружаем видео-примеры вместе с их промптами
+    #     video_examples_messages_ids = []
+    #     for index, value in templates_examples.items():
+    #         video_example_message = await call.message.answer_video(
+    #             video=value["file_id"],
+    #             caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
+    #             reply_markup=video_generation_keyboards.generatedVideoKeyboard(f"generate_video|{index}|{model_name}")
+    #         )
+    #         video_examples_messages_ids.append(video_example_message.message_id)
+    #         await state.update_data(video_examples_messages_ids=video_examples_messages_ids)
 
 
 # Обработка нажатия кнопок под видео-примером
@@ -75,10 +76,11 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     temp = call.data.split("|")
 
     if len(temp) == 4:
-        index = int(temp[1])
+        # TODO: режим генерации видео с видео-примерами временно отключен
+        # index = int(temp[1])
         model_name = temp[2]
         button_type = temp[3]
-        await state.update_data(video_example_index=index)
+        # await state.update_data(video_example_index=index)
     else:
         model_name = temp[1]
         button_type = temp[2]
@@ -91,35 +93,40 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     image_url = data["image_url"]
 
     # Удаляем сообщение с выбором видео-примера
-    try:
-        await bot.delete_message(user_id, int(data["select_video_example_message_id"]))
-    except Exception as e:
-        logger.error(f"Произошла ошибка при удалении сообщения с id {data['select_video_example_message_id']}: {e}")
+    # TODO: режим генерации видео с видео-примерами временно отключен
+    # try:
+    #     await bot.delete_message(user_id, int(data["select_video_example_message_id"]))
+    # except Exception as e:
+    #     logger.error(f"Произошла ошибка при удалении сообщения с id {data['select_video_example_message_id']}: {e}")
 
-    if len(temp) == 4:
-        # Получаем данные видео-примера по его индексу
-        video_example_data = await getVideoExampleDataByIndex(index)
+    # if len(temp) == 4:
+    #     # Получаем данные видео-примера по его индексу
+    #     video_example_data = await getVideoExampleDataByIndex(index)
 
     # Получаем кастомный промпт, если он есть, а если нет, то берем промпт из видео-примера 
     if "prompt_for_video" in data:
         custom_prompt = data["prompt_for_video"]
     else:
         custom_prompt = None
+
+    # TODO: режим генерации видео с видео-примерами временно отключен, поэтому кастомный промпт используется
+    video_example_prompt = custom_prompt
     
-    if custom_prompt:
-        video_example_prompt = custom_prompt
-    else:
-        video_example_prompt = video_example_data["prompt"]
+    # TODO: режим генерации видео с видео-примерами временно отключен
+    # if custom_prompt:
+    #     video_example_prompt = custom_prompt
+    # else:
+    #     video_example_prompt = video_example_data["prompt"]
 
-    # Удаляем сообщения с видео-примерами
-    if "video_examples_messages_ids" in data:
-        video_examples_messages_ids = data["video_examples_messages_ids"]
+    # # Удаляем сообщения с видео-примерами
+    # if "video_examples_messages_ids" in data:
+    #     video_examples_messages_ids = data["video_examples_messages_ids"]
 
-        for message_id in video_examples_messages_ids:
-            try:
-                await bot.delete_message(user_id, int(message_id))
-            except Exception as e:
-                logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
+    #     for message_id in video_examples_messages_ids:
+    #         try:
+    #             await bot.delete_message(user_id, int(message_id))
+    #         except Exception as e:
+    #             logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
                 
     # Удаляем текущее сообщение
     try:
@@ -195,7 +202,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     await message.answer_photo(
     photo=image_url,
     caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index, prompt),
-    reply_markup=video_generation_keyboards.videoExampleKeyboard(f"generate_video|{model_name}"))
+    reply_markup=video_generation_keyboards.generatedVideoKeyboard(f"generate_video|{model_name}"))
 
 
 # Обработка нажатия на кнопки корректности видео
@@ -278,13 +285,16 @@ async def start_save_video(call: types.CallbackQuery, state: FSMContext):
     # Отправляем видео
     video = types.FSInputFile(video_path)
     if type_for_video_generation == "test":
-        if "video_example_index" in stateData:
-            prefix = f"generate_video|{stateData['video_example_index']}|{model_name}"
-        else:
-            prefix = f"generate_video|{model_name}"
+        # TODO: режим генерации видео с видео-примерами временно отключен
+        # if "video_example_index" in stateData:
+        #     prefix = f"generate_video|{stateData['video_example_index']}|{model_name}"
+        # else:
+        #     prefix = f"generate_video|{model_name}"
+
+        prefix = f"generate_video|{model_name}"
 
         await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=video_generation_keyboards.videoExampleKeyboard(prefix, False))
+        reply_markup=video_generation_keyboards.generatedVideoKeyboard(prefix, False))
 
     elif type_for_video_generation == "work":
         # Получаем индекс модели
