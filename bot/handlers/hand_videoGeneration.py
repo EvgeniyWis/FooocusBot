@@ -1,12 +1,10 @@
-from utils.handlers import increaseCountInState
-from utils.handlers import appendDataToStateArray
+from utils.handlers import increaseCountInState, editMessageOrAnswer, appendDataToStateArray
 from assets.mocks.links import MOCK_LINK_FOR_SAVE_VIDEO
 from utils.handlers.videoGeneration import sendNextModelMessage
 from utils import retryOperation, text
 from utils.videos import generateVideo
 from utils.videoExamples import getVideoExampleDataByIndex, getVideoExamplesData
-from utils.generateImages.dataArray import getModelNameIndex
-from utils.handlers import editMessageOrAnswer
+from utils.generateImages.dataArray import getModelNameIndex, getDataByModelName
 from utils.googleDrive.files import saveFile
 from utils.googleDrive.folders import getFolderDataByID
 from aiogram import types
@@ -22,7 +20,7 @@ import os
 from datetime import datetime
 import asyncio
 from config import MOCK_MODE
-from utils.handlers.startGeneration.waitStateArrayReplenishment import waitStateArrayReplenishment
+from utils.handlers.startGeneration import waitStateArrayReplenishment
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -32,6 +30,11 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
         model_name = temp[1]
     else:
         model_name = None
+
+    # Инициализируем стейты
+    await state.update_data(sent_videos_count=0)
+    await state.update_data(saved_videos_count=0)
+    await state.update_data(generated_video_paths=[])
 
     # Отправляем сообщение для первой модели
     await sendNextModelMessage(state, call, model_name)
@@ -81,14 +84,14 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         # TODO: режим генерации видео с видео-примерами временно отключен
         # index = int(temp[1])
         model_name = temp[2]
-        button_type = temp[3]
+        type_for_video_generation = temp[3]
         # await state.update_data(video_example_index=index)
     else:
         model_name = temp[1]
-        button_type = temp[2]
+        type_for_video_generation = temp[2]
 
     user_id = call.from_user.id
-    await state.update_data(type_for_video_generation=button_type)
+    await state.update_data(type_for_video_generation=type_for_video_generation)
 
     # Получаем название модели и url изображения
     data = await state.get_data()
@@ -129,23 +132,17 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     #             await bot.delete_message(user_id, int(message_id))
     #         except Exception as e:
     #             logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
-                
-    # Удаляем текущее сообщение
-    try:
-        await bot.delete_message(user_id, call.message.message_id)
-    except Exception as e:
-        logger.error(f"Произошла ошибка при удалении сообщения с id {call.message.message_id}: {e}")
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
     
     # Отправляем сообщение про генерацию видео
-    message_for_delete = await editMessageOrAnswer(
-        call,text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
+    message_for_edit = await editMessageOrAnswer(
+        call, text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
     
     # Удаляем из очереди текущую модель
     stateData = await state.get_data()
-    stateData["saved_images_urls"].pop(0)
+    stateData["saved_images_urls"] = [x for x in stateData["saved_images_urls"] if not (model_name in x)]
     await state.update_data(saved_images_urls=stateData["saved_images_urls"])
     
     # Отправляем следующую модель
@@ -156,14 +153,15 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     stateData["saved_images_urls"].append(dataForUpdate)
     await state.update_data(saved_images_urls=stateData["saved_images_urls"])
 
-    # Увеличиваем счётчик того, сколько уже отправилось моделей
-    await increaseCountInState(state, "sent_videos_count")
+    if type_for_video_generation == "work":
+        # Увеличиваем счётчик того, сколько уже отправилось моделей
+        await increaseCountInState(state, "sent_videos_count")
 
-    # Проверяем, что модель последняя в генерации
-    stateData = await state.get_data()
-    if stateData["sent_videos_count"] == len(stateData["saved_images_urls"]):
-        await call.message.answer(text.SAVING_VIDEOS_SUCCESS_TEXT, 
-        reply_markup=video_generation_keyboards.saveVideoKeyboard())
+        # Проверяем, что модель последняя в генерации
+        stateData = await state.get_data()
+        if stateData["sent_videos_count"] == len(stateData["saved_images_urls"]):
+            await call.message.answer(text.SAVING_VIDEOS_SUCCESS_TEXT, 
+            reply_markup=video_generation_keyboards.saveVideoKeyboard())
 
     # Генерируем видео
     if MOCK_MODE:
@@ -172,10 +170,6 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         try:
             video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
         except Exception as e:
-                
-            # Удаляем сообщение про генерацию видео
-            await bot.delete_message(user_id, message_for_delete.message_id)
-
             # Отправляем сообщение об ошибке
             traceback.print_exc()
             await editMessageOrAnswer(
@@ -183,9 +177,53 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
             logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
             return
     
-    # Сохраняем видео в стейт
-    dataForUpdate = {f"{model_name}": video_path}
-    await appendDataToStateArray(state, "generated_video_paths", dataForUpdate)
+    # Изменяем сообщение про генерацию видео
+    await message_for_edit.edit_text(text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index))
+
+    # Сохраняем видео в стейт (только при рабочей генерации)
+    if type_for_video_generation == "work":
+        dataForUpdate = {"model_name": model_name, "video_path": video_path}
+        await appendDataToStateArray(state, "generated_video_paths", dataForUpdate)
+    else: # При тестовой просто отправляем юзеру результат генерации
+        video = types.FSInputFile(video_path)
+        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
+        reply_markup=video_generation_keyboards.generatedVideoKeyboard(f"generate_video|{model_name}", False))
+
+
+# Хендлер для сохранения видео
+async def start_save_video(call: types.CallbackQuery, state: FSMContext):
+    # Ждём пока появится следующее сгенерированное видео в очереди
+    generated_video_paths = await waitStateArrayReplenishment(state, "generated_video_paths", 
+    ("sent_videos_count", "saved_videos_count"))
+
+    # Получаем первую модель в очереди
+    stateData = await state.get_data()
+    model_name = generated_video_paths[0]["model_name"]
+    video_path = generated_video_paths[0]["video_path"]
+
+    # Получаем тип генерации
+    type_for_video_generation = stateData["type_for_video_generation"]
+
+    # Отправляем видео
+    video = types.FSInputFile(video_path)
+    if type_for_video_generation == "test":
+        # TODO: режим генерации видео с видео-примерами временно отключен
+        # if "video_example_index" in stateData:
+        #     prefix = f"generate_video|{stateData['video_example_index']}|{model_name}"
+        # else:
+        #     prefix = f"generate_video|{model_name}"
+
+        prefix = f"generate_video|{model_name}"
+
+        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
+        reply_markup=video_generation_keyboards.generatedVideoKeyboard(prefix, False))
+
+    elif type_for_video_generation == "work":
+        # Получаем индекс модели
+        model_name_index = getModelNameIndex(model_name)
+
+        await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
+        reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -216,19 +254,24 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
     model_name = temp[2]
 
     # Получаем данные
-    data = await state.get_data()
-    video_path = data["video_path"]
+    stateData = await state.get_data()
+
+    # Находим нужный путь к видео по модели
+    for data in stateData["generated_video_paths"]:
+        if data["model_name"] == model_name:
+            video_path = data["video_path"]
+            break
+
+    # Получаем id папки и тд
     user_id = call.from_user.id
-    video_folder_id = data["video_folder_id"]
+    modelData = await getDataByModelName(model_name)
+    video_folder_id = modelData["video_folder_id"]
     now = datetime.now().strftime("%Y-%m-%d")
 
     if button_type == "correct":
-        # Удаляем текущее сообщение
-        await bot.delete_message(user_id, call.message.message_id)
-
         # Удаляем из очереди текущую модель
         stateData = await state.get_data()
-        stateData["saved_images_urls"].pop(0)
+        stateData["saved_images_urls"] = [x for x in stateData["saved_images_urls"] if not (model_name in x)]
         await state.update_data(saved_images_urls=stateData["saved_images_urls"])
 
         # Получаем индекс модели
@@ -275,54 +318,17 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
             await call.message.answer(text.SAVING_VIDEOS_SUCCESS_TEXT)
 
 
-# Хендлер для сохранения видео
-async def start_save_video(call: types.CallbackQuery, state: FSMContext):
-    # Ждём пока появится следующее сгенерированное видео в очереди
-    # TODO: добавить здесь имена стейтов, чтобы он выходил из цикла
-    generated_video_paths = await waitStateArrayReplenishment(state, "generated_video_paths")
-
-    # Получаем первую модель в очереди
-    stateData = await state.get_data()
-    model_name = list(generated_video_paths[0].keys())[0]
-    video_path = generated_video_paths[0][model_name]
-
-    # Получаем тип генерации
-    type_for_video_generation = stateData["type_for_video_generation"]
-
-    # Отправляем видео
-    video = types.FSInputFile(video_path)
-    if type_for_video_generation == "test":
-        # TODO: режим генерации видео с видео-примерами временно отключен
-        # if "video_example_index" in stateData:
-        #     prefix = f"generate_video|{stateData['video_example_index']}|{model_name}"
-        # else:
-        #     prefix = f"generate_video|{model_name}"
-
-        prefix = f"generate_video|{model_name}"
-
-        await call.message.answer_video(video=video, caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(model_name), 
-        reply_markup=video_generation_keyboards.generatedVideoKeyboard(prefix, False))
-
-    elif type_for_video_generation == "work":
-        # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
-
-        await call.message.answer_video(video=video, caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index), 
-        reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(model_name))
-
-
-
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(start_generate_video, lambda call: call.data == "start_generate_video")
+    router.callback_query.register(start_generate_video, lambda call: call.data.startswith("start_generate_video"))
 
     router.callback_query.register(handle_video_generation_mode_buttons, lambda call: call.data.startswith("generate_video_mode"))
 
     router.callback_query.register(handle_video_example_buttons, lambda call: call.data.startswith("generate_video"))
 
+    router.callback_query.register(start_save_video, lambda call: call.data == "start_save_video")
+
     router.message.register(write_prompt_for_video, StateFilter(StartGenerationState.write_prompt_for_video))
 
     router.callback_query.register(handle_video_correctness_buttons, 
     lambda call: call.data.startswith("video_correctness"))
-
-    router.callback_query.register(start_save_video, lambda call: call.data == "start_save_video")
