@@ -1,31 +1,18 @@
 from aiogram.fsm.context import FSMContext
-import asyncio
 from .sendImageBlock import sendImageBlock
 from aiogram import types
 from ...generateImages.dataArray import getSettingNumberByModelName
-from logger import logger
+from .waitStateArrayReplenishment import waitStateArrayReplenishment
 
 
 # Функция для ожидания следующих блоков изображений и последующей отправки
 async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext) -> str:
     # Ждём пока появится следующий блок изображений в очереди
-    while True:
-        stateData = await state.get_data()
+    media_groups_for_generation = await waitStateArrayReplenishment(state, "media_groups_for_generation", 
+    ("will_be_sent_generated_images_count", "total_images_count"))
 
-        if not stateData["media_groups_for_generation"]:
-            media_groups_for_generation = []
-        else:
-            media_groups_for_generation = stateData["media_groups_for_generation"]
-
-        logger.info(f"Модели для генерации: {[list(i.keys())[0] for i in media_groups_for_generation]}")
-
-        if len(media_groups_for_generation) > 0:
-            break
-
-        if stateData["will_be_sent_generated_images_count"] == stateData["total_images_count"]:
-            return False
-
-        await asyncio.sleep(5)
+    if not media_groups_for_generation:
+        return False
 
     # Проверяем тестовая ли генерация
     is_test_generation = stateData["generations_type"] == "test"
