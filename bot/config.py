@@ -20,3 +20,12 @@ RUNPOD_HOST = f"https://api.runpod.ai/v2/{ENDPOINT_ID}"
 
 # ID чата разработчика
 DEV_CHAT_ID = 1979922062
+
+# Пользователи, которые могут использовать бота
+ALLOWED_USERS = [
+    DEV_CHAT_ID,
+    6455916237,
+    885831766,
+    835641645,
+    196507796
+]

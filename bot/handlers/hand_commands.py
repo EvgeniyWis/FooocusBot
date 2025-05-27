@@ -6,11 +6,16 @@ from utils import text
 from InstanceBot import router
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardRemove
+from config import ALLOWED_USERS
 
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
     await state.clear()
+
+    if message.from_user.id not in ALLOWED_USERS:
+        await message.answer(text.ACCESS_DENIED_TEXT)
+        return
 
     await message.answer(
         text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard()
