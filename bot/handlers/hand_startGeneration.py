@@ -355,10 +355,19 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             # Добавляем в стейт то, сколько отправленных изображений
             await increaseCountInState(state, "finally_sent_generated_images_count")
 
+            # Проверяем, что количество отправленных изображений и тех, которые собираются отправиться, равно
+            stateData = await state.get_data()
+            if stateData["finally_sent_generated_images_count"] >= stateData["will_be_sent_generated_images_count"]:
+                # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
+                await call.message.answer(text.GENERATE_IMAGES_SUCCESS_TEXT, 
+                reply_markup=start_generation_keyboards.saveImagesKeyboard())
+
+                # Ставим, что начался 2 этап
+                await state.update_data(generation_step=2)
+
         elif stateData["generation_step"] == 2:
             await call.message.edit_text(text.GENERATE_IMAGE_SUCCESS_TEXT, 
             reply_markup=start_generation_keyboards.saveImagesKeyboard())
-
 
     except Exception as e:
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
@@ -459,11 +468,9 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     except Exception as e:
         logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
 
-    # Добавляем в стейт то, сколько сохранённых изображений
-    await increaseCountInState(state, "saved_images_count")
-
     # Если это была последняя модель в сеансе, то отправляем сообщение о третьем этапе
-    if stateData["finally_sent_generated_images_count"] >= stateData["saved_images_count"]:
+    stateData = await state.get_data()
+    if stateData["finally_sent_generated_images_count"] >= len(stateData["saved_images_urls"]):
         await call.message.answer(text.SAVING_IMAGES_SUCCESS_TEXT, 
         reply_markup=video_generation_keyboards.generateVideoKeyboard())
 
