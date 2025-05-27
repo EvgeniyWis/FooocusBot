@@ -39,20 +39,18 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
 
     await state.update_data(select_video_example_message_id=select_video_example_message.message_id)
 
-    # TODO: временно убрали видео-примеры
     # Получаем все видео-шаблоны с их промптами
-    # templates_examples = await getVideoExamplesData()
+    templates_examples = await getVideoExamplesData()
 
-    # Выгружаем видео-примеры вместе с их промптами
-    # video_examples_messages_ids = []
-    # for index, value in templates_examples.items():
-    #     video_example_message = await call.message.answer_video(
-    #         video=value["file_id"],
-    #         caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
-    #         reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name)
-    #     )
-    #     video_examples_messages_ids.append(video_example_message.message_id)
-    #     await state.update_data(video_examples_messages_ids=video_examples_messages_ids)
+    video_examples_messages_ids = []
+    for index, value in templates_examples.items():
+        video_example_message = await call.message.answer_video(
+            video=value["file_id"],
+            caption=text.VIDEO_EXAMPLE_TEXT.format(model_name, model_name_index, value["prompt"]),
+            reply_markup=video_generation_keyboards.videoExampleKeyboard(index, model_name)
+        )
+        video_examples_messages_ids.append(video_example_message.message_id)
+        await state.update_data(video_examples_messages_ids=video_examples_messages_ids)
 
 
 # Обработка нажатия кнопок под видео-примером
@@ -88,14 +86,13 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
     video_example_file_id = video_example_data["file_id"]
     await state.update_data(video_example_file_id=video_example_file_id)
 
-    # TODO: временно убрали видео-примеры
     # Удаляем сообщения с видео-примерами
-    # video_examples_messages_ids = data["video_examples_messages_ids"]
-    # for message_id in video_examples_messages_ids:
-    #     try:
-    #         await bot.delete_message(user_id, int(message_id))
-    #     except Exception as e:
-    #         logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
+    video_examples_messages_ids = data["video_examples_messages_ids"]
+    for message_id in video_examples_messages_ids:
+        try:
+            await bot.delete_message(user_id, int(message_id))
+        except Exception as e:
+            logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
             
     # Удаляем текущее сообщение
     try:
