@@ -6,6 +6,7 @@ from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 from aiogram import types
 from datetime import datetime
 from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
+import os
 
 
 # Функция для сохранения видео в папку модели
@@ -20,7 +21,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о начале сохранения видео
-    await message.answer(text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
+    message_for_delete = await message.answer(text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
     # Получаем данные о модели по имени
     model_data = await getDataByModelName(model_name)
@@ -41,6 +42,18 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
 
     logger.info(f"Данные папки по id {model_data['video_folder_id']}: {folder}")
 
+    # Удаляем сообщение о начале сохранения видео
+    try:
+        await message_for_delete.delete()
+    except Exception as e:
+        logger.error(f"Ошибка при удалении сообщения о начале сохранения видео: {e}")
+
     # Отправляем сообщение о сохранении видео
     await message.answer(text.SAVE_VIDEO_SUCCESS_TEXT
     .format(link, model_name, parent_folder['webViewLink'], model_name_index))
+
+    # Удаляем видео из папки temp
+    try:
+        os.remove(video_path)
+    except Exception as e:
+        logger.error(f"Ошибка при удалении видео из папки temp: {e}")

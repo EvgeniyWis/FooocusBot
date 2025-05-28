@@ -93,7 +93,17 @@ async def generateVideo(prompt: str, image_url: str = None, image_path: str = No
                     if not video_path:
                         logger.error(f"Не удалось скачать видео: {result_url}")
                         raise Exception("Не удалось скачать видео")
-                        
+                    
+                    # Проверяем, что файл существует и имеет размер больше 0
+                    if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
+                        logger.error(f"Видео файл не существует или имеет нулевой размер: {video_path}")
+
+                        # Сохраняем по-новой
+                        video_path = await downloadVideo(result_url)
+                        if not video_path:
+                            logger.error(f"Не удалось скачать видео: {result_url}")
+                            raise Exception("Не удалось скачать видео")
+
                     return video_path
                 
             except Exception as e:
