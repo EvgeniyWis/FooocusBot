@@ -29,9 +29,12 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     model_name = call.data.split("|")[1]
 
     # Удаляем видео из папки temp/videos, если оно есть
-    stateData = await state.get_data()
-    if "video_path" in stateData:
-        os.remove(stateData["video_path"])
+    try:
+        stateData = await state.get_data()
+        if "video_path" in stateData:
+            os.remove(stateData["video_path"])
+    except Exception as e:
+        logger.error(f"Ошибка при удалении видео из папки temp/videos: {e}")
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
