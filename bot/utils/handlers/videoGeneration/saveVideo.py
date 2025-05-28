@@ -14,9 +14,6 @@ import os
 # Функция для сохранения видео в папку модели
 async def saveVideo(video_path: str, model_name: str, video_folder_id: str, 
     message: types.Message):
-    # Удаляем текущее сообщение
-    await bot.delete_message(message.from_user.id, message.message_id)
-
     # Получаем текущую дату
     now = datetime.now().strftime("%Y-%m-%d")
 
