@@ -43,10 +43,3 @@ async def saveVideo(video_path: str, model_name: str, video_folder_id: str,
     # Отправляем сообщение о сохранении видео
     await message.answer(text.SAVE_VIDEO_SUCCESS_TEXT
     .format(link, model_name, parent_folder['webViewLink'], model_name_index))
-
-    # Удаляем видео из папки temp/videos
-    try:
-        await asyncio.sleep(1)  # Добавляем небольшую задержку
-        os.remove(video_path)
-    except Exception as e:
-        logger.error(f"Ошибка при удалении временного видео-файла {video_path}: {e}")

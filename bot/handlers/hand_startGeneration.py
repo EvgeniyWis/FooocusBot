@@ -172,6 +172,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
 
     await state.update_data(prompt=prompt)
 
+    await state.set_state(None)
     # Генерируем изображения
     await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
             
@@ -214,6 +215,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     # Получаем индекс следующей модели
     next_model_index = getModelNameIndex(next_model)
 
+    await state.set_state(None)
     # Просим пользователя отправить промпт для следующей модели
     await message.answer(text.WRITE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index), 
     reply_markup=start_generation_keyboards.confirmWriteUniquePromptForNextModelKeyboard())
@@ -334,6 +336,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 logger.error(f"Произошла ошибка при замене лица: {e}")
                 await editMessageOrAnswer(
         call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
+                stateData["faceswap_generate_models"].remove(model_name)
+                await state.update_data(faceswap_generate_models=stateData["faceswap_generate_models"])
                 break
 
             break
@@ -413,6 +417,7 @@ async def write_model_name_for_generation(message: types.Message, state: FSMCont
         await message.answer(text.MODEL_NOT_FOUND_TEXT)
         return
 
+    await state.set_state(None)
     await message.answer(text.GET_MODEL_NAME_SUCCESS_TEXT)
     await state.set_state(StartGenerationState.write_prompt_for_images)
 

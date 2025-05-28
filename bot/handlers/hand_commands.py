@@ -11,7 +11,7 @@ from config import ALLOWED_USERS
 
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
-    await state.clear()
+    await state.set_state(None)
 
     if message.from_user.id not in ALLOWED_USERS:
         await message.answer(text.ACCESS_DENIED_TEXT)
