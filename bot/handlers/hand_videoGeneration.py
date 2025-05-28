@@ -67,7 +67,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
     # Получаем название модели и url изображения
     data = await state.get_data()
-    image_url = data[f"{model_name}_image_url"]
+    image_url = data["images_urls"][model_name]
 
     # Удаляем сообщение с выбором видео-примера
     try:
