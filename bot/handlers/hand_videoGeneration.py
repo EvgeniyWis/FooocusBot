@@ -111,7 +111,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
 
     # Генерируем видео
     try:
-        video_path = await generateVideo(video_example_prompt, image_url)
+        video_path = await retryOperation(generateVideo, 10, 1.5, video_example_prompt, image_url)
     except Exception as e:
         # Удаляем сообщение про генерацию видео
         await bot.delete_message(user_id, message_for_delete.message_id)
@@ -224,7 +224,7 @@ async def handle_prompt_for_videoGenerationFromImage(message: types.Message, sta
         await bot.download_file(file_path, temp_path)
 
         # Генерируем видео
-        video_path = await generateVideo(prompt, None, temp_path)
+        video_path = await retryOperation(generateVideo, 10, 1.5, prompt, None, temp_path)
         await state.update_data(video_path=video_path)
 
         video = types.FSInputFile(video_path)
