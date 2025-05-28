@@ -5,6 +5,9 @@ from utils.files.getGoogleDriveFileID import getGoogleDriveFileID
 import os
 import asyncio
 from utils.videos.downloadVideo import downloadVideo
+from config import ADMIN_ID
+from utils import text
+from InstanceBot import bot
 
 
 # Генерация видео с помощью kling
@@ -53,6 +56,10 @@ async def generateVideo(prompt: str, image_url: str = None, image_path: str = No
 
         if json.get('error'):
             logger.error(f"Ошибка валидации: {json.get('errors_validation')}")
+
+            if json["error"] == "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс.":
+                await bot.send_message(ADMIN_ID, text.KLING_INSUFFICIENT_BALANCE_TEXT)
+
             return None
 
         logger.info(f"Запрос на генерацию видео отправлен. Ответ: {json}")
