@@ -367,7 +367,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     if not link:
         traceback.print_exc()
         await editMessageOrAnswer(
-        call,text.SAVE_FILE_ERROR_TEXT)
+        call,text.SAVE_FILE_ERROR_TEXT.format(model_name, model_name_index))
         return
 
     dataForUpdate = {f"{model_name}": link}

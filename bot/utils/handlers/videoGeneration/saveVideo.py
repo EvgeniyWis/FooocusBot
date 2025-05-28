@@ -31,7 +31,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     link = await saveFile(video_path, user_id, model_name, model_data['video_folder_id'], now, False)
 
     if not link:
-        await message.answer(text.SAVE_FILE_ERROR_TEXT)
+        await message.answer(text.SAVE_FILE_ERROR_TEXT.format(model_name, model_name_index))
         return
     
     # Получаем данные родительской папки
