@@ -23,7 +23,9 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     await message.answer(text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index))
 
     # Получаем данные о модели по имени
-    model_data = getDataByModelName(model_name)
+    model_data = await getDataByModelName(model_name)
+
+    logger.info(f"Данные модели: {model_data}")
 
     # Сохраняем видео
     link = await saveFile(video_path, user_id, model_name, model_data['video_folder_id'], now, False)
