@@ -169,14 +169,13 @@ async def handle_video_correctness_buttons(call: types.CallbackQuery, state: FSM
     # Получаем данные
     data = await state.get_data()
     video_path = data["video_path"]
-    video_folder_id = data["video_folder_id"]
 
     if button_type == "correct":
         # Удаляем текущее сообщение с видео
         await bot.delete_message(call.message.chat.id, call.message.message_id)
 
         # Сохраняем видео
-        await saveVideo(video_path, model_name, video_folder_id, call.message)
+        await saveVideo(video_path, model_name, call.message)
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"
@@ -253,15 +252,12 @@ async def handle_model_name_for_video_generation_from_image(message: types.Messa
     if not await getDataByModelName(model_name):
         await message.answer(text.MODEL_NOT_FOUND_TEXT)
         return
-    
-    model_data = await getDataByModelName(model_name)
-    video_folder_id = model_data["video_folder_id"]
 
     stateData = await state.get_data()
     video_path = stateData["video_path"]
     await state.set_state(None)
     await state.update_data(model_name_for_video_generation_from_image=model_name)
-    await saveVideo(video_path, model_name, video_folder_id, message)
+    await saveVideo(video_path, model_name, message)
 
 
 # Добавление обработчиков
