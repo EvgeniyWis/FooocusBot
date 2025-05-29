@@ -94,10 +94,11 @@ def generatedVideoKeyboard(file_id_index: str):
 
     return kb
 
+# TODO:
 # Инлайн-клавиатура для сгенерируемого видео из изображения
 def generatedVideoKeyboard(file_id_index: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='🔄 Перегенерировать видео', callback_data=f'regenerate_video_from_image|{file_id_index}')],
+        # [InlineKeyboardButton(text='🔄 Перегенерировать видео', callback_data=f'regenerate_video_from_image|{file_id_index}')],
         [InlineKeyboardButton(text='💾 Сохранить видео', callback_data=f'save_video|{file_id_index}')]
     ])
 
