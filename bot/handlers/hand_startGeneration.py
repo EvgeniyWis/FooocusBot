@@ -248,7 +248,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     
     if not stateData["specific_model"]:
         # Отправляем следующее изображение (ждём пока появится следующий блок изображений в очереди и отправляем его)
-        next_model_name = asyncio.create_task(waitForImageBlocksGeneration(call.message, state))
+        next_model_name = asyncio.create_task(waitForImageBlocksGeneration(call.message, state, user_id))
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)

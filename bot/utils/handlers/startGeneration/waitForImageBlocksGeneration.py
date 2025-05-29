@@ -6,7 +6,7 @@ from .waitStateArrayReplenishment import waitStateArrayReplenishment
 
 
 # Функция для ожидания следующих блоков изображений и последующей отправки
-async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext) -> str:
+async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext, user_id: int) -> str:
     # Ждём пока появится следующий блок изображений в очереди
     media_groups_for_generation = await waitStateArrayReplenishment(state, "media_groups_for_generation", 
     ("will_be_sent_generated_images_count", "total_images_count"))
@@ -31,7 +31,7 @@ async def waitForImageBlocksGeneration(message: types.Message, state: FSMContext
     setting_number = getSettingNumberByModelName(model_name)
 
     # Отправляем изображение
-    await sendImageBlock(message, state, media_group, model_name, setting_number, is_test_generation)
+    await sendImageBlock(message, state, media_group, model_name, setting_number, is_test_generation, user_id)
 
     # Удаляем блок изображений из очереди
     await state.update_data(media_groups_for_generation=media_groups_for_generation[1:])
