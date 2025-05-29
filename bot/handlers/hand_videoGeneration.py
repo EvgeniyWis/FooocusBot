@@ -119,7 +119,7 @@ async def handle_video_example_buttons(call: types.CallbackQuery, state: FSMCont
         # Отправляем сообщение об ошибке
         traceback.print_exc()
         await editMessageOrAnswer(
-        call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, e))
+        call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, e))
         logger.error(f"Произошла ошибка при генерации видео для модели {model_name}: {e}")
         return
     
@@ -239,7 +239,7 @@ async def handle_prompt_for_videoGenerationFromImage(message: types.Message, sta
         os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
-        await message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format("", e))
+        await message.answer(text.GENERATE_VIDEO_FROM_IMAGE_ERROR_TEXT.format(e))
         logger.error(f"Ошибка при генерации видео из изображения: {e}")
 
 
