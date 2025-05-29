@@ -275,14 +275,11 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             image = Image.open(image_path)
             image_base64 = imageToBase64(image)
 
-            # Получаем негатив промпт
-            negative_prompt = data["json"]["input"]["negative_prompt"]
-            
             # Получаем базовую модель   
             base_model = data["json"]["input"]["base_model_name"]
             
             # Делаем upscale изображения
-            images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
+            images_output_base64 = await upscaleImage(image_base64, base_model)
 
             # Сохраняем изображения по этому же пути
             await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)

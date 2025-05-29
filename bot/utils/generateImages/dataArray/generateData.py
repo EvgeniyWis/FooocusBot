@@ -1,7 +1,9 @@
+from config import COMMON_NEGATIVE_PROMPT
+
 # Глобальная функция для генерации данных для запроса
 def generateData(model_name: str, picture_folder_id: str, video_folder_id: str, prompt: str,
-    loras: list[dict], base_config_model_name: str, image_number: int,
-    negative_prompt: str, embeddings: list[str] = []):
+    loras: list[dict], base_config_model_name: str, image_number: int, negative_prompt: str = COMMON_NEGATIVE_PROMPT,
+    embeddings: list[str] = []):
     data = {"json": {
         "input": {
             "api_name": "txt2img",
