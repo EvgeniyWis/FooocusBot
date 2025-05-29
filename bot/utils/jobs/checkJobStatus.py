@@ -12,9 +12,8 @@ async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.M
     while True:
         if state:
             data = await state.get_data()
-            if "stop_generation" in data:
-                if data["stop_generation"]:
-                    raise Exception("Генерация остановлена")
+            if data["stop_generation"]:
+                raise Exception("Генерация остановлена")
         
         try:
             response = requests.post(f'{RUNPOD_HOST}/status/{job_id}', headers=RUNPOD_HEADERS)

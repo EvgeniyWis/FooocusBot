@@ -16,6 +16,8 @@ async def start(message: types.Message, state: FSMContext):
     if message.from_user.id not in ALLOWED_USERS:
         await message.answer(text.ACCESS_DENIED_TEXT)
         return
+    
+    await state.update_data(stop_generation=False)
 
     await message.answer(
         text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard()
