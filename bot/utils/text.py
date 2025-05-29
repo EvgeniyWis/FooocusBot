@@ -225,3 +225,8 @@ SAVE_VIDEO_AND_WRITE_MODEL_NAME_TEXT = "✅ Введи название моде
 # Текст при недостаточном балансе
 KLING_INSUFFICIENT_BALANCE_TEXT = "❌ На Kling недостаточно средств на балансе!"
 
+# Текст при успешной генерации видео из изображения
+GENERATE_VIDEO_FROM_IMAGE_SUCCESS_TEXT = '✅ Видео успешно сгенерировано!'
+
+# Текст для ввода имени модели для сохранения видео
+ASK_FOR_MODEL_NAME_FOR_VIDEO_GENERATION_FROM_IMAGE_TEXT = "Введи название модели, в папку которой будет сохранено видео:"
