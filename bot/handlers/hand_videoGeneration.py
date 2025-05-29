@@ -367,12 +367,12 @@ async def handle_regenerate_video_from_image(call: types.CallbackQuery, state: F
     await generateVideoFromImage(image_file_id_index, prompt, call.message, state)
 
 
-# Хендлер для обработки нажатия на кнопку "💾 Сохранить видео"
-async def handle_save_video(call: types.CallbackQuery, state: FSMContext):
-    file_id_index = call.data.split("|")[1]
-    await state.update_data(current_file_id_index=file_id_index)
-    await state.set_state(StartGenerationState.ask_for_model_name_for_video_generation_from_image)
-    await call.message.answer(text.SAVE_VIDEO_AND_WRITE_MODEL_NAME_TEXT)
+# # Хендлер для обработки нажатия на кнопку "💾 Сохранить видео"
+# async def handle_save_video(call: types.CallbackQuery, state: FSMContext):
+#     file_id_index = call.data.split("|")[1]
+#     await state.update_data(current_file_id_index=file_id_index)
+#     await state.set_state(StartGenerationState.ask_for_model_name_for_video_generation_from_image)
+#     await call.message.answer(text.SAVE_VIDEO_AND_WRITE_MODEL_NAME_TEXT)
 
 
 # Хендлер для обработки ввода имени модели для сохранения видео
@@ -453,6 +453,6 @@ def hand_add():
     router.callback_query.register(handle_regenerate_video_from_image, 
     lambda call: call.data.startswith("regenerate_video_from_image"))
 
-    router.callback_query.register(handle_save_video, lambda call: call.data.startswith("save_video"))
+    # router.callback_query.register(handle_save_video, lambda call: call.data.startswith("save_video"))
 
     router.message.register(handle_model_name_for_video_generation_from_image, StateFilter(StartGenerationState.ask_for_model_name_for_video_generation_from_image))
