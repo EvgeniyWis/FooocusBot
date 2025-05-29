@@ -176,6 +176,12 @@ async def start_generateVideoFromImage(call: types.CallbackQuery, state: FSMCont
     await call.message.edit_text(text.SEND_IMAGE_FOR_VIDEO_GENERATION)
     await state.set_state(StartGenerationState.send_image_for_video_generation)
 
+    # Очищаем стейт от всех данных
+    # TODO: убрать и сделать так, чтобы можно было генерить одновременно несколько видео
+    await state.update_data(image_file_ids_for_videoGenerationFromImage=[])
+    await state.update_data(prompts_for_videoGenerationFromImage={})
+    await state.update_data(video_paths=[])
+
 
 # Обработка присылания изображения для генерации видео и запроса на присылания промпта
 async def write_prompt_for_videoGenerationFromImage(message: types.Message, state: FSMContext):
