@@ -269,7 +269,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     
     # Получаем данные генерации по названию модели
     dataArray = getDataArrayBySettingNumber(int(setting_number))
+    # Пытаемся найти данные в текущем массиве
     data = next((data for data in dataArray if data["model_name"] == model_name), None)
+    
+    # Если данные не найдены, ищем во всех доступных массивах
+    if data is None:
+        all_data_arrays = getAllDataArrays()
+        for arr in all_data_arrays:
+            data = next((d for d in arr if d["model_name"] == model_name), None)
+            if data is not None:
+                break
     picture_folder_id = data["picture_folder_id"]
     video_folder_id = data["video_folder_id"]
 
