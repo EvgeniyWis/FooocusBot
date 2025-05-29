@@ -11,10 +11,8 @@ from aiogram.fsm.context import FSMContext
 from keyboards import video_generation_keyboards
 from states import StartGenerationState
 from logger import logger
-from InstanceBot import bot
 import traceback
 from InstanceBot import router
-import os
 from datetime import datetime
 from config import MOCK_MODE
 from utils.handlers.startGeneration import waitStateArrayReplenishment
@@ -398,31 +396,31 @@ async def handle_model_name_for_video_generation_from_image(message: types.Messa
     await state.update_data(model_name_for_video_generation_from_image=model_name)
     await saveVideo(video_path, model_name, message)
 
-    try:
-        # Очищаем все стейты от текущих данных
-        await state.update_data(current_file_id_index=None)
+    # try:
+    #     # Очищаем все стейты от текущих данных
+    #     await state.update_data(current_file_id_index=None)
 
-        # Получаем file_id изображения, которое нужно удалить
-        image_file_id = stateData["image_file_ids_for_videoGenerationFromImage"][file_id_index]
+    #     # Получаем file_id изображения, которое нужно удалить
+    #     image_file_id = stateData["image_file_ids_for_videoGenerationFromImage"][file_id_index]
         
-        # Удаляем видео из списка и обновляем state
-        updated_video_paths = stateData["video_paths"]
-        updated_video_paths.pop(file_id_index)
-        await state.update_data(video_paths=updated_video_paths)
+    #     # Удаляем видео из списка и обновляем state
+    #     updated_video_paths = stateData["video_paths"]
+    #     updated_video_paths.pop(file_id_index)
+    #     await state.update_data(video_paths=updated_video_paths)
 
-        # Удаляем file_id из списка и обновляем state
-        updated_image_file_ids = stateData["image_file_ids_for_videoGenerationFromImage"]
-        updated_image_file_ids.pop(file_id_index)
-        await state.update_data(image_file_ids_for_videoGenerationFromImage=updated_image_file_ids)
+    #     # Удаляем file_id из списка и обновляем state
+    #     updated_image_file_ids = stateData["image_file_ids_for_videoGenerationFromImage"]
+    #     updated_image_file_ids.pop(file_id_index)
+    #     await state.update_data(image_file_ids_for_videoGenerationFromImage=updated_image_file_ids)
 
-        # Удаляем промпт по file_id и обновляем state
-        updated_prompts = stateData["prompts_for_videoGenerationFromImage"]
-        updated_prompts.pop(image_file_id)
-        await state.update_data(prompts_for_videoGenerationFromImage=updated_prompts)
+    #     # Удаляем промпт по file_id и обновляем state
+    #     updated_prompts = stateData["prompts_for_videoGenerationFromImage"]
+    #     updated_prompts.pop(image_file_id)
+    #     await state.update_data(prompts_for_videoGenerationFromImage=updated_prompts)
             
-        logger.info(f"Удалены данные из массивов: {updated_video_paths}, {updated_image_file_ids}, {updated_prompts}")
-    except Exception as e:
-        logger.error(f"Произошла ошибка при сохранении видео: {e}")
+    #     logger.info(f"Удалены данные из массивов: {updated_video_paths}, {updated_image_file_ids}, {updated_prompts}")
+    # except Exception as e:
+    #     logger.error(f"Произошла ошибка при сохранении видео: {e}")
 
 
 # Добавление обработчиков
