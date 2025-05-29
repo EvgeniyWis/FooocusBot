@@ -1,6 +1,5 @@
-from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
-from utils.generateImages.dataArray.getDataArrayByRandomizer import getDataArrayByRandomizer
-from utils.generateImages.generateImageBlock import generateImageBlock
+from .dataArray import getDataArrayWithRootPrompt, getDataArrayByRandomizer
+from .generateImageBlock import generateImageBlock
 from logger import logger
 from aiogram import types
 import asyncio

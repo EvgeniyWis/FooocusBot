@@ -1,4 +1,5 @@
 from .generateData import setting1_generateData
+from config import MOCK_MODE
 
 # Функция для генерации массива данных для запроса для настройки 1
 def setting1_getDataArray():
@@ -177,5 +178,8 @@ def setting1_getDataArray():
 lighting: ((bright daylight, model fully illuminated, photo bright, maximally illuminated))""",
         [2, 0.40, -0.90, -0.35, 2.10, 1.00, 1.60, 0.55, 1.95])
     ]
+
+    if MOCK_MODE:
+        dataArray = dataArray[:1]
 
     return dataArray

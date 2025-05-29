@@ -1,18 +1,27 @@
-from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
-from utils.generateImages.generateImagesByAllSettings import generateImagesByAllSettings
-from utils.generateImages.generateImageBlock import generateImageBlock
+from ...generateImages.dataArray import getDataByModelName, getDataArrayWithRootPrompt, getModelNameIndex
+from ...generateImages import generateImagesByAllSettings, generateImageBlock, generateImages
+from ... import text
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from utils import text
-from utils.generateImages.dataArray.getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
 from logger import logger
 import traceback
-from utils.generateImages.generateImages import generateImages
-from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
+import asyncio
+from keyboards import start_generation_keyboards
+
 
 # Функция для генерации изображения в зависимости от настроек
 async def generateImagesInHandler(prompt: str, message: types.Message, state: FSMContext,
     user_id: int, is_test_generation: bool, setting_number: str, with_randomizer: bool = False):
+    # Инициализируем стейт
+    await state.update_data(models_for_generation_queue=[])
+    await state.update_data(regenerate_images=[])
+    await state.update_data(will_be_sent_generated_images_count=0)
+    await state.update_data(finally_sent_generated_images_count=0)
+    await state.update_data(total_images_count=0)
+    await state.update_data(saved_videos_count=0)
+    await state.update_data(media_groups_for_generation=None)
+    await state.update_data(generation_step=1)
+
     # Генерируем изображения
     try:
         if is_test_generation:
@@ -59,12 +68,25 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 await message_for_edit.unpin()
                 
         stateData = await state.get_data()
-        if result:
-            if not stateData["stop_generation"]:
-                await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
-        else:
-            if not stateData["stop_generation"]:
-                raise Exception("Произошла ошибка при генерации изображения")
+
+        if not is_test_generation:
+            if result:
+                if "stop_generation" not in stateData:
+                    finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
+                    total_images_count = stateData["total_images_count"]
+                    
+                    # Ждём когда список моделей для генерации станет пустым
+                    while finally_sent_generated_images_count < total_images_count:
+                        stateData = await state.get_data()
+                        finally_sent_generated_images_count = stateData["finally_sent_generated_images_count"]
+                        total_images_count = stateData["total_images_count"]
+                        await asyncio.sleep(10)
+
+                    # Очищаем список медиагрупп
+                    await state.update_data(media_groups_for_generation=None)
+            else:
+                if "stop_generation" not in stateData:
+                    raise Exception("Произошла ошибка при генерации изображения")
 
     except Exception as e:
         try:

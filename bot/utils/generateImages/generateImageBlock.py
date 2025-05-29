@@ -1,16 +1,11 @@
 from aiogram import types
-from utils.generateImages.getReferenceImage import getReferenceImage
-from utils import text
-from utils.generateImages.base64ToImage import base64ToImage
+from .getReferenceImage import getReferenceImage
+from .base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
-from keyboards import start_generation_keyboards
-import shutil
 from ..jobs.getJobID import getJobID
 from ..jobs.checkJobStatus import checkJobStatus
-from config import TEMP_FOLDER_PATH
-from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
-from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
-
+from ..handlers.startGeneration.sendImageBlock import sendImageBlock
+from config import MOCK_MODE
 
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
@@ -26,17 +21,19 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             pass
         raise Exception("Генерация остановлена")
 
-    # Делаем запрос на генерацию и получаем id работы
-    job_id = await getJobID(dataJSON)
+    if not MOCK_MODE:
+        # Делаем запрос на генерацию и получаем id работы
+        job_id = await getJobID(dataJSON)
 
-    # Проверяем статус работы
-    response_json = await checkJobStatus(job_id, state, message, is_test_generation, checkOtherJobs)
+        # Проверяем статус работы
+        response_json = await checkJobStatus(job_id, state, message, is_test_generation, checkOtherJobs)
 
     try:
-        images_output = response_json["output"]
-        
-        if images_output == []:
-            raise Exception("Не удалось сгенерировать изображения")
+        if not MOCK_MODE:
+            images_output = response_json["output"]
+            
+            if images_output == []:
+                raise Exception("Не удалось сгенерировать изображения")
 
         media_group = []
         base_64_dataArray = []
@@ -47,35 +44,31 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
             media_group.append(types.InputMediaPhoto(media=types.FSInputFile(reference_image)))
 
         # Обрабатываем результаты
-        for i, image_data in enumerate(images_output):
-            base_64_data = await base64ToImage(image_data["base64"], model_name, i, user_id, is_test_generation)
-            base_64_dataArray.append(base_64_data)
-            media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
+        if not MOCK_MODE:
+            for i, image_data in enumerate(images_output):
+                base_64_data = await base64ToImage(image_data["base64"], model_name, i, user_id, is_test_generation)
+                base_64_dataArray.append(base_64_data)
+                media_group.append(types.InputMediaPhoto(media=types.FSInputFile(base_64_data)))
 
-        # Отправляем изображения
-        message_with_media_group = await message.answer_media_group(media_group)
+        # Если изображение первое в очереди, то отправляем его и инициализуем стейт (либо если это изображение, которое перегенерируется)
+        stateData = await state.get_data()
+        if stateData["media_groups_for_generation"] == None or model_name in stateData["regenerate_images"]:
+            # Обновляем стейт
+            if stateData["media_groups_for_generation"] == None:
+                await state.update_data(media_groups_for_generation=[])
 
-        if setting_number == "all":
-            setting_number = stateData["current_setting_number_for_unique_prompt"]
+            # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
+            elif model_name in stateData["regenerate_images"]:
+                stateData["regenerate_images"].remove(model_name)
+                await state.update_data(regenerate_images=stateData["regenerate_images"])
 
-        # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
-
-        # Получаем данные модели
-        model_data = await getDataByModelName(model_name)
-
-        # Отправляем клавиатуру для выбора изображения
-        await message.answer(text.SELECT_IMAGE_TEXT.format(model_name, model_name_index) if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number), 
-        reply_markup=start_generation_keyboards.selectImageKeyboard(model_name, setting_number, model_data["json"]["input"]["image_number"]) 
-        if not is_test_generation else start_generation_keyboards.testGenerationImagesKeyboard(setting_number) if stateData["setting_number"] != "all" else None)
-
-        # Сохраняем в стейт данные о медиагруппе, для её удаления
-        await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
-        
-        # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-        if is_test_generation:
-            shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")
-            return
+            # Отправляем изображение
+            await sendImageBlock(message, state, media_group, model_name, setting_number, is_test_generation)
+            
+        else: # Если изображение не первое в очереди, то добавляем его в стейт и оно отправится только после подтверждения генерации у прошлого изображения
+            dataForUpdate = {f"{model_name}": media_group}
+            stateData["media_groups_for_generation"].append(dataForUpdate)
+            await state.update_data(media_groups_for_generation=stateData["media_groups_for_generation"])
         
         return True
         

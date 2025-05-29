@@ -30,8 +30,18 @@ async def stop_generation(message: types.Message, state: FSMContext):
     await message.answer(text.STOP_GENERATION_TEXT, reply_markup=ReplyKeyboardRemove())
 
 
+# DEV: получение file id видео
+# async def get_file_id(message: types.Message):
+#     if message.video:
+#         await message.answer(message.video.file_id)
+
+
 # Добавление обработчиков
 def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())
 
     router.message.register(stop_generation, Command("stop"))
+
+    # DEV: получение file id видео
+    # router.message.register(get_file_id)
+
