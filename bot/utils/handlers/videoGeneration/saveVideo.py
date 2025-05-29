@@ -1,11 +1,10 @@
-from utils.saveImages.getFolderDataByID import getFolderDataByID
-from utils.files.saveFile import saveFile
 from utils import text
 from logger import logger
-from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
+from utils.generateImages.dataArray import getModelNameIndex, getDataByModelName
+from utils.googleDrive.files import saveFile
+from utils.googleDrive.folders import getFolderDataByID
 from aiogram import types
 from datetime import datetime
-from utils.generateImages.dataArray.getDataByModelName import getDataByModelName
 import os
 
 

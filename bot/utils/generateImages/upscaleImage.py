@@ -1,9 +1,10 @@
 from ..jobs.getJobID import getJobID
 from ..jobs.checkJobStatus import checkJobStatus
 from logger import logger
+from config import COMMON_NEGATIVE_PROMPT
 
 # Функция для upscale сгенерированного изображения
-async def upscaleImage(input_image: str, negative_prompt: str, base_config_model_name: str) -> str:
+async def upscaleImage(input_image: str,  base_config_model_name: str) -> str:
     # Логирование
     logger.info(f"Делаем upscale для изображения...")
 
@@ -17,7 +18,7 @@ async def upscaleImage(input_image: str, negative_prompt: str, base_config_model
             "advanced_params": {"sampler_name": "euler_ancestral", "overwrite_step": 60},
             "style_selections": [],
             "guidance_scale": 3.5,
-            "negative_prompt": negative_prompt,
+            "negative_prompt": COMMON_NEGATIVE_PROMPT,
             "base_model_name": base_config_model_name
         }
     }
