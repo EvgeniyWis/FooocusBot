@@ -149,6 +149,9 @@ async def chooseOnePromptGenerationType(call: types.CallbackQuery, state: FSMCon
         await state.set_state(StartGenerationState.write_prompt_for_images)
 
     elif one_prompt_generation_type == "random":
+        # Очищаем все данные, которые используются в рандомайзере
+        await state.update_data(variable_names_for_randomizer=[])
+        await state.update_data(variable_name_values=[])
         await editMessageOrAnswer(
         call,text.GET_RANDOM_PROMPT_TYPE_SUCCESS_TEXT, 
         reply_markup=randomizer_keyboards.randomizerKeyboard([]))
