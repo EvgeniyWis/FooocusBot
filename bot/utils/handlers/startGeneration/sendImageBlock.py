@@ -10,10 +10,7 @@ from config import MOCK_MODE
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
 async def sendImageBlock(message: types.Message, state: FSMContext, media_group: list, model_name: str, 
-    setting_number: str, is_test_generation: bool):
-    # Получаем id пользователя
-    user_id = message.from_user.id
-    
+    setting_number: str, is_test_generation: bool, user_id: int):
     # Отправляем изображения
     message_with_media_group = await message.answer_media_group(media_group)
 
