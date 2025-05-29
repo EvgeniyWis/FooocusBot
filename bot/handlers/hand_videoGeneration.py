@@ -385,7 +385,7 @@ async def handle_prompt_for_videoGenerationFromImage(message: types.Message, sta
 async def handle_model_name_for_video_generation_from_image(message: types.Message, state: FSMContext):
     # Получаем данные
     stateData = await state.get_data()
-    file_id_index = int(stateData["current_file_id_index"])
+    # file_id_index = int(stateData["current_file_id_index"])
 
     # Получаем данные по имени модели
     model_name = message.text
@@ -396,12 +396,12 @@ async def handle_model_name_for_video_generation_from_image(message: types.Messa
         return
 
     # Получаем путь к видео
-    logger.info(f"Попытка получить путь к видео: {stateData['video_paths']} по индексу: {file_id_index}")
-    video_path = stateData["video_paths"][file_id_index]
+    # logger.info(f"Попытка получить путь к видео: {stateData['video_paths']} по индексу: {file_id_index}")
+    # video_path = stateData["video_paths"][file_id_index]
+    video_path = stateData["video_path"]
 
     # Сохраняем видео
     await state.set_state(None)
-    await state.update_data(model_name_for_video_generation_from_image=model_name)
     await saveVideo(video_path, model_name, message)
 
     # try:
