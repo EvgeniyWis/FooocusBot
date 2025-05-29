@@ -33,3 +33,8 @@ ALLOWED_USERS = [
 
 # Администратор бота
 ADMIN_ID = 6455916237
+# Устанавливаем режим разработки
+DEVELOPMENT_MODE = True
+
+# Устанавливаем режим с моками
+MOCK_MODE = True

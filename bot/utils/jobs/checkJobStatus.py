@@ -1,4 +1,4 @@
-from utils import text
+from .. import text
 import requests
 from logger import logger
 from config import RUNPOD_HEADERS, RUNPOD_HOST
@@ -38,12 +38,17 @@ async def checkJobStatus(job_id: str, state: FSMContext = None, message: types.M
                 success_images_count = len([job for job in jobs.values() if job == 'COMPLETED'])
                 error_images_count = len([job for job in jobs.values() if job == 'FAILED'])
                 progress_images_count = len([job for job in jobs.values() if job == 'IN_PROGRESS'])
-                left_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
+                queue_images_count = len([job for job in jobs.values() if job == 'IN_QUEUE'])
+                left_images_count = total_jobs_count - len(jobs)
+                total_images_count = success_images_count + error_images_count + progress_images_count + queue_images_count + left_images_count
+
+                # Добавляем в стейт то, сколько готовых изображений
+                await state.update_data(total_images_count=total_images_count)
 
                 try:
                     await message.edit_text(text.GENERATE_IMAGES_PROCESS_TEXT
-                    .format(success_images_count, error_images_count, progress_images_count, left_images_count, 
-                        total_jobs_count - len(jobs)))
+                    .format(success_images_count, error_images_count, progress_images_count, queue_images_count, 
+                        left_images_count))
                 except Exception as e:
                     logger.error(f"Ошибка при изменении сообщения: {e}")
 
