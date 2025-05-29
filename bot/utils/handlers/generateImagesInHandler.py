@@ -60,10 +60,10 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 
         stateData = await state.get_data()
         if result:
-            if "stop_generation" not in stateData:
+            if not stateData["stop_generation"]:
                 await message.answer(text.GENERATE_IMAGE_SUCCESS_TEXT)
         else:
-            if "stop_generation" not in stateData:
+            if not stateData["stop_generation"]:
                 raise Exception("Произошла ошибка при генерации изображения")
 
     except Exception as e:
