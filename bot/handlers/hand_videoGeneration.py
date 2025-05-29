@@ -346,7 +346,7 @@ async def handle_prompt_for_videoGenerationFromImage(message: types.Message, sta
         os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
-        await message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format("", e))
+        await message.answer(text.GENERATE_VIDEO_FROM_IMAGE_ERROR_TEXT.format(e))
         logger.error(f"Ошибка при генерации видео из изображения: {e}")
 
 
