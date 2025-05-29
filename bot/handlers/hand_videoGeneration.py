@@ -16,6 +16,7 @@ from InstanceBot import router
 from datetime import datetime
 from config import MOCK_MODE
 from utils.handlers.startGeneration import waitStateArrayReplenishment
+from utils.handlers.videoGeneration.generateVideoFromImage import generateVideoFromImage
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
