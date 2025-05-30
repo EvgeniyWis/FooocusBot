@@ -39,9 +39,11 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
                 result = [await generateImageBlock(dataJSON, model_name, message_for_edit, state, user_id, setting_number, is_test_generation)]
         else:
             stateData = await state.get_data()
+            model_name_for_generation = stateData.get("model_name_for_generation", None)
+            logger.info(f"Получена модель для индивидуальной генерации: {model_name_for_generation}")
 
-            if "model_name_for_generation" in stateData:
-                model_name = stateData["model_name_for_generation"]
+            if model_name_for_generation:
+                model_name = model_name_for_generation
 
                 # Получаем порядковый номер модели
                 model_name_index = getModelNameIndex(model_name)
@@ -51,6 +53,9 @@ async def generateImagesInHandler(prompt: str, message: types.Message, state: FS
 
                 # Получаем данные о модели
                 dataArray = await getDataByModelName(model_name)
+
+                # Прибавляем корневой промпт
+                dataArray["json"]['input']['prompt'] += " " + prompt
                 dataJSON = dataArray["json"]
 
                 # Генерируем изображения
