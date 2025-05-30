@@ -345,10 +345,13 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             except Exception as e:
                 result_path = None
                 logger.error(f"Произошла ошибка при замене лица: {e}")
-                await editMessageOrAnswer(
-        call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
                 stateData["faceswap_generate_models"].remove(model_name)
                 await state.update_data(faceswap_generate_models=stateData["faceswap_generate_models"])
+                try:
+                    await editMessageOrAnswer(
+                    call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
+                except Exception as e:
+                    logger.error(f"Произошла ошибка при отправке сообщения об ошибке: {e}")
                 break
 
             break
