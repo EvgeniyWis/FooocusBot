@@ -17,9 +17,11 @@ async def start(message: types.Message, state: FSMContext):
         await message.answer(text.ACCESS_DENIED_TEXT)
         return
     
+    # Очищаем стейт
     await state.update_data(stop_generation=False)
     await state.update_data(jobs={})
     await state.update_data(total_jobs_count=0)
+    await state.update_data(model_name_for_generation=None)
 
     await message.answer(
         text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard()

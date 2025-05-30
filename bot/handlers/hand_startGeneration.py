@@ -60,6 +60,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
             call,
             text.WRITE_MODEL_NAME_TEXT
         )
+        # Очищаем стейт
         await state.set_state(StartGenerationState.write_model_name_for_generation)
         return 
 
@@ -73,7 +74,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Если выбрана настройка для теста, то продолжаем генерацию в тестовом режиме
     if generations_type == "test":
         if prompt_exist:
-            prompt = data["prompt"]
+            prompt = data["prompt_for_images"]
             user_id = call.from_user.id
             is_test_generation = generations_type == "test"
             setting_number = setting_number
@@ -172,8 +173,6 @@ async def write_prompt(message: types.Message, state: FSMContext):
     else:
         model_name = data["model_name_for_generation"]
         setting_number = getSettingNumberByModelName(model_name)
-
-    await state.update_data(prompt=prompt)
 
     await state.set_state(None)
     # Генерируем изображения
