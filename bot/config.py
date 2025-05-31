@@ -6,7 +6,7 @@ from logger import logger
 load_dotenv(find_dotenv())
 
 # ID эндпоинта для генерации изображений
-ENDPOINT_ID = "h76ebzwzulgkmu"
+ENDPOINT_ID = "mtuokv4whgchlc"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.info(f"BASE_DIR: {BASE_DIR}")
@@ -34,7 +34,6 @@ DEV_CHAT_ID = 5046166133
 
 # Пользователи, которые могут использовать бота
 ALLOWED_USERS = [
-    DEV_CHAT_ID,
     6455916237,
     885831766,
     835641645,
@@ -42,6 +41,8 @@ ALLOWED_USERS = [
     930038985,
     722063648,
     5948408400,
+    1979922062,
+    5046166133
 ]
 
 # Администратор бота

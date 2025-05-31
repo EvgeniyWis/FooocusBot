@@ -59,7 +59,7 @@ async def base64ToImage(
             image.save(f, format="PNG")
         image.close()  # Закрываем изображение после сохранения
 
-        logger.info(f"Изображение успешно загружено: {image}")
+        logger.info(f"Изображение успешно загружено: {image} по пути {file_path}")
 
         # Возвращаем изображение
         return file_path

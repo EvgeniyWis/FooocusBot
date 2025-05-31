@@ -468,8 +468,13 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 faceswap_models=stateData["faceswap_generate_models"],
             )
 
-            # Если результат замены лица не найден, то завершаем генерацию
+            # Если результат замены лица не найден, то завершаем генерацию и уменьшаем кол-во ожидаемых изображений
             if not result_path:
+                await increaseCountInState(
+                    state,
+                    "will_be_sent_generated_images_count",
+                    -1
+                )
                 return
 
             logger.info(f"Результат замены лица: {result_path}")
