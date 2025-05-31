@@ -1,5 +1,6 @@
 import os
-import requests
+
+import httpx
 from logger import logger
 
 
@@ -9,18 +10,21 @@ async def downloadVideo(url: str) -> str:
         temp_folder_path = "FocuuusBot/temp/videos"
         # Создаем временную директорию, если её нет
         os.makedirs(temp_folder_path, exist_ok=True)
-        
+
         # Генерируем уникальное имя файла
         video_path = f"{temp_folder_path}/{os.urandom(8).hex()}.mp4"
-        
+
         # Скачиваем видео
-        response = requests.get(url)
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
         if response.status_code == 200:
-            with open(video_path, 'wb') as f:
+            with open(video_path, "wb") as f:
                 f.write(response.content)
             return video_path
         else:
-            logger.error(f"Не удалось скачать видео, статус код: {response.status_code}")
+            logger.error(
+                f"Не удалось скачать видео, статус код: {response.status_code}"
+            )
             return None
     except Exception as e:
         logger.error(f"Ошибка при скачивании видео: {e}")

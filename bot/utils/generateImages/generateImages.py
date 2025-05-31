@@ -53,3 +53,4 @@ async def generateImages(setting_number: int, prompt: str, message: types.Messag
 
     return images
 
+

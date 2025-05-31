@@ -12,7 +12,5 @@ async def getDataByModelName(model_name: str) -> dict:
             if dataArray["model_name"] == model_name:
                 return dataArray
 
-    # Если модель не найдена, то возвращаем None
-    return None
-
-
+    # Если модель не найдена, то возвращаем пустой словарь
+    return {}
