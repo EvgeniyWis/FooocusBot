@@ -4,3 +4,4 @@ google-auth-httplib2==0.2.0
 google-api-python-client==2.168.0
 dotenv==0.9.9
 Pillow==11.2.1
+httpx==0.28.1

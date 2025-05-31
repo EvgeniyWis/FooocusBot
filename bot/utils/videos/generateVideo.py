@@ -64,90 +64,104 @@ async def generateVideo(
                 )
                 json = response.json()
 
-        logger.info(f"Ответ на запрос на генерацию видео: {json}")
+                logger.info(f"Ответ на запрос на генерацию видео: {json}")
 
-        if json.get("error"):
-            logger.error(f"Ошибка валидации: {json.get('errors_validation')}")
-
-            if (
-                json["error"]
-                == "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
-            ):
-                await bot.send_message(
-                    ADMIN_ID,
-                    text.KLING_INSUFFICIENT_BALANCE_TEXT,
-                )
-
-            return None
-
-        logger.info(f"Запрос на генерацию видео отправлен. Ответ: {json}")
-
-        # Проверяем статус задания в цикле
-        request_id = json["request_id"]
-        if not request_id:
-            logger.error("Не получен request_id в ответе API")
-            return None
-
-        url_status_endpoint = (
-            f"https://api.gen-api.ru/api/v1/request/get/{request_id}"
-        )
-
-        while True:
-            try:
-                response = await client.get(
-                    url_status_endpoint,
-                    headers=headers,
-                )
-                json = response.json()
-
-                logger.info(
-                    f"Статус задания на генерацию видео с id {request_id}: {json['status']}",
-                )
-
-                if json["status"] == "error":
-                    logger.error(f"Ошибка при генерации видео: {json}")
-                    raise Exception(json["result"][0])
-
-                elif (
-                    json["status"] == "success"
-                ):  # Если статус задания успешный, то возвращаем ответ
-                    # Получаем ссылку на выходное видео
-                    logger.info(
-                        f"Выходные данные запроса по id {request_id}: {json}",
+                if json.get("error"):
+                    logger.error(
+                        f"Ошибка валидации: {json.get('errors_validation')}",
                     )
-                    result_url = json["full_response"][0]["url"]
-                    logger.info(f"Ссылка на выходное видео: {result_url}")
 
-                    # Скачиваем видео локально
-                    video_path = await downloadVideo(result_url)
-                    if not video_path:
-                        logger.error(f"Не удалось скачать видео: {result_url}")
-                        raise Exception("Не удалось скачать видео")
-
-                    # Проверяем, что файл существует и имеет размер больше 0
                     if (
-                        not os.path.exists(video_path)
-                        or os.path.getsize(video_path) == 0
+                        json["error"]
+                        == "У Вас недостаточно средств на балансе. "
+                        "Подтвердите свой номер телефона и "
+                        "мы начислим Вам стартовый баланс."
                     ):
-                        logger.error(
-                            f"Видео файл не существует или имеет нулевой размер: {video_path}",
+                        await bot.send_message(
+                            ADMIN_ID,
+                            text.KLING_INSUFFICIENT_BALANCE_TEXT,
                         )
 
-                        # Сохраняем по-новой
-                        video_path = await downloadVideo(result_url)
-                        if not video_path:
-                            logger.error(
-                                f"Не удалось скачать видео: {result_url}",
+                    return None
+
+                logger.info(
+                    f"Запрос на генерацию видео отправлен. Ответ: {json}",
+                )
+
+                # Проверяем статус задания в цикле
+                request_id = json["request_id"]
+                if not request_id:
+                    logger.error("Не получен request_id в ответе API")
+                    return None
+
+                url_status_endpoint = (
+                    f"https://api.gen-api.ru/api/v1/request/get/{request_id}"
+                )
+
+                while True:
+                    try:
+                        response = await client.get(
+                            url_status_endpoint,
+                            headers=headers,
+                        )
+                        json = response.json()
+
+                        logger.info(
+                            f"Статус задания на генерацию видео с id {request_id}: "
+                            f"{json['status']}",
+                        )
+
+                        if json["status"] == "error":
+                            logger.error(f"Ошибка при генерации видео: {json}")
+                            raise Exception(json["result"][0])
+
+                        elif (
+                            json["status"] == "success"
+                        ):  # Если статус задания успешный, то возвращаем ответ
+                            # Получаем ссылку на выходное видео
+                            logger.info(
+                                f"Выходные данные запроса по id {request_id}: {json}",
                             )
-                            raise Exception("Не удалось скачать видео")
+                            result_url = json["full_response"][0]["url"]
+                            logger.info(
+                                f"Ссылка на выходное видео: {result_url}",
+                            )
 
-                    return video_path
+                            # Скачиваем видео локально
+                            video_path = await downloadVideo(result_url)
+                            if not video_path:
+                                logger.error(
+                                    f"Не удалось скачать видео: {result_url}",
+                                )
+                                raise Exception("Не удалось скачать видео")
 
-            except Exception as e:
-                logger.error(f"Ошибка при получении статуса задания: {e}")
-                raise e
+                            # Проверяем, что файл существует и имеет размер больше 0
+                            if (
+                                not os.path.exists(video_path)
+                                or os.path.getsize(video_path) == 0
+                            ):
+                                logger.error(
+                                    "Видео файл не существует или "
+                                    f"имеет нулевой размер: {video_path}",
+                                )
 
-            await asyncio.sleep(10)
+                                # Сохраняем по-новой
+                                video_path = await downloadVideo(result_url)
+                                if not video_path:
+                                    logger.error(
+                                        f"Не удалось скачать видео: {result_url}",
+                                    )
+                                    raise Exception("Не удалось скачать видео")
+
+                            return video_path
+
+                    except Exception as e:
+                        logger.error(
+                            f"Ошибка при получении статуса задания: {e}",
+                        )
+                        raise e
+
+                    await asyncio.sleep(10)
 
     except Exception as e:
         logger.error(f"Ошибка при отправке запроса на генерацию видео: {e}")

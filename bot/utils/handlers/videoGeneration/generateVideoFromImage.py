@@ -1,14 +1,15 @@
-from utils import text
-from InstanceBot import bot
-from utils.retryOperation import retryOperation
-from aiogram import types
-from aiogram.fsm.context import FSMContext
-from utils.videos.generateVideo import generateVideo
-from keyboards.videoGeneration import keyboards as video_generation_keyboards
-from states.UserState import StartGenerationState
 import os
 import traceback
+
+from aiogram import types
+from aiogram.fsm.context import FSMContext
+from InstanceBot import bot
+from keyboards.videoGeneration import keyboards as video_generation_keyboards
 from logger import logger
+
+from utils import text
+from utils.retryOperation import retryOperation
+from utils.videos.generateVideo import generateVideo
 
 
 # Функция для генерации видео из изображения

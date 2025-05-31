@@ -1,5 +1,7 @@
-from .generateData import setting1_generateData
 from config import MOCK_MODE
+
+from .generateData import setting1_generateData
+
 
 # Функция для генерации массива данных для запроса для настройки 1
 def setting1_getDataArray():
@@ -176,7 +178,7 @@ def setting1_getDataArray():
         Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features))
 
 lighting: ((bright daylight, model fully illuminated, photo bright, maximally illuminated))""",
-        [2, 0.40, -0.90, -0.35, 2.10, 1.00, 1.60, 0.55, 1.95])
+        [2, 0.40, -0.90, -0.35, 2.10, 1.00, 1.60, 0.55, 1.95]),
     ]
 
     if MOCK_MODE:

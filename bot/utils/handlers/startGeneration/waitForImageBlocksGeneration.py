@@ -8,7 +8,7 @@ from .waitStateArrayReplenishment import waitStateArrayReplenishment
 
 # Функция для ожидания следующих блоков изображений и последующей отправки
 async def waitForImageBlocksGeneration(
-    message: types.Message, state: FSMContext, user_id: int
+    message: types.Message, state: FSMContext, user_id: int,
 ) -> str:
     # Ждём пока появится следующий блок изображений в очереди
     media_groups_for_generation = await waitStateArrayReplenishment(
@@ -34,7 +34,7 @@ async def waitForImageBlocksGeneration(
     # Добавляем эту модель в "очередь генерации"
     stateData["models_for_generation_queue"].append(model_name)
     await state.update_data(
-        models_for_generation_queue=stateData["models_for_generation_queue"]
+        models_for_generation_queue=stateData["models_for_generation_queue"],
     )
 
     # Получаем номер настройки
@@ -53,7 +53,7 @@ async def waitForImageBlocksGeneration(
 
     # Удаляем блок изображений из очереди
     await state.update_data(
-        media_groups_for_generation=media_groups_for_generation[1:]
+        media_groups_for_generation=media_groups_for_generation[1:],
     )
 
     return model_name

@@ -11,8 +11,8 @@ def generationsTypeKeyboard():
             InlineKeyboardButton(
                 text="📹 Сгенерировать видео из изображения",
                 callback_data="generateVideoFromImage",
-            )
-        ]
+            ),
+        ],
     )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -22,7 +22,9 @@ def generationsTypeKeyboard():
 
 # Инлайн-клавиатура для выбора одного из изображений
 def selectImageKeyboard(
-    model_name: str, setting_number: str, image_number: int
+    model_name: str,
+    setting_number: str,
+    image_number: int,
 ):
     inline_keyboard = []
 
@@ -37,7 +39,7 @@ def selectImageKeyboard(
                     text=f"{i + 1}",
                     callback_data=f"select_image|{model_name}|{setting_number}|{i + 1}",
                 ),
-            ]
+            ],
         )
 
     inline_keyboard.append(
@@ -45,8 +47,8 @@ def selectImageKeyboard(
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
                 callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
-            )
-        ]
+            ),
+        ],
     )
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
@@ -61,17 +63,19 @@ def selectSettingKeyboard(is_test_generation: bool = False):
         inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    text=f"Настройка {i}", callback_data=f"select_setting|{i}"
-                )
-            ]
+                    text=f"Настройка {i}",
+                    callback_data=f"select_setting|{i}",
+                ),
+            ],
         )
 
     inline_keyboard.append(
         [
             InlineKeyboardButton(
-                text="Все настройки", callback_data="select_setting|all"
-            )
-        ]
+                text="Все настройки",
+                callback_data="select_setting|all",
+            ),
+        ],
     )
 
     # Генерация конкретной модели
@@ -81,8 +85,8 @@ def selectSettingKeyboard(is_test_generation: bool = False):
                 InlineKeyboardButton(
                     text="🔄 Генерация конкретной модели",
                     callback_data="select_setting|specific_model",
-                )
-            ]
+                ),
+            ],
         )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -98,15 +102,15 @@ def writePromptTypeKeyboard():
                 InlineKeyboardButton(
                     text="1️⃣ Один промпт для всех моделей",
                     callback_data="write_prompt_type|one",
-                )
+                ),
             ],
             [
                 InlineKeyboardButton(
-                    text="✨ Уникальный промпт для кажд��й модели",
+                    text="✨ Уникальный промпт для каждой модели",
                     callback_data="write_prompt_type|unique",
-                )
+                ),
             ],
-        ]
+        ],
     )
 
     return kb
@@ -120,9 +124,9 @@ def confirmWriteUniquePromptForNextModelKeyboard():
                 InlineKeyboardButton(
                     text="✍️ Написать промпт",
                     callback_data="confirm_write_unique_prompt_for_next_model",
-                )
+                ),
             ],
-        ]
+        ],
     )
 
     return kb
@@ -136,20 +140,21 @@ def testGenerationImagesKeyboard(setting_number: str):
                 InlineKeyboardButton(
                     text="🔄 Сгенерировать с другими настройками",
                     callback_data="generations_type|test|prompt_exist",
-                )
+                ),
             ],
             [
                 InlineKeyboardButton(
                     text="✍️ Изменить промпт",
                     callback_data=f"select_setting|{setting_number}",
-                )
+                ),
             ],
             [
                 InlineKeyboardButton(
-                    text="◀️ ��азад", callback_data="generations_type|test"
-                )
+                    text="◀️ ��азад",
+                    callback_data="generations_type|test",
+                ),
             ],
-        ]
+        ],
     )
 
     return kb
@@ -163,15 +168,15 @@ def onePromptGenerationChooseTypeKeyboard():
                 InlineKeyboardButton(
                     text="⚖️ Статичный промпт",
                     callback_data="one_prompt_generation_type|static",
-                )
+                ),
             ],
             [
                 InlineKeyboardButton(
                     text="🎲 Использовать рандомайзер",
                     callback_data="one_prompt_generation_type|random",
-                )
+                ),
             ],
-        ]
+        ],
     )
 
     return kb
@@ -185,9 +190,9 @@ def saveImagesKeyboard():
                 InlineKeyboardButton(
                     text="💾 Этап сохранения изображений",
                     callback_data="save_images",
-                )
-            ]
-        ]
+                ),
+            ],
+        ],
     )
 
     return kb
@@ -201,15 +206,15 @@ def saveImageKeyboard(model_name: str, setting_number: str):
                 InlineKeyboardButton(
                     text="💾 Сохранить изображение",
                     callback_data=f"save_image|{model_name}",
-                )
+                ),
             ],
             [
                 InlineKeyboardButton(
                     text="🔄 Перегенерировать",
                     callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
-                )
+                ),
             ],
-        ]
+        ],
     )
 
     return kb

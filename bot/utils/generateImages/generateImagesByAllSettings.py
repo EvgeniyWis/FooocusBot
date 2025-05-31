@@ -34,15 +34,15 @@ async def generateImagesByAllSettings(
     # Создаём сообщение с прогрессом генерации настроек
     message_with_settings = await message.answer(
         text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT.format(
-            "❌", "❌", "❌", "❌"
-        )
+            "❌", "❌", "❌", "❌",
+        ),
     )
 
     await message_with_settings.pin()
 
     # Создаём сообщение с прогрессом генерации изображений
     message_with_generations_status = await message.answer(
-        text.GET_PROMPT_SUCCESS_TEXT
+        text.GET_PROMPT_SUCCESS_TEXT,
     )
 
     if not is_test_generation:
@@ -67,7 +67,7 @@ async def generateImagesByAllSettings(
                 dataJSON = dataArray[0]["json"]
                 model_name = dataArray[0]["model_name"]
                 task = asyncio.create_task(
-                    process_generation(dataJSON, model_name, index)
+                    process_generation(dataJSON, model_name, index),
                 )
                 tasks.append(task)
             else:
@@ -83,7 +83,7 @@ async def generateImagesByAllSettings(
 
                     # Генерируем изображение
                     task = asyncio.create_task(
-                        process_generation(dataJSON, model_name, index)
+                        process_generation(dataJSON, model_name, index),
                     )
                     tasks.append(task)
 
@@ -96,7 +96,7 @@ async def generateImagesByAllSettings(
                     "✅" if 1 in settings_numbers_success else "❌",
                     "✅" if 2 in settings_numbers_success else "❌",
                     "✅" if 3 in settings_numbers_success else "❌",
-                )
+                ),
             )
 
         await message_with_settings.unpin()

@@ -1,7 +1,10 @@
-from aiogram.fsm.context import FSMContext
-from .getDataArrayBySettingNumber import getDataArrayBySettingNumber
 import random
+
+from aiogram.fsm.context import FSMContext
 from logger import logger
+
+from .getDataArrayBySettingNumber import getDataArrayBySettingNumber
+
 
 # Функция для применения переменных рандомайзера к промптам массива данных
 async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):

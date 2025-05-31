@@ -1,12 +1,11 @@
 from aiogram import types
-from aiogram.filters import CommandStart, StateFilter
+from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
-from keyboards import start_generation_keyboards
-from utils import text
-from InstanceBot import router
-from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardRemove
 from config import ALLOWED_USERS
+from InstanceBot import router
+from keyboards import start_generation_keyboards
+from utils import text
 
 
 # Отправка стартового меню при вводе "/start"
@@ -16,7 +15,7 @@ async def start(message: types.Message, state: FSMContext):
     if message.from_user.id not in ALLOWED_USERS:
         await message.answer(text.ACCESS_DENIED_TEXT)
         return
-    
+
     # Очищаем стейт
     await state.update_data(stop_generation=False)
     await state.update_data(jobs={})
@@ -24,11 +23,11 @@ async def start(message: types.Message, state: FSMContext):
     await state.update_data(model_name_for_generation=None)
 
     await message.answer(
-        text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard()
+        text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard(),
     )
 
 
-# Обработка команды /stop   
+# Обработка команды /stop
 async def stop_generation(message: types.Message, state: FSMContext):
     await state.update_data(stop_generation=True)
     await message.answer(text.STOP_GENERATION_TEXT, reply_markup=ReplyKeyboardRemove())
