@@ -65,11 +65,7 @@ async def generateImages(
             return None, e
 
     # Создаем список задач, выполняющихся параллельно
-    tasks = []
-    for data in dataArray:
-        task = asyncio.create_task(process_image(data))
-        tasks.append(task)
-        await asyncio.sleep(20)
+    tasks = [asyncio.create_task(process_image(data)) for data in dataArray]
 
     # Ждем выполнения всех задач
     results = await asyncio.gather(*tasks)
