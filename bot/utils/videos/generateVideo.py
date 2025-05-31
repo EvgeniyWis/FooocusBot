@@ -1,6 +1,7 @@
 import asyncio
 import os
 
+import aiofiles
 import httpx
 from config import ADMIN_ID
 from InstanceBot import bot
@@ -43,11 +44,15 @@ async def generateVideo(
             "version": "kling-v1-6",
         }
 
-        # Открываем файл для отправки
+        # Асинхронное открытие файла для отправки
         async with httpx.AsyncClient() as client:
-            with open(image_path, "rb") as image_file:
+            async with aiofiles.open(image_path, "rb") as image_file:
                 files = {
-                    "image": ("image.jpg", image_file, "image/jpeg"),
+                    "image": (
+                        "image.jpg",
+                        await image_file.read(),
+                        "image/jpeg",
+                    ),
                 }
                 headers = {
                     "Accept": "application/json",
@@ -115,9 +120,7 @@ async def generateVideo(
                             logger.error(f"Ошибка при генерации видео: {json}")
                             raise Exception(json["result"][0])
 
-                        elif (
-                            json["status"] == "success"
-                        ):  # Если статус задания успешный, то возвращаем ответ
+                        elif json["status"] == "success":
                             # Получаем ссылку на выходное видео
                             logger.info(
                                 f"Выходные данные запроса по id {request_id}: {json}",
