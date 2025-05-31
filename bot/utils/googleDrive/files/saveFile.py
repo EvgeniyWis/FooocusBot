@@ -1,13 +1,14 @@
-from ... import retryOperation
-from config import TEMP_FOLDER_PATH
-from logger import logger
-import shutil
 import asyncio
-from ..folders.deleteParentFolder import deleteParentFolder
-from ..folders.createFolder import createFolder
+import shutil
+
+from config import MOCK_MODE, TEMP_FOLDER_PATH
+from logger import logger
+
+from ... import retryOperation
 from ..auth import service
+from ..folders.createFolder import createFolder
+from ..folders.deleteParentFolder import deleteParentFolder
 from .uploadFile import uploadFile
-from config import MOCK_MODE
 
 
 # Сохранение одного файла
@@ -21,12 +22,12 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
         results = service.files().list(
             q=f"'{str(initial_folder_id)}' in parents and name = '{current_date}'",
             fields="files(id, name)",
-            pageSize=1000
+            pageSize=1000,
         ).execute()
 
         # Если папка с сегодняшней датой есть, то получаем её id
-        if results.get('files', []):
-            date_folder_id = results.get('files', [])[0].get('id')
+        if results.get("files", []):
+            date_folder_id = results.get("files", [])[0].get("id")
         else: # Если папки с сегодняшней датой нет, то создаём её
             date_folder_id, date_folder_link = await createFolder(current_date, None, initial_folder_id)
             logger.info(f"Полученный folder_id для папки с датой: {date_folder_id} и ссылка на папку: {date_folder_link}")
@@ -35,19 +36,19 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
         results = service.files().list(
             q=f"'{str(date_folder_id)}' in parents",
             fields="files(id, name)",
-            pageSize=1000
+            pageSize=1000,
         ).execute()
-        files_count = len(results.get('files', []))
+        files_count = len(results.get("files", []))
 
         # Создаем имя для файла
         name = f'{files_count + 1}.{file_path.split(".")[-1]}'
 
         # Создаем метаданные для файла
         file_metadata = {
-                        'name': name,
-                        'parents': [date_folder_id]
+                        "name": name,
+                        "parents": [date_folder_id],
                     }
-            
+
         # Загружаем файл
         file = await retryOperation(uploadFile, 10, 2, file_path, file_metadata, name, folder_name)
 
@@ -58,8 +59,8 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
 
             # Через 1 час удаляем и папку в более верхнем уровне
             asyncio.create_task(deleteParentFolder(folder_name, user_id))
-            
-        return file['webViewLink']
+
+        return file["webViewLink"]
 
     except Exception as e:
         logger.error(f"Ошибка при сохранении файла: {str(e)}")

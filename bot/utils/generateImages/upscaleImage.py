@@ -1,12 +1,14 @@
-from ..jobs.getJobID import getJobID
-from ..jobs.checkJobStatus import checkJobStatus
-from logger import logger
 from config import COMMON_NEGATIVE_PROMPT
+from logger import logger
+
+from ..jobs.checkJobStatus import checkJobStatus
+from ..jobs.getJobID import getJobID
+
 
 # Функция для upscale сгенерированного изображения
 async def upscaleImage(input_image: str,  base_config_model_name: str) -> str:
     # Логирование
-    logger.info(f"Делаем upscale для изображения...")
+    logger.info("Делаем upscale для изображения...")
 
     # Формируем json для отправки
     dataJSON = {
@@ -19,8 +21,8 @@ async def upscaleImage(input_image: str,  base_config_model_name: str) -> str:
             "style_selections": [],
             "guidance_scale": 3.5,
             "negative_prompt": COMMON_NEGATIVE_PROMPT,
-            "base_model_name": base_config_model_name
-        }
+            "base_model_name": base_config_model_name,
+        },
     }
 
     # Делаем запрос на генерацию и получаем id работы

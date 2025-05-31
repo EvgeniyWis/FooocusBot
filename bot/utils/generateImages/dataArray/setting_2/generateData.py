@@ -1,5 +1,6 @@
-from .generateLoras import setting2_generateLoras
 from ..generateData import generateData
+from .generateLoras import setting2_generateLoras
+
 
 # Функция для генерации данных для запроса настройки 2
 def setting2_generateData(model_name: str, picture_folder_id: str, video_folder_id: str, prompt: str,

@@ -1,11 +1,16 @@
-from utils import text
+import os
+from datetime import datetime
+
+from aiogram import types
 from logger import logger
-from utils.generateImages.dataArray import getModelNameIndex, getDataByModelName
+
+from utils import text
+from utils.generateImages.dataArray import (
+    getDataByModelName,
+    getModelNameIndex,
+)
 from utils.googleDrive.files import saveFile
 from utils.googleDrive.folders import getFolderDataByID
-from aiogram import types
-from datetime import datetime
-import os
 
 
 # Функция для сохранения видео в папку модели
@@ -28,15 +33,15 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     logger.info(f"Данные модели: {model_data}")
 
     # Сохраняем видео
-    link = await saveFile(video_path, user_id, model_name, model_data['video_folder_id'], now, False)
+    link = await saveFile(video_path, user_id, model_name, model_data["video_folder_id"], now, False)
 
     if not link:
         await message.answer(text.SAVE_FILE_ERROR_TEXT.format(model_name, model_name_index))
         return
-    
+
     # Получаем данные родительской папки
-    folder = getFolderDataByID(model_data['video_folder_id'])
-    parent_folder_id = folder['parents'][0]
+    folder = getFolderDataByID(model_data["video_folder_id"])
+    parent_folder_id = folder["parents"][0]
     parent_folder = getFolderDataByID(parent_folder_id)
 
     logger.info(f"Данные папки по id {model_data['video_folder_id']}: {folder}")
@@ -49,7 +54,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
 
     # Отправляем сообщение о сохранении видео
     await message.answer(text.SAVE_VIDEO_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink'], model_name_index))
+    .format(link, model_name, parent_folder["webViewLink"], model_name_index))
 
     # Удаляем видео из папки temp
     try:

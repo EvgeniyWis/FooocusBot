@@ -1,5 +1,6 @@
 from aiogram.fsm.state import State, StatesGroup
 
+
 class StartGenerationState(StatesGroup):
     write_prompt_for_images = State()
     write_prompt_for_video = State()

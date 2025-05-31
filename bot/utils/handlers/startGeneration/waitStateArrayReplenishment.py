@@ -1,10 +1,11 @@
+import asyncio
+
 from aiogram.fsm.context import FSMContext
 from logger import logger
-import asyncio
 
 
 # Функция для ожидания пополнения массива в стейте
-async def waitStateArrayReplenishment(state: FSMContext, array_name: str, 
+async def waitStateArrayReplenishment(state: FSMContext, array_name: str,
     stateNamesForCycleExit: tuple[str, str]) -> list[dict] | bool:
 
     try:

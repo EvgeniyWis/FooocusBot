@@ -1,9 +1,13 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from ...generateImages import getReferenceImage
-from ...generateImages.dataArray import getSettingNumberByModelName, getModelNameIndex
-from ... import text
 from keyboards import start_generation_keyboards
+
+from ... import text
+from ...generateImages import getReferenceImage
+from ...generateImages.dataArray import (
+    getModelNameIndex,
+    getSettingNumberByModelName,
+)
 
 
 # Функция для отправки сообщения для сохранения изображения
@@ -15,7 +19,7 @@ async def sendMessageForImageSaving(call: types.CallbackQuery, state: FSMContext
     # Если следующего изображения нет, то ничего не делаем
     if len(generated_images) == 0:
         return
-    
+
     model_data = stateData["generated_images"][0]
     model_name = list(model_data.keys())[0]
     result_path = model_data[model_name]
@@ -40,7 +44,7 @@ async def sendMessageForImageSaving(call: types.CallbackQuery, state: FSMContext
 
     # Отправляем сообщение к референсному фото и итоговому изображению
     await call.message.answer(
-        text.START_SAVE_IMAGE_TEXT.format(model_name, model_name_index), 
+        text.START_SAVE_IMAGE_TEXT.format(model_name, model_name_index),
         reply_markup=start_generation_keyboards.saveImageKeyboard(model_name, setting_number))
 
 

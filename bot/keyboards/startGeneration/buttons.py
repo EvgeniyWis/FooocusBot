@@ -6,8 +6,8 @@ def getGenerationsTypeButtons(prefix: str, with_test_generation: bool = True):
     inline_buttons = [
         [
             InlineKeyboardButton(
-                text="⚡️ Рабочая генерация", callback_data=f"{prefix}|work"
-            )
+                text="⚡️ Рабочая генерация", callback_data=f"{prefix}|work",
+            ),
         ],
     ]
 
@@ -15,9 +15,9 @@ def getGenerationsTypeButtons(prefix: str, with_test_generation: bool = True):
         inline_buttons.append(
             [
                 InlineKeyboardButton(
-                    text="⚙️ Тестовая генерация", callback_data=f"{prefix}|test"
-                )
-            ]
+                    text="⚙️ Тестовая генерация", callback_data=f"{prefix}|test",
+                ),
+            ],
         )
 
     return inline_buttons
