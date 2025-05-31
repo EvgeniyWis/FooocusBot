@@ -10,6 +10,7 @@ async def getReferenceImage(model_name: str) -> str:
         os.path.join(
             os.path.dirname(__file__),
             "..",
+            "..",
             "assets",
             "reference_images",
             f"{model_name}.jpeg",
@@ -24,7 +25,7 @@ async def getReferenceImage(model_name: str) -> str:
             pass
     except FileNotFoundError:
         logger.error(
-            f"Файл с референсным изображением для модели {model_name} не найден.",
+            f"Файл с референсным изображением для модели {model_name} по пути {reference_image_path} не найден.",
         )
         return ""
 
