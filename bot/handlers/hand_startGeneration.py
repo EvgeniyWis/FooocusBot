@@ -58,7 +58,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     if call.data == 'select_setting|specific_model':
         await editMessageOrAnswer(
             call,
-            text.WRITE_MODEL_NAME_TEXT
+            text.WRITE_MODELS_NAME_TEXT
         )
         # Очищаем стейт
         await state.set_state(StartGenerationState.write_model_name_for_generation)
@@ -167,17 +167,21 @@ async def write_prompt(message: types.Message, state: FSMContext):
     is_test_generation = data["generations_type"] == "test"
     await state.update_data(prompt_for_images=prompt)
 
+    await state.set_state(None)
+
     # Если в стейте есть номер настройки, то используем его, иначе получаем номер настройки по названию модели
     if "setting_number" in data:
         setting_number = data["setting_number"]
-    else:
-        model_name = data["model_name_for_generation"]
-        setting_number = getSettingNumberByModelName(model_name)
 
-    await state.set_state(None)
-    # Генерируем изображения
-    await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
-            
+        # Генерируем изображения
+        await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
+    else:
+        model_names = data["model_names_for_generation"]
+        logger.info(f"Список моделей для генерации: {model_names}")
+
+        # Генерируем изображения
+        await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, None)
+
 
 # Обработка ввода промпта для конкретной модели
 async def write_prompt_for_model(message: types.Message, state: FSMContext):
@@ -423,16 +427,27 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
 # Обработка ввода названия модели для генерации
 async def write_model_name_for_generation(message: types.Message, state: FSMContext):
-    model_name = message.text
-    await state.update_data(model_name_for_generation=model_name)
-
-    # Если такой модели не существует, то просим ввести другое название
-    if not await getDataByModelName(model_name):
-        await message.answer(text.MODEL_NOT_FOUND_TEXT)
-        return
+    # Если в сообщении есть запятые, то записываем массив моделей в стейт
+    model_names = message.text.split(",")
+    
+    # Если запятых нет, то записываем одну модель в стейт
+    if len(model_names) == 1:
+        model_names = [message.text]
+    
+    # Удаляем пробелы из названий моделей
+    model_names = [model_name.strip() for model_name in model_names]
+    
+    # Проверяем, существует ли такие модели
+    for model_name in model_names:
+        # Если такой модели не существует, то просим ввести другое название
+        if not await getDataByModelName(model_name):
+            await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_name))
+            return
+        
+    await state.update_data(model_names_for_generation=model_names)
 
     await state.set_state(None)
-    await message.answer(text.GET_MODEL_NAME_SUCCESS_TEXT)
+    await message.answer(text.GET_MODEL_NAME_SUCCESS_TEXT if len(model_names) == 1 else text.GET_MODEL_NAMES_SUCCESS_TEXT)
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
 

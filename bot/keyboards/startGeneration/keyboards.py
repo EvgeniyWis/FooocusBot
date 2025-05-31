@@ -38,7 +38,7 @@ def selectSettingKeyboard(is_test_generation: bool = False):
 
     # Генерация конкретной модели
     if not is_test_generation:
-        inline_keyboard.append([InlineKeyboardButton(text='🔄 Генерация конкретной модели', callback_data='select_setting|specific_model')])
+        inline_keyboard.append([InlineKeyboardButton(text='🔄 Индивидуальная генерация', callback_data='select_setting|specific_model')])
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
