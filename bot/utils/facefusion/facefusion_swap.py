@@ -4,6 +4,7 @@ import uuid
 import aiofiles
 from config import FACEFUSION_RESULTS_DIR
 from logger import logger
+import os
 
 # Настройка логирования
 
