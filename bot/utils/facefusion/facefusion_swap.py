@@ -20,7 +20,8 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     :return: абсолютный путь к выходному изображению
     """
     output_filename = f"{uuid.uuid4()}_output.jpg"
-    output_path = FACEFUSION_RESULTS_DIR / output_filename
+    output_path = os.path.join(FACEFUSION_RESULTS_DIR, output_filename)
+
 
     docker_cmd = [
         "docker",
