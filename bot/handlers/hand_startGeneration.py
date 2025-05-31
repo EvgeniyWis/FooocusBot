@@ -261,14 +261,14 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Получаем промпт для перегенерации изображения
     try:
-        prompt_for_regenerate_image = stateData["prompts_for_regenerate_images"][model_name]
-        logger.info(f"Промпт для перегенерации изображения: {prompt_for_regenerate_image}")
+        prompts_for_regenerate_images = stateData["prompts_for_regenerate_images"][model_name]
+        logger.info(f"Промпт для перегенерации изображения: {prompts_for_regenerate_images}")
     except Exception as e:
         logger.error(f"Произошла ошибка при получении промпта для перегенерации изображения: {e}")
-        prompt_for_regenerate_image = stateData["prompt_for_images"]
+        prompts_for_regenerate_images = stateData["prompt_for_images"]
 
     # Прибавляем к каждому элементу массива корневой промпт
-    data["json"]['input']['prompt'] += " " + prompt_for_regenerate_image
+    data["json"]['input']['prompt'] += " " + prompts_for_regenerate_images
 
     # Если индекс изображения равен "regenerate", то перегенерируем изображение
     if image_index == "regenerate":
@@ -480,7 +480,7 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     # Записываем новый промпт в стейт для этой модели
     dataForUpdate = {f"{model_name}": prompt}
     if "prompts_for_regenerate_images" not in stateData:
-        await state.update_data(prompt_for_regenerate_image=dataForUpdate)
+        await state.update_data(prompts_for_regenerate_images=dataForUpdate)
     else:
         stateData["prompts_for_regenerate_images"][model_name] = prompt
         await state.update_data(prompts_for_regenerate_images=stateData["prompts_for_regenerate_images"])
