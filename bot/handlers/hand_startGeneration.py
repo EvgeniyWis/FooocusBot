@@ -259,6 +259,17 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
 
+    # Получаем промпт для перегенерации изображения
+    try:
+        prompt_for_regenerate_image = stateData["prompts_for_regenerate_images"][model_name]
+        logger.info(f"Промпт для перегенерации изображения: {prompt_for_regenerate_image}")
+    except Exception as e:
+        logger.error(f"Произошла ошибка при получении промпта для перегенерации изображения: {e}")
+        prompt_for_regenerate_image = stateData["prompt_for_images"]
+
+    # Прибавляем к каждому элементу массива корневой промпт
+    data["json"]['input']['prompt'] += " " + prompt_for_regenerate_image
+
     # Если индекс изображения равен "regenerate", то перегенерируем изображение
     if image_index == "regenerate":
         is_test_generation = stateData["generations_type"] == "test"
@@ -289,9 +300,6 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             data = next((d for d in arr if d["model_name"] == model_name), None)
             if data is not None:
                 break
-
-    # Прибавляем к каждому элементу массива корневой промпт
-    data["json"]['input']['prompt'] += " " + stateData["prompt_for_images"]
 
     picture_folder_id = data["picture_folder_id"]
     video_folder_id = data["video_folder_id"]
@@ -468,6 +476,14 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     setting_number = stateData["setting_number_for_regenerate_image"]
     prompt = message.text
     user_id = message.from_user.id
+
+    # Записываем новый промпт в стейт для этой модели
+    dataForUpdate = {f"{model_name}": prompt}
+    if "prompts_for_regenerate_images" not in stateData:
+        await state.update_data(prompt_for_regenerate_image=dataForUpdate)
+    else:
+        stateData["prompts_for_regenerate_images"][model_name] = prompt
+        await state.update_data(prompts_for_regenerate_images=stateData["prompts_for_regenerate_images"])
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
