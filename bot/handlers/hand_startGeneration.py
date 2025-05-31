@@ -27,7 +27,6 @@ from utils.generateImages.ImageTobase64 import imageToBase64
 from utils.generateImages.base64ToImage import base64ToImage
 import asyncio
 from utils.handlers.editMessageOrAnswer import editMessageOrAnswer
-from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 import traceback
 
 
@@ -273,11 +272,19 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         return await generateImageBlock(data["json"], model_name, call.message, state, user_id, setting_number, is_test_generation, False)
     
-    # Получаем данные генерации по названию модели
-    dataArray = getDataArrayBySettingNumber(int(setting_number))
-    # Пытаемся найти данные в текущем массиве
-    data = next((data for data in dataArray if data["model_name"] == model_name), None)
-    
+    # Если индекс изображения равен "regenerate_with_new_prompt", то перегенерируем изображение с новым промптом
+    if image_index == "regenerate_with_new_prompt":
+        # Устанавливаем стейт для ввода нового промпта
+        await state.update_data(model_name_for_regenerate_image=model_name)
+        await state.update_data(setting_number_for_regenerate_image=setting_number)
+
+        await state.set_state(StartGenerationState.write_new_prompt_for_regenerate_image)
+
+        # Просим ввести новый промпт
+        await editMessageOrAnswer(
+            call,text.WRITE_NEW_PROMPT_TEXT)
+        return
+        
     # Если данные не найдены, ищем во всех доступных массивах
     if data is None:
         all_data_arrays = getAllDataArrays()
@@ -451,6 +458,31 @@ async def write_model_name_for_generation(message: types.Message, state: FSMCont
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
 
+# Обработка ввода нового промпта для перегенерации изображения
+async def write_new_prompt_for_regenerate_image(message: types.Message, state: FSMContext):
+    # Получаем данные
+    stateData = await state.get_data()
+    is_test_generation = stateData["generations_type"] == "test"
+    model_name = stateData["model_name_for_regenerate_image"]
+    setting_number = stateData["setting_number_for_regenerate_image"]
+    prompt = message.text
+    user_id = message.from_user.id
+
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+
+    # Отправляем сообщение о перегенерации изображения
+    await message.answer(text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(model_name, model_name_index, prompt))
+
+    # Получаем данные генерации по названию модели
+    data = await getDataByModelName(model_name)
+
+    # Прибавляем к каждому элементу массива корневой промпт
+    data["json"]['input']['prompt'] += " " + prompt 
+
+    return await generateImageBlock(data["json"], model_name, message, state, user_id, setting_number, is_test_generation, False)
+
+
 # Добавление обработчиков
 def hand_add():
     router.callback_query.register(
@@ -479,3 +511,5 @@ def hand_add():
     router.callback_query.register(select_image, lambda call: call.data.startswith("select_image"))
 
     router.message.register(write_model_name_for_generation, StateFilter(StartGenerationState.write_model_name_for_generation))
+
+    router.message.register(write_new_prompt_for_regenerate_image, StateFilter(StartGenerationState.write_new_prompt_for_regenerate_image))
