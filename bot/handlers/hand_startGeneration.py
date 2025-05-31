@@ -244,8 +244,9 @@ async def confirm_write_unique_prompt_for_next_model(call: types.CallbackQuery, 
 
 # Обработка выбора изображения
 async def select_image(call: types.CallbackQuery, state: FSMContext):
-    # Получаем id пользователя
+    # Получаем id пользователя и данные из стейта
     user_id = call.from_user.id
+    stateData = await state.get_data()
 
     # Получаем индекс работы и индекс изображения
     model_name = call.data.split("|")[1]
@@ -255,20 +256,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
+    # Получаем данные генерации по названию модели
+    data = await getDataByModelName(model_name)
+
     # Если индекс изображения равен "regenerate", то перегенерируем изображение
     if image_index == "regenerate":
-        stateData = await state.get_data()
         is_test_generation = stateData["generations_type"] == "test"
 
         # Отправляем сообщение о перегенерации изображения
         await editMessageOrAnswer(
         call,text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
-
-        # Получаем данные генерации по названию модели
-        data = await getDataByModelName(model_name)
-
-        # Прибавляем к каждому элементу массива корневой промпт
-        data["json"]['input']['prompt'] += " " + stateData["prompt_for_images"]
 
         return await generateImageBlock(data["json"], model_name, call.message, state, user_id, setting_number, is_test_generation, False)
     
@@ -292,6 +289,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             data = next((d for d in arr if d["model_name"] == model_name), None)
             if data is not None:
                 break
+
+    # Прибавляем к каждому элементу массива корневой промпт
+    data["json"]['input']['prompt'] += " " + stateData["prompt_for_images"]
+
     picture_folder_id = data["picture_folder_id"]
     video_folder_id = data["video_folder_id"]
 
