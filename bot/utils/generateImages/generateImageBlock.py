@@ -1,14 +1,16 @@
 from aiogram import types
-from .getReferenceImage import getReferenceImage
-from .base64ToImage import base64ToImage
 from aiogram.fsm.context import FSMContext
-from ..jobs.getJobID import getJobID
-from ..jobs.checkJobStatus import checkJobStatus
-from ..handlers.startGeneration.sendImageBlock import sendImageBlock
 from config import MOCK_MODE
 
+from ..handlers.startGeneration.sendImageBlock import sendImageBlock
+from ..jobs.checkJobStatus import checkJobStatus
+from ..jobs.getJobID import getJobID
+from .base64ToImage import base64ToImage
+from .getReferenceImage import getReferenceImage
+
+
 # Функция для генерации изображений по объекту данных
-async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext, 
+async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Message, state: FSMContext,
     user_id: int, setting_number: str, is_test_generation: bool = False, checkOtherJobs: bool = True):
     # Получаем данные из стейта
     stateData = await state.get_data()
@@ -31,7 +33,7 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
     try:
         if not MOCK_MODE:
             images_output = response_json["output"]
-            
+
             if images_output == []:
                 raise Exception("Не удалось сгенерировать изображения")
 
@@ -64,13 +66,13 @@ async def generateImageBlock(dataJSON: dict, model_name: str, message: types.Mes
 
             # Отправляем изображение
             await sendImageBlock(message, state, media_group, model_name, setting_number, is_test_generation, user_id)
-            
+
         else: # Если изображение не первое в очереди, то добавляем его в стейт и оно отправится только после подтверждения генерации у прошлого изображения
             dataForUpdate = {f"{model_name}": media_group}
             stateData["media_groups_for_generation"].append(dataForUpdate)
             await state.update_data(media_groups_for_generation=stateData["media_groups_for_generation"])
-        
+
         return True
-        
+
     except Exception as e:
         raise Exception(f"Ошибка при получении изображения: {e}")

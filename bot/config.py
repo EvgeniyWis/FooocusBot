@@ -1,14 +1,24 @@
 import os
 
 from dotenv import find_dotenv, load_dotenv
+from logger import logger
 
 load_dotenv(find_dotenv())
 
 # ID эндпоинта для генерации изображений
 ENDPOINT_ID = "h76ebzwzulgkmu"
 
-# Путь к папке для сохранения временных файлов
-TEMP_FOLDER_PATH = "facefusion-docker/.assets/images/temp"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+logger.info(f"BASE_DIR: {BASE_DIR}")
+
+TEMP_FOLDER_PATH = os.path.join(BASE_DIR, "bot", "temp")
+logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH}")
+
+FACEFUSION_DIR = os.path.join(os.path.dirname(BASE_DIR), "facefusion-docker")
+logger.info(f"FACEFUSION_DIR: {FACEFUSION_DIR}")
+
+FACEFUSION_RESULTS_DIR = os.path.join(FACEFUSION_DIR, ".assets/images/results")
+logger.info(f"FACEFUSION_RESULTS_DIR: {FACEFUSION_RESULTS_DIR}")
 
 # Заголовки для запросов на Runpod
 RUNPOD_HEADERS = {

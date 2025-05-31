@@ -15,7 +15,7 @@ async def start(message: types.Message, state: FSMContext):
     if message.from_user.id not in ALLOWED_USERS:
         await message.answer(text.ACCESS_DENIED_TEXT)
         return
-    
+
     # Очищаем стейт
     await state.update_data(stop_generation=False)
     await state.update_data(jobs={})

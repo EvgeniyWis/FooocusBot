@@ -4,7 +4,11 @@ import shutil
 
 import handlers
 from aiogram.types import BotCommand
-from config import DEV_CHAT_ID, TEMP_FOLDER_PATH
+from config import (
+    DEV_CHAT_ID,
+    FACEFUSION_RESULTS_DIR,
+    TEMP_FOLDER_PATH,
+)
 from InstanceBot import bot, dp
 from logger import logger
 
@@ -14,19 +18,16 @@ async def on_startup() -> None:
     if os.path.exists(TEMP_FOLDER_PATH):
         shutil.rmtree(TEMP_FOLDER_PATH)
 
-    # Удаляем папку temp
-    if os.path.exists("FocuuusBot/temp"):
-        shutil.rmtree("FocuuusBot/temp")
-
     # Удаляем содержимое папки results для facefusion-docker
-    if os.path.exists("facefusion-docker/.assets/images/results"):
-        for file in os.listdir("facefusion-docker/.assets/images/results"):
-            file_path = os.path.join("facefusion-docker/.assets/images/results", file)
+    if os.path.exists(FACEFUSION_RESULTS_DIR):
+        for file in os.listdir(FACEFUSION_RESULTS_DIR):
+            file_path = os.path.join(FACEFUSION_RESULTS_DIR, file)
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
     # Создаём temp папку
-    os.makedirs("FocuuusBot/temp/images", exist_ok=True)
+    temp_path = os.path.join(TEMP_FOLDER_PATH, "images")
+    os.makedirs(temp_path, exist_ok=True)
 
     # Добавляем обработчики
     handlers.hand_commands.hand_add()

@@ -11,7 +11,7 @@ async def downloadFromGoogleDrive(url: str, file_id: str) -> str | None:
     try:
         url = f"https://drive.google.com/uc?export=download&id={file_id}"
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(60.0)) as client:
             response = await client.get(url)
             if response.status_code == 200:
                 os.makedirs(RESULTS_FOLDER_PATH, exist_ok=True)
