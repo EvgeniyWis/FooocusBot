@@ -22,6 +22,8 @@ def selectImageKeyboard(model_name: str, setting_number: str, image_number: int)
         ])
 
     inline_keyboard.append([InlineKeyboardButton(text='🔄 Перегенерировать', callback_data=f'select_image|{model_name}|{setting_number}|regenerate')])
+    inline_keyboard.append([InlineKeyboardButton(text='🔄 Перегенерировать с новым промптом', callback_data=f'select_image|{model_name}|{setting_number}|regenerate_with_new_prompt')])
+    
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
