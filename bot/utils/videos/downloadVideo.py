@@ -15,7 +15,7 @@ async def downloadVideo(url: str) -> str:
         video_path = f"{temp_folder_path}/{os.urandom(8).hex()}.mp4"
 
         # Скачиваем видео
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(60.0)) as client:
             response = await client.get(url)
         if response.status_code == 200:
             with open(video_path, "wb") as f:

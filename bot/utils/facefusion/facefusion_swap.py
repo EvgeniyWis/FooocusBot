@@ -1,9 +1,13 @@
 import asyncio
 import uuid
-from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).parent.parent.parent.parent.parent.absolute()
-ASSETS_DIR = SCRIPT_DIR / "facefusion-docker" / ".assets" / "images" / "results"
+import aiofiles
+from config import FACEFUSION_RESULTS_DIR
+from logger import logger
+
+# Настройка логирования
+
+
 CONTAINER_NAME = "facefusion-docker-facefusion-cpu-1"
 
 
@@ -16,7 +20,7 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     :return: абсолютный путь к выходному изображению
     """
     output_filename = f"{uuid.uuid4()}_output.jpg"
-    output_path = ASSETS_DIR / output_filename
+    output_path = FACEFUSION_RESULTS_DIR / output_filename
 
     docker_cmd = [
         "docker",
@@ -34,6 +38,9 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     ]
 
     try:
+        logger.info(
+            f"Запуск FaceFusion для source: {source_filename}, target: {target_filename}",
+        )
         process = await asyncio.create_subprocess_exec(
             *docker_cmd,
             stdout=asyncio.subprocess.PIPE,
@@ -41,16 +48,20 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         )
         stdout, stderr = await process.communicate()
 
-        await asyncio.sleep(1)
-
         if process.returncode != 0:
+            logger.error(
+                f"FaceFusion завершился с ошибкой: {stderr.decode().strip()}",
+            )
             raise RuntimeError(f"FaceFusion failed: {stderr.decode().strip()}")
 
-        if not output_path.exists():
-            raise FileNotFoundError(
-                f"Файл {output_filename} не найден. Скорее всего проблема произошла с путями",
-            )
+        async with aiofiles.open(output_path, mode="rb") as f:
+            if not await f.readable():
+                logger.error(f"Файл {output_filename} не найден")
+                raise FileNotFoundError(
+                    f"Файл {output_filename} не найден. Скорее всего проблема произошла с путями",
+                )
 
+        logger.info(f"FaceFusion успешно завершен, результат: {output_path}")
         return str(output_path)
 
     except Exception as e:

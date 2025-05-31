@@ -436,7 +436,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                     )
 
                     try:
-                        result_path = await retryOperation(  # TODO: potentially slow operation
+                        result_path = await retryOperation(
                             facefusion_swap,
                             10,
                             1.5,
