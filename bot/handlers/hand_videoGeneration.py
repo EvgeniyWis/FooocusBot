@@ -1,3 +1,4 @@
+import asyncio
 import os
 import traceback
 from datetime import datetime
@@ -439,10 +440,34 @@ async def handle_prompt_for_videoGenerationFromImage(
     try:
         # Скачиваем изображение (file_id) и получаем путь к файлу
         # Для этого используем bot.download_file и сохраняем во временную папку
-        file = await bot.get_file(image_file_id)
+        try:
+            file = await asyncio.wait_for(
+                bot.get_file(image_file_id),
+                timeout=30,
+            )
+        except TimeoutError:
+            await message.answer(
+                "⏰ Время ожидания получения файла Telegram истекло. Попробуйте позже.",
+            )
+            raise TimeoutError(
+                "Время ожидания получения файла Telegram истекло.",
+            )
+
         file_path = file.file_path
         temp_path = f"FocuuusBot/temp/images/{image_file_id}.jpg"
-        await bot.download_file(file_path, temp_path)
+
+        try:
+            await asyncio.wait_for(
+                bot.download_file(file_path, temp_path),
+                timeout=60,
+            )
+        except TimeoutError:
+            await message.answer(
+                "⏰ Время ожидания скачивания файла Telegram истекло. Попробуйте позже.",
+            )
+            raise TimeoutError(
+                "Время ожидания скачивания файла Telegram истекло.",
+            )
 
         # Генерируем видео
         video_path = await retryOperation(

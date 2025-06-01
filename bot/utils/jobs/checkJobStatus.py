@@ -16,15 +16,23 @@ async def checkJobStatus(
     message: types.Message = None,
     is_test_generation: bool = False,
     checkOtherJobs: bool = True,
+    timeout: int = 60 * 10,
 ):
+    start_time = asyncio.get_event_loop().time()
+
     while True:
+        if asyncio.get_event_loop().time() - start_time > timeout:
+            raise TimeoutError(
+                "Превышено время ожидания статуса работы",
+            )
+
         if state:
             data = await state.get_data()
             if data["stop_generation"]:
                 raise Exception("Генерация остановлена")
 
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.post(
                     f"{RUNPOD_HOST}/status/{job_id}",
                     headers=RUNPOD_HEADERS,
