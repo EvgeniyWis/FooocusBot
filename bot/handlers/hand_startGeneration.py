@@ -337,17 +337,6 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
 
-    # Получаем промпт для перегенерации изображения
-    try:
-        prompts_for_regenerate_images = stateData["prompts_for_regenerate_images"][model_name]
-        logger.info(f"Промпт для перегенерации изображения: {prompts_for_regenerate_images}")
-    except Exception as e:
-        logger.error(f"Произошла ошибка при получении промпта для перегенерации изображения: {e}")
-        prompts_for_regenerate_images = stateData["prompt_for_images"]
-
-    # Прибавляем к каждому элементу массива корневой промпт
-    data["json"]['input']['prompt'] += " " + prompts_for_regenerate_images
-
     # Если индекс изображения равен "regenerate", то перегенерируем изображение
     if image_index == "regenerate":
         return await regenerateImage(model_name, call, state, setting_number)
@@ -561,6 +550,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         )
 
     except Exception as e:
+        traceback.print_exc()
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
         await editMessageOrAnswer(
             call,
@@ -755,6 +745,9 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
 
     # Прибавляем к каждому элементу массива корневой промпт
     data["json"]['input']['prompt'] += " " + prompt 
+    
+    # Добавляем модель в массив перегенируемых изображений
+    await appendDataToStateArray(state, "regenerate_images", model_name)
 
     return await generateImageBlock(data["json"], model_name, message, state, user_id, setting_number, is_test_generation, False)
 

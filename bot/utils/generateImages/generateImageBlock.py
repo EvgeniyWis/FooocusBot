@@ -47,6 +47,7 @@ async def generateImageBlock(
             message,
             is_test_generation,
             checkOtherJobs,
+            500
         )
 
     try:
