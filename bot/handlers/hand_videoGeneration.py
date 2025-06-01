@@ -106,14 +106,24 @@ async def handle_video_example_buttons(
         model_name = temp[1]
         type_for_video_generation = temp[2]
 
-    user_id = call.from_user.id
     await state.update_data(
         type_for_video_generation=type_for_video_generation,
     )
 
     # Получаем название модели и url изображения
-    data = await state.get_data()
-    image_url = data["images_urls"][model_name]
+    stateData = await state.get_data()
+    logger.info(f"Список сохраненных изображений: {stateData['saved_images_urls']}")
+    
+    # Ищем URL изображения для указанной модели в списке словарей
+    image_url = None
+    for item in stateData['saved_images_urls']:
+        if model_name in item:
+            image_url = item[model_name]
+            break
+            
+    if image_url is None:
+        await call.message.answer(f"Не удалось найти изображение для модели {model_name}")
+        return
 
     # Удаляем сообщение с выбором видео-примера
     # TODO: режим генерации видео с видео-примерами временно отключен
@@ -127,8 +137,8 @@ async def handle_video_example_buttons(
     #     video_example_data = await getVideoExampleDataByIndex(index)
 
     # Получаем кастомный промпт, если он есть, а если нет, то берем промпт из видео-примера
-    if "prompt_for_video" in data:
-        custom_prompt = data["prompt_for_video"]
+    if "prompt_for_video" in stateData:
+        custom_prompt = stateData["prompt_for_video"]
     else:
         custom_prompt = None
 
@@ -315,8 +325,9 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             model_name_index,
             prompt,
         ),
-        reply_markup=video_generation_keyboards.generatedVideoKeyboard(
-            f"generate_video|{model_name}",
+        reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
+            model_name,
+            True
         ),
     )
 

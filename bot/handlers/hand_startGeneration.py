@@ -436,10 +436,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                     )
 
                     try:
-                        result_path = await retryOperation(
-                            facefusion_swap,
-                            10,
-                            1.5,
+                        result_path = await facefusion_swap(
                             faceswap_source_path,
                             faceswap_target_path,
                         )
@@ -511,10 +508,14 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
             # Проверяем, что количество отправленных изображений и тех, которые собираются отправиться, равно
             stateData = await state.get_data()
-            if (
+            generation_is_finished = (
                 stateData["finally_sent_generated_images_count"]
-                >= stateData["will_be_sent_generated_images_count"]
-            ):
+                >= stateData["will_be_sent_generated_images_count"] and
+                stateData["finally_sent_generated_images_count"]
+                >= stateData["total_images_count"] 
+            )
+
+            if generation_is_finished:
                 # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
                 await call.message.answer(
                     text.GENERATE_IMAGES_SUCCESS_TEXT,
@@ -620,9 +621,6 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     # Делаем ссылку корректной
     image_id = link.split("/")[5]
     image_url = f"https://drive.google.com/uc?export=view&id={image_id}"
-    # Сохраняем ссылку на изображение в стейт вместе с именем модели
-    dataForUpdate = {f"{model_name}": image_url}
-    await appendDataToStateArray(state, "saved_images_urls", dataForUpdate)
 
     # Получаем данные родительской папки
     folder = getFolderDataByID(model_data["picture_folder_id"])
@@ -648,19 +646,23 @@ async def save_image(call: types.CallbackQuery, state: FSMContext):
     )
 
     # Удаляем отправленные изображения из чата
-    try:
-        mediagroup_messages_ids = stateData[
-            f"mediagroup_messages_ids_{model_name}"
-        ]
-        chat_id = call.message.chat.id
-        for message_id in mediagroup_messages_ids:
-            await bot.delete_message(chat_id=chat_id, message_id=message_id)
-    except Exception as e:
-        logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
+    # try:
+    #     mediagroup_messages_ids = stateData[
+    #         f"mediagroup_messages_ids_{model_name}"
+    #     ]
+    #     chat_id = call.message.chat.id
+    #     for message_id in mediagroup_messages_ids:
+    #         await bot.delete_message(chat_id=chat_id, message_id=message_id)
+    # except Exception as e:
+    #     logger.error(f"Произошла ошибка при удалении изображений из чата: {e}")
+
+    # Сохраняем ссылку на изображение в стейт вместе с именем модели
+    dataForUpdate = {f"{model_name}": image_url}
+    await appendDataToStateArray(state, "saved_images_urls", dataForUpdate)
 
     # Если это была последняя модель в сеансе, то отправляем сообщение о третьем этапе
     stateData = await state.get_data()
-    if stateData["finally_sent_generated_images_count"] >= len(
+    if stateData["finally_sent_generated_images_count"] == len(
         stateData["saved_images_urls"],
     ):
         await call.message.answer(
