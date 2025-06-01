@@ -36,13 +36,12 @@ async def generateImageBlock(
         job_id = await getJobID(dataJSON)
 
         # Проверяем статус работы
-        response_json = checkJobStatus(
+        response_json = await checkJobStatus(
             job_id,
             state,
             message,
             is_test_generation,
             checkOtherJobs,
-            timeout=700,
         )
 
     try:
