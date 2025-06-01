@@ -1,5 +1,6 @@
 from .generateData import setting3_generateData
 
+
 # Функция для генерации массива данных для запроса для настройки 3
 def setting3_getDataArray():
     # Массив дат с нужными параметрами для запроса
@@ -102,7 +103,7 @@ def setting3_getDataArray():
         setting3_generateData("leonaclaive", "1fnfPz-bY-e4Ad0N1HeiG5EHrZYnqEser", "1nSa0pZNEJUCNNgP-U_eT-pqxqi5lH-XV", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous platinum-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-        [-1.50, 1.30, 1.00, 0.75, 1.55, -0.95])
+        [-1.50, 1.30, 1.00, 0.75, 1.55, -0.95]),
     ]
 
     return dataArray

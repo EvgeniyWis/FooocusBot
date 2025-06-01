@@ -1,54 +1,64 @@
-from aiogram.types import BotCommand
-from config import TEMP_FOLDER_PATH
-from InstanceBot import bot, dp
-import handlers
 import asyncio
-from logger import logger
-import shutil
 import os
-from config import DEV_CHAT_ID
+import shutil
+
+import handlers
+from aiogram.types import BotCommand
+from config import (
+    DEV_CHAT_ID,
+    FACEFUSION_RESULTS_DIR,
+    TEMP_FOLDER_PATH,
+    TEMP_IMAGE_FILES_DIR,
+)
+from InstanceBot import bot, dp
+from logger import logger
+
 
 async def on_startup() -> None:
-    # Удаляем все файлы в папке temp
+    # Удаляем все файлы в папке temp facefusion
     if os.path.exists(TEMP_FOLDER_PATH):
         shutil.rmtree(TEMP_FOLDER_PATH)
 
-    # Удаляем папку temp
-    if os.path.exists("FocuuusBot/temp"):
-        shutil.rmtree("FocuuusBot/temp")
+    # Удаляем папку temp бота
+    if os.path.exists(TEMP_IMAGE_FILES_DIR):
+        shutil.rmtree(TEMP_IMAGE_FILES_DIR)
 
     # Удаляем содержимое папки results для facefusion-docker
-    if os.path.exists("facefusion-docker/.assets/images/results"):
-        for file in os.listdir("facefusion-docker/.assets/images/results"):
-            file_path = os.path.join("facefusion-docker/.assets/images/results", file)
+    if os.path.exists(FACEFUSION_RESULTS_DIR):
+        for file in os.listdir(FACEFUSION_RESULTS_DIR):
+            file_path = os.path.join(FACEFUSION_RESULTS_DIR, file)
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
     # Создаём temp папку
-    os.makedirs("FocuuusBot/temp/images", exist_ok=True)
+    temp_path = os.path.join(TEMP_IMAGE_FILES_DIR, "images")
+    os.makedirs(temp_path, exist_ok=True)
 
     # Добавляем обработчики
     handlers.hand_commands.hand_add()
     handlers.hand_startGeneration.hand_add()
     handlers.hand_randomizer.hand_add()
     handlers.hand_videoGeneration.hand_add()
-    
+
     bot_info = await bot.get_me()
 
     await bot.delete_webhook(drop_pending_updates=True)
 
     # Определяем команды и добавляем их в бота
     commands = [
-        BotCommand(command='/start', description='Перезапустить бота'),
-        BotCommand(command='/stop', description='Остановить генерацию'),
+        BotCommand(command="/start", description="Перезапустить бота"),
+        BotCommand(command="/stop", description="Остановить генерацию"),
     ]
 
     await bot.set_my_commands(commands)
 
-    logger.info(f'Бот запущен - @{bot_info.username}')
+    logger.info(f"Бот запущен - @{bot_info.username}")
 
     # Отправка DEV сообщения разработчику
-    await bot.send_message(DEV_CHAT_ID, "Бот запущен ✅")
+    try:
+        await bot.send_message(DEV_CHAT_ID, "Бот запущен ✅")
+    except Exception as e:
+        logger.error(f"Ошибка при отправке сообщения разработчику: {e}")
 
     await dp.start_polling(bot, skip_updates=True)
 

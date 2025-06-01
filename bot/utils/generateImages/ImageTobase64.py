@@ -1,6 +1,8 @@
 import base64
 import io
+
 from PIL import Image
+
 
 # Функция для преобразования изображения в base64
 def imageToBase64(image: Image.Image) -> str:
