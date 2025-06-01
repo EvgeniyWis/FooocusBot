@@ -16,6 +16,9 @@ from ...generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
+import asyncio
+from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
+
 
 
 # Функция для генерации изображения в зависимости от настроек
@@ -81,54 +84,33 @@ async def generateImagesInHandler(
                 ]
         else:
             stateData = await state.get_data()
-            model_name_for_generation = stateData.get(
-                "model_name_for_generation",
-                None,
-            )
-            logger.info(
-                f"Получена модель для индивидуальной генерации: {model_name_for_generation}",
-            )
+            model_names_for_generation = stateData.get("model_names_for_generation", [])
+            logger.info(f"Получен список моделей для индивидуальной генерации: {model_names_for_generation}")
 
-            if model_name_for_generation:
-                model_name = model_name_for_generation
+            if len(model_names_for_generation) > 0:
+                for model_name in model_names_for_generation:
+                    logger.info(f"Генерируем изображения для индивидуальной модели: {model_name}")
 
-                # Проверка на None перед использованием переменной
-                if model_name is None:
-                    raise ValueError("model_name не может быть None")
+                    # Получаем порядковый номер модели
+                    model_name_index = getModelNameIndex(model_name)
 
-                # Получаем порядковый номер модели
-                model_name_index = getModelNameIndex(model_name)
+                    # Отправляем сообщение о генерации изображений по имени модели
+                    await message.answer(text.GENERATE_IMAGES_BY_MODEL_NAME_TEXT.format(model_name, model_name_index))
 
-                # Отправляем сообщение о генерации изображений по имени модели
-                await message.answer(
-                    text.GENERATE_IMAGES_BY_MODEL_NAME_TEXT.format(
-                        model_name,
-                        model_name_index,
-                    ),
-                )
+                    # Получаем данные о модели
+                    dataArray = await getDataByModelName(model_name)
 
-                # Получаем данные о модели
-                dataArray = await getDataByModelName(model_name)
+                    # Прибавляем корневой промпт
+                    dataArray["json"]['input']['prompt'] += " " + prompt
+                    dataJSON = dataArray["json"]
 
-                # Проверка на None перед использованием переменной
-                if dataArray is None:
-                    raise ValueError("dataArray не может быть None")
+                    # Получаем номер настройки по названию модели
+                    setting_number = getSettingNumberByModelName(model_name)
 
-                # Прибавляем корневой промпт
-                dataArray["json"]["input"]["prompt"] += " " + prompt
-                dataJSON = dataArray["json"]
-
-                # Генерируем изображения
-                await generateImageBlock(
-                    dataJSON,
-                    model_name,
-                    message,
-                    state,
-                    user_id,
-                    setting_number,
-                    is_test_generation,
-                )
+                    # Запускаем задачу для генерации изображений
+                    asyncio.create_task(generateImageBlock(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation))
                 return
+
             elif setting_number == "all":
                 result = await generateImagesByAllSettings(
                     message,
