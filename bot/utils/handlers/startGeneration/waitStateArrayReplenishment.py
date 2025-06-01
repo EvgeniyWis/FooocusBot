@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 from aiogram.fsm.context import FSMContext
 from logger import logger
@@ -9,7 +10,13 @@ async def waitStateArrayReplenishment(state: FSMContext, array_name: str,
     stateNamesForCycleExit: tuple[str, str]) -> list[dict] | bool:
 
     try:
+        start_time = time.time()  # Запоминаем время начала
         while True:
+            # Проверяем, не прошло ли 2 минуты
+            if time.time() - start_time > 120:  # 120 секунд = 2 минуты
+                logger.warning("Превышено время ожидания (2 минуты)")
+                return False
+
             stateData = await state.get_data()
 
             if not stateData[array_name]:
