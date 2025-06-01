@@ -6,9 +6,6 @@ import aiofiles
 from config import FACEFUSION_RESULTS_DIR
 from logger import logger
 
-# Настройка логирования
-
-
 CONTAINER_NAME = "facefusion-docker-facefusion-cpu-1"
 
 
@@ -56,7 +53,7 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
             raise RuntimeError(f"FaceFusion failed: {stderr.decode().strip()}")
 
         async with aiofiles.open(output_path, mode="rb") as f:
-            if not await f.readable():
+            if not f.readable():
                 logger.error(f"Файл {output_filename} не найден")
                 raise FileNotFoundError(
                     f"Файл {output_filename} не найден. Скорее всего проблема произошла с путями",

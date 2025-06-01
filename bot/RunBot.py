@@ -8,15 +8,20 @@ from config import (
     DEV_CHAT_ID,
     FACEFUSION_RESULTS_DIR,
     TEMP_FOLDER_PATH,
+    TEMP_IMAGE_FILES_DIR,
 )
 from InstanceBot import bot, dp
 from logger import logger
 
 
 async def on_startup() -> None:
-    # Удаляем все файлы в папке temp
+    # Удаляем все файлы в папке temp facefusion
     if os.path.exists(TEMP_FOLDER_PATH):
         shutil.rmtree(TEMP_FOLDER_PATH)
+
+    # Удаляем папку temp бота
+    if os.path.exists(TEMP_IMAGE_FILES_DIR):
+        shutil.rmtree(TEMP_IMAGE_FILES_DIR)
 
     # Удаляем содержимое папки results для facefusion-docker
     if os.path.exists(FACEFUSION_RESULTS_DIR):
@@ -26,7 +31,7 @@ async def on_startup() -> None:
                 os.remove(file_path)
 
     # Создаём temp папку
-    temp_path = os.path.join(TEMP_FOLDER_PATH, "images")
+    temp_path = os.path.join(TEMP_IMAGE_FILES_DIR, "images")
     os.makedirs(temp_path, exist_ok=True)
 
     # Добавляем обработчики
