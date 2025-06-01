@@ -5,12 +5,12 @@ from .sendRunRequest import sendRunRequest
 
 
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы
-async def getJobID(dataJSON: dict):
+async def getJobID(dataJSON: dict, setting_number: int):
     # Делаем запрос на генерацию
     logger.info("Отправка запроса на генерацию...")
 
     # Получаем id работы
-    response_json = await retryOperation(sendRunRequest, 10, 2, dataJSON)
+    response_json = await retryOperation(sendRunRequest, 10, 2, dataJSON, setting_number)
 
     logger.info(f"Ответ на запрос: {response_json}")
 

@@ -16,7 +16,7 @@ from keyboards import (
 from logger import logger
 from PIL import Image
 from states.UserState import StartGenerationState
-from utils import retryOperation, text
+from utils import text
 from utils.facefusion import facefusion_swap
 from utils.generateImages import (
     base64ToImage,
@@ -44,6 +44,7 @@ from utils.handlers.startGeneration import (
     sendMessageForImageSaving,
     waitForImageBlocksGeneration,
 )
+from utils.generateImages.dataArray import getSettingNumberByModelName
 
 
 # Обработка выбора количества генераций
@@ -78,6 +79,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
             call,
             text.WRITE_MODELS_NAME_TEXT
         )
+        await state.update_data(specific_model=True)
         # Очищаем стейт
         await state.set_state(StartGenerationState.write_model_name_for_generation)
         return 
@@ -346,12 +348,22 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Прибавляем к каждому элементу массива корневой промпт
     data["json"]['input']['prompt'] += " " + prompts_for_regenerate_images
 
-    # Проверяем тестовая ли это генерация
-    is_test_generation = stateData["generations_type"] == "test"
-
     # Если индекс изображения равен "regenerate", то перегенерируем изображение
     if image_index == "regenerate":
         return await regenerateImage(model_name, call, state, setting_number)
+    
+    # Если индекс изображения равен "regenerate_with_new_prompt", то перегенерируем изображение с новым промптом
+    elif image_index == "regenerate_with_new_prompt":
+        # Устанавливаем стейт для ввода нового промпта
+        await state.update_data(model_name_for_regenerate_image=model_name)
+        await state.update_data(setting_number_for_regenerate_image=setting_number)
+
+        await state.set_state(StartGenerationState.write_new_prompt_for_regenerate_image)
+
+        # Просим ввести новый промпт
+        await editMessageOrAnswer(
+            call,text.WRITE_NEW_PROMPT_TEXT)
+        return
 
     try:
         # Добавляем в стейт то, сколько отправленных изображений
@@ -360,21 +372,6 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             "will_be_sent_generated_images_count",
         )
 
-        await generateImageBlock(data["json"], model_name, call.message, state, user_id, setting_number, is_test_generation, False)
-    
-        # Если индекс изображения равен "regenerate_with_new_prompt", то перегенерируем изображение с новым промптом
-        if image_index == "regenerate_with_new_prompt":
-            # Устанавливаем стейт для ввода нового промпта
-            await state.update_data(model_name_for_regenerate_image=model_name)
-            await state.update_data(setting_number_for_regenerate_image=setting_number)
-
-            await state.set_state(StartGenerationState.write_new_prompt_for_regenerate_image)
-
-            # Просим ввести новый промпт
-            await editMessageOrAnswer(
-                call,text.WRITE_NEW_PROMPT_TEXT)
-            return
-            
         # Если данные не найдены, ищем во всех доступных массивах
         if data is None:
             all_data_arrays = getAllDataArrays()
@@ -383,243 +380,185 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 if data is not None:
                     break
 
-        picture_folder_id = data["picture_folder_id"]
         video_folder_id = data["video_folder_id"]
 
         # Сохраняем название модели и id папки для видео
         await state.update_data(model_name=model_name)
         await state.update_data(video_folder_id=video_folder_id)
 
-        # Меняем текст на сообщении о начале upscale
-        await editMessageOrAnswer(
+        if not MOCK_MODE:
+            # Меняем текст на сообщении о начале upscale
+            await editMessageOrAnswer(
             call,text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
-        # Получаем само изображение по пути
-        image_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
-        image = Image.open(image_path)
-        image_base64 = imageToBase64(image)
+            # Получаем само изображение по пути
+            image_path = (
+                f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
+            )
+            image = Image.open(image_path)
+            image_base64 = imageToBase64(image)
 
-        # Получаем негатив промпт
-        negative_prompt = data["json"]["input"]["negative_prompt"]
-        
-        # Получаем базовую модель   
-        base_model = data["json"]["input"]["base_model_name"]
-        
-        # Делаем upscale изображения
-        images_output_base64 = await upscaleImage(image_base64, negative_prompt, base_model)
+            # Получаем базовую модель
+            base_model = data["json"]["input"]["base_model_name"]
 
-        # Сохраняем изображения по этому же пути
-        await base64ToImage(images_output_base64, model_name, int(image_index) - 1, user_id, False)
+            # Получаем номер настройки
+            setting_number = getSettingNumberByModelName(model_name)
 
-        # Меняем текст на сообщении об очереди на замену лица
-        await editMessageOrAnswer(
-            call,text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index))
+            # Делаем upscale изображения
+            images_output_base64 = await upscaleImage(image_base64, base_model, setting_number)
 
-        # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-        faceswap_target_path = f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
-        faceswap_source_path = f"images/faceswap/{model_name}.jpg"
-        logger.info(f"Путь к исходному изображению для замены лица: {faceswap_target_path}")
-        logger.info(f"Путь к целевому изображению для замены лица: {faceswap_source_path}")
+            # Сохраняем изображения по этому же пути
+            await base64ToImage(
+                images_output_base64,
+                model_name,
+                int(image_index) - 1,
+                user_id,
+                False,
+            )
 
-        # Если стейта для сохранения моделей и их изображений для faceswap ещё нет, то создаём его
-        stateData = await state.get_data()
-        if "faceswap_generate_models" not in stateData:
-            await state.update_data(faceswap_generate_models=[model_name])
-        else:
+            # Меняем текст на сообщении об очереди на замену лица
+            await editMessageOrAnswer(
+                call,
+                text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index),
+            )
+
+            # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
+            faceswap_target_path = (
+                f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
+            )
+            faceswap_source_path = f"images/faceswap/{model_name}.jpg"
+            logger.info(
+                f"Путь к исходному изображению для замены лица: {faceswap_target_path}",
+            )
+            logger.info(
+                f"Путь к целевому изображению для замены лица: {faceswap_source_path}",
+            )
+
             # Добавляем в стейт путь к изображению для faceswap
-            stateData["faceswap_generate_models"].append(model_name)
-            await state.update_data(faceswap_generate_models=stateData["faceswap_generate_models"])
+            await appendDataToStateArray(
+                state,
+                "faceswap_generate_models",
+                model_name,
+            )
 
-        # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
-        while True:
-            stateData = await state.get_data()
-            faceswap_generate_models = stateData["faceswap_generate_models"]
+            # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
+            while True:
+                stateData = await state.get_data()
+                faceswap_generate_models = stateData[
+                    "faceswap_generate_models"
+                ]
 
-            logger.info(f"Список генераций для замены лица: {faceswap_generate_models}")
-
-            # Если в списке генераций настала очередь этой модели, то запускаем генерацию
-            if model_name == faceswap_generate_models[0]:
-                await editMessageOrAnswer(
-            call,text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
-                
-                try:
-                    result_path = await retryOperation(facefusion_swap, 10, 1.5, faceswap_source_path, faceswap_target_path)
-                except Exception as e:
-                    result_path = None
-                    logger.error(f"Произошла ошибка при замене лица: {e}")
-                    stateData["faceswap_generate_models"].remove(model_name)
-                    await state.update_data(faceswap_generate_models=stateData["faceswap_generate_models"])
-                    try:
-                        await editMessageOrAnswer(
-                        call,text.FACE_SWAP_ERROR_TEXT.format(model_name, model_name_index))
-                    except Exception as e:
-                        logger.error(f"Произошла ошибка при отправке сообщения об ошибке: {e}")
-                    break
-
-                # Получаем само изображение по пути
-                image_path = (
-                    f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
-                )
-                image = Image.open(image_path)
-                image_base64 = imageToBase64(image)
-
-                # Получаем базовую модель
-                base_model = data["json"]["input"]["base_model_name"]
-
-                # Делаем upscale изображения
-                images_output_base64 = await upscaleImage(image_base64, base_model)
-
-                # Сохраняем изображения по этому же пути
-                await base64ToImage(
-                    images_output_base64,
-                    model_name,
-                    int(image_index) - 1,
-                    user_id,
-                    False,
-                )
-
-                # Меняем текст на сообщении об очереди на замену лица
-                await editMessageOrAnswer(
-                    call,
-                    text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index),
-                )
-
-                # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-                faceswap_target_path = (
-                    f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
-                )
-                faceswap_source_path = f"images/faceswap/{model_name}.jpg"
                 logger.info(
-                    f"Путь к исходному изображению для замены лица: {faceswap_target_path}",
-                )
-                logger.info(
-                    f"Путь к целевому изображению для замены лица: {faceswap_source_path}",
+                    f"Список генераций для замены лица: {faceswap_generate_models}",
                 )
 
-                # Добавляем в стейт путь к изображению для faceswap
-                await appendDataToStateArray(
-                    state,
-                    "faceswap_generate_models",
-                    model_name,
-                )
-
-                # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
-                while True:
-                    stateData = await state.get_data()
-                    faceswap_generate_models = stateData[
-                        "faceswap_generate_models"
-                    ]
-
-                    logger.info(
-                        f"Список генераций для замены лица: {faceswap_generate_models}",
+                # Если в списке генераций настала очередь этой модели, то запускаем генерацию
+                if model_name == faceswap_generate_models[0]:
+                    await editMessageOrAnswer(
+                        call,
+                        text.FACE_SWAP_PROGRESS_TEXT.format(
+                            image_index,
+                            model_name,
+                            model_name_index,
+                        ),
                     )
 
-                    # Если в списке генераций настала очередь этой модели, то запускаем генерацию
-                    if model_name == faceswap_generate_models[0]:
+                    try:
+                        result_path = await facefusion_swap(
+                            faceswap_source_path,
+                            faceswap_target_path,
+                        )
+                    except Exception as e:
+                        result_path = None
+                        logger.error(
+                            f"Произошла ошибка при замене лица у модели {model_name} с индексом {model_name_index}: {e}",
+                        )
                         await editMessageOrAnswer(
                             call,
-                            text.FACE_SWAP_PROGRESS_TEXT.format(
-                                image_index,
+                            text.FACE_SWAP_ERROR_TEXT.format(
                                 model_name,
                                 model_name_index,
                             ),
                         )
-
-                        try:
-                            result_path = await facefusion_swap(
-                                faceswap_source_path,
-                                faceswap_target_path,
-                            )
-                        except Exception as e:
-                            result_path = None
-                            logger.error(
-                                f"Произошла ошибка при замене лица у модели {model_name} с индексом {model_name_index}: {e}",
-                            )
-                            await editMessageOrAnswer(
-                                call,
-                                text.FACE_SWAP_ERROR_TEXT.format(
-                                    model_name,
-                                    model_name_index,
-                                ),
-                            )
-                            break
-
                         break
 
-                    await asyncio.sleep(10)
+                    break
 
-                # После генерации удаляем модель из стейта
-                stateData = await state.get_data()
-                stateData["faceswap_generate_models"].remove(model_name)
-                await state.update_data(
-                    faceswap_models=stateData["faceswap_generate_models"],
-                )
+                await asyncio.sleep(10)
 
-                # Если результат замены лица не найден, то завершаем генерацию и уменьшаем кол-во ожидаемых изображений
-                if not result_path:
-                    await increaseCountInState(
-                        state,
-                        "will_be_sent_generated_images_count",
-                        -1
-                    )
-                    return
+            # После генерации удаляем модель из стейта
+            stateData = await state.get_data()
+            stateData["faceswap_generate_models"].remove(model_name)
+            await state.update_data(
+                faceswap_models=stateData["faceswap_generate_models"],
+            )
 
-                logger.info(f"Результат замены лица: {result_path}")
-            else:
-                result_path = "FocuuusBot/bot/assets/mocks/mock_image.jpg"
+        else:
+            result_path = "FocuuusBot/bot/assets/mocks/mock_image.jpg"
 
-            if stateData["generation_step"] == 1:
-                # Добавляем result_path в стейт
-                updateData = {f"{model_name}": result_path}
-                await appendDataToStateArray(state, "generated_images", updateData)
+        # Если результат замены лица не найден, то завершаем генерацию и уменьшаем кол-во ожидаемых изображений
+        if not result_path:
+            await increaseCountInState(
+                state,
+                "will_be_sent_generated_images_count",
+                -1
+            )
+            return
 
-                stateData = await state.get_data()
-                logger.info(
-                    f"Список сгенерируемых изображений для сохранения: {stateData['generated_images']}",
-                )
+        logger.info(f"Результат замены лица: {result_path}")
 
-                # Меняем текст на сообщении
-                await editMessageOrAnswer(
-                    call,
-                    text.FACE_SWAP_SUCCESS_TEXT.format(
-                        model_name,
-                        model_name_index,
-                    ),
-                    reply_markup=start_generation_keyboards.saveImagesKeyboard()
-                    if stateData["specific_model"]
-                    else None,
-                )
+        if stateData["generation_step"] == 1:
+            # Добавляем result_path в стейт
+            updateData = {f"{model_name}": result_path}
+            await appendDataToStateArray(state, "generated_images", updateData)
 
-                # Добавляем в стейт то, сколько отправленных изображений
-                await increaseCountInState(
-                    state,
-                    "finally_sent_generated_images_count",
-                )
+            stateData = await state.get_data()
+            logger.info(
+                f"Список сгенерируемых изображений для сохранения: {stateData['generated_images']}",
+            )
 
-                # Проверяем, что количество отправленных изображений и тех, которые собираются отправиться, равно
-                stateData = await state.get_data()
-                generation_is_finished = (
-                    stateData["finally_sent_generated_images_count"]
-                    >= stateData["will_be_sent_generated_images_count"] and
-                    stateData["finally_sent_generated_images_count"]
-                    >= stateData["total_images_count"] 
-                )
+            # Меняем текст на сообщении
+            await editMessageOrAnswer(
+                call,
+                text.FACE_SWAP_SUCCESS_TEXT.format(
+                    model_name,
+                    model_name_index,
+                ),
+                reply_markup=start_generation_keyboards.saveImagesKeyboard()
+                if stateData["specific_model"]
+                else None,
+            )
 
-                if generation_is_finished:
-                    # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
-                    await call.message.answer(
-                        text.GENERATE_IMAGES_SUCCESS_TEXT,
-                        reply_markup=start_generation_keyboards.saveImagesKeyboard(),
-                    )
+            # Добавляем в стейт то, сколько отправленных изображений
+            await increaseCountInState(
+                state,
+                "finally_sent_generated_images_count",
+            )
 
-                    # Ставим, что начался 2 этап
-                    await state.update_data(generation_step=2)
+            # Проверяем, что количество отправленных изображений и тех, которые собираются отправиться, равно
+            stateData = await state.get_data()
+            generation_is_finished = (
+                stateData["finally_sent_generated_images_count"]
+                >= stateData["will_be_sent_generated_images_count"] and
+                stateData["finally_sent_generated_images_count"]
+                >= stateData["total_images_count"] 
+            )
 
-            elif stateData["generation_step"] == 2:
-                await call.message.edit_text(
-                    text.GENERATE_IMAGE_SUCCESS_TEXT,
+            if generation_is_finished:
+                # И только после этого отправляем сообщение о успешной генерации с возможностью начать этап сохранения изображений
+                await call.message.answer(
+                    text.GENERATE_IMAGES_SUCCESS_TEXT,
                     reply_markup=start_generation_keyboards.saveImagesKeyboard(),
                 )
+
+                # Ставим, что начался 2 этап
+                await state.update_data(generation_step=2)
+
+        elif stateData["generation_step"] == 2:
+            await call.message.edit_text(
+                text.GENERATE_IMAGE_SUCCESS_TEXT,
+                reply_markup=start_generation_keyboards.saveImagesKeyboard(),
+        )
 
     except Exception as e:
         logger.error(f"Произошла ошибка при генерации изображения: {e}")
