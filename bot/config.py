@@ -11,11 +11,14 @@ ENDPOINT_ID = "mtuokv4whgchlc"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.info(f"BASE_DIR: {BASE_DIR}")
 
-TEMP_FOLDER_PATH = os.path.join(BASE_DIR, "bot", "temp")
-logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH}")
+TEMP_IMAGE_FILES_DIR = os.path.join(BASE_DIR, "bot", "temp")
+logger.info(f"TEMP_IMAGE_FILES_DIR: {TEMP_IMAGE_FILES_DIR}")
 
 FACEFUSION_DIR = os.path.join(os.path.dirname(BASE_DIR), "facefusion-docker")
 logger.info(f"FACEFUSION_DIR: {FACEFUSION_DIR}")
+
+TEMP_FOLDER_PATH = os.path.join(FACEFUSION_DIR, ".assets", "images", "temp")
+logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH}")
 
 FACEFUSION_RESULTS_DIR = os.path.join(FACEFUSION_DIR, ".assets/images/results")
 logger.info(f"FACEFUSION_RESULTS_DIR: {FACEFUSION_RESULTS_DIR}")
@@ -42,7 +45,7 @@ ALLOWED_USERS = [
     722063648,
     5948408400,
     1979922062,
-    5046166133
+    5046166133,
 ]
 
 # Администратор бота
