@@ -48,3 +48,4 @@ def hand_add():
     # DEV: получение file id видео
     # router.message.register(get_file_id)
 
+

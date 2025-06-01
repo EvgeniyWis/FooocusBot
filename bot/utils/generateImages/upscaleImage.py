@@ -6,7 +6,7 @@ from ..jobs.getJobID import getJobID
 
 
 # Функция для upscale сгенерированного изображения
-async def upscaleImage(input_image: str,  base_config_model_name: str) -> str:
+async def upscaleImage(input_image: str, base_config_model_name: str) -> str:
     # Логирование
     logger.info("Делаем upscale для изображения...")
 
@@ -17,7 +17,10 @@ async def upscaleImage(input_image: str,  base_config_model_name: str) -> str:
             "require_base64": True,
             "uov_method": "Upscale (1.5x)",
             "input_image": input_image,
-            "advanced_params": {"sampler_name": "euler_ancestral", "overwrite_step": 60},
+            "advanced_params": {
+                "sampler_name": "euler_ancestral",
+                "overwrite_step": 60,
+            },
             "style_selections": [],
             "guidance_scale": 3.5,
             "negative_prompt": COMMON_NEGATIVE_PROMPT,
@@ -29,10 +32,9 @@ async def upscaleImage(input_image: str,  base_config_model_name: str) -> str:
     job_id = await getJobID(dataJSON)
 
     # Проверяем статус работы
-    response_json = await checkJobStatus(job_id)
+    response_json = await checkJobStatus(job_id, timeout=300)
 
     # Получаем изображение
     image_data = response_json["output"][0]["base64"]
 
     return image_data
-
