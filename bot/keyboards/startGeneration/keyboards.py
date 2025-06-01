@@ -138,7 +138,7 @@ def testGenerationImagesKeyboard(setting_number: str):
             ],
             [
                 InlineKeyboardButton(
-                    text="◀️ ��азад",
+                    text="◀️ Назад",
                     callback_data="generations_type|test",
                 ),
             ],

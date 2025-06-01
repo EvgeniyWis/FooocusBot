@@ -7,14 +7,14 @@ load_dotenv(find_dotenv())
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "7t2kpbp8h4oqt8"
-SETTING_2_ENDPOINT_ID = "dsy8xqnx0pae75"
-SETTING_3_ENDPOINT_ID = "u3rofgiar81qlr"
-SETTING_4_ENDPOINT_ID = "1nhq9omaacbye8"
+SETTING_2_ENDPOINT_ID = ""
+SETTING_3_ENDPOINT_ID = ""
+SETTING_4_ENDPOINT_ID = ""
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.info(f"BASE_DIR: {BASE_DIR}")
 
-TEMP_IMAGE_FILES_DIR = os.path.join(BASE_DIR, "bot", "temp")
+TEMP_IMAGE_FILES_DIR = os.path.join(BASE_DIR, "bot", "temp", "images")
 logger.info(f"TEMP_IMAGE_FILES_DIR: {TEMP_IMAGE_FILES_DIR}")
 
 FACEFUSION_DIR = os.path.join(os.path.dirname(BASE_DIR), "facefusion-docker")

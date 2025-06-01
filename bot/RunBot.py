@@ -45,9 +45,10 @@ async def on_startup() -> None:
     await bot.delete_webhook(drop_pending_updates=True)
 
     # Определяем команды и добавляем их в бота
+    # TODO: команду /stop вернуть
     commands = [
         BotCommand(command="/start", description="Перезапустить бота"),
-        BotCommand(command="/stop", description="Остановить генерацию"),
+        # BotCommand(command="/stop", description="Остановить генерацию"),
     ]
 
     await bot.set_my_commands(commands)

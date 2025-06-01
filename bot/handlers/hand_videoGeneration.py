@@ -7,7 +7,7 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from assets.mocks.links import MOCK_LINK_FOR_SAVE_VIDEO
-from config import MOCK_MODE
+from config import MOCK_MODE, TEMP_IMAGE_FILES_DIR
 from InstanceBot import bot, router
 from keyboards import video_generation_keyboards
 from logger import logger
@@ -175,13 +175,6 @@ async def handle_video_example_buttons(
         call,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
     )
-
-    # Удаляем из очереди текущую модель
-    stateData = await state.get_data()
-    stateData["saved_images_urls"] = [
-        x for x in stateData["saved_images_urls"] if model_name not in x
-    ]
-    await state.update_data(saved_images_urls=stateData["saved_images_urls"])
 
     # Отправляем следующую модель
     await sendNextModelMessage(state, call)
@@ -463,7 +456,7 @@ async def handle_prompt_for_videoGenerationFromImage(
             )
 
         file_path = file.file_path
-        temp_path = f"FocuuusBot/temp/images/{image_file_id}.jpg"
+        temp_path = f"{TEMP_IMAGE_FILES_DIR}/{image_file_id}.jpg"
 
         try:
             await asyncio.wait_for(
@@ -487,7 +480,7 @@ async def handle_prompt_for_videoGenerationFromImage(
             None,
             temp_path,
         )
-        await state.update_data(video_path=video_path)
+        await state.update_data(video_path_for_videoGenerationFromImage=video_path)
 
         video = types.FSInputFile(video_path)
         await message.answer_video(
@@ -514,27 +507,28 @@ async def handle_prompt_for_videoGenerationFromImage(
         logger.error(f"Ошибка при генерации видео из изображения: {e}")
 
 
+# TODO: пофиксить
 # # Хендлер для обработки нажатия на кнопку "🔄 Перегенерировать видео"
-async def handle_regenerate_video_from_image(call: types.CallbackQuery, state: FSMContext):
-    # Получаем данные из стейта
-    stateData = await state.get_data()
-    image_file_id_index = int(call.data.split("|")[1])
-    image_file_id = stateData["image_file_ids_for_videoGenerationFromImage"][image_file_id_index]
-    prompt = stateData["prompts_for_videoGenerationFromImage"][image_file_id]
+# async def handle_regenerate_video_from_image(call: types.CallbackQuery, state: FSMContext):
+#     # Получаем данные из стейта
+#     stateData = await state.get_data()
+#     image_file_id_index = int(call.data.split("|")[1])
+#     image_file_id = stateData["image_file_ids_for_videoGenerationFromImage"][image_file_id_index]
+#     prompt = stateData["prompts_for_videoGenerationFromImage"][image_file_id]
 
-    # Отправляем сообщение о прогрессе
-    await call.message.answer(text.GENERATE_VIDEO_FROM_IMAGE_PROGRESS_TEXT)
+#     # Отправляем сообщение о прогрессе
+#     await call.message.answer(text.GENERATE_VIDEO_FROM_IMAGE_PROGRESS_TEXT)
 
-    # Генерируем видео
-    await generateVideoFromImage(image_file_id_index, prompt, call.message, state)
+#     # Генерируем видео
+#     await generateVideoFromImage(image_file_id_index, prompt, call.message, state)
 
 
-# Хендлер для обработки нажатия на кнопку "💾 Сохранить видео"
-async def handle_save_video(call: types.CallbackQuery, state: FSMContext):
-    file_id_index = call.data.split("|")[1]
-    await state.update_data(current_file_id_index=file_id_index)
-    await state.set_state(StartGenerationState.ask_for_model_name_for_video_generation_from_image)
-    await call.message.answer(text.SAVE_VIDEO_AND_WRITE_MODEL_NAME_TEXT)
+# # Хендлер для обработки нажатия на кнопку "💾 Сохранить видео"
+# async def handle_save_video(call: types.CallbackQuery, state: FSMContext):
+#     file_id_index = call.data.split("|")[1]
+#     await state.update_data(current_file_id_index=file_id_index)
+#     await state.set_state(StartGenerationState.ask_for_model_name_for_video_generation_from_image)
+#     await call.message.answer(text.SAVE_VIDEO_AND_WRITE_MODEL_NAME_TEXT)
 
 
 # Хендлер для обработки ввода имени модели для сохранения видео
@@ -557,12 +551,13 @@ async def handle_model_name_for_video_generation_from_image(
     # Получаем путь к видео
     # logger.info(f"Попытка получить путь к видео: {stateData['video_paths']} по индексу: {file_id_index}")
     # video_path = stateData["video_paths"][file_id_index]
-    video_path = stateData["generated_video_paths"][0]["video_path"]
+    video_path = stateData["video_path_for_videoGenerationFromImage"]
 
     # Сохраняем видео
     await state.set_state(None)
     await saveVideo(video_path, model_name, message)
 
+    # TODO: 
     # try:
     #     # Очищаем все стейты от текущих данных
     #     await state.update_data(current_file_id_index=None)
@@ -637,10 +632,11 @@ def hand_add():
         ),
     )
 
-    router.callback_query.register(handle_regenerate_video_from_image,
-    lambda call: call.data.startswith("regenerate_video_from_image"))
+    # TODO: пофиксить
+    # router.callback_query.register(handle_regenerate_video_from_image,
+    # lambda call: call.data.startswith("regenerate_video_from_image"))
 
-    router.callback_query.register(handle_save_video, lambda call: call.data.startswith("save_video"))
+    # router.callback_query.register(handle_save_video, lambda call: call.data.startswith("save_video"))
 
     router.message.register(
         handle_model_name_for_video_generation_from_image,
