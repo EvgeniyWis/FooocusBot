@@ -5,8 +5,11 @@ from logger import logger
 
 load_dotenv(find_dotenv())
 
-# ID эндпоинта для генерации изображений
-ENDPOINT_ID = "mtuokv4whgchlc"
+# ID эндпоинтов для генерации изображений (для каждой настройки своя)
+SETTING_1_ENDPOINT_ID = "7t2kpbp8h4oqt8"
+SETTING_2_ENDPOINT_ID = "dsy8xqnx0pae75"
+SETTING_3_ENDPOINT_ID = "u3rofgiar81qlr"
+SETTING_4_ENDPOINT_ID = "1nhq9omaacbye8"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.info(f"BASE_DIR: {BASE_DIR}")
@@ -30,10 +33,10 @@ RUNPOD_HEADERS = {
 }
 
 # URL для запросов на Runpod
-RUNPOD_HOST = f"https://api.runpod.ai/v2/{ENDPOINT_ID}"
+RUNPOD_HOST = f"https://api.runpod.ai/v2"
 
 # ID чата разработчика
-DEV_CHAT_ID = 5046166133
+DEV_CHAT_ID = 1979922062
 
 # Пользователи, которые могут использовать бота
 ALLOWED_USERS = [
@@ -46,6 +49,7 @@ ALLOWED_USERS = [
     5948408400,
     1979922062,
     5046166133,
+    866512502
 ]
 
 # Администратор бота

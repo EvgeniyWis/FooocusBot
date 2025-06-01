@@ -15,7 +15,8 @@ async def sendNextModelMessage(state: FSMContext, call: types.CallbackQuery, mod
     # Получаем название модели, которая стоит первой в очереди
     stateData = await state.get_data()
 
-    # Если нет изображений, то выходим
+    # Если текущее изображение последнее, то выходим
+    logger.info(f"Сохранённые изображения на данный момент (отправка следующей модели): {stateData['saved_images_urls']}")
     if len(stateData["saved_images_urls"]) == 0:
         return
 
@@ -36,9 +37,11 @@ async def sendNextModelMessage(state: FSMContext, call: types.CallbackQuery, mod
 
     # Удаляем видео из папки temp/videos, если оно есть
     if not MOCK_MODE:
-        stateData = await state.get_data()
-        if "video_path" in stateData:
-            os.remove(stateData["video_path"])
+        try:
+            if stateData["generated_video_paths"]:
+                os.remove(stateData["video_path"])
+        except Exception as e:
+            logger.error(f"Ошибка при удалении видео из папки temp/videos: {e}")
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)

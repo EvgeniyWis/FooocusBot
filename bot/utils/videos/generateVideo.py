@@ -18,7 +18,8 @@ async def generateVideo(
     prompt: str,
     image_url: str = None,
     image_path: str = None,
-) -> None:
+) -> str |None:
+    logger.info(f"Генерация видео с помощью kling: \nПромпт: {prompt}\nСсылка на изображение: {image_url}\nПуть к изображению: {image_path}")
     try:
         if image_url:
             # Получаем id изображения

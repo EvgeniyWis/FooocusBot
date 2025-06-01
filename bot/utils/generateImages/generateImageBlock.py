@@ -7,6 +7,7 @@ from ..jobs.checkJobStatus import checkJobStatus
 from ..jobs.getJobID import getJobID
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
+from .dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 
 
 # Функция для генерации изображений по объекту данных
@@ -32,12 +33,16 @@ async def generateImageBlock(
         raise Exception("Генерация остановлена")
 
     if not MOCK_MODE:
+        # Получаем номер настройки по имени модели
+        setting_number = getSettingNumberByModelName(model_name)
+
         # Делаем запрос на генерацию и получаем id работы
-        job_id = await getJobID(dataJSON)
+        job_id = await getJobID(dataJSON, setting_number)
 
         # Проверяем статус работы
         response_json = await checkJobStatus(
             job_id,
+            setting_number,
             state,
             message,
             is_test_generation,

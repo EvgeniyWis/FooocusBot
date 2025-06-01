@@ -6,7 +6,7 @@ from ..jobs.getJobID import getJobID
 
 
 # Функция для upscale сгенерированного изображения
-async def upscaleImage(input_image: str, base_config_model_name: str) -> str:
+async def upscaleImage(input_image: str, base_config_model_name: str, setting_number: int) -> str:
     # Логирование
     logger.info("Делаем upscale для изображения...")
 
@@ -29,10 +29,10 @@ async def upscaleImage(input_image: str, base_config_model_name: str) -> str:
     }
 
     # Делаем запрос на генерацию и получаем id работы
-    job_id = await getJobID(dataJSON)
+    job_id = await getJobID(dataJSON, setting_number)
 
     # Проверяем статус работы
-    response_json = await checkJobStatus(job_id, timeout=300)
+    response_json = await checkJobStatus(job_id, setting_number, timeout=300)
 
     # Получаем изображение
     image_data = response_json["output"][0]["base64"]

@@ -1,13 +1,21 @@
 import httpx
 from config import RUNPOD_HEADERS, RUNPOD_HOST
 from logger import logger
+from utils.jobs.getEndpointID import getEndpointID
 
 
 # Функция для отправки запроса на генерацию
-async def sendRunRequest(dataJSON: dict):
+async def sendRunRequest(dataJSON: dict, setting_number: int):
+    # Получаем ID эндпоинта для генерации изображений
+    ENDPOINT_ID = await getEndpointID(setting_number)
+
+    # Формируем URL для отправки запроса
+    url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/run"
+
+    # Отправляем запрос на генерацию
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{RUNPOD_HOST}/run",
+            url,
             headers=RUNPOD_HEADERS,
             json=dataJSON,
             timeout=httpx.Timeout(

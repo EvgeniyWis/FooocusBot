@@ -5,13 +5,14 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from config import RUNPOD_HEADERS, RUNPOD_HOST
 from logger import logger
-
 from .. import text
+from .getEndpointID import getEndpointID
 
 
 # Функция для получения статуса работы
 async def checkJobStatus(
     job_id: str,
+    setting_number: int,
     state: FSMContext = None,
     message: types.Message = None,
     is_test_generation: bool = False,
@@ -32,9 +33,14 @@ async def checkJobStatus(
                 raise Exception("Генерация остановлена")
 
         try:
+            # Получаем ID эндпоинта для генерации изображений
+            ENDPOINT_ID = await getEndpointID(setting_number)
+
+            # Формируем URL для отправки запроса
+            url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
             async with httpx.AsyncClient(timeout=20.0) as client:
                 response = await client.post(
-                    f"{RUNPOD_HOST}/status/{job_id}",
+                    url,
                     headers=RUNPOD_HEADERS,
                 )
                 response_json = response.json()
@@ -44,7 +50,7 @@ async def checkJobStatus(
             )
         except Exception as e:
             logger.error(
-                f"Ошибка при получении статуса работы: {e} \nОтвет: {response_json}",
+                f"Ошибка при получении статуса работы: {e} \nОтвет: {response.text}",
             )
             await asyncio.sleep(10)
             continue
@@ -93,8 +99,8 @@ async def checkJobStatus(
                             left_images_count,
                         ),
                     )
-                except Exception as e:
-                    logger.error(f"Ошибка при изменении сообщения: {e}")
+                except:
+                    pass
 
         if response_json["status"] == "COMPLETED":
             break

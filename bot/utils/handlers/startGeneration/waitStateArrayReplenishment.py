@@ -7,13 +7,13 @@ from logger import logger
 
 # Функция для ожидания пополнения массива в стейте
 async def waitStateArrayReplenishment(state: FSMContext, array_name: str,
-    stateNamesForCycleExit: tuple[str, str]) -> list[dict] | bool:
+    stateNamesForCycleExit: tuple[str, str], timeout: int = 120) -> list[dict] | bool:
 
     try:
         start_time = time.time()  # Запоминаем время начала
         while True:
             # Проверяем, не прошло ли 2 минуты
-            if time.time() - start_time > 120:  # 120 секунд = 2 минуты
+            if time.time() - start_time > timeout:
                 logger.warning("Превышено время ожидания (2 минуты)")
                 return False
 
@@ -24,7 +24,7 @@ async def waitStateArrayReplenishment(state: FSMContext, array_name: str,
             else:
                 array = stateData[array_name]
 
-            logger.info(f"Модели для генерации {array}: {[list(i.keys())[0] for i in array]}")
+            # logger.info(f"Модели для генерации {array}: {[list(i.keys())[0] for i in array]}")
 
             if len(array) > 0:
                 return array
