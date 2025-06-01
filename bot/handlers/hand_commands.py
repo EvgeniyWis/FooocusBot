@@ -1,12 +1,11 @@
 from aiogram import types
-from aiogram.filters import CommandStart, StateFilter
+from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
-from keyboards import start_generation_keyboards
-from utils import text
-from InstanceBot import router
-from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardRemove
 from config import ALLOWED_USERS
+from InstanceBot import router
+from keyboards import start_generation_keyboards
+from utils import text
 
 
 # Отправка стартового меню при вводе "/start"
@@ -24,14 +23,20 @@ async def start(message: types.Message, state: FSMContext):
     await state.update_data(model_names_for_generation=[])
 
     await message.answer(
-        text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard()
+        text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard(),
     )
 
 
-# Обработка команды /stop   
+# Обработка команды /stop
 async def stop_generation(message: types.Message, state: FSMContext):
     await state.update_data(stop_generation=True)
     await message.answer(text.STOP_GENERATION_TEXT, reply_markup=ReplyKeyboardRemove())
+
+
+# DEV: получение file id видео
+# async def get_file_id(message: types.Message):
+#     if message.video:
+#         await message.answer(message.video.file_id)
 
 
 # Добавление обработчиков
@@ -39,3 +44,8 @@ def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())
 
     router.message.register(stop_generation, Command("stop"))
+
+    # DEV: получение file id видео
+    # router.message.register(get_file_id)
+
+

@@ -1,13 +1,23 @@
 from aiogram.types import InlineKeyboardButton
 
+
 # Функция для выдавания кнопок с выбором типа генерации
 def getGenerationsTypeButtons(prefix: str, with_test_generation: bool = True):
     inline_buttons = [
-        [InlineKeyboardButton(text=f'⚡️ Рабочая генерация', callback_data=f'{prefix}|work')]
+        [
+            InlineKeyboardButton(
+                text="⚡️ Рабочая генерация", callback_data=f"{prefix}|work",
+            ),
+        ],
     ]
 
     if with_test_generation:
-        inline_buttons.append([InlineKeyboardButton(text='⚙️ Тестовая генерация', callback_data=f'{prefix}|test')])
+        inline_buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="⚙️ Тестовая генерация", callback_data=f"{prefix}|test",
+                ),
+            ],
+        )
 
     return inline_buttons
-

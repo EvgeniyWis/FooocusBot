@@ -1,8 +1,10 @@
 import asyncio
 import os
 import shutil
+
 from config import TEMP_FOLDER_PATH
 from logger import logger
+
 
 async def deleteParentFolder(folder_name: str, user_id: int):
     try:
@@ -12,4 +14,3 @@ async def deleteParentFolder(folder_name: str, user_id: int):
             shutil.rmtree(parent_path)
     except Exception as e:
         logger.error(f"Ошибка при удалении родительской папки: {e}")
-        

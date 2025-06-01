@@ -1,5 +1,6 @@
 from .getAllDataArrays import getAllDataArrays
 
+
 # Функция для получения индекса модели
 def getModelNameIndex(model_name: str):
     # Получаем все настройки
