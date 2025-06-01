@@ -1,10 +1,10 @@
 import asyncio
+import os
 import uuid
 
 import aiofiles
 from config import FACEFUSION_RESULTS_DIR
 from logger import logger
-import os
 
 # Настройка логирования
 
@@ -22,7 +22,6 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     """
     output_filename = f"{uuid.uuid4()}_output.jpg"
     output_path = os.path.join(FACEFUSION_RESULTS_DIR, output_filename)
-
 
     docker_cmd = [
         "docker",
