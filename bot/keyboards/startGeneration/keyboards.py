@@ -92,12 +92,13 @@ def writePromptTypeKeyboard():
                     callback_data="write_prompt_type|one",
                 ),
             ],
-            [
-                InlineKeyboardButton(
-                    text="✨ Уникальный промпт для каждой модели",
-                    callback_data="write_prompt_type|unique",
-                ),
-            ],
+            # TODO: вернуть уникальный промпт для каждой модели
+            # [
+            #     InlineKeyboardButton(
+            #         text="✨ Уникальный промпт для каждой модели",
+            #         callback_data="write_prompt_type|unique",
+            #     ),
+            # ],
         ],
     )
 
@@ -196,12 +197,13 @@ def saveImageKeyboard(model_name: str, setting_number: str):
                     callback_data=f"save_image|{model_name}",
                 ),
             ],
-            [
-                InlineKeyboardButton(
-                    text="🔄 Перегенерировать",
-                    callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
-                ),
-            ],
+            # TODO: добавить кнопку перегенерировать
+            # [
+            #     InlineKeyboardButton(
+            #         text="🔄 Перегенерировать",
+            #         callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
+            #     ),
+            # ],
         ],
     )
 

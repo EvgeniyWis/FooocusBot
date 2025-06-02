@@ -28,7 +28,7 @@ async def generateImagesByAllSettings(
     if with_randomizer:
         dataArrays = [
             await getDataArrayByRandomizer(state, index + 1)
-            for index, dataArray in enumerate(dataArrays)
+            for index in enumerate(dataArrays)
         ]
 
     # Создаём сообщение с прогрессом генерации настроек

@@ -17,7 +17,7 @@ async def checkJobStatus(
     message: types.Message = None,
     is_test_generation: bool = False,
     checkOtherJobs: bool = True,
-    timeout: int = 60 * 10,
+    timeout: int = 600 * 10,
 ):
     start_time = asyncio.get_event_loop().time()
 
@@ -101,6 +101,9 @@ async def checkJobStatus(
                     )
                 except:
                     pass
+            else:
+                # Добавляем в стейт то, сколько готовых изображений
+                await state.update_data(total_images_count=1)
 
         if response_json["status"] == "COMPLETED":
             break

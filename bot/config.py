@@ -7,9 +7,9 @@ load_dotenv(find_dotenv())
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "7t2kpbp8h4oqt8"
-SETTING_2_ENDPOINT_ID = ""
-SETTING_3_ENDPOINT_ID = ""
-SETTING_4_ENDPOINT_ID = ""
+SETTING_2_ENDPOINT_ID = "z8ucydl90zd843"
+SETTING_3_ENDPOINT_ID = "sw0ded20r1mufl"
+SETTING_4_ENDPOINT_ID = "1dp9mqqts7cx3j"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.info(f"BASE_DIR: {BASE_DIR}")
@@ -49,7 +49,8 @@ ALLOWED_USERS = [
     5948408400,
     1979922062,
     5046166133,
-    866512502
+    866512502,
+    7313424156
 ]
 
 # Администратор бота
@@ -60,6 +61,12 @@ DEVELOPMENT_MODE = False
 
 # Устанавливаем режим с моками
 MOCK_MODE = False
+
+# Устанавливаем режим с Upscale
+UPSCALE_MODE = True
+
+# Устанавливаем режим с facefusion
+FACEFUSION_MODE = True
 
 # Инициализируем общий негатив промпт
 COMMON_NEGATIVE_PROMPT = "score_6, score_5, score_4, Negative_&_Positive_Embeddings_By_Stable_Yogi, negative_hand, pony, negativeXL_D, low quality, oversaturated, disfigured, poorly, bad, wrong, mutated, worst quality, normal quality, ugly face, mutated hands, extra fingers, poorly drawn hands, fused fingers, too many fingers, long neck, bad hands, text, signature, signature artist, multiple female, multiple male, bad anatomy, low res, blurry face, blurry eyes, tiny hands, tiny feet, multiple women, disproportionately large head, disproportionately long torso, six fingers, low quality hands, hat, multicolored hair, pubic hair, asian, tan lines, makeup, lipstick, playing cards, black skin, steering wheel, man, naked nipples, naked breasts, cartoon, anime, 3d, cgi, illustration, doll-like, overly muscular, chubby, plastic skin, waxy texture, blurry, jpeg artifacts, extra limbs, distorted proportions, unnatural face, unrealistic anatomy, deformed eyes, exaggerated curves, barbie face, uncanny valley, big head, overexposed, underexposed, low-quality shading, unnatural smile"

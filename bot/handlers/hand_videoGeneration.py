@@ -53,11 +53,12 @@ async def handle_video_generation_mode_buttons(
     state: FSMContext,
 ):
     # Получаем индекс модели
-    model_name = call.data.split("|")[1]
+    temp = call.data.split("|")
+    model_name = temp[1]
     model_name_index = getModelNameIndex(model_name)
 
     # Получаем выбранный режим генерации видео
-    mode = call.data.split("|")[2]
+    mode = temp[2]
 
     # Если выбран режим "Написать свой промпт", то отправляем сообщение для ввода кастомного промпта
     if mode == "write_prompt":
@@ -118,6 +119,7 @@ async def handle_video_example_buttons(
 
     # Получаем название модели и url изображения
     stateData = await state.get_data()
+
     logger.info(f"Список сохраненных изображений: {stateData['saved_images_urls']}")
     
     # Ищем URL изображения для указанной модели в списке словарей
@@ -126,7 +128,7 @@ async def handle_video_example_buttons(
         if model_name in item:
             image_url = item[model_name]
             break
-            
+    
     if image_url is None:
         await call.message.answer(f"Не удалось найти изображение для модели {model_name}")
         return
@@ -285,7 +287,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         ),
         reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
             model_name,
-            True
+            True,
         ),
     )
 
@@ -303,6 +305,7 @@ async def handle_video_correctness_buttons(
     stateData = await state.get_data()
 
     # Находим нужный путь к видео по модели
+    logger.info(f"Список путей к видео: {stateData['generated_video_paths']}")
     for data in stateData["generated_video_paths"]:
         if data["model_name"] == model_name:
             video_path = data["video_path"]
@@ -557,7 +560,7 @@ async def handle_model_name_for_video_generation_from_image(
     await state.set_state(None)
     await saveVideo(video_path, model_name, message)
 
-    # TODO: 
+    # TODO: вернуть
     # try:
     #     # Очищаем все стейты от текущих данных
     #     await state.update_data(current_file_id_index=None)
@@ -581,6 +584,94 @@ async def handle_model_name_for_video_generation_from_image(
     #     logger.info(f"Удалены данные из массивов: {updated_video_paths}, {updated_image_file_ids}, {updated_prompts}")
     # except Exception as e:
     #     logger.error(f"Произошла ошибка при сохранении видео: {e}")
+
+
+# Обработка нажатия кнопки "❌ Перегенерировать видео"
+async def regenerate_video(call: types.CallbackQuery, state: FSMContext):
+    temp = call.data.split("|")
+    model_name = temp[1]
+
+    # Отправляем сообщение для этой модели
+    logger.info(f"Сохранённые изображения на данный момент (перегенерация): {stateData['saved_images_urls']}")
+
+    # Отправляем следующую модель для сохранения
+    stateData = await state.get_data()
+    if len(stateData["generated_video_paths"]) > 0:
+        await sendSavingNextModel(call, state)
+
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
+
+    # Отправляем сообщение про перегенерацию видео
+    await call.message.answer(text.REGENERATE_VIDEO_TEXT.format(model_name, model_name_index))
+
+    # TODO: декомпозировать
+
+    # Получаем название модели и url изображения
+    stateData = await state.get_data()
+
+    logger.info(f"Список сохраненных изображений: {stateData['saved_images_urls']}")
+    
+    # Ищем URL изображения для указанной модели в списке словарей
+    image_url = None
+    for item in stateData['saved_images_urls']:
+        if model_name in item:
+            image_url = item[model_name]
+            break
+    
+    if image_url is None:
+        await call.message.answer(f"Не удалось найти изображение для модели {model_name}")
+        return
+    
+    # Получаем кастомный промпт, если он есть, а если нет, то берем промпт из видео-примера
+    if "prompt_for_video" in stateData:
+        custom_prompt = stateData["prompt_for_video"]
+    else:
+        custom_prompt = None
+
+    video_example_prompt = custom_prompt
+
+    # Генерируем видео
+    if MOCK_MODE:
+        video_path = "FocuuusBot/bot/assets/mocks/mock_video.mp4"
+    else:
+        try:
+            video_path = await retryOperation(
+                generateVideo,
+                10,
+                1.5,
+                video_example_prompt,
+                image_url,
+            )
+        except Exception as e:
+            # Отправляем сообщение об ошибке
+            traceback.print_exc()
+            await editMessageOrAnswer(
+                call,
+                text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, e),
+            )
+            logger.error(
+                f"Произошла ошибка при генерации видео для модели {model_name}: {e}",
+            )
+            return
+    
+    if not video_path:
+        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, "Не удалось сгенерировать видео"))
+        return
+    
+    # Изменяем сообщение про генерацию видео
+    await call.message.answer(
+        text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index),
+    )
+
+    dataForUpdate = {"model_name": model_name, "video_path": video_path}
+    await appendDataToStateArray(
+        state,
+        "generated_video_paths",
+        dataForUpdate,
+    )
+
+    await sendSavingNextModel(call, state)
 
 
 # Добавление обработчиков
@@ -643,4 +734,9 @@ def hand_add():
         StateFilter(
             StartGenerationState.ask_for_model_name_for_video_generation_from_image,
         ),
+    )
+
+    router.callback_query.register(
+        regenerate_video,
+        lambda call: call.data.startswith("regenerate_video"),
     )

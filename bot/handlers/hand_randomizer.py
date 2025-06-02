@@ -24,6 +24,9 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
     elif action == "start_generation":
         data = await state.get_data()
 
+        # Удаляем текущее сообщение
+        await call.message.delete()
+
         # Если нету переменных для рандомайзера, то отправляем сообщение с ошибкой
         if "variable_names_for_randomizer" not in data:
             await call.answer(text.VARIABLES_FOR_RANDOMIZER_NOT_WRITTEN_TEXT, show_alert=True)
