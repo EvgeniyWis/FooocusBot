@@ -64,14 +64,15 @@ def selectSettingKeyboard(is_test_generation: bool = False):
             ],
         )
 
-    inline_keyboard.append(
-        [
-            InlineKeyboardButton(
-                text="Все настройки",
-                callback_data="select_setting|all",
-            ),
-        ],
-    )
+    # TODO: вернуть
+    # inline_keyboard.append(
+    #     [
+    #         InlineKeyboardButton(
+    #             text="Все настройки",
+    #             callback_data="select_setting|all",
+    #         ),
+    #     ],
+    # )
 
     # Генерация конкретной модели
     if not is_test_generation:
