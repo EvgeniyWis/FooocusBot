@@ -592,10 +592,14 @@ async def regenerate_video(call: types.CallbackQuery, state: FSMContext):
     model_name = temp[1]
 
     # Отправляем сообщение для этой модели
+    stateData = await state.get_data()
     logger.info(f"Сохранённые изображения на данный момент (перегенерация): {stateData['saved_images_urls']}")
 
+    # Удаляем модель из стейта
+    stateData["generated_video_paths"] = [x for x in stateData["generated_video_paths"] if x["model_name"] != model_name]
+    await state.update_data(generated_video_paths=stateData["generated_video_paths"])
+
     # Отправляем следующую модель для сохранения
-    stateData = await state.get_data()
     if len(stateData["generated_video_paths"]) > 0:
         await sendSavingNextModel(call, state)
 

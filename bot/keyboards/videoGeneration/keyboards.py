@@ -31,7 +31,8 @@ def videoGenerationTypeKeyboard(model_name: str, with_test_generation: bool = Fa
     prefix = f"generate_video|{model_name}"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        *getGenerationsTypeButtons(prefix, with_test_generation),
+        # TODO: вернуть тестовую генерацию
+        *getGenerationsTypeButtons(prefix, False),
     ])
 
     return kb
@@ -40,7 +41,8 @@ def videoGenerationTypeKeyboard(model_name: str, with_test_generation: bool = Fa
 def videoCorrectnessKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✅ Сохранить видео", callback_data=f"video_correctness|correct|{model_name}")],
-        [InlineKeyboardButton(text="❌ Перегенерировать видео", callback_data=f"regenerate_video|{model_name}")],
+        # TODO: вернуть перегенерацию
+        # [InlineKeyboardButton(text="❌ Перегенерировать видео", callback_data=f"regenerate_video|{model_name}")],
     ])
 
     return kb
