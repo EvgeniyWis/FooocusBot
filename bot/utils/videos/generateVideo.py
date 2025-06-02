@@ -46,7 +46,7 @@ async def generateVideo(
         }
 
         # Асинхронное открытие файла для отправки
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=60) as client:
             async with aiofiles.open(image_path, "rb") as image_file:
                 files = {
                     "image": (

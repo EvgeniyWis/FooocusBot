@@ -39,7 +39,7 @@ async def generateImagesInHandler(
     await state.update_data(total_images_count=0)
     await state.update_data(saved_videos_count=0)
     await state.update_data(media_groups_for_generation=None)
-    await state.update_data(generation_step=1)
+    await state.update_data(saved_images_urls=[])
 
     # Генерируем изображения
     try:
@@ -65,7 +65,7 @@ async def generateImagesInHandler(
                     text.GET_PROMPT_SUCCESS_TEXT,
                 )
                 # Прибавляем к каждому элементу массива корневой промпт
-                dataArray = getDataArrayWithRootPrompt(
+                dataArray = await getDataArrayWithRootPrompt(
                     int(setting_number),
                     prompt,
                 )
@@ -87,31 +87,7 @@ async def generateImagesInHandler(
             model_names_for_generation = stateData.get("model_names_for_generation", [])
             logger.info(f"Получен список моделей для индивидуальной генерации: {model_names_for_generation}")
 
-            if len(model_names_for_generation) > 0:
-                for model_name in model_names_for_generation:
-                    logger.info(f"Генерируем изображения для индивидуальной модели: {model_name}")
-
-                    # Получаем порядковый номер модели
-                    model_name_index = getModelNameIndex(model_name)
-
-                    # Отправляем сообщение о генерации изображений по имени модели
-                    await message.answer(text.GENERATE_IMAGES_BY_MODEL_NAME_TEXT.format(model_name, model_name_index))
-
-                    # Получаем данные о модели
-                    dataArray = await getDataByModelName(model_name)
-
-                    # Прибавляем корневой промпт
-                    dataArray["json"]['input']['prompt'] += " " + prompt
-                    dataJSON = dataArray["json"]
-
-                    # Получаем номер настройки по названию модели
-                    setting_number = getSettingNumberByModelName(model_name)
-
-                    # Запускаем задачу для генерации изображений
-                    asyncio.create_task(generateImageBlock(dataJSON, model_name, message, state, user_id, setting_number, is_test_generation))
-                return
-
-            elif setting_number == "all":
+            if setting_number == "all":
                 result = await generateImagesByAllSettings(
                     message,
                     state,
@@ -133,6 +109,7 @@ async def generateImagesInHandler(
                     user_id,
                     is_test_generation,
                     with_randomizer,
+                    model_names_for_generation
                 )
                 await message_for_edit.unpin()
 

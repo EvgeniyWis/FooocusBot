@@ -29,6 +29,9 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
         # Применяем значение переменной к промпу
         formated_prompt += " " + f"{variable_name}: {random_variable_value};"
 
+    # Сохраняем промпт в стейт
+    await state.update_data(prompt_for_images=formated_prompt)
+
     # Применяем промпт к массиву данных
     for data in dataArray:
         data["json"]["input"]["prompt"] += " " + formated_prompt

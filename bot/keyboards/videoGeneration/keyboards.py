@@ -40,7 +40,7 @@ def videoGenerationTypeKeyboard(model_name: str, with_test_generation: bool = Fa
 def videoCorrectnessKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✅ Сохранить видео", callback_data=f"video_correctness|correct|{model_name}")],
-        [InlineKeyboardButton(text="❌ Перегенерировать видео", callback_data=f"start_generate_video|{model_name}")],
+        [InlineKeyboardButton(text="❌ Перегенерировать видео", callback_data=f"regenerate_video|{model_name}")],
     ])
 
     return kb
@@ -63,15 +63,5 @@ def videoGenerationModeKeyboard(model_name: str):
 def saveVideoKeyboard():
     kb = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="📹 Начать сохранение видео", callback_data="start_save_video")]])
-
-    return kb
-
-# TODO:
-# Инлайн-клавиатура для сгенерируемого видео из изображения
-def generatedVideoKeyboard(file_id_index: str):
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        # [InlineKeyboardButton(text='🔄 Перегенерировать видео', callback_data=f'regenerate_video_from_image|{file_id_index}')],
-        [InlineKeyboardButton(text="💾 Сохранить видео", callback_data=f"save_video|{file_id_index}")],
-    ])
 
     return kb

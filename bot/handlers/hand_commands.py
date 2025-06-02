@@ -18,9 +18,7 @@ async def start(message: types.Message, state: FSMContext):
     
     # Очищаем стейт
     await state.update_data(stop_generation=False)
-    await state.update_data(jobs={})
-    await state.update_data(total_jobs_count=0)
-    await state.update_data(model_names_for_generation=[])
+    await state.update_data(generation_step=1)
 
     await message.answer(
         text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard(),
