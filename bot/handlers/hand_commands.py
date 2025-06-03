@@ -19,7 +19,7 @@ async def start(message: types.Message, state: FSMContext):
     # Очищаем стейт
     await state.update_data(stop_generation=False)
     await state.update_data(generation_step=1)
-    await state.update_data(prompts_for_regenerate_images=[])
+    await state.update_data(prompts_for_regenerate_images={})
     
     await message.answer(
         text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard(),

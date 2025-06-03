@@ -20,7 +20,7 @@ async def sendRunRequest(dataJSON: dict, setting_number: int):
             json=dataJSON,
             timeout=httpx.Timeout(
                 10,
-                read=30,
+                read=60,
             ),  # (connect timeout, read timeout)
         )
         logger.info(f"Статус код ответа: {response.status_code}")
