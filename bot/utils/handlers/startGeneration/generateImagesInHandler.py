@@ -71,8 +71,8 @@ async def generateImagesInHandler(
                 ]
         else:
             stateData = await state.get_data()
-            model_names_for_generation = stateData.get("model_names_for_generation", [])
-            logger.info(f"Получен список моделей для индивидуальной генерации: {model_names_for_generation}")
+            model_indexes_for_generation = stateData.get("model_indexes_for_generation", [])
+            logger.info(f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}")
 
             if setting_number == "all":
                 result = await generateImagesByAllSettings(
@@ -96,7 +96,7 @@ async def generateImagesInHandler(
                     user_id,
                     is_test_generation,
                     with_randomizer,
-                    model_names_for_generation
+                    model_indexes_for_generation
                 )
                 await message_for_edit.unpin()
 

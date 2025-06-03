@@ -18,12 +18,12 @@ async def generateImages(
     user_id: int,
     is_test_generation: bool,
     with_randomizer: bool = False,
-    model_names_for_generation: list[str] = None,
+    model_indexes_for_generation: list[int] = None,
 ):
     if not with_randomizer:
         # Прибавляем к каждому элементу массива корневой промпт
-        if model_names_for_generation:
-            dataArray = await getDataArrayWithRootPrompt(setting_number, prompt, model_names_for_generation)
+        if model_indexes_for_generation:
+            dataArray = await getDataArrayWithRootPrompt(setting_number, prompt, model_indexes_for_generation)
         else:
             dataArray = await getDataArrayWithRootPrompt(setting_number, prompt)
     else:
