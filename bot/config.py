@@ -9,7 +9,7 @@ load_dotenv(find_dotenv())
 SETTING_1_ENDPOINT_ID = "7t2kpbp8h4oqt8"
 SETTING_2_ENDPOINT_ID = "z8ucydl90zd843"
 SETTING_3_ENDPOINT_ID = "sw0ded20r1mufl"
-SETTING_4_ENDPOINT_ID = "1dp9mqqts7cx3j"
+SETTING_4_ENDPOINT_ID = "1f0qlar276qtgk"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.info(f"BASE_DIR: {BASE_DIR}")
