@@ -533,6 +533,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
             # Проверяем, что количество отправленных изображений и тех, которые собираются отправиться, равно
             stateData = await state.get_data()
+            logger.info(f"Изображения, которые собираются отправиться: {stateData['will_be_sent_generated_images_count']}")
+            logger.info(f"Изображения, которые уже отправлены: {stateData['finally_sent_generated_images_count']}")
+            logger.info(f"Количество всех изображений: {stateData['total_images_count']}")
             generation_is_finished = (
                 stateData["finally_sent_generated_images_count"]
                 >= stateData["will_be_sent_generated_images_count"] and
