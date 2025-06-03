@@ -221,9 +221,8 @@ async def write_prompt(message: types.Message, state: FSMContext):
         # Генерируем изображения
         await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
     else:
-        model_names = stateData["model_names_for_generation"]
-        logger.info(f"Список моделей для генерации: {model_names}")
-        setting_number = getSettingNumberByModelName(model_names[0])
+        model_indexes = stateData["model_indexes_for_generation"]
+        logger.info(f"Список моделей для генерации: {model_indexes}")
 
         # Генерируем изображения
         await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
@@ -541,28 +540,32 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 # Обработка ввода названия модели для генерации
 async def write_model_name_for_generation(message: types.Message, state: FSMContext):
     # Если в сообщении есть запятые, то записываем массив моделей в стейт
-    model_names = message.text.split(",")
+    model_indexes = message.text.split(",")
     
     # Если запятых нет, то записываем одну модель в стейт
-    if len(model_names) == 1:
-        model_names = [message.text]
-    else:
-        await state.update_data(specific_model=False)
+    if len(model_indexes) == 1:
+        model_indexes = [message.text]
     
     # Удаляем пробелы из названий моделей
-    model_names = [model_name.strip() for model_name in model_names]
+    model_indexes = [model_index.strip() for model_index in model_indexes]
+
+    # Проверяем, что это число
+    for model_index in model_indexes:
+        if not model_index.isdigit():
+            await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
+            return
     
     # Проверяем, существует ли такие модели
-    for model_name in model_names:
-        # Если такой модели не существует, то просим ввести другое название
-        if not await getDataByModelName(model_name):
-            await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_name))
+    for model_index in model_indexes:
+        # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
+        if int(model_index) > 100 or int(model_index) < 1:
+            await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
             return
         
-    await state.update_data(model_names_for_generation=model_names)
+    await state.update_data(model_indexes_for_generation=model_indexes)
 
     await state.set_state(None)
-    await message.answer(text.GET_MODEL_NAME_SUCCESS_TEXT if len(model_names) == 1 else text.GET_MODEL_NAMES_SUCCESS_TEXT)
+    await message.answer(text.GET_MODEL_INDEX_SUCCESS_TEXT if len(model_indexes) == 1 else text.GET_MODEL_INDEXES_SUCCESS_TEXT)
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
 
