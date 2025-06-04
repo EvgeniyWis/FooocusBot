@@ -57,7 +57,9 @@ def setting2_getDataArray():
 
         setting2_generateData("rinazuri.xo", "1JIAUqLTUvEK2J96Wt9cf8HIYgiyH194v", "1hkSyBwCarx3ekFhHgzxrbNBAqDpVkNce", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, medium-large breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes.""",
+        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, medium-large breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes.
+                        
+    Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
         [1, 1, 3.00, 0.30, -0.80, -1.50]),
 
         setting2_generateData("mari_avellin", "1O6zEUDunP-eQ2CK1H8HWgV7x0iXWfQA9", "1QEi15xo0-zJsacV1hD5zm1DW36LJbk2x", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
