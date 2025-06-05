@@ -3,20 +3,25 @@ from keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
 # Инлайн-клавиатура для генерации видео
-def generateVideoKeyboard():
+def generateVideoKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="📹 Начать генерацию видео", callback_data="start_generate_video")]])
+    [InlineKeyboardButton(text='📹 Сгенерировать видео', callback_data=f'start_generate_video|{model_name}')]])
 
     return kb
 
 
 # Инлайн-клавиатура при отправки примера видео с промптом с выбором типа генерации и возможности написания кастомного промпта
 def videoWritePromptKeyboard(model_name: str):
-    prefix = f"generate_video|{model_name}"
+    prefix = f"generate_video_mode|{model_name}"
 
-    inline_keyboard = []
-    inline_keyboard.append([InlineKeyboardButton(text="✒️ Написать свой промпт", callback_data=f"{prefix}|write_prompt")])
+    inline_keyboard = [[InlineKeyboardButton(text="✒️ Написать свой промпт", callback_data=f"{prefix}|write_prompt")]]
 
+    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+    return kb
+
+
+# Инлайн-клавиатура для выбора типа генерации видео
 def generatedVideoKeyboard(prefix: str, with_test_generation: bool = True):
 
     inline_keyboard = getGenerationsTypeButtons(prefix, with_test_generation)
@@ -31,8 +36,7 @@ def videoGenerationTypeKeyboard(model_name: str, with_test_generation: bool = Fa
     prefix = f"generate_video|{model_name}"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        # TODO: вернуть тестовую генерацию
-        *getGenerationsTypeButtons(prefix, False),
+        *getGenerationsTypeButtons(prefix, with_test_generation),
     ])
 
     return kb
@@ -41,8 +45,7 @@ def videoGenerationTypeKeyboard(model_name: str, with_test_generation: bool = Fa
 def videoCorrectnessKeyboard(model_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✅ Сохранить видео", callback_data=f"video_correctness|correct|{model_name}")],
-        # TODO: вернуть перегенерацию
-        # [InlineKeyboardButton(text="❌ Перегенерировать видео", callback_data=f"regenerate_video|{model_name}")],
+        [InlineKeyboardButton(text="❌ Перегенерировать видео", callback_data=f"start_generate_video|{model_name}")],
     ])
 
     return kb

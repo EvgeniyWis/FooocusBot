@@ -24,9 +24,6 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     await editMessageOrAnswer(
     call, text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
 
-    # Добавляем модель в массив перегенируемых изображений
-    await appendDataToStateArray(state, "regenerate_images", model_name)
-
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
 
@@ -36,11 +33,7 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
         logger.info(f"Промпт для перегенерации изображения: {prompt}")
     except Exception as e:
         logger.error(f"Произошла ошибка при получении промпта для перегенерации изображения: {e}")
-        try:
-            prompt = next((item["prompt"] for item in stateData["unique_prompts_for_models"] if item["model_name"] == model_name), None)
-        except Exception as e:
-            logger.error(f"Произошла ошибка при получении промпта для перегенерации изображения: {e}")
-            prompt = stateData["prompt_for_images"]
+        prompt = stateData["prompt_for_images"]
 
     # Прибавляем к каждому элементу массива корневой промпт
     data["json"]['input']['prompt'] += " " + prompt

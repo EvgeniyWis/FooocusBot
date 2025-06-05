@@ -50,13 +50,6 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
             except:
                 pass
 
-        # Сохраняем в стейт данные о медиагруппе, для её удаления
-        if message_with_media_group:
-            try:
-                await state.update_data(**{f"mediagroup_messages_ids_{model_name}": [i.message_id for i in message_with_media_group]})
-            except Exception as e:
-                logging.error(f"Ошибка при сохранении данных в стейт: {e}")
-
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
         if is_test_generation and not MOCK_MODE:
             try:

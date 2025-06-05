@@ -28,8 +28,8 @@ async def checkJobStatus(
             )
 
         if state:
-            data = await state.get_data()
-            if data["stop_generation"]:
+            stateData = await state.get_data()
+            if stateData["stop_generation"]:
                 raise Exception("Генерация остановлена")
 
         try:

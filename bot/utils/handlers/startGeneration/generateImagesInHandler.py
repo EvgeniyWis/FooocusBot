@@ -13,11 +13,8 @@ from ...generateImages import (
 )
 from ...generateImages.dataArray import (
     getDataArrayWithRootPrompt,
-    getDataByModelName,
-    getModelNameIndex,
 )
 import asyncio
-from utils.generateImages.dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 
 
 
@@ -31,16 +28,6 @@ async def generateImagesInHandler(
     setting_number: str,
     with_randomizer: bool = False,
 ):
-    # Инициализируем стейт
-    await state.update_data(models_for_generation_queue=[])
-    await state.update_data(regenerate_images=[])
-    await state.update_data(will_be_sent_generated_images_count=0)
-    await state.update_data(finally_sent_generated_images_count=0)
-    await state.update_data(total_images_count=0)
-    await state.update_data(saved_videos_count=0)
-    await state.update_data(media_groups_for_generation=None)
-    await state.update_data(saved_images_urls=[])
-
     # Генерируем изображения
     try:
         # Добавлена проверка на None для переменной message перед использованием
@@ -115,33 +102,8 @@ async def generateImagesInHandler(
 
         stateData = await state.get_data()
 
-        if not is_test_generation:
-            if result:
-                if "stop_generation" not in stateData:
-                    finally_sent_generated_images_count = stateData[
-                        "finally_sent_generated_images_count"
-                    ]
-                    total_images_count = stateData["total_images_count"]
-
-                    # Ждём когда список моделей для генерации станет пустым
-                    while (
-                        finally_sent_generated_images_count
-                        < total_images_count
-                    ):
-                        stateData = await state.get_data()
-                        finally_sent_generated_images_count = stateData[
-                            "finally_sent_generated_images_count"
-                        ]
-                        total_images_count = stateData["total_images_count"]
-                        await asyncio.sleep(10)
-
-                    # Очищаем список медиагрупп
-                    await state.update_data(media_groups_for_generation=None)
-            else:
-                if "stop_generation" not in stateData:
-                    raise Exception(
-                        "Произошла ошибка при генерации изображения",
-                    )
+        if not result and not stateData["stop_generation"]:
+            raise Exception("Произошла ошибка при генерации изображения")
 
     except Exception as e:
         try:

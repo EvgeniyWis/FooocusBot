@@ -88,40 +88,24 @@ async def generateImageBlock(
 
         # Если изображение первое в очереди, то отправляем его и инициализуем стейт (либо если это изображение, которое перегенерируется)
         stateData = await state.get_data()
-        if (
-            stateData["media_groups_for_generation"] == None
-            or model_name in stateData["regenerate_images"]
-        ):
-            # Обновляем стейт
-            if stateData["media_groups_for_generation"] == None:
-                await state.update_data(media_groups_for_generation=[])
-
-            # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
-            elif model_name in stateData["regenerate_images"]:
-                stateData["regenerate_images"].remove(model_name)
-                await state.update_data(
-                    regenerate_images=stateData["regenerate_images"],
-                )
-
-            # Отправляем изображение
-            await sendImageBlock(
-                message,
-                state,
-                media_group,
-                model_name,
-                setting_number,
-                is_test_generation,
-                user_id,
-            )
-
-        else:  # Если изображение не первое в очереди, то добавляем его в стейт и оно отправится только после подтверждения генерации у прошлого изображения
-            dataForUpdate = {f"{model_name}": media_group}
-            stateData["media_groups_for_generation"].append(dataForUpdate)
+        
+        # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
+        if model_name in stateData["regenerate_images"]:
+            stateData["regenerate_images"].remove(model_name)
             await state.update_data(
-                media_groups_for_generation=stateData[
-                    "media_groups_for_generation"
-                ],
+                regenerate_images=stateData["regenerate_images"],
             )
+
+        # Отправляем изображение
+        await sendImageBlock(
+            message,
+            state,
+            media_group,
+            model_name,
+            setting_number,
+            is_test_generation,
+            user_id,
+        )
 
         return True
 
