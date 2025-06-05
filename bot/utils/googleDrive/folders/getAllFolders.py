@@ -1,7 +1,6 @@
-from .auth import service
 from logger import logger
-from collections import defaultdict
-from ..generateImages.dataArray.getModelNameIndex import getModelNameIndex
+from utils.googleDrive.auth import service
+from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 
 
 async def getAllFolders(parent_folder_id: str = None):
