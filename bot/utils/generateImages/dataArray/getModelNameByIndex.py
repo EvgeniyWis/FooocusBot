@@ -6,6 +6,9 @@ def getModelNameByIndex(index):
     # Получаем все массивы данных из всех настроек
     all_settings = getAllDataArrays()
 
+    # Преобразуем индекс в число
+    index = int(index)
+
     # Проверяем, что индекс больше 0
     if index <= 0:
         return None

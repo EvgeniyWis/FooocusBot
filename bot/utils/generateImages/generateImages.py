@@ -11,7 +11,7 @@ from .generateImageBlock import generateImageBlock
 
 # Функция для генерации изображений с помощью API
 async def generateImages(
-    setting_number: int,
+    setting_number: int | str,
     prompt: str,
     message: types.Message,
     state: FSMContext,

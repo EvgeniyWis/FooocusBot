@@ -13,10 +13,9 @@ from ...generateImages.dataArray import getDataByModelName, getModelNameIndex
 # Функция для отправки сообщения со сгенерируемыми изображениями
 async def sendImageBlock(message: types.Message, state: FSMContext, media_group: list, model_name: str,
     setting_number: str, is_test_generation: bool, user_id: int):
-    message_with_media_group = None
     try:
         # Отправляем изображения
-        message_with_media_group = await message.answer_media_group(media_group)
+        await message.answer_media_group(media_group)
     except Exception as e:
         logging.error(f"Ошибка при отправке медиагруппы: {e}")
         try:

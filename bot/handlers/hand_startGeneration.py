@@ -225,7 +225,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
         logger.info(f"Список моделей для генерации: {model_indexes}")
 
         # Генерируем изображения
-        await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
+        await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, "individual")
 
 
 # Обработка ввода промпта для конкретной модели

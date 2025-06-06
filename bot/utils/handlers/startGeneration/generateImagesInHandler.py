@@ -89,7 +89,7 @@ async def generateImagesInHandler(
                 )
                 await message_for_edit.pin()
                 result = await generateImages(
-                    int(setting_number),
+                    setting_number,
                     prompt,
                     message_for_edit,
                     state,

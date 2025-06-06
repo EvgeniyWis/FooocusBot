@@ -62,11 +62,3 @@ def videoGenerationModeKeyboard(model_name: str):
     ])
 
     return kb
-
-
-# Инлайн-клавиатура для сохранения видео
-def saveVideoKeyboard():
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="📹 Начать сохранение видео", callback_data="start_save_video")]])
-
-    return kb
