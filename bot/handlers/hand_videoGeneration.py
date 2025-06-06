@@ -25,6 +25,8 @@ from utils.handlers.videoGeneration import saveVideo
 from utils.videos import generateVideo
 from utils.googleDrive.folders import getFolderDataByID
 from utils.handlers import appendDataToStateArray
+from utils.generateImages.dataArray.getModelNameByIndex import getModelNameByIndex
+
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -482,15 +484,21 @@ async def handle_model_name_for_video_generation_from_image(
     # file_id_index = int(stateData["current_file_id_index"])
 
     # Получаем данные по имени модели
-    model_name = message.text
+    model_index = int(message.text)
 
-    # Если такой модели не существует, то просим ввести другое название
-    if not await getDataByModelName(model_name):
-        await message.answer(text.MODEL_NOT_FOUND_TEXT)
+    # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
+    if model_index > 100 or model_index < 1:
+        await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
         return
 
     # Получаем путь к видео
-    video_path = stateData["video_path_for_videoGenerationFromImage"]
+    # logger.info(f"Попытка получить путь к видео: {stateData['video_paths']} по индексу: {file_id_index}")
+    # video_path = stateData["video_paths"][file_id_index]
+    video_path = stateData["video_path"]
+
+    # Получаем название модели по индексу
+    model_name = await getModelNameByIndex(model_index)
+
 
     # Сохраняем видео
     await state.set_state(None)
