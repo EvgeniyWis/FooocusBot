@@ -27,13 +27,23 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
 
-    # Получаем промпт для перегенерации изображения
-    try:
-        prompt = stateData.get("prompts_for_regenerate_images", {})[model_name]
+    # Получаем промпт для перегенерации изображения в зависимости от режима генерации
+    randomizer_prompts = next((item for item in stateData.get("randomizer_prompts", []) if model_name in item.keys()), None)
+    prompt_for_images = stateData.get("prompt_for_images", "")
+    prompts_for_regenerate_images = next((item for item in stateData.get("prompts_for_regenerate_images", []) if model_name in item.keys()), None)
+
+    if prompts_for_regenerate_images:
+        prompt = prompts_for_regenerate_images[model_name]
+
         logger.info(f"Промпт для перегенерации изображения: {prompt}")
-    except Exception as e:
-        logger.error(f"Произошла ошибка при получении промпта для перегенерации изображения: {e}")
-        prompt = stateData.get("prompt_for_images", "")
+
+    elif randomizer_prompts:
+        prompt = randomizer_prompts[model_name]
+        logger.info(f"Промпт для перегенерации изображения, полученный из рандомайзера: {prompt}")
+
+    else:
+        prompt = prompt_for_images
+        logger.info(f"Промпт для перегенерации изображения, полученный из стейта: {prompt}")
 
     # Прибавляем к каждому элементу массива корневой промпт
     data["json"]['input']['prompt'] += " " + prompt
