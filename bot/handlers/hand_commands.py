@@ -40,11 +40,13 @@ async def start(message: types.Message, state: FSMContext):
 # Обработка команды /stop
 async def stop_generation(message: types.Message, state: FSMContext):
     await state.update_data(stop_generation=True)
-    await message.answer(text.STOP_GENERATION_TEXT, reply_markup=ReplyKeyboardRemove())
+    await message.answer(text.STOP_GENERATION_TEXT_WITH_WAITING, reply_markup=ReplyKeyboardRemove())
 
     # Отменяем все работы
     stateData = await state.get_data()
     await cancelJobs(stateData.get("image_generation_jobs", []))
+
+    await message.answer(text.STOP_GENERATION_TEXT, reply_markup=ReplyKeyboardRemove())
 
 
 # DEV: получение file id видео

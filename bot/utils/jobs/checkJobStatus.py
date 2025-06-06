@@ -54,8 +54,8 @@ async def checkJobStatus(
             stateData = await state.get_data()
 
             if "jobs" in stateData:
-                jobs = stateData["jobs"]
-                total_jobs_count = stateData["total_jobs_count"]
+                jobs = stateData.get("jobs", {})
+                total_jobs_count = stateData.get("total_jobs_count", 0)
                 jobs[job_id] = response_json["status"]
                 await state.update_data(jobs=jobs)
 

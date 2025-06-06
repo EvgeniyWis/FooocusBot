@@ -12,7 +12,7 @@ from ..editMessageOrAnswer import editMessageOrAnswer
 # Функция для перегенерации изображения
 async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSMContext, setting_number: str):
     stateData = await state.get_data()
-    is_test_generation = stateData["generations_type"] == "test"
+    is_test_generation = stateData.get("generations_type", "test") == "test"
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
@@ -29,11 +29,11 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
 
     # Получаем промпт для перегенерации изображения
     try:
-        prompt = stateData["prompts_for_regenerate_images"][model_name]
+        prompt = stateData.get("prompts_for_regenerate_images", {})[model_name]
         logger.info(f"Промпт для перегенерации изображения: {prompt}")
     except Exception as e:
         logger.error(f"Произошла ошибка при получении промпта для перегенерации изображения: {e}")
-        prompt = stateData["prompt_for_images"]
+        prompt = stateData.get("prompt_for_images", "")
 
     # Прибавляем к каждому элементу массива корневой промпт
     data["json"]['input']['prompt'] += " " + prompt

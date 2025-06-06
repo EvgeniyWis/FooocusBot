@@ -23,9 +23,7 @@ async def generateVideoFromImage(
     try:
         # Получаем данные из стейта и file id изображения
         stateData = await state.get_data()
-        image_file_ids = stateData[
-            "image_file_ids_for_videoGenerationFromImage"
-        ]
+        image_file_ids = stateData.get("image_file_ids_for_videoGenerationFromImage", [])
         image_file_id = image_file_ids[file_id_index]
 
         # Скачиваем изображение (file_id) и получаем путь к файлу с таймаутом
@@ -64,8 +62,9 @@ async def generateVideoFromImage(
         if "video_paths" not in stateData:
             await state.update_data(video_paths=[video_path])
         else:
-            stateData["video_paths"].append(video_path)
-            await state.update_data(video_paths=stateData["video_paths"])
+            video_paths = stateData.get("video_paths", [])
+            video_paths.append(video_path)
+            await state.update_data(video_paths=video_paths)
 
         video = types.FSInputFile(video_path)
         await message.answer_video(
