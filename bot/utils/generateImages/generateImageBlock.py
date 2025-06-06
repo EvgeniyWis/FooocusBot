@@ -23,21 +23,13 @@ async def generateImageBlock(
 ):
     # Получаем данные из стейта
     stateData = await state.get_data()
-    stop_generation = stateData.get("stop_generation", False)
-
-    if stop_generation:
-        try:
-            message.unpin()
-        except:
-            pass
-        raise Exception("Генерация остановлена")
 
     if not MOCK_MODE:
         # Получаем номер настройки по имени модели
         setting_number = getSettingNumberByModelName(model_name)
 
         # Делаем запрос на генерацию и получаем id работы
-        job_id = await getJobID(dataJSON, setting_number)
+        job_id = await getJobID(dataJSON, setting_number, state)
 
         # Проверяем статус работы
         response_json = await checkJobStatus(
@@ -49,6 +41,9 @@ async def generateImageBlock(
             checkOtherJobs,
             500
         )
+
+        if not response_json:
+            return False
 
     try:
         if not MOCK_MODE:

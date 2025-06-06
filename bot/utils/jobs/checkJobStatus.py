@@ -27,11 +27,6 @@ async def checkJobStatus(
                 "Превышено время ожидания статуса работы",
             )
 
-        if state:
-            stateData = await state.get_data()
-            if stateData["stop_generation"]:
-                raise Exception("Генерация остановлена")
-
         try:
             # Получаем ID эндпоинта для генерации изображений
             ENDPOINT_ID = await getEndpointID(setting_number)
@@ -77,6 +72,9 @@ async def checkJobStatus(
                 queue_images_count = len(
                     [job for job in jobs.values() if job == "IN_QUEUE"],
                 )
+                cancelled_images_count = len(
+                    [job for job in jobs.values() if job == "CANCELLED"],
+                )
                 left_images_count = total_jobs_count - len(jobs)
                 total_images_count = (
                     success_images_count
@@ -84,6 +82,7 @@ async def checkJobStatus(
                     + progress_images_count
                     + queue_images_count
                     + left_images_count
+                    + cancelled_images_count
                 )
 
                 # Добавляем в стейт то, сколько готовых изображений
@@ -94,6 +93,7 @@ async def checkJobStatus(
                         text.GENERATE_IMAGES_PROCESS_TEXT.format(
                             success_images_count,
                             error_images_count,
+                            cancelled_images_count,
                             progress_images_count,
                             queue_images_count,
                             left_images_count,
@@ -111,12 +111,24 @@ async def checkJobStatus(
         elif response_json["status"] in ["FAILED", "CANCELLED"]:
             if response_json["status"] == "FAILED":
                 raise Exception(response_json["error"])
-            else:
-                raise Exception("Работа была отменена")
+            
+            response_json = None
+
+            break
 
         await asyncio.sleep(10)
 
     # Когда работа завершена, получаем изображение
     logger.info(f"Работа по id {job_id} завершена!")
 
+    # Удаляем id работы из стейта
+    if state:
+        stateData = await state.get_data()
+        image_generation_jobs = stateData.get("image_generation_jobs", [])
+        
+        # Находим и удаляем задачу по job_id
+        image_generation_jobs = [job for job in image_generation_jobs if job['job_id'] != job_id]
+        await state.update_data(image_generation_jobs=image_generation_jobs)
+        logger.info(f"Удаляем id работы {job_id} из стейта {image_generation_jobs}")
+    
     return response_json

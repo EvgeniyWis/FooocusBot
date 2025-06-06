@@ -4,8 +4,8 @@ from .buttons import getGenerationsTypeButtons
 
 
 # Инлайн-клавиатура для выбора количества генераций
-def generationsTypeKeyboard():
-    inline_keyboard = getGenerationsTypeButtons("generations_type")
+def generationsTypeKeyboard(with_work_generation: bool = True, with_test_generation: bool = True):
+    inline_keyboard = getGenerationsTypeButtons("generations_type", with_test_generation, with_work_generation)
     inline_keyboard.append(
         [
             InlineKeyboardButton(
