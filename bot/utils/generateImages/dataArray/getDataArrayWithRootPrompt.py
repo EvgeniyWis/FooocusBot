@@ -13,7 +13,7 @@ async def getDataArrayWithRootPrompt(setting_number: int, root_prompt: str, mode
         dataArray = [await getDataByModelName(model_name) for model_name in model_names_for_generation]
         
     else: # Если нет, то берем по настройке
-        dataArray = getDataArrayBySettingNumber(setting_number)
+        dataArray = getDataArrayBySettingNumber(int(setting_number))
 
     for data in dataArray:
         data["json"]["input"]["prompt"] += " " + root_prompt

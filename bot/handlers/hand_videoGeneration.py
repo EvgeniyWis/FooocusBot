@@ -196,11 +196,6 @@ async def handle_video_example_buttons(
     dataForUpdate = {f"{model_name}": video_path}
     await appendDataToStateArray(state, "video_paths", dataForUpdate)
 
-    # Изменяем сообщение про генерацию видео
-    await message_for_edit.edit_text(
-        text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_name_index),
-    )
-
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
     prefix = f"generate_video|{model_name}"

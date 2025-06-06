@@ -15,7 +15,7 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     variable_names_for_randomizer = stateData["variable_names_for_randomizer"]
 
     # Получаем массив данных
-    dataArray = getDataArrayBySettingNumber(setting_number)
+    dataArray = getDataArrayBySettingNumber(int(setting_number))
 
     # Проходимся по всем промптам для каждой переменной рандомайзера и формируем промпт
     formated_prompt = ""
