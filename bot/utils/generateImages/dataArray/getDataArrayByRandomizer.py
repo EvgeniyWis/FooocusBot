@@ -25,6 +25,9 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
             # Получаем значения переменной
             variable_values = stateData.get(f"randomizer_{variable_name}_values", [])
 
+            if len(variable_values) == 0:
+                continue
+
             # Получаем случайное значение переменной
             random_variable_value = random.choice(variable_values)
 
