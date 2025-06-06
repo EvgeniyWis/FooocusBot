@@ -47,7 +47,7 @@ async def on_startup() -> None:
     # Определяем команды и добавляем их в бота
     commands = [
         BotCommand(command="/start", description="Перезапустить бота"),
-        BotCommand(command="/stop", description="Остановить генерацию"),
+        BotCommand(command="/stop", description="Остановить генерацию изображений"),
     ]
 
     await bot.set_my_commands(commands)

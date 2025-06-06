@@ -2,10 +2,12 @@ from logger import logger
 
 from .. import retryOperation
 from .sendRunRequest import sendRunRequest
+from utils.handlers.appendDataToStateArray import appendDataToStateArray
+from aiogram.fsm.context import FSMContext
 
 
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы
-async def getJobID(dataJSON: dict, setting_number: int):
+async def getJobID(dataJSON: dict, setting_number: int, state: FSMContext):
     # Делаем запрос на генерацию
     logger.info("Отправка запроса на генерацию...")
 
@@ -17,5 +19,9 @@ async def getJobID(dataJSON: dict, setting_number: int):
     job_id = response_json["id"]
 
     logger.info(f"Получен id работы: {job_id}")
+
+    # Сохраняем его в стейт
+    dataForUpdate = {"job_id": job_id, "setting_number": setting_number}
+    await appendDataToStateArray(state, "image_generation_jobs", dataForUpdate)
 
     return job_id
