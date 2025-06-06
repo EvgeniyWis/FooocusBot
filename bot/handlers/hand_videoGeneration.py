@@ -37,8 +37,9 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Удаляем видео из папки temp/videos, если оно есть
     try:
         stateData = await state.get_data()
-        if "video_path" in stateData:
-            os.remove(stateData["video_path"])
+        video_path = stateData.get("video_path", "")
+        if video_path:
+            os.remove(video_path)
     except Exception as e:
         logger.error(f"Ошибка при удалении видео из папки temp/videos: {e}")
 
@@ -115,7 +116,7 @@ async def handle_video_example_buttons(
 
     # Получаем название модели и url изображения
     stateData = await state.get_data()
-    image_url_dict = next((item for item in stateData["saved_images_urls"] if model_name in item.keys()), None)
+    image_url_dict = next((item for item in stateData.get("saved_images_urls", []) if model_name in item.keys()), None)
     
     # Получаем URL изображения из словаря
     image_url = image_url_dict[model_name] if image_url_dict else None
@@ -133,7 +134,7 @@ async def handle_video_example_buttons(
 
     # Получаем кастомный промпт, если он есть, а если нет, то берем промпт из видео-примера
     if "prompt_for_video" in stateData:
-        custom_prompt = stateData["prompt_for_video"]
+        custom_prompt = stateData.get("prompt_for_video", "")
     else:
         custom_prompt = None
 
@@ -231,8 +232,8 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     prompt = message.text
     await state.update_data(prompt_for_video=prompt)
     stateData = await state.get_data()
-    model_name = stateData["model_name_for_video_generation"]
-    image_url_dict = next((item for item in stateData["saved_images_urls"] if model_name in item.keys()), None)
+    model_name = stateData.get("model_name_for_video_generation", "")
+    image_url_dict = next((item for item in stateData.get("saved_images_urls", []) if model_name in item.keys()), None)
     
     # Получаем URL изображения из словаря
     image_url = image_url_dict[model_name] if image_url_dict else None
@@ -301,7 +302,7 @@ async def handle_video_correctness_buttons(
         text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
     )
 
-    video_path = next((item for item in stateData["video_paths"] if model_name in item.keys()), None)
+    video_path = next((item for item in stateData.get("video_paths", []) if model_name in item.keys()), None)
     video_path = video_path[model_name]
 
     # Сохраняем видео
@@ -475,7 +476,7 @@ async def handle_model_name_for_video_generation_from_image(
 ):
     # Получаем данные
     stateData = await state.get_data()
-    # file_id_index = int(stateData["current_file_id_index"])
+    # file_id_index = int(stateData.get("current_file_id_index", 0))
 
     # Получаем данные по имени модели
     model_index = int(message.text)
@@ -486,9 +487,9 @@ async def handle_model_name_for_video_generation_from_image(
         return
 
     # Получаем путь к видео
-    # logger.info(f"Попытка получить путь к видео: {stateData['video_paths']} по индексу: {file_id_index}")
-    # video_path = stateData["video_paths"][file_id_index]
-    video_path = stateData["video_path"]
+    # logger.info(f"Попытка получить путь к видео: {stateData.get('video_paths', [])} по индексу: {file_id_index}")
+    # video_path = stateData.get("video_paths", [])[file_id_index]
+    video_path = stateData.get("video_path", "")
 
     # Получаем название модели по индексу
     model_name = await getModelNameByIndex(model_index)
@@ -504,19 +505,19 @@ async def handle_model_name_for_video_generation_from_image(
     #     await state.update_data(current_file_id_index=None)
 
     #     # Получаем file_id изображения, которое нужно удалить
-    #     image_file_id = stateData["image_file_ids_for_videoGenerationFromImage"][file_id_index]
+    #     image_file_id = stateData.get("image_file_ids_for_videoGenerationFromImage", [])[file_id_index]
     #     # Удаляем видео из списка и обновляем state
-    #     updated_video_paths = stateData["video_paths"]
+    #     updated_video_paths = stateData.get("video_paths", [])
     #     updated_video_paths.pop(file_id_index)
     #     await state.update_data(video_paths=updated_video_paths)
 
     #     # Удаляем file_id из списка и обновляем state
-    #     updated_image_file_ids = stateData["image_file_ids_for_videoGenerationFromImage"]
+    #     updated_image_file_ids = stateData.get("image_file_ids_for_videoGenerationFromImage", [])
     #     updated_image_file_ids.pop(file_id_index)
     #     await state.update_data(image_file_ids_for_videoGenerationFromImage=updated_image_file_ids)
 
     #     # Удаляем промпт по file_id и обновляем state
-    #     updated_prompts = stateData["prompts_for_videoGenerationFromImage"]
+    #     updated_prompts = stateData.get("prompts_for_videoGenerationFromImage", {})
     #     updated_prompts.pop(image_file_id)
     #     await state.update_data(prompts_for_videoGenerationFromImage=updated_prompts)
     #     logger.info(f"Удалены данные из массивов: {updated_video_paths}, {updated_image_file_ids}, {updated_prompts}")

@@ -12,7 +12,7 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     stateData = await state.get_data()
 
     # Получаем переменные рандомайзера
-    variable_names_for_randomizer = stateData["variable_names_for_randomizer"]
+    variable_names_for_randomizer = stateData.get("variable_names_for_randomizer", [])
 
     # Получаем массив данных
     dataArray = getDataArrayBySettingNumber(int(setting_number))
@@ -21,7 +21,7 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     formated_prompt = ""
     for variable_name in variable_names_for_randomizer:
         # Получаем значения переменной
-        variable_values = stateData[f"randomizer_{variable_name}_values"]
+        variable_values = stateData.get(f"randomizer_{variable_name}_values", [])
 
         # Получаем случайное значение переменной
         random_variable_value = random.choice(variable_values)

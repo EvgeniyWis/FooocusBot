@@ -86,14 +86,14 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
     stateData = await state.get_data()
-    generations_type = stateData["generations_type"]
-    prompt_exist = stateData["prompt_exist"]
+    generations_type = stateData.get("generations_type", "test")
+    prompt_exist = stateData.get("prompt_exist", False)
     await state.update_data(specific_model=False)
 
     # Если выбрана настройка для теста, то продолжаем генерацию в тестовом режиме
     if generations_type == "test":
         if prompt_exist:
-            prompt = stateData["prompt_for_images"]
+            prompt = stateData.get("prompt_for_images", "")
             user_id = call.from_user.id
             is_test_generation = generations_type == "test"
             setting_number = setting_number
@@ -146,7 +146,7 @@ async def choose_writePrompt_type(
     else:
         # Получаем данные
         stateData = await state.get_data()
-        setting_number = stateData["setting_number"]
+        setting_number = stateData.get("setting_number", 1)
 
         if setting_number == "all":
             # Получаем все настройки
@@ -209,19 +209,19 @@ async def write_prompt(message: types.Message, state: FSMContext):
     prompt = message.text
     user_id = message.from_user.id
     stateData = await state.get_data()
-    is_test_generation = stateData["generations_type"] == "test"
+    is_test_generation = stateData.get("generations_type", "test") == "test"
     await state.update_data(prompt_for_images=prompt)
 
     await state.set_state(None)
 
     # Если в стейте есть номер настройки, то используем его, иначе получаем номер настройки по названию модели
     if "setting_number" in stateData:
-        setting_number = stateData["setting_number"]
+        setting_number = stateData.get("setting_number", 1)
 
         # Генерируем изображения
         await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
     else:
-        model_indexes = stateData["model_indexes_for_generation"]
+        model_indexes = stateData.get("model_indexes_for_generation", [])
         logger.info(f"Список моделей для генерации: {model_indexes}")
 
         # Генерируем изображения
@@ -233,8 +233,8 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     # Получаем данные
     stateData = await state.get_data()
     prompt = message.text
-    model_name = stateData["current_model_for_unique_prompt"]
-    setting_number = stateData["setting_number"]
+    model_name = stateData.get("current_model_for_unique_prompt", "")
+    setting_number = stateData.get("setting_number", 1)
     user_id = message.from_user.id
 
     # Получаем индекс модели
@@ -287,7 +287,7 @@ async def confirm_write_unique_prompt_for_next_model(
 ):
     # Получаем данные
     stateData = await state.get_data()
-    next_model = stateData["current_model_for_unique_prompt"]
+    next_model = stateData.get("current_model_for_unique_prompt", "")
 
     # Получаем индекс следующей модели
     next_model_index = getModelNameIndex(next_model)
@@ -410,9 +410,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
                 while True:
                     stateData = await state.get_data()
-                    faceswap_generate_models = stateData[
-                        "faceswap_generate_models"
-                    ]
+                    faceswap_generate_models = stateData.get("faceswap_generate_models", [])
 
                     logger.info(
                         f"Список генераций для замены лица: {faceswap_generate_models}",
@@ -454,9 +452,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
                 # После генерации удаляем модель из стейта
                 stateData = await state.get_data()
-                stateData["faceswap_generate_models"].remove(model_name)
+                faceswap_generate_models = stateData.get("faceswap_generate_models", [])
+                faceswap_generate_models.remove(model_name)
                 await state.update_data(
-                    faceswap_models=stateData["faceswap_generate_models"],
+                    faceswap_models=faceswap_generate_models,
                 )
             else:
                 result_path = MOCK_FACEFUSION_PATH
@@ -573,9 +572,9 @@ async def write_model_name_for_generation(message: types.Message, state: FSMCont
 async def write_new_prompt_for_regenerate_image(message: types.Message, state: FSMContext):
     # Получаем данные
     stateData = await state.get_data()
-    is_test_generation = stateData["generations_type"] == "test"
-    model_name = stateData["model_name_for_regenerate_image"]
-    setting_number = stateData["setting_number_for_regenerate_image"]
+    is_test_generation = stateData.get("generations_type", "test") == "test"
+    model_name = stateData.get("model_name_for_regenerate_image", "")
+    setting_number = stateData.get("setting_number_for_regenerate_image", 1)
     prompt = message.text
     user_id = message.from_user.id
 

@@ -29,7 +29,7 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
 
         # Если номер настройки все, то получаем номер настройки из стейта
         if setting_number == "all":
-            setting_number = stateData["current_setting_number_for_unique_prompt"]
+            setting_number = stateData.get("current_setting_number_for_unique_prompt", 1)
 
         # Получаем индекс модели
         model_name_index = getModelNameIndex(model_name)
@@ -41,7 +41,7 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
         try:
             await message.answer(text.SELECT_IMAGE_TEXT.format(model_name, model_name_index) if not is_test_generation else text.SELECT_TEST_IMAGE_TEXT.format(setting_number),
             reply_markup=start_generation_keyboards.selectImageKeyboard(model_name, setting_number, model_data["json"]["input"]["image_number"])
-            if not is_test_generation else start_generation_keyboards.testGenerationImagesKeyboard(setting_number) if stateData["setting_number"] != "all" else None)
+            if not is_test_generation else start_generation_keyboards.testGenerationImagesKeyboard(setting_number) if stateData.get("setting_number", 1) != "all" else None)
         except Exception as e:
             logging.error(f"Ошибка при отправке сообщения с клавиатурой: {e}")
             try:

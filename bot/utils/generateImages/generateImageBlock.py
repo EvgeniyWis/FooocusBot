@@ -85,10 +85,11 @@ async def generateImageBlock(
         stateData = await state.get_data()
         
         # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
-        if model_name in stateData["regenerate_images"]:
-            stateData["regenerate_images"].remove(model_name)
+        regenerate_images = stateData.get("regenerate_images", [])
+        if model_name in regenerate_images:
+            regenerate_images.remove(model_name)
             await state.update_data(
-                regenerate_images=stateData["regenerate_images"],
+                regenerate_images=regenerate_images,
             )
 
         # Отправляем изображение

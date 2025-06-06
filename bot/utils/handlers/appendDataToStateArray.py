@@ -9,6 +9,7 @@ async def appendDataToStateArray(state: FSMContext, key: str, value: Any):
         await state.update_data(**{key: [value]})
     else:
         # Добавляем в стейт путь к изображению для faceswap
-        stateData[key].append(value)
-        await state.update_data(**{key: stateData[key]})
+        data = stateData.get(key, [])
+        data.append(value)
+        await state.update_data(**{key: data})
 
