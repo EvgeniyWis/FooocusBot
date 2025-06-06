@@ -1,5 +1,5 @@
 import shutil
-import logging
+from logger import logger
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
@@ -17,7 +17,7 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
         # Отправляем изображения
         await message.answer_media_group(media_group)
     except Exception as e:
-        logging.error(f"Ошибка при отправке медиагруппы: {e}")
+        logger.error(f"Ошибка при отправке медиагруппы: {e}")
         try:
             await message.answer("Произошла ошибка при отправке изображений, но продолжаем работу...")
         except:
@@ -43,23 +43,22 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
             reply_markup=start_generation_keyboards.selectImageKeyboard(model_name, setting_number, model_data["json"]["input"]["image_number"])
             if not is_test_generation else start_generation_keyboards.testGenerationImagesKeyboard(setting_number) if stateData.get("setting_number", 1) != "all" else None)
         except Exception as e:
-            logging.error(f"Ошибка при отправке сообщения с клавиатурой: {e}")
+            logger.error(f"Ошибка при отправке сообщения с клавиатурой: {e}")
             try:
                 await message.answer("Произошла ошибка при отправке клавиатуры...")
             except:
                 pass
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-        if not MOCK_MODE:
+        if is_test_generation and not MOCK_MODE:
             try:
-                prefix = "test" if is_test_generation else model_name
-                file_path = f"{TEMP_FOLDER_PATH}/{prefix}_{user_id}"
+                file_path = f"{TEMP_FOLDER_PATH}/test_{user_id}"
                 shutil.rmtree(file_path)
             except Exception as e:
-                logging.error(f"Ошибка при удалении временных файлов: {e}")
+                logger.error(f"Ошибка при удалении временных файлов: {e}")
 
     except Exception as e:
-        logging.error(f"Критическая ошибка в функции sendImageBlock: {e}")
+        logger.error(f"Критическая ошибка в функции sendImageBlock: {e}")
         try:
             await message.answer("Произошла ошибка, но бот продолжает работу...")
         except:

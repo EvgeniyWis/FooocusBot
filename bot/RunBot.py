@@ -9,6 +9,7 @@ from config import (
     FACEFUSION_RESULTS_DIR,
     TEMP_FOLDER_PATH,
     TEMP_IMAGE_FILES_DIR,
+    TEMP_DIR,
 )
 from InstanceBot import bot, dp
 from logger import logger
@@ -18,6 +19,10 @@ async def on_startup() -> None:
     # Удаляем все файлы в папке temp facefusion
     if os.path.exists(TEMP_FOLDER_PATH):
         shutil.rmtree(TEMP_FOLDER_PATH)
+
+    # Удаляем все файлы в папке temp
+    if os.path.exists(TEMP_DIR):
+        shutil.rmtree(TEMP_DIR)
 
     # Удаляем папку temp бота
     if os.path.exists(TEMP_IMAGE_FILES_DIR):
