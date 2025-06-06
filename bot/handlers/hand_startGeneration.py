@@ -370,7 +370,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 setting_number = getSettingNumberByModelName(model_name)
 
                 # Делаем upscale изображения
-                images_output_base64 = await upscaleImage(image_base64, base_model, setting_number)
+                images_output_base64 = await upscaleImage(image_base64, base_model, setting_number, state)
 
                 # Сохраняем изображения по этому же пути
                 await base64ToImage(
