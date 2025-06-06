@@ -305,6 +305,12 @@ async def confirm_write_unique_prompt_for_next_model(
 
 # Обработка выбора изображения
 async def select_image(call: types.CallbackQuery, state: FSMContext):
+    # Отправляем сообщение о выборе изображения
+    await editMessageOrAnswer(
+        call,
+        text.SELECT_IMAGE_PROGRESS_TEXT,
+    )
+
     # Получаем id пользователя и данные из стейта
     user_id = call.from_user.id
     stateData = await state.get_data()

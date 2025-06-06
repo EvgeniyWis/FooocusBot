@@ -34,15 +34,6 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Получаем название модели
     model_name = call.data.split("|")[1]
 
-    # Удаляем видео из папки temp/videos, если оно есть
-    try:
-        stateData = await state.get_data()
-        video_path = stateData.get("video_path", "")
-        if video_path:
-            os.remove(video_path)
-    except Exception as e:
-        logger.error(f"Ошибка при удалении видео из папки temp/videos: {e}")
-
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
@@ -340,7 +331,10 @@ async def handle_video_correctness_buttons(
 
     # Удаляем видео из папки temp/videos
     if not MOCK_MODE:
-        os.remove(video_path)
+        try: 
+            os.remove(video_path)
+        except Exception as e:
+            logger.error(f"Ошибка при удалении видео из папки temp/videos: {e}")
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"

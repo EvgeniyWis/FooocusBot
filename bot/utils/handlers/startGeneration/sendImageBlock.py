@@ -50,11 +50,14 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
                 pass
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-        if is_test_generation and not MOCK_MODE:
+        if not MOCK_MODE:
             try:
-                shutil.rmtree(f"{TEMP_FOLDER_PATH}/test_{user_id}")
+                prefix = "test" if is_test_generation else model_name
+                file_path = f"{TEMP_FOLDER_PATH}/{prefix}_{user_id}"
+                shutil.rmtree(file_path)
             except Exception as e:
                 logging.error(f"Ошибка при удалении временных файлов: {e}")
+
     except Exception as e:
         logging.error(f"Критическая ошибка в функции sendImageBlock: {e}")
         try:

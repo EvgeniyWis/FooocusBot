@@ -24,9 +24,6 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
     elif action == "start_generation":
         stateData = await state.get_data()
 
-        # Удаляем текущее сообщение
-        await call.message.delete()
-
         # Если нету переменных для рандомайзера, то отправляем сообщение с ошибкой
         variable_names_for_randomizer = stateData.get("variable_names_for_randomizer", [])
         if len(variable_names_for_randomizer) == 0:
@@ -34,6 +31,10 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
             return
 
         else:
+            # Удаляем текущее сообщение
+            await call.message.delete()
+
+            # Отправляем сообщение о генерации
             user_id = call.from_user.id
             setting_number = stateData.get("setting_number", 1)
             is_test_generation = setting_number == "test"
