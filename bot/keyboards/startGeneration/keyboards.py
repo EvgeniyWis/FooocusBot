@@ -168,3 +168,12 @@ def onePromptGenerationChooseTypeKeyboard():
     )
 
     return kb
+
+
+# Инлайн-клавиатура для перегенерации видео
+def regenerateVideoKeyboard(model_name: str):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='🔄 Перегенерировать видео', callback_data=f'start_generate_video|{model_name}')]
+    ])
+
+    return kb

@@ -181,9 +181,8 @@ async def handle_video_example_buttons(
             # Отправляем сообщение об ошибке
             traceback.print_exc()
             await editMessageOrAnswer(
-                call,
-                text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, e),
-            )
+            call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, e),
+            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
             logger.error(
                 f"Произошла ошибка при генерации видео для модели {model_name}: {e}",
             )
