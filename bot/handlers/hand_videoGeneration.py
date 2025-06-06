@@ -479,7 +479,11 @@ async def handle_model_name_for_video_generation_from_image(
     # file_id_index = int(stateData.get("current_file_id_index", 0))
 
     # Получаем данные по имени модели
-    model_index = int(message.text)
+    try:
+        model_index = int(message.text)
+    except ValueError:
+        await message.answer(text.WRONG_MODEL_INDEX_TEXT.format(message.text))
+        return
 
     # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
     if model_index > 100 or model_index < 1:
