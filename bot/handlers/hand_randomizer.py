@@ -63,13 +63,13 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
 
     variable_name = call.data.split("|")[2]
     # Если была выбрана кнопка "➕ Добавить значения"
-    if action == "add_values":
+    if action == "add_val":
         await editMessageOrAnswer(
         call,text.ADD_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name))
         await state.set_state(RandomizerState.write_value_for_variable_for_randomizer)
 
     # Если была выбрана кнопка "🗑️ Удалить значение"
-    elif action == "delete_values":
+    elif action == "delete_val":
         variable_name_values = f"randomizer_{variable_name}_values"
         values = stateData.get(variable_name_values, [])
 
@@ -78,7 +78,7 @@ async def handle_variable_action_buttons(call: types.CallbackQuery, state: FSMCo
         reply_markup=randomizer_keyboards.deleteValuesForVariableKeyboard(values, variable_name))
 
     # Если была выбрана кнопка "❌ Удалить переменную"
-    elif action == "delete_variable":
+    elif action == "delete_var":
         stateData = await state.get_data()
         variable_names_for_randomizer = stateData.get("variable_names_for_randomizer", [])
         variable_names_for_randomizer.remove(variable_name)
@@ -180,7 +180,7 @@ async def write_value_for_variable_for_randomizer(message: types.Message, state:
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(handle_variable_action_buttons, lambda call: call.data.startswith("randomizer_variable"))
+    router.callback_query.register(handle_variable_action_buttons, lambda call: call.data.startswith("var"))
 
     router.callback_query.register(handle_delete_value_for_variable_buttons, lambda call: call.data.startswith("randomizer_delete_value"))
 
