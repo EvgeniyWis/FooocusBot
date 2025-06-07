@@ -11,7 +11,7 @@ from utils.generateImages.dataArray import (
 )
 from utils.googleDrive.files import saveFile
 from utils.googleDrive.folders import getFolderDataByID
-from bot.config import MOCK_MODE
+from config import MOCK_MODE
 
 
 # Функция для сохранения видео в папку модели
