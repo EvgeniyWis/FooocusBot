@@ -152,7 +152,7 @@ async def handle_video_example_buttons(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение про генерацию видео
-    message_for_edit = await editMessageOrAnswer(
+    await editMessageOrAnswer(
         call,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
     )
@@ -187,6 +187,13 @@ async def handle_video_example_buttons(
     # Добавляем путь к видео в стейт
     dataForUpdate = {f"{model_name}": video_path}
     await appendDataToStateArray(state, "video_paths", dataForUpdate)
+
+    # Удаляем изображение из массива объектов saved_images_urls
+    saved_images_urls = stateData.get("saved_images_urls", [])
+    for item in saved_images_urls:
+        if model_name in item.keys():
+            saved_images_urls.remove(item)
+    await state.update_data(saved_images_urls=saved_images_urls)
 
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
