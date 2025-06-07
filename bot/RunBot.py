@@ -53,7 +53,6 @@ async def on_startup() -> None:
     commands = [
         BotCommand(command="/start", description="Перезапустить бота"),
         BotCommand(command="/stop", description="Остановить генерацию изображений"),
-        BotCommand(command="/clear", description="Очистить стейт"),
     ]
 
     await bot.set_my_commands(commands)
