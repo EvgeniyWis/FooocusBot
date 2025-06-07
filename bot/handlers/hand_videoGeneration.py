@@ -181,7 +181,8 @@ async def handle_video_example_buttons(
             return
     
     if not video_path:
-        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, "Не удалось сгенерировать видео"))
+        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, "Не удалось сгенерировать видео"),
+            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
         return
     
     # Добавляем путь к видео в стейт
@@ -291,15 +292,6 @@ async def handle_video_correctness_buttons(
     video_folder_id = modelData["video_folder_id"]
     now = datetime.now().strftime("%Y-%m-%d")
 
-    # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
-
-    # Отправляем сообщение о начале сохранения видео
-    message_for_edit = await editMessageOrAnswer(
-        call,
-        text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
-    )
-
     video_path = next((item for item in stateData.get("video_paths", []) if model_name in item.keys()), None)
     video_path = video_path[model_name]
 
@@ -321,27 +313,7 @@ async def handle_video_correctness_buttons(
     call,text.SAVE_FILE_ERROR_TEXT)
         return
     
-    # Получаем данные родительской папки
-    folder = getFolderDataByID(video_folder_id)
-    parent_folder_id = folder['parents'][0]
-    parent_folder = getFolderDataByID(parent_folder_id)
-
-    logger.info(f"Данные папки по id {video_folder_id}: {folder}")
-
-    # Удаляем сообщение про генерацию видео
-    await bot.delete_message(user_id, message_for_edit.message_id)
-
-    # Отправляем сообщение о сохранении видео
-    await message_for_edit.answer(text.SAVE_VIDEO_SUCCESS_TEXT
-    .format(link, model_name, parent_folder['webViewLink'], model_name_index)
-    )
-
-    # Удаляем видео из папки temp/videos
-    if not MOCK_MODE:
-        try: 
-            os.remove(video_path)
-        except Exception as e:
-            logger.error(f"Ошибка при удалении видео из папки temp/videos: {e}")
+    await saveVideo(video_path, model_name, call.message)
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"
