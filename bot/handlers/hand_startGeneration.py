@@ -71,6 +71,14 @@ async def choose_generations_type(
 
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
+    # Очищаем стейт
+    await state.update_data(stop_generation=False)
+    await state.update_data(generation_step=1)
+    await state.update_data(prompts_for_regenerate_images=[])
+    await state.update_data(regenerate_images=[])
+    await state.update_data(model_indexes_for_generation=[])
+    await state.update_data(saved_images_urls=[])
+
     # Если выбрана конкретная модель, то просим ввести название модели
     if call.data == "select_setting|specific_model":
         await editMessageOrAnswer(

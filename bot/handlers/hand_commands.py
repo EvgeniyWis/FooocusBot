@@ -17,13 +17,6 @@ async def start(message: types.Message, state: FSMContext):
         await message.answer(text.ACCESS_DENIED_TEXT)
         return
 
-    # Очищаем стейт
-    await state.update_data(stop_generation=False)
-    await state.update_data(generation_step=1)
-    await state.update_data(prompts_for_regenerate_images=[])
-    await state.update_data(regenerate_images=[])
-    await state.update_data(model_indexes_for_generation=[])
-
     # Отправляем сообщение с кнопками
     await message.answer(
         text.START_TEXT, reply_markup=start_generation_keyboards.generationsTypeKeyboard(),
@@ -42,6 +35,12 @@ async def stop_generation(message: types.Message, state: FSMContext):
     await message.answer(text.STOP_GENERATION_TEXT, reply_markup=ReplyKeyboardRemove())
 
 
+# Обработка команды /clear
+async def clear_state(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer(text.STATE_CLEARED_TEXT)
+
+
 # DEV: получение file id видео
 # async def get_file_id(message: types.Message):
 #     if message.video:
@@ -53,6 +52,8 @@ def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())
 
     router.message.register(stop_generation, Command("stop"))
+
+    router.message.register(clear_state, Command("clear"))
 
     # DEV: получение file id видео
     # router.message.register(get_file_id)
