@@ -22,6 +22,7 @@ async def start(message: types.Message, state: FSMContext):
     await state.update_data(generation_step=1)
     await state.update_data(prompts_for_regenerate_images=[])
     await state.update_data(regenerate_images=[])
+    await state.update_data(model_indexes_for_generation=[])
 
     # Отправляем сообщение с кнопками
     await message.answer(
