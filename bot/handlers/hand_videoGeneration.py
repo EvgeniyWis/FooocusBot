@@ -286,32 +286,9 @@ async def handle_video_correctness_buttons(
     # Получаем данные
     stateData = await state.get_data()
 
-    # Получаем id папки и тд
-    user_id = call.from_user.id
-    modelData = await getDataByModelName(model_name)
-    video_folder_id = modelData["video_folder_id"]
-    now = datetime.now().strftime("%Y-%m-%d")
-
+    # Получаем путь к видео
     video_path = next((item for item in stateData.get("video_paths", []) if model_name in item.keys()), None)
     video_path = video_path[model_name]
-
-    # Сохраняем видео
-    if not MOCK_MODE:
-        link = await saveFile(
-            video_path,
-            user_id,
-            model_name,
-            video_folder_id,
-            now,
-            False,
-        )
-    else:
-        link = MOCK_LINK_FOR_SAVE_VIDEO
-
-    if not link:
-        await editMessageOrAnswer(
-    call,text.SAVE_FILE_ERROR_TEXT)
-        return
     
     await saveVideo(video_path, model_name, call.message)
 

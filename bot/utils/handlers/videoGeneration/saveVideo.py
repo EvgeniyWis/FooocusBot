@@ -11,6 +11,7 @@ from utils.generateImages.dataArray import (
 )
 from utils.googleDrive.files import saveFile
 from utils.googleDrive.folders import getFolderDataByID
+from bot.config import MOCK_MODE
 
 
 # Функция для сохранения видео в папку модели
@@ -57,7 +58,8 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     .format(link, model_name, parent_folder["webViewLink"], model_name_index))
 
     # Удаляем видео из папки temp
-    try:
-        os.remove(video_path)
-    except Exception as e:
-        logger.error(f"Ошибка при удалении видео из папки temp: {e}")
+    if not MOCK_MODE:
+        try:
+            os.remove(video_path)
+        except Exception as e:
+            logger.error(f"Ошибка при удалении видео из папки temp: {e}")
