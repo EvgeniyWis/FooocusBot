@@ -189,17 +189,17 @@ async def handle_video_example_buttons(
     dataForUpdate = {f"{model_name}": video_path}
     await appendDataToStateArray(state, "video_paths", dataForUpdate)
 
-    # Удаляем изображение из массива объектов saved_images_urls
-    saved_images_urls = stateData.get("saved_images_urls", [])
-    for item in saved_images_urls:
-        if model_name in item.keys():
-            saved_images_urls.remove(item)
-    await state.update_data(saved_images_urls=saved_images_urls)
-
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
     prefix = f"generate_video|{model_name}"
     if type_for_video_generation == "work":
+        # Удаляем изображение из массива объектов saved_images_urls
+        saved_images_urls = stateData.get("saved_images_urls", [])
+        for item in saved_images_urls:
+            if model_name in item.keys():
+                saved_images_urls.remove(item)
+        await state.update_data(saved_images_urls=saved_images_urls)
+        
         await call.message.answer_video(
             video=video,
             caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(
