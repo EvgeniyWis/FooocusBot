@@ -11,7 +11,7 @@ def randomizerKeyboard(current_variables: list[str]):
     inline_keyboard = []
 
     for variable in current_variables:
-        inline_keyboard.append([InlineKeyboardButton(text=variable, callback_data=f"randomizer|{variable}")])
+        inline_keyboard.append([InlineKeyboardButton(text=variable, callback_data=f"randomizer|{variable[:10]}")])
 
     inline_keyboard.append(
         [InlineKeyboardButton(text="➕ Добавить переменную", callback_data="randomizer|add_variable")],
@@ -38,10 +38,10 @@ def stopInputValuesForVariableKeyboard():
 # Клавиатура для выбора действия с переменной в рандомайзере
 def variableActionKeyboard(variable_name: str):
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="➕ Добавить значения", callback_data=f"randomizer_variable|add_values|{variable_name}")],
-        [InlineKeyboardButton(text="🗑️ Удалить значение", callback_data=f"randomizer_variable|delete_values|{variable_name}")],
-        [InlineKeyboardButton(text="❌ Удалить переменную", callback_data=f"randomizer_variable|delete_variable|{variable_name}")],
-        [InlineKeyboardButton(text="🔙 Назад", callback_data="randomizer_variable|back")],
+        [InlineKeyboardButton(text="➕ Добавить значения", callback_data=f"var|add_val|{variable_name}")],
+        [InlineKeyboardButton(text="🗑️ Удалить значение", callback_data=f"var|delete_val|{variable_name}")],
+        [InlineKeyboardButton(text="❌ Удалить переменную", callback_data=f"var|delete_var|{variable_name}")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="var|back")],
     ])
 
     return kb
