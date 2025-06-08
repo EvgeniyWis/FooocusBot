@@ -5,8 +5,8 @@ from logger import logger
 from ... import text
 from ...generateImages import generateImageBlock
 from ...generateImages.dataArray import getDataByModelName, getModelNameIndex
-from ...handlers.appendDataToStateArray import appendDataToStateArray
 from ..editMessageOrAnswer import editMessageOrAnswer
+from utils.handlers import getDataInDictsArray
 
 
 # Функция для перегенерации изображения
@@ -28,17 +28,19 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     data = await getDataByModelName(model_name)
 
     # Получаем промпт для перегенерации изображения в зависимости от режима генерации
-    randomizer_prompts = next((item for item in stateData.get("randomizer_prompts", []) if model_name in item.keys()), None)
+    randomizer_prompts = stateData.get("randomizer_prompts", [])
+    randomizer_prompt = await getDataInDictsArray(randomizer_prompts, model_name)
     prompt_for_images = stateData.get("prompt_for_images", "")
-    prompts_for_regenerate_images = next((item for item in stateData.get("prompts_for_regenerate_images", []) if model_name in item.keys()), None)
+    prompts_for_regenerate_images = stateData.get("prompts_for_regenerate_images", [])
+    prompts_for_regenerate_image = await getDataInDictsArray(prompts_for_regenerate_images, model_name)
 
     if prompts_for_regenerate_images:
-        prompt = prompts_for_regenerate_images[model_name]
+        prompt = prompts_for_regenerate_image
 
         logger.info(f"Промпт для перегенерации изображения: {prompt}")
 
     elif randomizer_prompts:
-        prompt = randomizer_prompts[model_name]
+        prompt = randomizer_prompt
         logger.info(f"Промпт для перегенерации изображения, полученный из рандомайзера: {prompt}")
 
     else:
