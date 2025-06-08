@@ -48,6 +48,7 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
         logger.info(f"Промпт для перегенерации изображения, полученный из стейта: {prompt}")
 
     # Прибавляем к каждому элементу массива корневой промпт
-    data["json"]['input']['prompt'] += " " + prompt
+    json = data["json"].copy()
+    json["input"]["prompt"] += " " + prompt
 
-    return await generateImageBlock(data["json"], model_name, call.message, state, user_id, setting_number, is_test_generation, False)
+    return await generateImageBlock(json, model_name, call.message, state, user_id, setting_number, is_test_generation, False)
