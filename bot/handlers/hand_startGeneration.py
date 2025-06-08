@@ -36,6 +36,7 @@ from utils.googleDrive.folders import getFolderDataByID
 from utils.handlers import (
     appendDataToStateArray,
     editMessageOrAnswer,
+    deleteMessageFromState
 )
 from utils.handlers.startGeneration import (
     generateImagesInHandler,
@@ -79,7 +80,9 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         'regenerate_images': [],
         'model_indexes_for_generation': [],
         'saved_images_urls': [],
-        'faceswap_generate_models': []
+        'faceswap_generate_models': [],
+        'imageGeneration_mediagroup_messages_ids': [],
+        'videoGeneration_messages_ids': []
     }
     
     await state.update_data(**initial_state)
@@ -513,7 +516,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         logger.info(f"Результат замены лица: {result_path}")
 
         # Меняем текст на сообщении
-        await editMessageOrAnswer(
+        saving_progress_message = await editMessageOrAnswer(
             call,
             text.SAVE_IMAGE_PROGRESS_TEXT.format(model_name, model_name_index),
         )
@@ -569,6 +572,12 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             ),
             reply_markup=video_generation_keyboards.generateVideoKeyboard(model_name)
         )
+
+        # Удаляем сообщение о сохранении изображения
+        await saving_progress_message.delete()
+
+        # Удаляем медиагруппу
+        await deleteMessageFromState(state, "imageGeneration_mediagroup_messages_ids", model_name, call.message.chat.id)
 
     except Exception as e:
         traceback.print_exc()

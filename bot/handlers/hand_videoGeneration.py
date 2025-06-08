@@ -1,12 +1,10 @@
 import asyncio
 import os
 import traceback
-from datetime import datetime
 
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from assets.mocks.links import MOCK_LINK_FOR_SAVE_VIDEO
 from config import MOCK_MODE, TEMP_IMAGE_FILES_DIR
 from InstanceBot import bot, router
 from keyboards import video_generation_keyboards
@@ -14,16 +12,15 @@ from logger import logger
 from states import StartGenerationState
 from utils import retryOperation, text
 from utils.generateImages.dataArray import (
-    getDataByModelName,
     getModelNameIndex,
 )
-from utils.googleDrive.files import saveFile
 from utils.handlers import (
     editMessageOrAnswer,
+    getDataInDictsArray,
+    deleteMessageFromState
 )
 from utils.handlers.videoGeneration import saveVideo
 from utils.videos import generateVideo
-from utils.googleDrive.folders import getFolderDataByID
 from utils.handlers import appendDataToStateArray
 from utils.generateImages.dataArray.getModelNameByIndex import getModelNameByIndex
 
@@ -92,6 +89,9 @@ async def handle_video_example_buttons(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
+    # Удаляем текущее сообщение
+    await call.message.delete()
+
     # Получаем индекс видео-примера и тип кнопки
     temp = call.data.split("|")
 
@@ -107,11 +107,9 @@ async def handle_video_example_buttons(
 
     # Получаем название модели и url изображения
     stateData = await state.get_data()
-    image_url_dict = next((item for item in stateData.get("saved_images_urls", []) if model_name in item.keys()), None)
+    saved_images_urls = stateData.get("saved_images_urls", [])
+    image_url = await getDataInDictsArray(saved_images_urls, model_name)
     
-    # Получаем URL изображения из словаря
-    image_url = image_url_dict[model_name] if image_url_dict else None
-
     # Удаляем сообщение с выбором видео-примера
     # TODO: режим генерации видео с видео-примерами временно отключен
     # try:
@@ -152,7 +150,7 @@ async def handle_video_example_buttons(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение про генерацию видео
-    await editMessageOrAnswer(
+    video_progress_message = await editMessageOrAnswer(
         call,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
     )
@@ -193,14 +191,7 @@ async def handle_video_example_buttons(
     video = types.FSInputFile(video_path)
     prefix = f"generate_video|{model_name}"
     if type_for_video_generation == "work":
-        # Удаляем изображение из массива объектов saved_images_urls
-        saved_images_urls = stateData.get("saved_images_urls", [])
-        for item in saved_images_urls:
-            if model_name in item.keys():
-                saved_images_urls.remove(item)
-        await state.update_data(saved_images_urls=saved_images_urls)
-        
-        await call.message.answer_video(
+        video_message = await call.message.answer_video(
             video=video,
             caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(
                 model_name,
@@ -211,7 +202,7 @@ async def handle_video_example_buttons(
             ),
         )
     else:  # При тестовой просто отправляем юзеру результат генерации
-        await call.message.answer_video(
+        video_message = await call.message.answer_video(
             video=video,
             caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(
                 model_name,
@@ -223,6 +214,12 @@ async def handle_video_example_buttons(
             ),
         )
 
+    # Удаляем сообщение о генерации видео
+    await video_progress_message.delete()
+
+    # Сохраняем сообщение в стейт для последующего удаления
+    dataForUpdate = {f"{model_name}": video_message.message_id}
+    await appendDataToStateArray(state, "videoGeneration_messages_ids", dataForUpdate)
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -232,10 +229,8 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     await state.update_data(prompt_for_video=prompt)
     stateData = await state.get_data()
     model_name = stateData.get("model_name_for_video_generation", "")
-    image_url_dict = next((item for item in stateData.get("saved_images_urls", []) if model_name in item.keys()), None)
-    
-    # Получаем URL изображения из словаря
-    image_url = image_url_dict[model_name] if image_url_dict else None
+    saved_images_urls = stateData.get("saved_images_urls", [])
+    image_url = await getDataInDictsArray(saved_images_urls, model_name)
     
     if not image_url:
         await message.answer("Ошибка: не удалось найти URL изображения")
@@ -283,14 +278,28 @@ async def handle_video_correctness_buttons(
     temp = call.data.split("|")
     model_name = temp[2]
 
+    # Убираем кнопки у сообщения
+    await call.message.edit_reply_markup(None)
+
     # Получаем данные
     stateData = await state.get_data()
 
     # Получаем путь к видео
-    video_path = next((item for item in stateData.get("video_paths", []) if model_name in item.keys()), None)
-    video_path = video_path[model_name]
-    
+    video_paths = stateData.get("video_paths", [])
+    video_path = await getDataInDictsArray(video_paths, model_name)
+
+    # Удаляем изображение из массива объектов saved_images_urls
+    saved_images_urls = stateData.get("saved_images_urls", [])
+    for item in saved_images_urls:
+        if model_name in item.keys():
+            saved_images_urls.remove(item)
+    await state.update_data(saved_images_urls=saved_images_urls)
+
+    # Сохраняем видео
     await saveVideo(video_path, model_name, call.message)
+
+    # Удаляем сообщение о генерации видео
+    await deleteMessageFromState(state, "videoGeneration_messages_ids", model_name, call.message.chat.id)
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"

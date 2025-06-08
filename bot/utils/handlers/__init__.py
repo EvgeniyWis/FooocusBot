@@ -1,3 +1,4 @@
 from .appendDataToStateArray import appendDataToStateArray
 from .editMessageOrAnswer import editMessageOrAnswer
-
+from .getDataInDictsArray import getDataInDictsArray
+from .deleteMessageFromState import deleteMessageFromState
