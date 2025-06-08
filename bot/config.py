@@ -6,7 +6,7 @@ from logger import logger
 load_dotenv(find_dotenv())
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
-SETTING_1_ENDPOINT_ID = ""
+SETTING_1_ENDPOINT_ID = "aelfxb1abgc86i"
 SETTING_2_ENDPOINT_ID = "z8ucydl90zd843"
 SETTING_3_ENDPOINT_ID = "sw0ded20r1mufl"
 SETTING_4_ENDPOINT_ID = "1f0qlar276qtgk"
