@@ -72,12 +72,17 @@ async def choose_generations_type(
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Очищаем стейт
-    await state.update_data(stop_generation=False)
-    await state.update_data(generation_step=1)
-    await state.update_data(prompts_for_regenerate_images=[])
-    await state.update_data(regenerate_images=[])
-    await state.update_data(model_indexes_for_generation=[])
-    await state.update_data(saved_images_urls=[])
+    initial_state = {
+        'stop_generation': False,
+        'generation_step': 1,
+        'prompts_for_regenerate_images': [],
+        'regenerate_images': [],
+        'model_indexes_for_generation': [],
+        'saved_images_urls': [],
+        'faceswap_generate_models': []
+    }
+    
+    await state.update_data(**initial_state)
 
     # Если выбрана конкретная модель, то просим ввести название модели
     if call.data == "select_setting|specific_model":
@@ -422,9 +427,33 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 )
 
                 # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
+                start_time = datetime.now()
+                last_models_state = []
+
                 while True:
                     stateData = await state.get_data()
                     faceswap_generate_models = stateData.get("faceswap_generate_models", [])
+
+                    # Проверяем, изменился ли список моделей
+                    if faceswap_generate_models != last_models_state:
+                        start_time = datetime.now()
+                        last_models_state = faceswap_generate_models.copy()
+
+                    # Проверяем таймаут
+                    current_time = datetime.now()
+                    elapsed_time = (current_time - start_time).total_seconds()
+                    if elapsed_time > 600:  # 10 минут = 600 секунд
+                        logger.error(
+                            f"Таймаут ожидания обновления списка faceswap_generate_models для модели {model_name}"
+                        )
+                        await editMessageOrAnswer(
+                            call,
+                            text.FACE_SWAP_TIMEOUT_ERROR_TEXT.format(
+                                model_name,
+                                model_name_index,
+                            ),
+                        )
+                        return
 
                     logger.info(
                         f"Список генераций для замены лица: {faceswap_generate_models}",
