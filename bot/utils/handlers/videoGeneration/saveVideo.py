@@ -54,8 +54,12 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
         logger.error(f"Ошибка при удалении сообщения о начале сохранения видео: {e}")
 
     # Отправляем сообщение о сохранении видео
-    await message.answer(text.SAVE_VIDEO_SUCCESS_TEXT
-    .format(link, model_name, parent_folder["webViewLink"], model_name_index))
+    video = types.FSInputFile(video_path)
+    await message.answer_video(
+        video=video,
+        caption=text.SAVE_VIDEO_SUCCESS_TEXT
+        .format(link, model_name, parent_folder["webViewLink"], model_name_index)
+    )
 
     # Удаляем видео из папки temp
     if not MOCK_MODE:

@@ -8,6 +8,7 @@ from keyboards import start_generation_keyboards
 
 from ... import text
 from ...generateImages.dataArray import getDataByModelName, getModelNameIndex
+from ...handlers import appendDataToStateArray
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
@@ -15,7 +16,11 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
     setting_number: str, is_test_generation: bool, user_id: int):
     try:
         # Отправляем изображения
-        await message.answer_media_group(media_group)
+        media_group_message = await message.answer_media_group(media_group)
+
+        # Сохраняем их в стейт 
+        dataForUpdate = {f"{model_name}": [media.message_id for media in media_group_message]}
+        await appendDataToStateArray(state, "imageGeneration_mediagroup_messages_ids", dataForUpdate)
     except Exception as e:
         logger.error(f"Ошибка при отправке медиагруппы: {e}")
         try:
