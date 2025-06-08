@@ -8,6 +8,7 @@ from ..jobs.getJobID import getJobID
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
 from .dataArray.getSettingNumberByModelName import getSettingNumberByModelName
+from logger import logger
 
 
 # Функция для генерации изображений по объекту данных
@@ -27,6 +28,9 @@ async def generateImageBlock(
     if not MOCK_MODE:
         # Получаем номер настройки по имени модели
         setting_number = getSettingNumberByModelName(model_name)
+
+        # Логируем наш json
+        logger.info(f"Отправляем запрос на генерацию изображений с данными: {dataJSON}")
 
         # Делаем запрос на генерацию и получаем id работы
         job_id = await getJobID(dataJSON, setting_number, state)
