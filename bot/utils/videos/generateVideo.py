@@ -42,14 +42,13 @@ async def generateVideo(
             "aspect_ratio": "9:16",
             "negative_prompt": "cartoon, anime, 3D render, low resolution, blurry, out of focus, pixelated, overexposed, underexposed, oversaturated, flat lighting, unrealistic proportions, unnatural colors, poorly detailed textures, poorly rendered hair, low-quality shadows, distorted features, artificial-looking expressions, plastic skin, unnatural movement, stiff pose, low-quality assets, low frame rate, poorly lit environments, amateur composition, unbalanced colors, noise, grainy image, lack of depth, unnatural anatomy, clipping issues, over-sharpening, artificial glow, mismatched elements.",
             "cfg_scale": 0.7,
-            "version": "kling-v1-6",
         }
 
         # Асинхронное открытие файла для отправки
         async with httpx.AsyncClient(timeout=60) as client:
             async with aiofiles.open(image_path, "rb") as image_file:
                 files = {
-                    "image": (
+                    "image_url": (
                         "image.jpg",
                         await image_file.read(),
                         "image/jpeg",
@@ -61,7 +60,7 @@ async def generateVideo(
                 }
 
                 # Отправляем запрос на генерацию видео
-                url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling"
+                url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
                 response = await client.post(
                     url_endpoint,
                     data=data,
