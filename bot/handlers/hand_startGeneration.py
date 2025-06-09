@@ -498,12 +498,13 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                     await asyncio.sleep(10)
 
                 # После генерации удаляем модель из стейта
-                stateData = await state.get_data()
-                faceswap_generate_models = stateData.get("faceswap_generate_models", [])
-                faceswap_generate_models.remove(model_name)
-                await state.update_data(
-                    faceswap_models=faceswap_generate_models,
-                )
+                if model_name in faceswap_generate_models:
+                    stateData = await state.get_data()
+                    faceswap_generate_models = stateData.get("faceswap_generate_models", [])
+                    faceswap_generate_models.remove(model_name)
+                    await state.update_data(
+                        faceswap_models=faceswap_generate_models,
+                    )
             else:
                 result_path = MOCK_FACEFUSION_PATH
 
