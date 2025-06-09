@@ -32,20 +32,23 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     randomizer_prompt = await getDataInDictsArray(randomizer_prompts, model_name)
     prompt_for_images = stateData.get("prompt_for_images", "")
     prompts_for_regenerate_images = stateData.get("prompts_for_regenerate_images", [])
-    prompts_for_regenerate_image = await getDataInDictsArray(prompts_for_regenerate_images, model_name)
+    prompt_for_regenerate_image = await getDataInDictsArray(prompts_for_regenerate_images, model_name)
 
-    if prompts_for_regenerate_images:
-        prompt = prompts_for_regenerate_image
+    if prompt_for_regenerate_image:
+        prompt = prompt_for_regenerate_image
 
         logger.info(f"Промпт для перегенерации изображения: {prompt}")
 
-    elif randomizer_prompts:
+    elif randomizer_prompt:
         prompt = randomizer_prompt
         logger.info(f"Промпт для перегенерации изображения, полученный из рандомайзера: {prompt}")
 
-    else:
+    elif prompt_for_images:
         prompt = prompt_for_images
         logger.info(f"Промпт для перегенерации изображения, полученный из стейта: {prompt}")
+
+    else:
+        prompt = ""
 
     # Прибавляем к каждому элементу массива корневой промпт
     json = data["json"].copy()
