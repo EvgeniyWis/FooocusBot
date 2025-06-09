@@ -14,13 +14,11 @@ def randomizerKeyboard(current_variables: list[str]):
         inline_keyboard.append([InlineKeyboardButton(text=variable_name,
         callback_data=f"randomizer|{variable_index}")])
 
-    inline_keyboard.append(
+    inline_keyboard.extend([
         [InlineKeyboardButton(text="➕ Добавить переменную", callback_data="randomizer|add_variable")],
-    )
-
-    inline_keyboard.append(
-        [InlineKeyboardButton(text="⚡️ Начать генерацию", callback_data="randomizer|start_generation")],
-    )
+        [InlineKeyboardButton(text="💬 Одно сообщение", callback_data="randomizer|one_message")],
+        [InlineKeyboardButton(text="⚡️ Начать генерацию", callback_data="randomizer|start_generation")]
+    ])
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 

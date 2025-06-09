@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from InstanceBot import router
 from keyboards import randomizer_keyboards
 from logger import logger
-from states.UserState import RandomizerState
+from states.RandomizerState import RandomizerState
 from utils import text
 from utils.handlers import editMessageOrAnswer
 from utils.handlers.startGeneration import generateImagesInHandler
@@ -23,6 +23,12 @@ async def handle_randomizer_buttons(call: types.CallbackQuery, state: FSMContext
         await editMessageOrAnswer(
         call,text.ADD_VARIABLE_FOR_RANDOMIZER_TEXT)
         await state.set_state(RandomizerState.write_variable_for_randomizer)
+
+    # Если была выбрана кнопка "💬 Одно сообщение"
+    elif action == "one_message":
+        await editMessageOrAnswer(
+        call,text.ONE_MESSAGE_FOR_RANDOMIZER_TEXT)
+        await state.set_state(RandomizerState.write_one_message_for_randomizer)
 
     # Если была выбрана кнопка "⚡️ Начать генерацию"
     elif action == "start_generation":
@@ -196,6 +202,73 @@ async def write_value_for_variable_for_randomizer(message: types.Message, state:
         logger.error(f"Ошибка при отправке значения для рандомайзера: {e}")
 
 
+# Обработка ввода одного сообщения для рандомайзера
+async def write_one_message_for_randomizer(message: types.Message, state: FSMContext):
+    """
+    Переменная 1: значение 1, значение 2, значение 3;
+    Переменная 2: значение 1, значение 2, значение 3;
+    Переменная 3: значение 1, значение 2, значение 3;
+    """
+    try:
+        # Разбиваем сообщение на строки и удаляем пустые строки
+        lines = [line.strip() for line in message.text.split('\n') if line.strip()]
+        
+        # Проверяем, что есть хотя бы одна строка
+        if not lines:
+            await message.answer("Сообщение пустое. Пожалуйста, введите данные в правильном формате.")
+            return
+
+        # Очищаем предыдущие данные
+        await state.update_data(variable_names_for_randomizer=[])
+
+        variable_names = []
+        
+        # Обрабатываем каждую строку
+        for line in lines:
+            # Проверяем формат строки (должна содержать ":")
+            if ":" not in line:
+                await message.answer(f"Неправильный формат строки: {line}\nКаждая строка должна содержать название переменной, двоеточие и значения.")
+                return
+                
+            # Разделяем на название переменной и значения
+            variable_name, values_str = line.split(":", 1)
+            variable_name = variable_name.strip()
+            
+            # Проверяем, что строка заканчивается на точку с запятой
+            if not values_str.strip().endswith(";"):
+                await message.answer(f"Строка должна заканчиваться точкой с запятой (;): {line}")
+                return
+                
+            # Убираем точку с запятой и разбиваем значения по запятым
+            values = [val.strip() for val in values_str.rstrip(";").split(",")]
+            values = [val for val in values if val]  # Удаляем пустые значения
+            
+            # Проверяем, что есть хотя бы одно значение
+            if not values:
+                await message.answer(f"Не указаны значения для переменной: {variable_name}")
+                return
+                
+            # Добавляем переменную и её значения в state
+            variable_names.append(variable_name)
+            await state.update_data(**{f"randomizer_{variable_name}_values": values})
+        
+        # Сохраняем список имен переменных
+        await state.update_data(variable_names_for_randomizer=variable_names)
+        
+        # Отправляем сообщение об успешном добавлении
+        await message.answer(text.ONE_MESSAGE_FOR_RANDOMIZER_SUCCESS_TEXT)
+        
+        await message.answer(
+            text.RANDOMIZER_MENU_TEXT,
+            reply_markup=randomizer_keyboards.randomizerKeyboard(variable_names)
+        )
+        await state.set_state(None)
+        
+    except Exception as e:
+        logger.error(f"Ошибка при обработке сообщения для рандомайзера: {e}")
+        await message.answer(text.ONE_MESSAGE_FOR_RANDOMIZER_ERROR_TEXT)
+
+
 # Добавление обработчиков
 def hand_add():
     router.callback_query.register(handle_variable_action_buttons, lambda call: call.data.startswith("var"))
@@ -207,3 +280,5 @@ def hand_add():
     router.message.register(write_variable_for_randomizer, StateFilter(RandomizerState.write_variable_for_randomizer))
 
     router.message.register(write_value_for_variable_for_randomizer, StateFilter(RandomizerState.write_value_for_variable_for_randomizer))
+
+    router.message.register(write_one_message_for_randomizer, StateFilter(RandomizerState.write_one_message_for_randomizer))
