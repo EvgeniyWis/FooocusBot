@@ -48,10 +48,11 @@ async def generateImages(
             )
 
             # Прибавляем к каждому элементу массива корневой промпт
-            data["json"]["input"]["prompt"] += " " + prompt
+            json = data["json"].copy()
+            json["input"]["prompt"] += " " + prompt
 
             image = await generateImageBlock(
-                data["json"],
+                json,
                 data["model_name"],
                 message,
                 state,

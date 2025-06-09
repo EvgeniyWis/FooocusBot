@@ -265,11 +265,12 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     data = await getDataByModelName(model_name)
 
     # Прибавляем к каждому элементу массива корневой промпт
-    data["json"]["input"]["prompt"] += " " + prompt
+    json = data["json"].copy()
+    json["input"]["prompt"] += " " + prompt
 
     # Генерируем изображения
     await generateImageBlock(
-        data["json"],
+        json,
         model_name,
         message_for_edit,
         state,
@@ -644,9 +645,11 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     data = await getDataByModelName(model_name)
 
     # Прибавляем к каждому элементу массива корневой промпт
-    data["json"]['input']['prompt'] += " " + prompt 
-
-    return await generateImageBlock(data["json"], model_name, message, state, user_id, setting_number, is_test_generation, False)
+    json = data["json"].copy()
+    json["input"]["prompt"] += " " + prompt 
+    
+    await state.set_state(None)
+    return await generateImageBlock(json, model_name, message, state, user_id, setting_number, is_test_generation, False)
 
 
 # Добавление обработчиков
