@@ -12,7 +12,7 @@ from ...generateImages import (
     generateImagesByAllSettings,
 )
 from ...generateImages.dataArray import (
-    getDataArrayWithRootPrompt,
+    getDataArrayBySettingNumber,
 )
 import asyncio
 
@@ -51,16 +51,19 @@ async def generateImagesInHandler(
                 message_for_edit = await message.answer(
                     text.GET_PROMPT_SUCCESS_TEXT,
                 )
-                # Прибавляем к каждому элементу массива корневой промпт
-                dataArray = await getDataArrayWithRootPrompt(
+                # Получаем данные для генерации
+                dataArray = await getDataArrayBySettingNumber(
                     int(setting_number),
-                    prompt,
                 )
-                dataJSON = dataArray[0]["json"]
+
+                # Прибавляем корневой промпт
+                json = dataArray[0]["json"].copy()
+                json["input"]["prompt"] += " " + prompt
+
                 model_name = dataArray[0]["model_name"]
                 result = [
                     await generateImageBlock(
-                        dataJSON,
+                        json,
                         model_name,
                         message_for_edit,
                         state,
