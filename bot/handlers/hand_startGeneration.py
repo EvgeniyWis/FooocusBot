@@ -15,7 +15,7 @@ from keyboards import (
 )
 from logger import logger
 from PIL import Image
-from states.UserState import StartGenerationState
+from states.StartGenerationState import StartGenerationState
 from utils import text
 from utils.facefusion import facefusion_swap
 from utils.generateImages import (
