@@ -647,7 +647,8 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     # Прибавляем к каждому элементу массива корневой промпт
     json = data["json"].copy()
     json["input"]["prompt"] += " " + prompt 
-
+    
+    await state.set_state(None)
     return await generateImageBlock(json, model_name, message, state, user_id, setting_number, is_test_generation, False)
 
 
