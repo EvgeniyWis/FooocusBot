@@ -13,4 +13,4 @@ def getGoogleDriveFileID(url: str) -> str | None:
         match = re.search(pattern, url)
         return match.group(1) if match else None
     except Exception as e:
-        return None
+        raise Exception(f"Произошла ошибка при получении ID файла из Google Drive: {e}")

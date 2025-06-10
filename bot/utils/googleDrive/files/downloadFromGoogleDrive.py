@@ -27,5 +27,4 @@ async def downloadFromGoogleDrive(url: str, file_id: str) -> str | None:
             logger.error(f"Неудачный статус ответа: {response.status_code}")
             return None
     except Exception as e:
-        logger.error(f"Ошибка при скачивании изображения: {e}")
-        return None
+        raise Exception(f"Произошла ошибка при скачивании файла из Google Drive: {e}")

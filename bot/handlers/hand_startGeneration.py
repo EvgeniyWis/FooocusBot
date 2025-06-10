@@ -15,7 +15,7 @@ from keyboards import (
 )
 from logger import logger
 from PIL import Image
-from states.UserState import StartGenerationState
+from states.StartGenerationState import StartGenerationState
 from utils import text
 from utils.facefusion import facefusion_swap
 from utils.generateImages import (
@@ -44,6 +44,8 @@ from utils.handlers.startGeneration import (
 )
 from utils.generateImages.dataArray import getSettingNumberByModelName
 from utils.googleDrive.files import convertDriveLink
+
+import os
 
 
 # Обработка выбора количества генераций
@@ -489,21 +491,23 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                                 text.FACE_SWAP_ERROR_TEXT.format(
                                     model_name,
                                     model_name_index,
+                                    e
                                 ),
                             )
-                            break
+                            raise e
 
                         break
 
                     await asyncio.sleep(10)
 
                 # После генерации удаляем модель из стейта
-                stateData = await state.get_data()
-                faceswap_generate_models = stateData.get("faceswap_generate_models", [])
-                faceswap_generate_models.remove(model_name)
-                await state.update_data(
-                    faceswap_models=faceswap_generate_models,
-                )
+                if model_name in faceswap_generate_models:
+                    stateData = await state.get_data()
+                    faceswap_generate_models = stateData.get("faceswap_generate_models", [])
+                    faceswap_generate_models.remove(model_name)
+                    await state.update_data(
+                        faceswap_models=faceswap_generate_models,
+                    )
             else:
                 result_path = MOCK_FACEFUSION_PATH
 
@@ -577,16 +581,20 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         # Удаляем сообщение о сохранении изображения
         await saving_progress_message.delete()
 
+        # Удаляем изображение с замененным лицом
+        if not MOCK_MODE:
+            os.remove(result_path)
+
         # Удаляем медиагруппу
         await deleteMessageFromState(state, "imageGeneration_mediagroup_messages_ids", model_name, call.message.chat.id)
 
     except Exception as e:
         traceback.print_exc()
-        logger.error(f"Произошла ошибка при генерации изображения: {e}")
         await editMessageOrAnswer(
             call,
             text.GENERATE_IMAGE_ERROR_TEXT.format(model_name, e),
         )
+        raise e
 
 
 # Обработка ввода названия модели для генерации
