@@ -60,27 +60,27 @@ def setting3_getDataArray():
         real_beauty, igbaddie, 1girl, 18 years old, armenian girl, sorority girl, volumnous platinum-blonde hair with black curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 1.80, 1.35, -1.70]),
 
-        setting3_generateData("simona.caramella", "1e2lBwb_QGWo9xDI6tO0curnmLYAnK39r", "1YNDuFvCXfnHmaSu5cUjzUfKgope-VvI8", """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("simona.caramella", "1e2lBwb_QGWo9xDI6tO0curnmLYAnK39r", "1YNDuFvCXfnHmaSu5cUjzUfKgope-VvI8", """score9, high quality, photorealistic, bright lighting, skin detail, BREAK
 
-        realbeauty, 1girl, 18 years old, Armenian girl, long voluminous brown hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright brown eyes, sharp cheekbones.""",
+        1girl, 18 years old, Armenian, long brown hair, big breasts, slim waist, hourglass figure, tan skin, cute face, big lips, smirk, brown eyes, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 3.25, 0.10, -1.05]),
 
-        setting3_generateData("alinacute.xo", "1BorTaz1lMxtcFzBuoP-rueWXbiiF0Tj9", "1qbpG-XxdF8p0utQkALgb9r2qyrvxzqTm", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("alinacute.xo", "1BorTaz1lMxtcFzBuoP-rueWXbiiF0Tj9", "1qbpG-XxdF8p0utQkALgb9r2qyrvxzqTm", """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-platinum hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-brown eyes, sharp facial features, sharp cheekbones.""",
+        realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright brown eyes, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 3.40, 0.10, -1.50]),
 
-        setting3_generateData("sasha_no_limit", "1hMK6QpRbKz5Bqod6juL7qzz-pLmeZidx", "1FRpGyFkEmjip59DbJPb3vct3HpXLqh1G", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("sasha_no_limit", "1hMK6QpRbKz5Bqod6juL7qzz-pLmeZidx", "1FRpGyFkEmjip59DbJPb3vct3HpXLqh1G", """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-platinum-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-brown eyes, sharp facial features, sharp cheekbones.""",
+        realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum-blonde hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright brown eyes, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 1.50, 0.65, -1.15]),
 
-        setting3_generateData("paulinacute.xo", "1BkIuoC8Ev1zIQmxHBLgsE8-6A3Hr22sq", "1f_Lu5mukPusDcCatZ6CnT70beV24YZ2i", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("paulinacute.xo", "1BkIuoC8Ev1zIQmxHBLgsE8-6A3Hr22sq", "1f_Lu5mukPusDcCatZ6CnT70beV24YZ2i", """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-platinum blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
+realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blonde hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright blue eyes, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 2.00, 0.10, -1.00]),
 
-        setting3_generateData("callieroux", "1oMwvePG5pSnbquF6wEr6yGWw45EjaeyO", "1u9fE_nQdDVSnbucs95u1kqcn0vwMGRFM", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            setting3_generateData("callieroux", "1oMwvePG5pSnbquF6wEr6yGWw45EjaeyO", "1u9fE_nQdDVSnbucs95u1kqcn0vwMGRFM", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-platinum blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 3.45, 0.10, -0.40]),
