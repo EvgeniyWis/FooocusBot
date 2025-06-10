@@ -491,6 +491,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                                 text.FACE_SWAP_ERROR_TEXT.format(
                                     model_name,
                                     model_name_index,
+                                    e
                                 ),
                             )
                             break
