@@ -52,7 +52,7 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
         file = await retryOperation(uploadFile, 10, 2, file_path, file_metadata, name, folder_name)
 
         if with_deleting_temp_folder:
-            # Удаляем папку с файлами через 30 минут
+            # Удаляем папку с файлами через 1 час
             asyncio.create_task(delete_temp_files_with_delay(folder_name, user_id))
 
             # Через 1 час удаляем и папку в более верхнем уровне
