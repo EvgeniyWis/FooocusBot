@@ -194,16 +194,17 @@ async def write_value_for_variable_for_randomizer(message: types.Message, state:
         await state.update_data(**{variable_name_values: values})
 
     await state.set_state(None)
-    await message.answer(text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(value, variable_name))
+    await message.answer(text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(value, variable_name),
+                         reply_markup=randomizer_keyboards.stopInputValuesForVariableKeyboard())
     await state.set_state(RandomizerState.write_value_for_variable_for_randomizer)
 
 
 # Обработка ввода одного сообщения для рандомайзера
 async def write_one_message_for_randomizer(message: types.Message, state: FSMContext):
     """
-    Переменная 1: значение 1, значение 2, значение 3;
-    Переменная 2: значение 1, значение 2, значение 3;
-    Переменная 3: значение 1, значение 2, значение 3;
+    Переменная 1: значение 1/значение 2/значение 3;
+    Переменная 2: значение 1/значение 2/значение 3;
+    Переменная 3: значение 1/значение 2/значение 3;
     """
     # Разбиваем сообщение на строки и удаляем пустые строки
     lines = [line.strip() for line in message.text.split('\n') if line.strip()]
@@ -234,8 +235,8 @@ async def write_one_message_for_randomizer(message: types.Message, state: FSMCon
             await message.answer(f"Строка должна заканчиваться точкой с запятой (;): {line}")
             return
             
-        # Убираем точку с запятой и разбиваем значения по запятым
-        values = [val.strip() for val in values_str.rstrip(";").split(",")]
+        # Убираем точку с запятой и разбиваем значения по слешу
+        values = [val.strip() for val in values_str.rstrip(";").split("/")]
         values = [val for val in values if val]  # Удаляем пустые значения
         
         # Проверяем, что есть хотя бы одно значение
