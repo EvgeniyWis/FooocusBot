@@ -45,6 +45,8 @@ from utils.handlers.startGeneration import (
 from utils.generateImages.dataArray import getSettingNumberByModelName
 from utils.googleDrive.files import convertDriveLink
 
+import os
+
 
 # Обработка выбора количества генераций
 async def choose_generations_type(
@@ -577,6 +579,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Удаляем сообщение о сохранении изображения
         await saving_progress_message.delete()
+
+        # Удаляем изображение с замененным лицом
+        if not MOCK_MODE:
+            os.remove(result_path)
 
         # Удаляем медиагруппу
         await deleteMessageFromState(state, "imageGeneration_mediagroup_messages_ids", model_name, call.message.chat.id)
