@@ -68,8 +68,4 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
                 logger.error(f"Ошибка при удалении временных файлов: {e}")
 
     except Exception as e:
-        logger.error(f"Критическая ошибка в функции sendImageBlock: {e}")
-        try:
-            await message.answer("Произошла ошибка, но бот продолжает работу...")
-        except:
-            pass
+        raise Exception(f"Произошла ошибка в функции sendImageBlock: {e}")

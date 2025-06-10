@@ -13,6 +13,7 @@ from config import (
 )
 from InstanceBot import bot, dp
 from logger import logger
+from middleware import ErrorHandlingMiddleware
 
 
 async def on_startup() -> None:
@@ -44,6 +45,10 @@ async def on_startup() -> None:
     handlers.hand_startGeneration.hand_add()
     handlers.hand_randomizer.hand_add()
     handlers.hand_videoGeneration.hand_add()
+
+    # Регистрируем middleware для обработки ошибок
+    dp.message.middleware(ErrorHandlingMiddleware())
+    dp.callback_query.middleware(ErrorHandlingMiddleware())
 
     bot_info = await bot.get_me()
 

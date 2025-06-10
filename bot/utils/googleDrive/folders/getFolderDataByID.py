@@ -12,5 +12,4 @@ def getFolderDataByID(folder_id: str):
         ).execute()
         return folder
     except Exception as e:
-        logger.error(f"Ошибка при получении данных папки: {e}")
-        return None
+        raise Exception(f"Произошла ошибка при получении данных папки: {e}")

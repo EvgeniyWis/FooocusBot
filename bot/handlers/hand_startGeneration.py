@@ -494,7 +494,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                                     e
                                 ),
                             )
-                            break
+                            raise e
 
                         break
 
@@ -590,11 +590,11 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     except Exception as e:
         traceback.print_exc()
-        logger.error(f"Произошла ошибка при генерации изображения: {e}")
         await editMessageOrAnswer(
             call,
             text.GENERATE_IMAGE_ERROR_TEXT.format(model_name, e),
         )
+        raise e
 
 
 # Обработка ввода названия модели для генерации

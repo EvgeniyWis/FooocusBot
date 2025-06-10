@@ -106,5 +106,4 @@ async def generateImagesByAllSettings(
         await message_with_settings.unpin()
         await message_with_generations_status.unpin()
         traceback.print_exc()
-        logger.error(f"Ошибка при тестовой генерации по всем настройкам: {e}")
-        return False
+        raise Exception(f"Произошла ошибка при генерации изображений по всем настройкам: {e}")

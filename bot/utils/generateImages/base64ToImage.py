@@ -65,4 +65,4 @@ async def base64ToImage(
         return file_path
 
     except Exception as e:
-        print(f"Ошибка при обработке изображения: {str(e)}")
+        raise e

@@ -117,4 +117,4 @@ async def generateImagesInHandler(
         traceback.print_exc()
         await message.answer(text.GENERATION_IMAGE_ERROR_TEXT)
         await state.clear()
-        return
+        raise e
