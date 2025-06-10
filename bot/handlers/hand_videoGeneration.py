@@ -246,7 +246,6 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(
                 model_name,
                 model_name_index,
-                prompt,
             ),
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
@@ -259,7 +258,6 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(
                 model_name,
                 model_name_index,
-                prompt,
             ),
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
