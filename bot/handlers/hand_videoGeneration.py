@@ -34,6 +34,9 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
+    # Удаляем кнопку "📹 Сгенерировать видео"
+    await call.message.edit_reply_markup(None)
+
     # Отправляем сообщение для выбора видео-примеров
     await editMessageOrAnswer(
         call,text.SELECT_VIDEO_TYPE_GENERATION_TEXT.format(model_name, model_name_index),
