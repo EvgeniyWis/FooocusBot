@@ -68,5 +68,4 @@ async def getAllFolders(model_names: list[str] = None):
         return "\n\n".join(formatted_output)
         
     except Exception as e:
-        logger.error(f"Ошибка при получении списка папок: {str(e)}")
-        raise e 
+        raise Exception(f"Произошла ошибка при получении списка папок: {e}")

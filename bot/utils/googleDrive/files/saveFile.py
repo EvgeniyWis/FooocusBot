@@ -63,5 +63,4 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
         return file["webViewLink"]
 
     except Exception as e:
-        logger.error(f"Ошибка при сохранении файла: {str(e)}")
-        return False
+        raise Exception(f"Произошла ошибка при сохранении файла: {e}")

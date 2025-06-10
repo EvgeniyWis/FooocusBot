@@ -169,5 +169,4 @@ async def generateVideo(
                     await asyncio.sleep(10)
 
     except Exception as e:
-        logger.error(f"Ошибка при отправке запроса на генерацию видео: {e}")
-        raise e
+        raise Exception(f"Произошла ошибка при отправке запроса на генерацию видео: {e}")
