@@ -298,15 +298,15 @@ ONE_MESSAGE_FOR_RANDOMIZER_TEXT = """
 Оно нужно для ввода всех переменных и значений с помощью всего одного сообщения. 
 Формат ввода: 
 <code>
-Переменная 1: значение 1, значение 2, значение 3;
-Переменная 2: значение 1, значение 2, значение 3;
-Переменная 3: значение 1, значение 2, значение 3;
+Переменная 1: значение 1/значение 2/значение 3;
+Переменная 2: значение 1/значение 2/значение 3;
+Переменная 3: значение 1/значение 2/значение 3;
 </code>
 Пример: 
 <code>
-location: sea, forest, city;
-clothing: jeans, t-shirt, dress;
-time: morning, afternoon, evening;
+location: sea/forest/city;
+clothing: jeans/t-shirt/dress;
+time: morning/afternoon/evening;
 </code>
 """
 
