@@ -23,7 +23,7 @@ logger.info(f"FACEFUSION_DIR: {FACEFUSION_DIR}")
 TEMP_FOLDER_PATH = os.path.join(FACEFUSION_DIR, ".assets", "images", "temp")
 logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH}")
 
-FACEFUSION_RESULTS_DIR = os.path.join(FACEFUSION_DIR, ".assets/images/results")
+FACEFUSION_RESULTS_DIR = os.path.join(FACEFUSION_DIR, ".assets", "images", "results")
 logger.info(f"FACEFUSION_RESULTS_DIR: {FACEFUSION_RESULTS_DIR}")
 
 TEMP_DIR = os.path.join(BASE_DIR, "temp")
