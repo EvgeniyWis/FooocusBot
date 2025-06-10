@@ -307,7 +307,6 @@ ONE_MESSAGE_FOR_RANDOMIZER_TEXT = """
 location: sea, forest, city;
 clothing: jeans, t-shirt, dress;
 time: morning, afternoon, evening;
-...
 </code>
 """
 
