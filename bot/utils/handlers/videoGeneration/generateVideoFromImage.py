@@ -85,4 +85,4 @@ async def generateVideoFromImage(
         await message.answer(
             text.GENERATE_VIDEO_FROM_IMAGE_ERROR_TEXT.format(e),
         )
-        logger.error(f"Ошибка при генерации видео из изображения: {e}")
+        raise Exception(f"Произошла ошибка при генерации видео из изображения: {e}")

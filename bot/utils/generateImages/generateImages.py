@@ -64,10 +64,7 @@ async def generateImages(
             return image, None
         except Exception as e:
             traceback.print_exc()
-            logger.error(
-                f"Произошла ошибка при генерации изображения во внутренней функции: {e}",
-            )
-            return None, e
+            raise Exception(f"Произошла ошибка при генерации изображения во внутренней функции: {e}")
 
     # Создаем список задач, выполняющихся параллельно
     tasks = [asyncio.create_task(process_image(data)) for data in dataArray]

@@ -26,7 +26,6 @@ async def downloadVideo(url: str) -> str:
                 "Не удалось скачать видео, "
                 f"статус код: {response.status_code}",
             )
-            return ""
+            raise Exception(f"Не удалось скачать видео, статус код: {response.status_code}")
     except Exception as e:
-        logger.error(f"Ошибка при скачивании видео: {e}")
-        return ""
+        raise Exception(f"Произошла ошибка при скачивании видео: {e}")

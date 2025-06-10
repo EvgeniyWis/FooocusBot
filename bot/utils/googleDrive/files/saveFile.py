@@ -1,7 +1,5 @@
 import asyncio
-import shutil
 
-from config import MOCK_MODE, TEMP_FOLDER_PATH
 from logger import logger
 
 from ... import retryOperation
@@ -9,6 +7,7 @@ from ..auth import service
 from ..folders.createFolder import createFolder
 from ..folders.deleteParentFolder import deleteParentFolder
 from .uploadFile import uploadFile
+from .delete_temp_files_with_delay import delete_temp_files_with_delay
 
 
 # Сохранение одного файла
@@ -53,9 +52,8 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
         file = await retryOperation(uploadFile, 10, 2, file_path, file_metadata, name, folder_name)
 
         if with_deleting_temp_folder:
-            # Удаляем папку с файлами
-            if not MOCK_MODE:
-                shutil.rmtree(f"{TEMP_FOLDER_PATH}/{f'{folder_name}_{user_id}' if folder_name else ""}")
+            # Удаляем папку с файлами через 1 час
+            asyncio.create_task(delete_temp_files_with_delay(folder_name, user_id))
 
             # Через 1 час удаляем и папку в более верхнем уровне
             asyncio.create_task(deleteParentFolder(folder_name, user_id))
@@ -63,5 +61,4 @@ async def saveFile(file_path: str, user_id: int, folder_name: str, initial_folde
         return file["webViewLink"]
 
     except Exception as e:
-        logger.error(f"Ошибка при сохранении файла: {str(e)}")
-        return False
+        raise Exception(f"Произошла ошибка при сохранении файла: {e}")

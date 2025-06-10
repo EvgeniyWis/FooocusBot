@@ -2,6 +2,7 @@ import shutil
 from logger import logger
 
 from aiogram import types
+from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 from config import MOCK_MODE, TEMP_FOLDER_PATH
 from keyboards import start_generation_keyboards
@@ -9,14 +10,15 @@ from keyboards import start_generation_keyboards
 from ... import text
 from ...generateImages.dataArray import getDataByModelName, getModelNameIndex
 from ...handlers import appendDataToStateArray
+from utils.retry_with_delay import retry_with_delay
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
 async def sendImageBlock(message: types.Message, state: FSMContext, media_group: list, model_name: str,
     setting_number: str, is_test_generation: bool, user_id: int):
     try:
-        # Отправляем изображения
-        media_group_message = await message.answer_media_group(media_group)
+        # Отправляем изображения с механизмом повторных попыток
+        media_group_message = await retry_with_delay(message.answer_media_group, media_group)
 
         # Сохраняем их в стейт 
         dataForUpdate = {f"{model_name}": [media.message_id for media in media_group_message]}
@@ -24,7 +26,10 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
     except Exception as e:
         logger.error(f"Ошибка при отправке медиагруппы: {e}")
         try:
-            await message.answer("Произошла ошибка при отправке изображений, но продолжаем работу...")
+            if isinstance(e, TelegramRetryAfter):
+                await message.answer(f"Превышен лимит отправки сообщений. Пожалуйста, подождите {e.retry_after} секунд и попробуйте снова.")
+            else:
+                await message.answer("Произошла ошибка при отправке изображений, но продолжаем работу...")
         except:
             pass
 
@@ -63,8 +68,4 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
                 logger.error(f"Ошибка при удалении временных файлов: {e}")
 
     except Exception as e:
-        logger.error(f"Критическая ошибка в функции sendImageBlock: {e}")
-        try:
-            await message.answer("Произошла ошибка, но бот продолжает работу...")
-        except:
-            pass
+        raise Exception(f"Произошла ошибка в функции sendImageBlock: {e}")

@@ -15,69 +15,69 @@ def setting2_getDataArray():
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, huge breasts, slim waist, sagging breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, plump lips, smirk, blue eyes.""",
         [1, 1, 1.50, -0.20, -0.95, -1.50]),
 
-        setting2_generateData("celinemyrren", "1MewlumBdDWVwjTvzOFA_H3hCbK9DKB6w", "1pED-Ju31kpAnVukTmIGxR9Q7-ykF4O_G", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("celinemyrren", "1zL7OWlFfEdOFl_bvnLIKoEe8VVspE5Fn", "1wepiHdwKQ8xQBVKhPaUxLgL_BOYbKXjM", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous brown hair, long hair, huge breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, plump lips, smirk, bright-green eyes.""",
         [1, 1, 2.05, 0.05, -0.15, -1.5]),
 
-        setting2_generateData("gracelowell.xo", "1-Bd2njGfGJqZmT22H480rsdi9k5JH3k4", "1ZGOobvh86VwEohgl1JIHZPUDu1vc8Pmu", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("gracelowell.xo", "1KQZimxqXua-vF8-_7gUIenrU5C544r5M", "1OG4YeEvj2Rlo4CrUWtvtVciT-DMQpaFZ", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous blonde hair, long hair, huge breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes.""",
         [1, 1, 2.05, 0.05, -0.85, -1.5]),
 
-        setting2_generateData("valeriagomez.xo", "1XZ7e9lw9YOh7cBHIkHk-zA6TGOcAzYKT", "1sLWJ_iUUDTwgCYyefUIt-rg2TwscUgPe", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("valeriagomez.xo", "1ksAaqiUNxX_8AcxLNcZGFgyGNjuz97fo", "1-VU7GIe8nV4hTNRhk9X4c62fGQ1pWwln", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, arabian girl, 18 years old, sorority girl, voluminous black hair, long hair, huge breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, ((high tan skin)), skinny, cute, big plump lips, plump lips, smirk, bright-brown eyes.""",
         [1, 1, 2.40, 0.55, -0.35, -1.5]),
 
-        setting2_generateData("ivyxhart", "1cXOMMG_lTaLtAEKcTsgNGcbIUwoWvJ7f", "18pHevQjt2WhfY1di7UkMymZLTPIVE5Bg", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("ivyxhart", "1v1-rA4z3eRk8AuO-rNt9-nKhiQCe2A4i", "1fok6e3RKfWe2gs-IR4tPjoVh0IC6k9l2", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, arabian girl, 18 years old, sorority girl, voluminous black hair, long hair, huge breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, ((high tan skin)), skinny, cute, big plump lips, plump lips, smirk, bright-brown eyes.""",
         [1, 1, 2.40, 0.55, -1.70, -1.5]),
 
-        setting2_generateData("ellamaddix.xo", "1T_i3SezGe3Ax6kVvLkkLKJm28t5z-fIv", "1nQ3rvu0pDtG8TPsZbGPacT7QsDuSzpiD", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("ellamaddix.xo", "1gtcEggKrbNMDE8ceykHylGSV0WQa1win", "1ituzRBr7mIXdVdjKplVWMcwVYV3Ekjc5", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous blonde hair, long hair, huge breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes.""",
         [1, 1, 0.40, 0.50, -0.95, -1.50]),
 
-        setting2_generateData("mileyleclair.xo", "16rFM8sfW3Wt1_H4laM_YNbGJyS54UZVv", "1O69eo4EUFXjA_7Hjd8bnweEYUJ2c64cj", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("mileyleclair.xo", "1wSgokKf7KtaM9Pk6k4eMvTvbKbZbZnpN", "15PJT6LxJh1wdqCs5God9rOhjfprvF1Ab", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous blonde hair, long hair, huge breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes.""",
         [1, 1, 2.00, 1.20, -2.70, -1.50]),
 
-        setting2_generateData("thea_azelle", "1dEwFs_CrcyF-FOlp184sRSqBjtxBDZZU", "1fSafUUzZ5blwHkWKjWHFHNZU0V-iYNzH", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+        setting2_generateData("thea_azelle", "1xmfOthCO11uXY0P4vmePeiqB5m0CqT8x", "1cH6zixQYYZqVfo7jj1x6V47SAOruv5mb", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
         real_beauty, igbaddie, 1girl, caucasian girl, 30 years old, sorority girl, voluminous ash-blonde hair, long hair, huge breasts, slim waist, huge breasts, slim waist, sagging breasts, big bubble butt, huge ass toned legs, ((high tan skin)), skinny, cute, (((big plump lips))), plump lips, smirk, bright-brown eyes""",
         [1, 1, 1.00, 0.30, -1.20, -1.50]),
 
-        setting2_generateData("briaclaire.xo", "1IUWtkIHr4sVUbcrUCGNQke5pzN43xv1f", "1rQtAEMT_x0ERNLIt1_tSWo_fx4q6rlEU", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("briaclaire.xo", "1yRr_qWf3oi0Re9MRSCFuNx96WZltPcx_", "1_w-ME7mXI5GbkbmKUzSBIongXPL-NEmO", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous brown hair, long hair, medium-large breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes.""",
         [1, 1, 4.00, 0.50, -1.70, -1.5]),
 
-        setting2_generateData("rinazuri.xo", "1JIAUqLTUvEK2J96Wt9cf8HIYgiyH194v", "1hkSyBwCarx3ekFhHgzxrbNBAqDpVkNce", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("rinazuri.xo", "16kfOvHl49oYtjQwWCti-6XQFbaFhmk4R", "1A9x1vWllbCV0RdkTIgaXH-tw5uYhtd3p", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, medium-large breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes.
                         
     Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
         [1, 1, 3.00, 0.30, -0.80, -1.50]),
 
-        setting2_generateData("mari_avellin", "1O6zEUDunP-eQ2CK1H8HWgV7x0iXWfQA9", "1QEi15xo0-zJsacV1hD5zm1DW36LJbk2x", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("mari_avellin", "1byOhjOqAv1jls_fixANmpgZJaJaub17E", "1SwwlT6BneWXHnIXBrVplpAr2u7V4v7rY", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, caucasian girl, 30 years old, sorority girl, voluminous ash-blonde hair, long hair, huge breasts, slim waist, huge breasts, slim waist, sagging breasts, big bubble butt, huge ass toned legs, ((high tan skin)), skinny, cute, (((big plump lips))), plump lips, smirk, bright-brown eyes.""",
         [1, 1, 1.00, -0.10, -0.60, -1.50]),
 
-        setting2_generateData("amirawellex", "1szeEciKpQ6e61PORMV4OGgur95gwlWv8", "1kIcl1nUUqxzRjdP0QpCkK_JTGXfxlC2M", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("amirawellex", "1zJBDXAWf_zQJTMwWO_IZsYow3y317b0d", "1HhN2Y_IX3mNRqsHjoNW-mQoVsnrkFAhX", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, asian girl, sorority girl, voluminous black hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes.""",
         [1, 1, 2.75, 0.15, -1.30, -1.5]),
 
-        setting2_generateData("dianadelmar.xo", "19u8NDR2tM9AppA3tEcs63cyqJ27LGXww", "1aqANpJFlh4SpwXu7FSjjVBFedI_6RdJR", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("dianadelmar.xo", "1HhN2Y_IX3mNRqsHjoNW-mQoVsnrkFAhX", "10ZLClflAS1iuPp2NO5lOdbaqPMH1sUkR", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, asian girl, sorority girl, voluminous brown hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
         [1, 1, 3.70, 1.35, -2.40, -1.50]),
 
-        setting2_generateData("kaiastell", "1WYkPXqckfpQ-NLGA5DAjTxvH-7u91fCd", "1OIGXAElIq8k6jAPRFu9HgjWpqUItkDel", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting2_generateData("kaiastell", "1l_7AHjkOnWLUEiCZSlOD7GNg5am6akcY", "1m_wGBpS8G8QqZGYYEmPZnhvclT7ErTFr", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, asian girl, sorority girl, voluminous brown hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
         [1, 1, 3.20, 1.45, -0.20, -1.5]),

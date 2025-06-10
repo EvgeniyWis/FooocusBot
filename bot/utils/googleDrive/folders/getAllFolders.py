@@ -3,11 +3,11 @@ from utils.googleDrive.auth import service
 from utils.generateImages.dataArray.getModelNameIndex import getModelNameIndex
 
 
-async def getAllFolders(parent_folder_id: str = None):
+async def getAllFolders(model_names: list[str] = None):
     """
     Получает отформатированный список папок в Google Drive с основными ссылками на папки моделей
     Args:
-        parent_folder_id (str, optional): ID родительской папки. 
+        model_names (list[str], optional): Список моделей, для которых нужно получить папки.
             Если не указан, будут получены все папки на диске.
     Returns:
         str: Отформатированный текст со списком моделей и ссылками на их папки
@@ -15,10 +15,6 @@ async def getAllFolders(parent_folder_id: str = None):
     try:
         # Создаем query для поиска только папок
         query = "mimeType='application/vnd.google-apps.folder'"
-        
-        # Если указан parent_folder_id, ищем только в этой папке
-        if parent_folder_id:
-            query += f" and '{parent_folder_id}' in parents"
         
         # Словарь для хранения информации по моделям
         models_info = {}
@@ -37,7 +33,8 @@ async def getAllFolders(parent_folder_id: str = None):
             ).execute()
             
             for folder in response.get('files', []):
-                if folder.get('name') not in ["video", "picture", "2025-06-03"]:
+                folder_name = folder.get('name')
+                if folder_name not in ["video", "picture", "2025-06-03"] and (model_names is None or folder_name in model_names):
                     model_name = folder.get('name')
                     created_time = folder.get('createdTime')
                     
@@ -71,5 +68,4 @@ async def getAllFolders(parent_folder_id: str = None):
         return "\n\n".join(formatted_output)
         
     except Exception as e:
-        logger.error(f"Ошибка при получении списка папок: {str(e)}")
-        raise e 
+        raise Exception(f"Произошла ошибка при получении списка папок: {e}")

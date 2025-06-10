@@ -7,15 +7,17 @@ from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv())
 
+# Создаём бота
 bot = Bot(
     token=os.getenv("BOT_API_TOKEN"),
     default=DefaultBotProperties(parse_mode="HTML"),
 )
 
+dp = Dispatcher()
+router = Router()
+
 # Увеличиваем таймаут для запросов к Telegram API
 bot.session = AiohttpSession(timeout=60)
 
 
-dp = Dispatcher()
-router = Router()
 dp.include_router(router)
