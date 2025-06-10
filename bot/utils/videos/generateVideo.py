@@ -87,6 +87,8 @@ async def generateVideo(
                             text.KLING_INSUFFICIENT_BALANCE_TEXT,
                         )
 
+                        raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
+
                     return None
 
                 logger.info(
