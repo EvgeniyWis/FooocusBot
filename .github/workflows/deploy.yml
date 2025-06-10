@@ -31,5 +31,6 @@ jobs:
           cd ..
           cd FocuuusBotFolder/FocuuusBot
           git pull origin master
+          pip install -r requirements.txt
           sudo systemctl restart focuuusbot.service
           EOF
