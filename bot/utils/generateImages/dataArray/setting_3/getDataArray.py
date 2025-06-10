@@ -60,9 +60,9 @@ def setting3_getDataArray():
         real_beauty, igbaddie, 1girl, 18 years old, armenian girl, sorority girl, volumnous platinum-blonde hair with black curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 1.80, 1.35, -1.70]),
 
-        setting3_generateData("simona.caramella", "1e2lBwb_QGWo9xDI6tO0curnmLYAnK39r", "1YNDuFvCXfnHmaSu5cUjzUfKgope-VvI8", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("simona.caramella", "1e2lBwb_QGWo9xDI6tO0curnmLYAnK39r", "1YNDuFvCXfnHmaSu5cUjzUfKgope-VvI8", """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, 1girl, 18 years old, armenian girl, sorority girl, volumnous brown hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-brown eyes, sharp facial features, sharp cheekbones.""",
+        realbeauty, 1girl, 18 years old, Armenian girl, long voluminous brown hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright brown eyes, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 3.25, 0.10, -1.05]),
 
         setting3_generateData("alinacute.xo", "1BorTaz1lMxtcFzBuoP-rueWXbiiF0Tj9", "1qbpG-XxdF8p0utQkALgb9r2qyrvxzqTm", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
