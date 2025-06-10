@@ -465,6 +465,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                         f"Список генераций для замены лица: {faceswap_generate_models}",
                     )
 
+                    # Если список пуст, то завершаем цикл
+                    if not len(faceswap_generate_models):
+                        break
+
                     # Если в списке генераций настала очередь этой модели, то запускаем генерацию
                     if model_name == faceswap_generate_models[0]:
                         await editMessageOrAnswer(
