@@ -15,6 +15,7 @@ from ...generateImages.dataArray import (
     getDataArrayBySettingNumber,
 )
 import asyncio
+from utils.handlers.startGeneration.cancelImageGenerationJobs import cancelImageGenerationJobs
 
 
 
@@ -28,6 +29,9 @@ async def generateImagesInHandler(
     setting_number: str,
     with_randomizer: bool = False,
 ):
+    # Отменяем все работы
+    await cancelImageGenerationJobs(state)
+
     # Генерируем изображения
     try:
         # Добавлена проверка на None для переменной message перед использованием
@@ -103,10 +107,10 @@ async def generateImagesInHandler(
                 )
                 await message_for_edit.unpin()
 
-        stateData = await state.get_data()
-
         if not result:
             raise Exception("Произошла ошибка при генерации изображения")
+        else:
+            await message.answer(text.GENERATION_SUCCESS_TEXT)
 
     except Exception as e:
         try:
