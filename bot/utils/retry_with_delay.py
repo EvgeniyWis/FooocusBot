@@ -14,5 +14,3 @@ async def retry_with_delay(func, *args, max_retries=3):
             retry_after = int(e.retry_after)
             logger.warning(f"Флуд контроль обнаружен. Ожидание {retry_after} секунд перед повторной попыткой. Попытка {attempt + 1}/{max_retries}")
             await asyncio.sleep(retry_after)
-        except Exception as e:
-            raise e
