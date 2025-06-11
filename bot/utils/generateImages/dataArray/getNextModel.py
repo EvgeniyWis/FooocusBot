@@ -27,7 +27,7 @@ async def getNextModel(
 
         # Получаем текущую настройку
         stateData = await state.get_data()
-        current_setting_number = data[
+        current_setting_number = stateData[
             "current_setting_number_for_unique_prompt"
         ]
 
