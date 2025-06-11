@@ -76,7 +76,6 @@ async def choose_generations_type(
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Очищаем стейт
     initial_state = {
-        'stop_generation': False,
         'generation_step': 1,
         'prompts_for_regenerate_images': [],
         'regenerate_images': [],
@@ -285,6 +284,12 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     # Получаем следующую модель
     next_model = await getNextModel(model_name, setting_number, state)
 
+    # Если следующая модель не найдена, то завершаем генерацию
+    if not next_model:
+        await message.answer(text.GENERATION_SUCCESS_TEXT)
+        return
+
+    # Выводим в лог следующую модель
     logger.info(f"Следующая модель: {next_model}")
 
     # Получаем индекс следующей модели
@@ -378,7 +383,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         # Сохраняем название модели и id папки для видео
         await state.update_data(model_name=model_name)
 
+        # Инициализируем результирующий путь
+        result_path = None
+        
+        # Если не в режиме мока, то продолжаем генерацию
         if not MOCK_MODE:
+            # Получаем само изображение по пути
+            image_path = (
+                f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
+            )
+
             # Меняем текст на сообщении о начале upscale
             if UPSCALE_MODE:
                 await editMessageOrAnswer(
@@ -388,6 +402,15 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 image_path = (
                     f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
                 )
+
+                # Если изображение не найдено, то завершаем генерацию
+                if not os.path.exists(image_path):
+                    await editMessageOrAnswer(
+                        call,
+                        text.IMAGE_NOT_FOUND_TEXT.format(image_index, model_name, model_name_index),
+                    )
+                    return
+
                 image = Image.open(image_path)
                 image_base64 = imageToBase64(image)
 
@@ -508,9 +531,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                     await asyncio.sleep(10)
 
                 # После генерации удаляем модель из стейта
+                stateData = await state.get_data()
+                faceswap_generate_models = stateData.get("faceswap_generate_models", [])
                 if model_name in faceswap_generate_models:
-                    stateData = await state.get_data()
-                    faceswap_generate_models = stateData.get("faceswap_generate_models", [])
                     faceswap_generate_models.remove(model_name)
                     await state.update_data(
                         faceswap_models=faceswap_generate_models,
