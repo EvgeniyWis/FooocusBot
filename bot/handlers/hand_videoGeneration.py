@@ -450,7 +450,8 @@ async def handle_model_name_for_video_generation_from_image(
     # Получаем данные по имени модели
     try:
         model_index = int(message.text)
-    except ValueError:
+    except Exception as e:
+        logger.error(f"Произошла ошибка при получении индекса модели: {e}")
         await message.answer(text.WRONG_MODEL_INDEX_TEXT.format(message.text))
         return
 
