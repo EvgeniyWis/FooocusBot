@@ -78,16 +78,15 @@ async def generateVideo(
 
                     if (
                         json["error"]
-                        == "У Вас недостаточно средств на балансе. "
-                        "Подтвердите свой номер телефона и "
-                        "мы начислим Вам стартовый баланс."
+                        == "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
                     ):
-                        await bot.send_message(
-                            ADMIN_ID,
-                            text.KLING_INSUFFICIENT_BALANCE_TEXT,
-                        )
-
-                        raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
+                        try:
+                            await bot.send_message(
+                                ADMIN_ID,
+                                text.KLING_INSUFFICIENT_BALANCE_TEXT,
+                            )
+                        finally:
+                            raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
 
                     return None
 
@@ -169,4 +168,4 @@ async def generateVideo(
                     await asyncio.sleep(10)
 
     except Exception as e:
-        logger.error(f"Произошла ошибка при отправке запроса на генерацию видео: {e}")
+        raise e
