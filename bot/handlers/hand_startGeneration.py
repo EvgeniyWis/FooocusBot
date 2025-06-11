@@ -345,6 +345,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
 
+    # Удаляем медиагруппу
+    await deleteMessageFromState(state, "imageGeneration_mediagroup_messages_ids", model_name, call.message.chat.id)
+
     try:
 
         # Если индекс изображения равен "regenerate", то перегенерируем изображение
@@ -589,9 +592,6 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         if not MOCK_MODE:
             os.remove(result_path)
 
-        # Удаляем медиагруппу
-        await deleteMessageFromState(state, "imageGeneration_mediagroup_messages_ids", model_name, call.message.chat.id)
-
     except Exception as e:
         traceback.print_exc()
         await editMessageOrAnswer(
@@ -642,6 +642,9 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     setting_number = stateData.get("setting_number_for_regenerate_image", 1)
     prompt = message.text
     user_id = message.from_user.id
+
+    # Удаляем сообщение пользователя
+    await message.delete()
 
     # Записываем новый промпт в стейт для этой модели
     dataForUpdate = {f"{model_name}": prompt}
