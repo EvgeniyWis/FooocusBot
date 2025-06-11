@@ -57,7 +57,6 @@ async def generateImageBlock(
                 raise Exception("Не удалось сгенерировать изображения")
 
         media_group = []
-        base_64_dataArray = []
 
         # Получаем референсное изображение и добавляем его в медиагруппу
         reference_image = await getReferenceImage(model_name)
@@ -71,17 +70,16 @@ async def generateImageBlock(
         # Обрабатываем результаты
         if not MOCK_MODE:
             for i, image_data in enumerate(images_output):
-                base_64_data = await base64ToImage(
+                file_path = await base64ToImage(
                     image_data["base64"],
                     model_name,
                     i,
                     user_id,
                     is_test_generation,
                 )
-                base_64_dataArray.append(base_64_data)
                 media_group.append(
                     types.InputMediaPhoto(
-                        media=types.FSInputFile(base_64_data),
+                        media=types.FSInputFile(file_path),
                     ),
                 )
 
