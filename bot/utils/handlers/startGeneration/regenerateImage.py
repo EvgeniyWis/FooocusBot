@@ -21,7 +21,7 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     user_id = call.from_user.id
 
     # Отправляем сообщение о перегенерации изображения
-    await editMessageOrAnswer(
+    regenerate_message = await editMessageOrAnswer(
     call, text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index))
 
     # Получаем данные генерации по названию модели
@@ -54,4 +54,7 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     json = data["json"].copy()
     json["input"]["prompt"] += " " + prompt
 
-    return await generateImageBlock(json, model_name, call.message, state, user_id, setting_number, is_test_generation, False)
+    try:
+        return await generateImageBlock(json, model_name, call.message, state, user_id, setting_number, is_test_generation, False)
+    finally:
+        await regenerate_message.delete()

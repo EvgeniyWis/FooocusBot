@@ -27,15 +27,15 @@ from utils.generateImages.dataArray.getModelNameByIndex import getModelNameByInd
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
-async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
+async def start_generate_video(call: types.CallbackQuery):
     # Получаем название модели
     model_name = call.data.split("|")[1]
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
-    # Удаляем кнопку "📹 Сгенерировать видео"
-    await call.message.edit_reply_markup(None)
+    # Удаляем сообщение
+    await call.message.delete()
 
     # Отправляем сообщение для выбора видео-примеров
     await editMessageOrAnswer(
@@ -59,13 +59,18 @@ async def handle_video_generation_mode_buttons(
     # Если выбран режим "Написать свой промпт", то отправляем сообщение для ввода кастомного промпта
     if mode == "write_prompt":
         await state.update_data(model_name_for_video_generation=model_name)
-        await editMessageOrAnswer(
+        write_prompt_message = await editMessageOrAnswer(
             call,
             text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(
                 model_name,
                 model_name_index,
             ),
         )
+        # Сохраняем в стейт сообщение о написании промпта для последующего удаления
+        dataForUpdate = {f"{model_name}": write_prompt_message.message_id}
+        await appendDataToStateArray(state, "write_prompt_messages_ids", dataForUpdate)
+
+        # Переключаем стейт
         await state.set_state(StartGenerationState.write_prompt_for_video)
         return
 
@@ -235,6 +240,12 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     if not image_url:
         await message.answer("Ошибка: не удалось найти URL изображения")
         return
+    
+    # Удаляем сообщение пользователя
+    await message.delete()
+    
+    # Удаляем сообщение о написании промпта
+    await deleteMessageFromState(state, "write_prompt_messages_ids", model_name, message.chat.id)
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
