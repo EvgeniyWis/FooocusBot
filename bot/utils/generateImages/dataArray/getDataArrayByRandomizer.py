@@ -6,6 +6,7 @@ from logger import logger
 from utils.handlers import appendDataToStateArray
 
 from .getDataArrayBySettingNumber import getDataArrayBySettingNumber
+from .random_choice_variables_for_images import random_choice_variables_for_images
 
 
 # Функция для применения переменных рандомайзера к промптам массива данных
@@ -19,19 +20,22 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     # Получаем массив данных
     dataArray = getDataArrayBySettingNumber(int(setting_number))
 
+    generators = {}
+    for variable_name in variable_names_for_randomizer:
+        variable_values = stateData.get(f"randomizer_{variable_name}_values", [])
+        if variable_values:
+            generators[variable_name] = random_choice_variables_for_images(variable_values)
+        else:
+            logger.warning(f"Нет значений для переменной '{variable_name}'")
+    
     # Проходимся по всем промптам для каждой переменной рандомайзера и формируем промпт
     for data in dataArray:
         for variable_name in variable_names_for_randomizer:
-            # Получаем значения переменной
-            variable_values = stateData.get(f"randomizer_{variable_name}_values", [])
-
-            if len(variable_values) == 0:
+            gen = generators.get(variable_name)
+            if not gen:
                 continue
-
-            # Получаем случайное значение переменной
-            random_variable_value = random.choice(variable_values)
-
-            # Применяем значение переменной к промпу
+            random_variable_value = next(gen)
+            
             formated_prompt = f"{variable_name}: {random_variable_value};"
 
             data["json"]["input"]["prompt"] += " " + formated_prompt
