@@ -1,7 +1,7 @@
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from .getDataInDictsArray import getDataInDictsArray
+from ..getDataInDictsArray import getDataInDictsArray
 
 from InstanceBot import bot
 

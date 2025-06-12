@@ -2,10 +2,10 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from ... import text
-from ...generateImages import generateImageBlock
-from ...generateImages.dataArray import getDataByModelName, getModelNameIndex
-from ..editMessageOrAnswer import editMessageOrAnswer
+from utils import text
+from utils.generateImages import generateImageBlock
+from utils.generateImages.dataArray import getDataByModelName, getModelNameIndex
+from utils.handlers.messages.editMessageOrAnswer import editMessageOrAnswer
 from utils.handlers import getDataInDictsArray
 
 
