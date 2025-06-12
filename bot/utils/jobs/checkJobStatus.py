@@ -37,7 +37,7 @@ async def checkJobStatus(
 
                 # Формируем URL для отправки запроса
                 url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
-                response_json = await httpx_post(url, RUNPOD_HEADERS)
+                response_json = await httpx_post(url, RUNPOD_HEADERS, with_response_text_logging=False)
 
             except Exception as e:
                 logger.error(
@@ -108,7 +108,9 @@ async def checkJobStatus(
                 if response_json["status"] == "FAILED":
                     raise Exception(response_json["error"])
                 
-                response_json = None
+                elif response_json["status"] == "CANCELLED":
+                    response_json = "Работа была отменена"
+                
                 break
 
             await asyncio.sleep(10)
