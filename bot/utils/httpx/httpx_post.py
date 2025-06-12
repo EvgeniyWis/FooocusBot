@@ -28,7 +28,7 @@ async def httpx_post(url: str, headers: dict, json: dict = None, timeout: int = 
 
             try:
                 response_json = response.json()
-                logger.info(f"Ответ от сервера по отмене работы: {response_json}")
+                logger.info(f"Ответ от сервера: {response_json}")
             except ValueError as e: 
                 logger.error(
                     f"Ошибка при парсинге JSON ответа: {e}, тело ответа: {response.text}",
