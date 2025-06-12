@@ -1,7 +1,6 @@
 import os
 
-import httpx
-from logger import logger
+from utils.httpx import httpx_get
 
 
 # Скачивание видео по ссылке и сохранении его в папку temp
@@ -15,17 +14,13 @@ async def downloadVideo(url: str) -> str:
         video_path = f"{temp_folder_path}/{os.urandom(8).hex()}.mp4"
 
         # Скачиваем видео
-        async with httpx.AsyncClient(timeout=httpx.Timeout(60.0)) as client:
-            response = await client.get(url)
-        if response.status_code == 200:
+        response_json = await httpx_get(url, 180)
+
+        if response_json:
             with open(video_path, "wb") as f:
-                f.write(response.content)
+                f.write(response_json.content)
             return video_path
         else:
-            logger.error(
-                "Не удалось скачать видео, "
-                f"статус код: {response.status_code}",
-            )
-            raise Exception(f"Не удалось скачать видео, статус код: {response.status_code}")
+            raise Exception(f"Не удалось скачать видео, ответ: {response_json.text}")
     except Exception as e:
         raise Exception(f"Произошла ошибка при скачивании видео: {e}")

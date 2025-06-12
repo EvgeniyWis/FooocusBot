@@ -1,12 +1,13 @@
 import asyncio
 
-import httpx
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from config import RUNPOD_HEADERS, RUNPOD_HOST
 from logger import logger
-from .. import text
-from .getEndpointID import getEndpointID
+
+from utils import text
+from utils.jobs.getEndpointID import getEndpointID
+from utils import httpx_post
 
 
 # Функция для получения статуса работы
@@ -19,6 +20,8 @@ async def checkJobStatus(
     checkOtherJobs: bool = True,
     timeout: int = 600 * 100,
 ):
+    response_json = None
+    
     try:
         start_time = asyncio.get_event_loop().time()
 
@@ -34,19 +37,11 @@ async def checkJobStatus(
 
                 # Формируем URL для отправки запроса
                 url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
-                async with httpx.AsyncClient(timeout=20.0) as client:
-                    response = await client.post(
-                        url,
-                        headers=RUNPOD_HEADERS,
-                    )
-                    response_json = response.json()
+                response_json = await httpx_post(url, RUNPOD_HEADERS)
 
-                logger.info(
-                    f"Получен статус работы c id {job_id}: {response_json['status']}",
-                )
             except Exception as e:
                 logger.error(
-                    f"Ошибка при получении статуса работы: {e} \nОтвет: {response.text}",
+                    f"Неожиданная ошибка при получении статуса работы: {e}",
                 )
                 await asyncio.sleep(10)
                 continue
@@ -100,8 +95,8 @@ async def checkJobStatus(
                                 left_images_count,
                             ),
                         )
-                    except:
-                        pass
+                    except Exception as e:
+                        logger.warning(f"Не удалось обновить сообщение о прогрессе: {str(e)}")
                 else:
                     # Добавляем в стейт то, сколько готовых изображений
                     await state.update_data(total_images_count=1)
@@ -114,10 +109,13 @@ async def checkJobStatus(
                     raise Exception(response_json["error"])
                 
                 response_json = None
-
                 break
 
             await asyncio.sleep(10)
+
+    except Exception as e:
+        logger.error(f"Критическая ошибка при проверке статуса работы {job_id}: {str(e)}")
+        raise
 
     finally:
         # Когда работа завершена, получаем изображение
@@ -125,12 +123,15 @@ async def checkJobStatus(
 
         # Удаляем id работы из стейта
         if state:
-            stateData = await state.get_data()
-            image_generation_jobs = stateData.get("image_generation_jobs", [])
-            
-            # Находим и удаляем задачу по job_id
-            image_generation_jobs = [job for job in image_generation_jobs if job['job_id'] != job_id]
-            await state.update_data(image_generation_jobs=image_generation_jobs)
-            logger.info(f"Удаляем id работы {job_id} из стейта {image_generation_jobs}")
+            try:
+                stateData = await state.get_data()
+                image_generation_jobs = stateData.get("image_generation_jobs", [])
+                
+                # Находим и удаляем задачу по job_id
+                image_generation_jobs = [job for job in image_generation_jobs if job['job_id'] != job_id]
+                await state.update_data(image_generation_jobs=image_generation_jobs)
+                logger.info(f"Удаляем id работы {job_id} из стейта {image_generation_jobs}")
+            except Exception as e:
+                logger.error(f"Ошибка при очистке состояния для работы {job_id}: {str(e)}")
     
     return response_json
