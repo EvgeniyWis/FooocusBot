@@ -2,15 +2,15 @@ import asyncio
 import os
 
 import aiofiles
-import httpx
 from config import ADMIN_ID
 from InstanceBot import bot
 from logger import logger
 
 from utils import text
+from utils.httpx import httpx_post, httpx_get
+from utils.googleDrive.files import downloadFromGoogleDrive, getGoogleDriveFileID
+from utils.videos import downloadVideo
 
-from ..googleDrive.files import downloadFromGoogleDrive, getGoogleDriveFileID
-from ..videos import downloadVideo
 
 
 # Генерация видео с помощью kling
@@ -45,127 +45,117 @@ async def generateVideo(
         }
 
         # Асинхронное открытие файла для отправки
-        async with httpx.AsyncClient(timeout=60) as client:
-            async with aiofiles.open(image_path, "rb") as image_file:
-                files = {
-                    "image_url": (
-                        "image.jpg",
-                        await image_file.read(),
-                        "image/jpeg",
-                    ),
-                }
-                headers = {
-                    "Accept": "application/json",
-                    "Authorization": f"Bearer {os.getenv('KLING_API_KEY')}",
-                }
+        async with aiofiles.open(image_path, "rb") as image_file:
+            files = {
+                "image_url": (
+                    "image.jpg",
+                    await image_file.read(),
+                    "image/jpeg",
+                ),
+            }
 
-                # Отправляем запрос на генерацию видео
-                url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
-                response = await client.post(
-                    url_endpoint,
-                    data=data,
-                    files=files,
-                    headers=headers,
-                )
-                json = response.json()
+        headers = {
+            "Accept": "application/json",
+            "Authorization": f"Bearer {os.getenv('KLING_API_KEY')}",
+        }
 
-                logger.info(f"Ответ на запрос на генерацию видео: {json}")
+        # Отправляем запрос на генерацию видео
+        url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
+        json = await httpx_post(url_endpoint, headers, data, files)
 
-                if json.get("error"):
-                    logger.error(
-                        f"Ошибка валидации: {json.get('errors_validation')}",
+        logger.info(f"Ответ на запрос на генерацию видео: {json}")
+
+        if json.get("error"):
+            logger.error(
+                f"Ошибка валидации: {json.get('errors_validation')}",
+            )
+
+            if (
+                json["error"]
+                == "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
+            ):
+                try:
+                    await bot.send_message(
+                        ADMIN_ID,
+                        text.KLING_INSUFFICIENT_BALANCE_TEXT,
                     )
+                finally:
+                    raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
 
-                    if (
-                        json["error"]
-                        == "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
-                    ):
-                        try:
-                            await bot.send_message(
-                                ADMIN_ID,
-                                text.KLING_INSUFFICIENT_BALANCE_TEXT,
-                            )
-                        finally:
-                            raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
+            return None
 
-                    return None
+        logger.info(
+            f"Запрос на генерацию видео отправлен. Ответ: {json}",
+        )
+
+        # Проверяем статус задания в цикле
+        request_id = json["request_id"]
+        if not request_id:
+            logger.error("Не получен request_id в ответе API")
+            return None
+
+        url_status_endpoint = (
+            f"https://api.gen-api.ru/api/v1/request/get/{request_id}"
+        )
+
+        while True:
+            try:
+                json = await httpx_get(url_status_endpoint)
 
                 logger.info(
-                    f"Запрос на генерацию видео отправлен. Ответ: {json}",
+                    f"Статус задания на генерацию видео с id {request_id}: "
+                    f"{json['status']}",
                 )
 
-                # Проверяем статус задания в цикле
-                request_id = json["request_id"]
-                if not request_id:
-                    logger.error("Не получен request_id в ответе API")
-                    return None
+                if json["status"] == "error":
+                    logger.error(f"Ошибка при генерации видео: {json}")
+                    raise Exception(json["result"][0])
 
-                url_status_endpoint = (
-                    f"https://api.gen-api.ru/api/v1/request/get/{request_id}"
-                )
+                elif json["status"] == "success":
+                    # Получаем ссылку на выходное видео
+                    logger.info(
+                        f"Выходные данные запроса по id {request_id}: {json}",
+                    )
+                    result_url = json["full_response"][0]["url"]
+                    logger.info(
+                        f"Ссылка на выходное видео: {result_url}",
+                    )
 
-                while True:
-                    try:
-                        response = await client.get(
-                            url_status_endpoint,
-                            headers=headers,
-                        )
-                        json = response.json()
-
-                        logger.info(
-                            f"Статус задания на генерацию видео с id {request_id}: "
-                            f"{json['status']}",
-                        )
-
-                        if json["status"] == "error":
-                            logger.error(f"Ошибка при генерации видео: {json}")
-                            raise Exception(json["result"][0])
-
-                        elif json["status"] == "success":
-                            # Получаем ссылку на выходное видео
-                            logger.info(
-                                f"Выходные данные запроса по id {request_id}: {json}",
-                            )
-                            result_url = json["full_response"][0]["url"]
-                            logger.info(
-                                f"Ссылка на выходное видео: {result_url}",
-                            )
-
-                            # Скачиваем видео локально
-                            video_path = await downloadVideo(result_url)
-                            if not video_path:
-                                logger.error(
-                                    f"Не удалось скачать видео: {result_url}",
-                                )
-                                raise Exception("Не удалось скачать видео")
-
-                            # Проверяем, что файл существует и имеет размер больше 0
-                            if (
-                                not os.path.exists(video_path)
-                                or os.path.getsize(video_path) == 0
-                            ):
-                                logger.error(
-                                    "Видео файл не существует или "
-                                    f"имеет нулевой размер: {video_path}",
-                                )
-
-                                # Сохраняем по-новой
-                                video_path = await downloadVideo(result_url)
-                                if not video_path:
-                                    logger.error(
-                                        f"Не удалось скачать видео: {result_url}",
-                                    )
-                                    raise Exception("Не удалось скачать видео")
-
-                            return video_path
-
-                    except Exception as e:
+                    # Скачиваем видео локально
+                    video_path = await downloadVideo(result_url)
+                    if not video_path:
                         logger.error(
-                            f"Ошибка при получении статуса задания: {e}",
+                            f"Не удалось скачать видео: {result_url}",
                         )
-                        raise e
+                        raise Exception("Не удалось скачать видео")
 
-                    await asyncio.sleep(10)
+                    # Проверяем, что файл существует и имеет размер больше 0
+                    if (
+                        not os.path.exists(video_path)
+                        or os.path.getsize(video_path) == 0
+                    ):
+                        logger.error(
+                            "Видео файл не существует или "
+                            f"имеет нулевой размер: {video_path}",
+                        )
+
+                        # Сохраняем по-новой
+                        video_path = await downloadVideo(result_url)
+                        if not video_path:
+                            logger.error(
+                                f"Не удалось скачать видео: {result_url}",
+                            )
+                            raise Exception("Не удалось скачать видео")
+
+                    return video_path
+
+            except Exception as e:
+                logger.error(
+                    f"Ошибка при получении статуса задания: {e}",
+                )
+                raise e
+
+            await asyncio.sleep(10)
 
     except Exception as e:
         raise e
