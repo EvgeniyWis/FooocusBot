@@ -15,10 +15,9 @@ from utils.generateImages.dataArray import (
     getModelNameIndex,
 )
 from utils.handlers import (
-    editMessageOrAnswer,
     getDataInDictsArray,
-    deleteMessageFromState
 )
+from utils.handlers.messages import deleteMessageFromState, editMessageOrAnswer
 from utils.handlers.videoGeneration import saveVideo
 from utils.videos import generateVideo
 from utils.handlers import appendDataToStateArray

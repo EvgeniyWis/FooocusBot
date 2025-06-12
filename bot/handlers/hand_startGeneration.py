@@ -35,9 +35,8 @@ from utils.googleDrive.files import saveFile
 from utils.googleDrive.folders import getFolderDataByID
 from utils.handlers import (
     appendDataToStateArray,
-    editMessageOrAnswer,
-    deleteMessageFromState
 )
+from utils.handlers.messages import deleteMessageFromState, editMessageOrAnswer
 from utils.handlers.startGeneration import (
     generateImagesInHandler,
     regenerateImage,

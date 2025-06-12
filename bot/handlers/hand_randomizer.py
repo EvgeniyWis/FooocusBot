@@ -6,7 +6,7 @@ from keyboards import randomizer_keyboards
 from logger import logger
 from states.RandomizerState import RandomizerState
 from utils import text
-from utils.handlers import editMessageOrAnswer
+from utils.handlers.messages import editMessageOrAnswer
 from utils.handlers.startGeneration import generateImagesInHandler
 
 
