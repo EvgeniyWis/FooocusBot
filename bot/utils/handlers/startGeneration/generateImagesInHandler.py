@@ -110,7 +110,11 @@ async def generateImagesInHandler(
         if not result:
             raise Exception("Произошла ошибка при генерации изображения")
         else:
-            await message.answer(text.GENERATION_SUCCESS_TEXT)
+            stateData = await state.get_data()
+            stop_generation = stateData.get("stop_generation", False)
+            
+            if not stop_generation:
+                await message.answer(text.GENERATION_SUCCESS_TEXT)
 
     except Exception as e:
         try:
