@@ -199,3 +199,6 @@ keys_and_token.txt
 
 bot/config
 temp/
+
+# redis
+redisdata/
