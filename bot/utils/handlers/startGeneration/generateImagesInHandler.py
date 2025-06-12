@@ -113,7 +113,7 @@ async def generateImagesInHandler(
             stateData = await state.get_data()
             stop_generation = stateData.get("stop_generation", False)
             
-            if not stop_generation:
+            if not stop_generation and len(model_indexes_for_generation) > 1:
                 await message.answer(text.GENERATION_SUCCESS_TEXT)
 
     except Exception as e:
