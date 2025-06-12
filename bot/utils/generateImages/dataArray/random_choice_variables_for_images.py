@@ -30,16 +30,3 @@ def random_choice_variables_for_images(variable_values: MutableSequence[str]):
         random.shuffle(pool)
         for variable_name in pool:
             yield variable_name
-
-
-if __name__ == "__main__":
-    test_values = ["a", "b", "c", "d"]
-    gen = random_choice_variables_for_images(test_values)
-    used = set()
-    for i in range(10):
-        val = next(gen)
-        print(val)
-        used.add(val)
-        if len(used) == len(test_values):
-            print("Все значения использованы, начинается новый цикл")
-            used.clear()
