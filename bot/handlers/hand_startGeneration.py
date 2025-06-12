@@ -47,6 +47,8 @@ from utils.googleDrive.files import convertDriveLink
 
 import os
 
+from bot.utils import retryOperation
+
 
 # Обработка выбора количества генераций
 async def choose_generations_type(
@@ -507,10 +509,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                         )
 
                         try:
-                            result_path = await facefusion_swap(
-                                faceswap_source_path,
-                                faceswap_target_path,
+                            result_path = await retryOperation(
+                                facefusion_swap, 5, 2, faceswap_source_path, faceswap_target_path
                             )
+
                         except Exception as e:
                             result_path = None
                             logger.error(
