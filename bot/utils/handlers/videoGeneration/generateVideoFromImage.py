@@ -79,7 +79,8 @@ async def generateVideoFromImage(
         await state.set_state(None)
 
         # Удаляем временное изображение
-        os.remove(temp_path)
+        if os.path.exists(temp_path):   
+            os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
         await message.answer(
