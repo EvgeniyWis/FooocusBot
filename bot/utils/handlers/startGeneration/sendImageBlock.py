@@ -11,14 +11,15 @@ from ... import text
 from ...generateImages.dataArray import getDataByModelName, getModelNameIndex
 from ...handlers import appendDataToStateArray
 from utils.retry_with_delay import retry_with_delay
+from .rate_limiter_for_send_media_group import safe_send_media_group
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
 async def sendImageBlock(message: types.Message, state: FSMContext, media_group: list, model_name: str,
     setting_number: str, is_test_generation: bool, user_id: int):
     try:
-        # Отправляем изображения с механизмом повторных попыток
-        media_group_message = await retry_with_delay(message.answer_media_group, media_group)
+        # Отправляем изображения с механизмом повторных попыток и глобальным rate limiter
+        media_group_message = await retry_with_delay(safe_send_media_group, message, media_group)
 
         # Сохраняем их в стейт 
         dataForUpdate = {f"{model_name}": [media.message_id for media in media_group_message]}
