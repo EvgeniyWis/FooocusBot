@@ -7,6 +7,7 @@ from InstanceBot import router
 from keyboards import start_generation_keyboards
 from utils import text
 from utils.handlers.startGeneration.cancelImageGenerationJobs import cancelImageGenerationJobs
+import asyncio
 
 
 # Отправка стартового меню при вводе "/start"
@@ -26,10 +27,15 @@ async def start(message: types.Message, state: FSMContext):
 # Обработка команды /stop
 async def stop_generation(message: types.Message, state: FSMContext):
     await message.answer(text.STOP_GENERATION_TEXT_WITH_WAITING, reply_markup=ReplyKeyboardRemove())
-
+    
+    # Начинаем отмену
+    await state.update_data(stop_generation=True)
     await cancelImageGenerationJobs(state)
 
+    # Завершаем отмену
     await message.answer(text.STOP_GENERATION_TEXT, reply_markup=ReplyKeyboardRemove())
+    await asyncio.sleep(5)
+    await state.update_data(stop_generation=False)
 
 
 # Обработка команды /clear
