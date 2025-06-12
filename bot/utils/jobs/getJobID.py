@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 
 
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы
-async def getJobID(dataJSON: dict, setting_number: int, state: FSMContext):
+async def getJobID(dataJSON: dict, setting_number: int, state: FSMContext, user_id: int):
     # Делаем запрос на генерацию
     logger.info("Отправка запроса на генерацию...")
 
@@ -21,7 +21,7 @@ async def getJobID(dataJSON: dict, setting_number: int, state: FSMContext):
     logger.info(f"Получен id работы: {job_id}")
 
     # Сохраняем его в стейт
-    dataForUpdate = {"job_id": job_id, "setting_number": setting_number}
+    dataForUpdate = {"job_id": job_id, "setting_number": setting_number, "user_id": user_id}
     await appendDataToStateArray(state, "image_generation_jobs", dataForUpdate)
 
     return job_id
