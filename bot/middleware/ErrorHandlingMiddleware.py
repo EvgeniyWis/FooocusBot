@@ -1,7 +1,7 @@
 from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from config import DEV_CHAT_ID
+from config import DEV_CHAT_IDS
 from InstanceBot import bot
 import traceback
 from logger import logger
@@ -36,8 +36,9 @@ class ErrorHandlingMiddleware(BaseMiddleware):
             logger.error(f"Ошибка: {str(e)}\nTraceback: {traceback.format_exc()}")
             
             try:
-                # Отправляем сообщение об ошибке разработчику
-                await bot.send_message(DEV_CHAT_ID, error_message)
+                # Отправляем сообщение об ошибке разработчикам
+                for DEV_CHAT_ID in DEV_CHAT_IDS:
+                    await bot.send_message(DEV_CHAT_ID, error_message)
                 
                 # Если ошибка произошла в чате с пользователем, отправляем ему сообщение
                 if hasattr(event, "chat"):

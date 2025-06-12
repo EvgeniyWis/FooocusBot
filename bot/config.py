@@ -38,7 +38,7 @@ RUNPOD_HEADERS = {
 RUNPOD_HOST = f"https://api.runpod.ai/v2"
 
 # ID чата разработчика
-DEV_CHAT_ID = 1979922062
+DEV_CHAT_IDS = [1979922062, 5046166133]
 
 # Пользователи, которые могут использовать бота
 ALLOWED_USERS = [

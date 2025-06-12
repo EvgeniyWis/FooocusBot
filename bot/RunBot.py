@@ -5,7 +5,7 @@ import shutil
 import handlers
 from aiogram.types import BotCommand
 from config import (
-    DEV_CHAT_ID,
+    DEV_CHAT_IDS,
     FACEFUSION_RESULTS_DIR,
     TEMP_FOLDER_PATH,
     TEMP_IMAGE_FILES_DIR,
@@ -64,9 +64,10 @@ async def on_startup() -> None:
 
     logger.info(f"Бот запущен - @{bot_info.username}")
 
-    # Отправка DEV сообщения разработчику
+    # Отправка DEV сообщения разработчикам о запуске бота
     try:
-        await bot.send_message(DEV_CHAT_ID, "Бот запущен ✅")
+        for DEV_CHAT_ID in DEV_CHAT_IDS:    
+            await bot.send_message(DEV_CHAT_ID, "Бот запущен ✅")
     except Exception as e:
         logger.error(f"Ошибка при отправке сообщения разработчику: {e}")
 
