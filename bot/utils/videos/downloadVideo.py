@@ -14,13 +14,14 @@ async def downloadVideo(url: str) -> str:
         video_path = f"{temp_folder_path}/{os.urandom(8).hex()}.mp4"
 
         # Скачиваем видео
-        response_json = await httpx_get(url, 180)
+        response = await httpx_get(url, timeout=180, stream=True)
 
-        if response_json:
+        if response and response.status_code == 200:
             with open(video_path, "wb") as f:
-                f.write(response_json.content)
+                async for chunk in response.aiter_bytes():
+                    f.write(chunk)
             return video_path
         else:
-            raise Exception(f"Не удалось скачать видео, ответ: {response_json.text}")
+            raise Exception(f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'}")
     except Exception as e:
         raise Exception(f"Произошла ошибка при скачивании видео: {e}")
