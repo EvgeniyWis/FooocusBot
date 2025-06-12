@@ -47,7 +47,7 @@ from utils.googleDrive.files import convertDriveLink
 
 import os
 
-from bot.utils import retryOperation
+from utils import retryOperation
 
 
 # Обработка выбора количества генераций
