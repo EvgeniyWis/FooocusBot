@@ -476,17 +476,11 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                     current_time = datetime.now()
                     elapsed_time = (current_time - start_time).total_seconds()
                     if elapsed_time > 1800:  # 30 минут = 1800 секунд
+                        error_message = f"Таймаут ожидания обновления списка faceswap_generate_models для модели {model_name}"
                         logger.error(
-                            f"Таймаут ожидания обновления списка faceswap_generate_models для модели {model_name}"
+                            error_message
                         )
-                        await editMessageOrAnswer(
-                            call,
-                            text.FACE_SWAP_TIMEOUT_ERROR_TEXT.format(
-                                model_name,
-                                model_name_index,
-                            ),
-                        )
-                        return
+                        raise Exception(error_message)
 
                     logger.info(
                         f"Список генераций для замены лица: {faceswap_generate_models}",
