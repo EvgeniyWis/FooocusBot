@@ -35,6 +35,9 @@ async def upscaleImage(input_image: str, base_config_model_name: str, setting_nu
     # Проверяем статус работы
     response_json = await checkJobStatus(job_id, setting_number, state, timeout=1000)
 
+    if not response_json:
+        raise Exception("Не удалось сделать upscale для изображения")
+
     # Получаем изображение
     image_data = response_json["output"][0]["base64"]
 
