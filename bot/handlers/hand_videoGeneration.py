@@ -34,7 +34,10 @@ async def start_generate_video(call: types.CallbackQuery):
     model_name_index = getModelNameIndex(model_name)
 
     # Удаляем сообщение
-    await call.message.delete()
+    try:
+        await call.message.delete()
+    except Exception as e:
+        logger.error(f"Произошла ошибка при удалении сообщения: {e}")
 
     # Отправляем сообщение для выбора видео-примеров
     await editMessageOrAnswer(
