@@ -1,7 +1,7 @@
-import httpx
 from config import RUNPOD_HEADERS, RUNPOD_HOST
-from logger import logger
+
 from utils.jobs.getEndpointID import getEndpointID
+from utils import httpx_post
 
 
 # Функция для отправки запроса на генерацию
@@ -13,29 +13,6 @@ async def sendRunRequest(dataJSON: dict, setting_number: int):
     url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/run"
 
     # Отправляем запрос на генерацию
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            url,
-            headers=RUNPOD_HEADERS,
-            json=dataJSON,
-            timeout=httpx.Timeout(
-                10,
-                read=60,
-            ),  # (connect timeout, read timeout)
-        )
-        logger.info(f"Статус код ответа: {response.status_code}")
-        logger.info(f"Тело ответа: {response.text}")
+    response_json = await httpx_post(url, RUNPOD_HEADERS, dataJSON)
 
-        if response.status_code != 200:
-            raise Exception(f"Сервер вернул ошибку: {response.status_code}")
-
-        try:
-            response_json = response.json()
-            return response_json
-        except (
-            ValueError
-        ) as e:  # response.json() выкидывает ValueError, если JSON невалидный
-            logger.error(
-                f"Ошибка при парсинге JSON ответа: {e}, тело ответа: {response.text}",
-            )
-            raise Exception("Сервер вернул невалидный JSON")
+    return response_json

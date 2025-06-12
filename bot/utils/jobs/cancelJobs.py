@@ -1,8 +1,9 @@
 from config import RUNPOD_HOST, RUNPOD_HEADERS
-from utils.jobs.getEndpointID import getEndpointID
-from logger import logger
-import httpx
 
+from logger import logger
+
+from utils import httpx_post
+from utils.jobs.getEndpointID import getEndpointID
 
 # Функция для отмены всех работ
 async def cancelJobs(jobs_ids: list[dict]):
@@ -12,43 +13,21 @@ async def cancelJobs(jobs_ids: list[dict]):
     
     # Отменяем все работы
     for job_dict in jobs_ids:
-        # Получаем id работы и номер настройки
-        setting_number = job_dict["setting_number"]
-        job_id = job_dict["job_id"]
-        
-        # Получаем ID эндпоинта для генерации изображений
-        ENDPOINT_ID = await getEndpointID(setting_number)
-
-        # Формируем URL для отправки запроса
-        url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/cancel/{job_id}"
-
-        # Отправляем запрос на генерацию
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                url,
-                headers=RUNPOD_HEADERS,
-                timeout=httpx.Timeout(
-                    10,
-                    read=60,
-                ), 
-            )
-            logger.info(f"Статус код ответа: {response.status_code}")
-            logger.info(f"Тело ответа: {response.text}")
-
-            if response.status_code != 200:
-                raise Exception(f"Сервер вернул ошибку: {response.status_code}")
+        try:
+            # Получаем id работы и номер настройки
+            setting_number = job_dict["setting_number"]
+            job_id = job_dict["job_id"]
             
-            logger.info(f"Работа по id {job_id} отменена!")
+            # Получаем ID эндпоинта для генерации изображений
+            ENDPOINT_ID = await getEndpointID(setting_number)
 
-            try:
-                response_json = response.json()
-                logger.info(f"Ответ от сервера по отмене работы: {response_json}")
-            except (
-                ValueError
-            ) as e: 
-                logger.error(
-                    f"Ошибка при парсинге JSON ответа: {e}, тело ответа: {response.text}",
-                )
-                raise Exception("Сервер вернул невалидный JSON")
+            # Формируем URL для отправки запроса
+            url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/cancel/{job_id}"
+
+            # Отправляем запрос на отмену работы
+            await httpx_post(url, RUNPOD_HEADERS)
+        except Exception as e:
+            logger.error(f"Неожиданная ошибка при отмене работы {job_id}: {str(e)}")
+            continue
 
     return True
