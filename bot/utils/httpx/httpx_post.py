@@ -4,7 +4,8 @@ import asyncio
 
 
 # Функция-обёртка для отправки POST-запросов с настройками таймаутов
-async def httpx_post(url: str, headers: dict, json: dict = None, timeout: int = 60):
+async def httpx_post(url: str, headers: dict, json: dict = None, timeout: int = 60, 
+    with_response_text_logging: bool = True):
     response_json = None
     
     async with httpx.AsyncClient(timeout=httpx.Timeout(timeout), follow_redirects=True) as client:
@@ -21,14 +22,18 @@ async def httpx_post(url: str, headers: dict, json: dict = None, timeout: int = 
                 ), 
             )
             logger.info(f"Статус код ответа: {response.status_code}")
-            logger.info(f"Тело ответа: {response.text}")
+            
+            if with_response_text_logging:
+                logger.info(f"Тело ответа: {response.text}")
 
             if response.status_code != 200:
                 raise Exception(f"Сервер вернул ошибку: {response.status_code}")
 
             try:
                 response_json = response.json()
-                logger.info(f"Ответ от сервера: {response_json}")
+
+                if with_response_text_logging:  
+                    logger.info(f"Ответ от сервера: {response_json}")
             except ValueError as e: 
                 logger.error(
                     f"Ошибка при парсинге JSON ответа: {e}, тело ответа: {response.text}",
