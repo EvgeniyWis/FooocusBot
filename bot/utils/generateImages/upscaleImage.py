@@ -7,7 +7,8 @@ from aiogram.fsm.context import FSMContext
 
 
 # Функция для upscale сгенерированного изображения
-async def upscaleImage(input_image: str, base_config_model_name: str, setting_number: int, state: FSMContext) -> str:
+async def upscaleImage(input_image: str, base_config_model_name: str, setting_number: int, 
+    state: FSMContext, user_id: int) -> str:
     # Логирование
     logger.info("Делаем upscale для изображения...")
 
@@ -30,7 +31,7 @@ async def upscaleImage(input_image: str, base_config_model_name: str, setting_nu
     }
 
     # Делаем запрос на генерацию и получаем id работы
-    job_id = await getJobID(dataJSON, setting_number, state)
+    job_id = await getJobID(dataJSON, setting_number, state, user_id)
 
     # Проверяем статус работы
     response_json = await checkJobStatus(job_id, setting_number, state, timeout=1000)
