@@ -56,7 +56,7 @@ async def generateImagesInHandler(
                     text.GET_PROMPT_SUCCESS_TEXT,
                 )
                 # Получаем данные для генерации
-                dataArray = await getDataArrayBySettingNumber(
+                dataArray = getDataArrayBySettingNumber(
                     int(setting_number),
                 )
 
