@@ -4,7 +4,6 @@ from aiogram.fsm.context import FSMContext
 from config import MOCK_MODE
 
 from ..handlers.startGeneration.sendImageBlock import sendImageBlock
-from ..jobs.check_job_status import check_job_status, CANCELLED_JOB_TEXT
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
 from utils.task_storage.istorage import ITaskStorage
@@ -36,6 +35,7 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         is_test_generation=is_test_generation,
         check_other_jobs=checkOtherJobs,
     )
+    from ..jobs.check_job_status import check_job_status, CANCELLED_JOB_TEXT
     # Проверяем статус работы
     response_json = await check_job_status(
         job_id,
