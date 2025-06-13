@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from config import MOCK_MODE
 
 from ..handlers.startGeneration.sendImageBlock import sendImageBlock
-from ..jobs.checkJobStatus import checkJobStatus
+from ..jobs.checkJobStatus import checkJobStatus, CANCELLED_JOB_TEXT
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
 
@@ -38,13 +38,13 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
     )
 
     # Если работа не завершена, то возвращаем False
-    if not response_json:
+    if not response_json or response_json == CANCELLED_JOB_TEXT:
         return False
 
     # Если работа завершена, то обрабатываем результаты
     try:
         if not MOCK_MODE:
-            images_output = response_json["output"]
+            images_output = response_json.get("output", [])
 
             if images_output == []:
                 raise Exception("Не удалось сгенерировать изображения")

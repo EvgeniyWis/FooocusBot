@@ -1,6 +1,6 @@
 from aiogram import types
 from logger import logger
-from utils.handlers.messages import preserve_code_tags
+from utils.handlers.messages.preserve_code_tags import preserve_code_tags
 
 
 # Функция для редактирования сообщения и при случаи ошибки отправки сообщения
