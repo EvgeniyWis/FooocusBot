@@ -70,6 +70,7 @@ class RedisTaskRepository(ITaskStorage):
         job_type: str,
         is_test_generation: bool,
         check_other_jobs: bool,
+        chat_id: int,
     ) -> None:
         """
         Сохраняет новую задачу в Redis, если она ещё не существует.
@@ -83,6 +84,7 @@ class RedisTaskRepository(ITaskStorage):
             job_type (str): Тип задачи (например, "generate_image").
             is_test_generation (bool): Флаг тестового режима.
             check_other_jobs (bool): Флаг обновления стейта по другим задачам.
+            chat_id (int): ID чата.
 
         Returns:
             None
@@ -99,6 +101,7 @@ class RedisTaskRepository(ITaskStorage):
             "model_name": model_name,
             "setting_number": setting_number,
             "job_type": job_type,
+            "chat_id": chat_id,
             "is_test_generation": is_test_generation,
             "check_other_jobs": check_other_jobs,
         }
@@ -171,7 +174,7 @@ class RedisTaskRepository(ITaskStorage):
             message_id = task['message_id']
 
             key = StorageKey(
-                bot_id=str(bot.id),
+                bot_id=bot.id,
                 chat_id=chat_id,
                 user_id=user_id,
             )

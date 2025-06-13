@@ -34,6 +34,7 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         job_type=data.get("job_type"),
         is_test_generation=is_test_generation,
         check_other_jobs=checkOtherJobs,
+        chat_id=data.get("chat_id"),
     )
     from ..jobs.check_job_status import check_job_status, CANCELLED_JOB_TEXT
     # Проверяем статус работы
@@ -46,7 +47,6 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         is_test_generation,
         checkOtherJobs,
         500,
-        task_repo=task_repo,
     )
 
     # Если работа не завершена, то возвращаем False
