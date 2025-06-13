@@ -31,7 +31,7 @@ async def upscaleImage(input_image: str, base_config_model_name: str, setting_nu
     }
 
     # Делаем запрос на генерацию и получаем id работы
-    job_id = await getJobID(dataJSON, setting_number, state, user_id)
+    job_id = await getJobID(dataJSON, setting_number, state, user_id, "upscale")
 
     # Проверяем статус работы
     response_json = await checkJobStatus(job_id, setting_number, state, timeout=1000)
