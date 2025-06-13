@@ -10,7 +10,8 @@ from utils.repository.istorage import ITaskStorage
 
 
 async def process_image_block(job_id: str, model_name: str, setting_number: int, user_id: int, 
-    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool, task_repo: ITaskStorage) -> bool:
+    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool, task_repo: ITaskStorage,
+    chat_id: int) -> bool:
     """
     Функция для обработки работы по её id и после удачного завершения - отправки сообщения с изображениями
     
@@ -23,6 +24,8 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         message (types.Message): сообщение
         is_test_generation (bool): флаг, указывающий на тестовую генерацию
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
+        task_repo (ITaskStorage): репозиторий задач
+        chat_id (int): id чата
     """
     data = await state.get_data()
     await task_repo.add_task(

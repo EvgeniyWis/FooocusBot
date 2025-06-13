@@ -543,7 +543,8 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     json["input"]["prompt"] += " " + prompt 
     
     await state.set_state(None)
-    await generateImageBlock(json, model_name, regenerate_progress_message.message_id, state, user_id, setting_number, is_test_generation, False)
+    await generateImageBlock(json, model_name, regenerate_progress_message.message_id, 
+    state, user_id, setting_number, is_test_generation, False, chat_id=message.chat.id)
     await regenerate_progress_message.delete()
 
 # Добавление обработчиков

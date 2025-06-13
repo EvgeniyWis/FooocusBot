@@ -58,6 +58,7 @@ async def generateImagesByAllSettings(
                 user_id,
                 index + 1,
                 is_test_generation,
+                chat_id=message.chat.id,
             )
 
     try:
