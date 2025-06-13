@@ -6,12 +6,13 @@ from config import MOCK_MODE
 from ..handlers.startGeneration.sendImageBlock import sendImageBlock
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
-from utils.repository.istorage import ITaskStorage
+from utils.repository.abc_task_storage_repository import AbstractTaskStorageRepository 
+from utils.adapters.redis_task_storage_repository import RedisTaskStorageRepository
 
 
 async def process_image_block(job_id: str, model_name: str, setting_number: int, user_id: int, 
-    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool, task_repo: ITaskStorage,
-    chat_id: int) -> bool:
+    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool,
+    chat_id: int, task_repo: AbstractTaskStorageRepository = RedisTaskStorageRepository) -> bool:
     """
     Функция для обработки работы по её id и после удачного завершения - отправки сообщения с изображениями
     
@@ -37,7 +38,7 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         job_type=data.get("job_type"),
         is_test_generation=is_test_generation,
         check_other_jobs=checkOtherJobs,
-        chat_id=data.get("chat_id"),
+        chat_id=chat_id,
     )
     from ..jobs.check_job_status import check_job_status, CANCELLED_JOB_TEXT
     # Проверяем статус работы
