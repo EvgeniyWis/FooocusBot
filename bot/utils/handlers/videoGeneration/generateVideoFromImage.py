@@ -6,11 +6,10 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from InstanceBot import bot
 from keyboards.videoGeneration import keyboards as video_generation_keyboards
-from logger import logger
 
 from utils import text
 from utils.retryOperation import retryOperation
-from utils.videos.generateVideo import generateVideo
+from utils.videos.generate_video import generate_video
 
 
 # Функция для генерации видео из изображения
@@ -50,7 +49,7 @@ async def generateVideoFromImage(
 
         # Генерируем видео
         video_path = await retryOperation(
-            generateVideo,
+            generate_video,
             10,
             1.5,
             prompt,

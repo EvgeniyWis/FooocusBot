@@ -19,7 +19,7 @@ from utils.handlers import (
 )
 from utils.handlers.messages import deleteMessageFromState, editMessageOrAnswer
 from utils.handlers.videoGeneration import saveVideo
-from utils.videos import generateVideo
+from utils.videos import generate_video
 from utils.handlers import appendDataToStateArray
 from utils.generateImages.dataArray.getModelNameByIndex import getModelNameByIndex
 
@@ -171,7 +171,7 @@ async def handle_video_example_buttons(
     else:
         try:
             video_path = await retryOperation(
-                generateVideo,
+                generate_video,
                 10,
                 1.5,
                 video_example_prompt,
@@ -413,7 +413,7 @@ async def handle_prompt_for_videoGenerationFromImage(
 
         # Генерируем видео
         video_path = await retryOperation(
-            generateVideo,
+            generate_video,
             10,
             1.5,
             prompt,

@@ -3,8 +3,16 @@ import os
 from utils.httpx import httpx_get
 
 
-# Скачивание видео по ссылке и сохранении его в папку temp
-async def downloadVideo(url: str) -> str:
+async def download_video(url: str) -> str:
+    """
+    Скачивание видео по ссылке и сохранении его в папку temp
+
+    Args:
+        url (str): Ссылка на видео
+
+    Returns:
+        str: Путь к сгенерированному видео
+    """
     try:
         temp_folder_path = "FocuuusBot/temp/videos"
         # Создаем временную директорию, если её нет
