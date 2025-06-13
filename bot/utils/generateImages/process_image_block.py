@@ -7,11 +7,11 @@ from ..handlers.startGeneration.sendImageBlock import sendImageBlock
 from ..jobs.check_job_status import check_job_status, CANCELLED_JOB_TEXT
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
-from RunBot import redis_task_storage
+from utils.task_storage.istorage import ITaskStorage
 
 
 async def process_image_block(job_id: str, model_name: str, setting_number: int, user_id: int, 
-    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool) -> bool:
+    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool, task_repo: ITaskStorage) -> bool:
     """
     Функция для обработки работы по её id и после удачного завершения - отправки сообщения с изображениями
     
@@ -26,15 +26,15 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
     """
     data = await state.get_data()
-    await redis_task_storage.add_task(
+    await task_repo.add_task(
         job_id=job_id,
-        model_name=model_name,
-        setting_number=setting_number,
         user_id=user_id,
         message_id=message_id,
+        model_name=model_name,
+        setting_number=setting_number,
+        job_type=data.get("job_type"),
         is_test_generation=is_test_generation,
         check_other_jobs=checkOtherJobs,
-        job_type=data.get("job_type"),
     )
     # Проверяем статус работы
     response_json = await check_job_status(
@@ -45,7 +45,8 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         state,
         is_test_generation,
         checkOtherJobs,
-        500
+        500,
+        task_repo=task_repo,
     )
 
     # Если работа не завершена, то возвращаем False
