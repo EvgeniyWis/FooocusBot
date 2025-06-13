@@ -3,12 +3,12 @@ from config import RUNPOD_HOST, RUNPOD_HEADERS
 from logger import logger
 
 from utils import httpx_post
-from utils.jobs.getEndpointID import getEndpointID
+from utils.jobs.get_endpoint_ID import get_endpoint_ID
 # from utils.check_unfinished_tasks import check_unfinished_tasks
 
 
 # Функция для отмены всех работ
-async def cancelJobs(jobs_ids: list[dict]):
+async def cancel_jobs(jobs_ids: list[dict]):
     # Если нет работ, то ничего не делаем
     if len(jobs_ids) == 0:
         return False
@@ -21,7 +21,7 @@ async def cancelJobs(jobs_ids: list[dict]):
             job_id = job_dict["job_id"]
             
             # Получаем ID эндпоинта для генерации изображений
-            ENDPOINT_ID = await getEndpointID(setting_number)
+            ENDPOINT_ID = await get_endpoint_ID(setting_number)
 
             # Формируем URL для отправки запроса
             url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/cancel/{job_id}"
