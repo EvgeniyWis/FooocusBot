@@ -9,7 +9,7 @@ from utils.generateImages import base64ToImage
 
 
 async def check_upscale_status(job_id: str, setting_number: int, state: FSMContext,
-    model_name: str, image_index: int, user_id: int) -> str:
+    model_name: str, image_index: int, user_id: int, message_id: int) -> str:
     """
     Функция для проверки статуса работы upscale и отсылания улучшенного изображения
 
@@ -23,7 +23,8 @@ async def check_upscale_status(job_id: str, setting_number: int, state: FSMConte
     """
 
     # Проверяем статус работы
-    response_json = await checkJobStatus(job_id, setting_number, state, timeout=1000)
+    response_json = await checkJobStatus(job_id, setting_number, user_id, message_id, state, 
+    timeout=1000, checkOtherJobs=False)
 
     if not response_json:
         raise Exception("Не удалось сделать upscale для изображения")

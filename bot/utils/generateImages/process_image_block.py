@@ -10,7 +10,7 @@ from .getReferenceImage import getReferenceImage
 
 
 async def process_image_block(job_id: str, model_name: str, setting_number: int, user_id: int, 
-    state: FSMContext, message: types.Message, is_test_generation: bool, checkOtherJobs: bool) -> bool:
+    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool) -> bool:
     """
     Функция для обработки работы по её id и после удачного завершения - отправки сообщения с изображениями
     
@@ -29,8 +29,9 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
     response_json = await checkJobStatus(
         job_id,
         setting_number,
+        user_id,
+        message_id,
         state,
-        message,
         is_test_generation,
         checkOtherJobs,
         500
@@ -88,7 +89,6 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
 
         # Отправляем изображение
         await sendImageBlock(
-            message,
             state,
             media_group,
             model_name,

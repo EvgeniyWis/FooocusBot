@@ -5,13 +5,13 @@ from aiogram.fsm.context import FSMContext
 
 from utils.jobs.getJobID import getJobID
 
-from utils.generateImages.upscale import check_upscale_status
+from utils.generateImages.upscale.check_upscale_status import check_upscale_status
 
 from utils.handlers import appendDataToStateArray
 
 
 async def upscale_image(input_image: str, base_config_model_name: str, setting_number: int, 
-    state: FSMContext, user_id: int, model_name: str, image_index: int) -> str:
+    state: FSMContext, user_id: int, model_name: str, image_index: int, message_id: int) -> str:
     """
     Функция для посылания запроса на upscale сгенерированного изображения и проверки его статуса работы
 
@@ -58,6 +58,6 @@ async def upscale_image(input_image: str, base_config_model_name: str, setting_n
     await appendDataToStateArray(state, "upscale_data", dataForUpdate)
 
     # Проверяем статус работы
-    result = await check_upscale_status(job_id, setting_number, state, model_name, image_index, user_id)
+    result = await check_upscale_status(job_id, setting_number, state, model_name, image_index, user_id, message_id)
 
     return result

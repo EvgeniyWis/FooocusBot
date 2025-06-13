@@ -332,7 +332,6 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     # Получаем id пользователя и данные из стейта
     user_id = call.from_user.id
-    stateData = await state.get_data()
 
     # Получаем индекс работы и индекс изображения
     model_name = call.data.split("|")[1]

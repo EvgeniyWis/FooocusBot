@@ -7,7 +7,6 @@ from aiogram.types import BotCommand
 from config import (
     DEV_CHAT_IDS,
     FACEFUSION_RESULTS_DIR,
-    TEMP_FOLDER_PATH,
     TEMP_IMAGE_FILES_DIR,
     TEMP_DIR,
 )

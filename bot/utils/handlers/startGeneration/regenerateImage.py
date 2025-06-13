@@ -55,6 +55,6 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     json["input"]["prompt"] += " " + prompt
 
     try:
-        return await generateImageBlock(json, model_name, call.message, state, user_id, setting_number, is_test_generation, False)
+        return await generateImageBlock(json, model_name, call.message.message_id, state, user_id, setting_number, is_test_generation, False)
     finally:
         await regenerate_message.delete()
