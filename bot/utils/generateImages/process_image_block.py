@@ -79,11 +79,11 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         stateData = await state.get_data()
         
         # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
-        regenerate_images = stateData.get("regenerate_images", [])
-        if model_name in regenerate_images:
-            regenerate_images.remove(model_name)
+        regenerated_models = stateData.get("regenerated_models", [])
+        if model_name in regenerated_models:
+            regenerated_models.remove(model_name)
             await state.update_data(
-                regenerate_images=regenerate_images,
+                regenerated_models=regenerated_models,
             )
 
         # Отправляем изображение

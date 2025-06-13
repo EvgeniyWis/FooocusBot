@@ -72,8 +72,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Очищаем стейт
     initial_state = {
         'generation_step': 1,
-        'prompts_for_regenerate_images': [],
-        'regenerate_images': [],
+        'prompts_for_regenerated_models': [],
+        'regenerated_models': [],
         'model_indexes_for_generation': [],
         'saved_images_urls': [],
         'faceswap_generated_models': [],
@@ -522,7 +522,7 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
 
     # Записываем новый промпт в стейт для этой модели
     dataForUpdate = {f"{model_name}": prompt}
-    await appendDataToStateArray(state, "prompts_for_regenerate_images", dataForUpdate)
+    await appendDataToStateArray(state, "prompts_for_regenerated_models", dataForUpdate)
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)

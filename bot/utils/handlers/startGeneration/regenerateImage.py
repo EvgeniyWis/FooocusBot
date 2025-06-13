@@ -31,8 +31,8 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     randomizer_prompts = stateData.get("randomizer_prompts", [])
     randomizer_prompt = await getDataInDictsArray(randomizer_prompts, model_name)
     prompt_for_images = stateData.get("prompt_for_images", "")
-    prompts_for_regenerate_images = stateData.get("prompts_for_regenerate_images", [])
-    prompt_for_regenerate_image = await getDataInDictsArray(prompts_for_regenerate_images, model_name)
+    prompts_for_regenerated_models = stateData.get("prompts_for_regenerated_models", [])
+    prompt_for_regenerate_image = await getDataInDictsArray(prompts_for_regenerated_models, model_name)
 
     if prompt_for_regenerate_image:
         prompt = prompt_for_regenerate_image
