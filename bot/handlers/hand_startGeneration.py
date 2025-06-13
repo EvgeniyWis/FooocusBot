@@ -40,7 +40,7 @@ from utils.googleDrive.files import convertDriveLink
 import os
 
 
-from utils.handlers.startGeneration import processUpscaleImage, processFaceswapImage
+from utils.handlers.startGeneration import process_upscale_image, process_Faceswap_image
 
 
 # Обработка выбора количества генераций
@@ -385,10 +385,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         if not MOCK_MODE:
             # Меняем текст на сообщении о начале upscale
             if UPSCALE_MODE:
-                await processUpscaleImage(call, state, image_index, model_name)
+                await process_upscale_image(call, state, image_index, model_name)
 
             if FACEFUSION_MODE:
-                result_path = await processFaceswapImage(call, state, image_index, model_name)
+                result_path = await process_Faceswap_image(call, state, image_index, model_name)
             else:
                 result_path = MOCK_FACEFUSION_PATH
 

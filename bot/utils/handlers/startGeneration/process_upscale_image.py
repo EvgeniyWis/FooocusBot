@@ -1,7 +1,8 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from utils.generateImages import upscaleImage, base64ToImage, imageToBase64
+from utils.generateImages.upscale import upscale_image
+from utils.generateImages import base64ToImage, imageToBase64
 from utils.generateImages.dataArray import getSettingNumberByModelName, getDataByModelName, getModelNameIndex
 from utils.handlers.messages import editMessageOrAnswer
 from utils import text
@@ -11,7 +12,7 @@ import os
 from PIL import Image
 
 
-async def processUpscaleImage(call: types.CallbackQuery, state: FSMContext, 
+async def process_upscale_image(call: types.CallbackQuery, state: FSMContext, 
     image_index: int, model_name: str):
     """
     Функция для обработки upscale изображения, обработки процесса в хендлере и сохранения изображения по пути
@@ -58,13 +59,6 @@ async def processUpscaleImage(call: types.CallbackQuery, state: FSMContext,
     setting_number = getSettingNumberByModelName(model_name)
 
     # Делаем upscale изображения
-    images_output_base64 = await upscaleImage(image_base64, base_model, setting_number, state, user_id)
+    await upscale_image(image_base64, base_model, setting_number, state, user_id, model_name, image_index)
 
-    # Сохраняем изображения по этому же пути
-    await base64ToImage(
-        images_output_base64,
-        model_name,
-        int(image_index) - 1,
-        user_id,
-        False,
-                )
+    return True
