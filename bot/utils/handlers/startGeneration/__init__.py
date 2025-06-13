@@ -2,5 +2,5 @@ from .generateImagesInHandler import generateImagesInHandler
 from .regenerateImage import regenerateImage
 from .sendImageBlock import sendImageBlock
 from .cancelImageGenerationJobs import cancelImageGenerationJobs
-from .processUpscaleImage import processUpscaleImage
-from .processFaceswapImage import processFaceswapImage
+from .process_upscale_image import process_upscale_image
+from .process_faceswap_image import process_Faceswap_image
