@@ -8,14 +8,14 @@ from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from utils.repository.istorage import ITaskStorage
+from utils.repository.abc_task_storage_repository import AbstractTaskStorageRepository
 from utils.factory.redis_factory import create_redis_client
 from logger import logger
 
 
 ProcessImageCallback: Any = Callable[..., Coroutine]
 
-class RedisTaskRepository(ITaskStorage):
+class RedisTaskStorageRepository(AbstractTaskStorageRepository):
     """
     Репозиторий для работы с задачами генерации, сохранёнными в Redis.
 

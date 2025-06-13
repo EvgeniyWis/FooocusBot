@@ -13,12 +13,12 @@ from config import (
 from InstanceBot import bot, dp, redis_client
 from logger import logger
 from middleware import ErrorHandlingMiddleware
-from utils.task_storage.redis_task_storage import RedisTaskRepository
+from utils.adapters.redis_task_storage_repository import RedisTaskStorageRepository
 from utils.generateImages.process_image_block import process_image_block
 from InstanceBot import storage
 
 
-redis_task_storage = RedisTaskRepository(redis_client)
+redis_task_storage = RedisTaskStorageRepository(redis_client)
 
 
 async def on_startup() -> None:
