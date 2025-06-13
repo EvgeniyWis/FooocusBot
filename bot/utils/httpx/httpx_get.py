@@ -6,7 +6,6 @@ from logger import logger
 async def httpx_get(url: str, headers: dict = None, timeout: int = 60, stream: bool = False):
     async with httpx.AsyncClient(timeout=httpx.Timeout(timeout), follow_redirects=True) as client:
         response = await client.get(url, headers=headers)
-        logger.info(f"Статус ответа: {response.status_code}")
 
         if response.status_code == 200:
             if stream:

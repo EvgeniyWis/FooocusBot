@@ -95,8 +95,8 @@ async def checkJobStatus(
                                 left_images_count,
                             ),
                         )
-                    except Exception as e:
-                        logger.warning(f"Не удалось обновить сообщение о прогрессе: {str(e)}")
+                    except:
+                        pass
                 else:
                     # Добавляем в стейт то, сколько готовых изображений
                     await state.update_data(total_images_count=1)

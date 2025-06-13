@@ -61,19 +61,23 @@ async def generateVideo(
 
         # Отправляем запрос на генерацию видео
         url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
-        json = await httpx_post(url_endpoint, headers, data, files)
+        json = await httpx_post(url_endpoint, headers, data=data, files=files)
 
         logger.info(f"Ответ на запрос на генерацию видео: {json}")
 
         if json.get("error"):
-            logger.error(
-                f"Ошибка валидации: {json.get('errors_validation')}",
-            )
+            # Обрабатываем ошибки валидации
+            errors_validation = json.get("errors_validation")
 
-            if (
-                json["error"]
-                == "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
-            ):
+            if errors_validation:
+                logger.error(
+                    f"Ошибка валидации: {errors_validation}",
+                )
+
+            # Обрабатываем ошибку недостаточного баланса    
+            NOT_ENOUGH_MONEY_ERROR_TEXT = "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
+
+            if json["error"] == NOT_ENOUGH_MONEY_ERROR_TEXT:
                 try:
                     await bot.send_message(
                         ADMIN_ID,
@@ -82,7 +86,7 @@ async def generateVideo(
                 finally:
                     raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
 
-            return None
+            raise Exception(json["error"])
 
         logger.info(
             f"Запрос на генерацию видео отправлен. Ответ: {json}",
@@ -100,14 +104,20 @@ async def generateVideo(
 
         while True:
             try:
-                json = await httpx_get(url_status_endpoint)
+                json = await httpx_get(url_status_endpoint, headers=headers)
 
                 logger.info(
                     f"Статус задания на генерацию видео с id {request_id}: "
                     f"{json['status']}",
                 )
 
-                if json["status"] == "error":
+                if json["status"] == "error":                  
+                    # Обрабатываем ошибку промпта, непройденного модераций
+                    PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT = "Параметры сформированы некорректно. Пожалуйста, убедитесь в правильности введенных данных и отсутствии неприемлемого контента в подсказках."
+
+                    if json["result"][0] == PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT:
+                        return {"error": PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT}
+                    
                     logger.error(f"Ошибка при генерации видео: {json}")
                     raise Exception(json["result"][0])
 
