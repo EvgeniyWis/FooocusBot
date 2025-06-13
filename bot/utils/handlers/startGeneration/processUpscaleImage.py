@@ -1,16 +1,18 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+
 from utils.generateImages import upscaleImage, base64ToImage, imageToBase64
-from utils.generateImages.dataArray import getSettingNumberByModelName, getDataByModelName
+from utils.generateImages.dataArray import getSettingNumberByModelName, getDataByModelName, getModelNameIndex
 from utils.handlers.messages import editMessageOrAnswer
 from utils import text
+
 from config import TEMP_FOLDER_PATH
 import os
 from PIL import Image
 
 
 async def processUpscaleImage(call: types.CallbackQuery, state: FSMContext, 
-    image_index: int, model_name: str, model_name_index: int, user_id: int):
+    image_index: int, model_name: str):
     """
     Функция для обработки upscale изображения, обработки процесса в хендлере и сохранения изображения по пути
     
@@ -19,10 +21,14 @@ async def processUpscaleImage(call: types.CallbackQuery, state: FSMContext,
         state (FSMContext): контекст состояния
         image_index (int): индекс изображения
         model_name (str): название модели
-        model_name_index (int): индекс модели
-        user_id (int): id пользователя
     """
+    # Получаем айдишник пользователя
+    user_id = call.from_user.id
+    
+    # Получаем индекс модели
+    model_name_index = getModelNameIndex(model_name)
 
+    # Отправляем сообщение о начале upscale
     await editMessageOrAnswer(
         call,text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
