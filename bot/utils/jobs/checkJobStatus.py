@@ -8,14 +8,16 @@ from logger import logger
 from utils import text
 from utils.jobs.getEndpointID import getEndpointID
 from utils import httpx_post
+from InstanceBot import bot
 
 
 # Функция для получения статуса работы
 async def checkJobStatus(
     job_id: str,
     setting_number: int,
+    user_id: int,
+    message_id: int,
     state: FSMContext = None,
-    message: types.Message = None,
     is_test_generation: bool = False,
     checkOtherJobs: bool = True,
     timeout: int = 600 * 100,
@@ -46,7 +48,7 @@ async def checkJobStatus(
                 await asyncio.sleep(10)
                 continue
 
-            if state and message and not is_test_generation and checkOtherJobs:
+            if state and not is_test_generation and checkOtherJobs:
                 stateData = await state.get_data()
 
                 if "jobs" in stateData:
@@ -85,8 +87,10 @@ async def checkJobStatus(
                     await state.update_data(total_images_count=total_images_count)
 
                     try:
-                        await message.edit_text(
-                            text.GENERATE_IMAGES_PROCESS_TEXT.format(
+                        await bot.edit_message_text(
+                            chat_id=user_id,
+                            message_id=message_id,
+                            text=text.GENERATE_IMAGES_PROCESS_TEXT.format(
                                 success_images_count,
                                 error_images_count,
                                 cancelled_images_count,

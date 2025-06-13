@@ -54,7 +54,7 @@ async def generateImages(
             image = await generateImageBlock(
                 json,
                 data["model_name"],
-                message,
+                message.message_id,
                 state,
                 user_id,
                 setting_number,
