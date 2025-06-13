@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from utils.generateImages import upscaleImage, base64ToImage, imageToBase64
+from utils.generateImages import upscaleImage, base64ToImage
 from utils.generateImages.dataArray import getSettingNumberByModelName, getDataByModelName, getModelNameIndex
 from utils.handlers.messages import editMessageOrAnswer
 from utils import text

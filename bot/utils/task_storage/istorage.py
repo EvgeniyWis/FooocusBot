@@ -17,9 +17,9 @@ class ITaskStorage(ABC):
         raise NotImplementedError()
     
     @abstractmethod
-    async def get_tasks(self) -> list: 
+    async def get_task(self) -> list: 
         """
-        Get all tasks from the storage.
+        Get current task from the storage.
         """
         raise NotImplementedError()
     

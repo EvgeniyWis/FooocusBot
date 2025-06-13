@@ -11,11 +11,12 @@ from ... import text
 from ...generateImages.dataArray import getDataByModelName, getModelNameIndex
 from ...handlers import appendDataToStateArray
 from .rate_limiter_for_send_media_group import safe_send_media_group
+from bot.InstanceBot import bot
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
 async def sendImageBlock(message: types.Message, state: FSMContext, media_group: list, model_name: str,
-    setting_number: str, is_test_generation: bool, user_id: int):
+    setting_number: str, is_test_generation: bool, user_id: int, bot: bot):
     try:
         # Отправляем изображения с механизмом повторных попыток и глобальным rate limiter
         media_group_message = await safe_send_media_group(message, media_group)
@@ -27,9 +28,9 @@ async def sendImageBlock(message: types.Message, state: FSMContext, media_group:
         logger.error(f"Ошибка при отправке медиагруппы: {e}")
         try:
             if isinstance(e, TelegramRetryAfter):
-                await message.answer(f"Превышен лимит отправки сообщений. Пожалуйста, подождите {e.retry_after} секунд и попробуйте снова.")
+                await bot.send_message(chat_id=message.chat.id, text=f"Превышен лимит отправки сообщений. Пожалуйста, подождите {e.retry_after} секунд и попробуйте снова.")
             else:
-                await message.answer("Произошла ошибка при отправке изображений, но продолжаем работу...")
+                await bot.send_message(chat_id=message.chat.id, text="Произошла ошибка при отправке изображений, но продолжаем работу...")
         except:
             pass
 
