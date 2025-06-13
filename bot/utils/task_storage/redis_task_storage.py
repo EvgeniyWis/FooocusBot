@@ -1,149 +1,172 @@
-import os
 import json
-from typing import Any
+from typing import Any, Callable, Optional
 
 import redis.asyncio as aioredis
+from aiogram import Bot, types
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.base import StorageKey
+from aiogram.utils.exceptions import RetryAfter, TelegramAPIError
 
-from logger import logger
 from utils.task_storage.istorage import ITaskStorage
+from utils.redis.redis_factory import get_redis_client
+from utils.generateImages.process_image_block import process_image_block
+from logger import logger
 
 
-class RedisTaskStorage(ITaskStorage):
+class RedisTaskRepository(ITaskStorage):
     """
-    Класс для проверки и восстановления незавершенных задач 
-    (генерации изображений, upscale изображений) в Redis.
-    Использует Redis для хранения и управления задачами.
-
-    Attributes:
-        redis_client (aioredis.Redis): Асинхронный клиент Redis.
-        connected (bool): Флаг, указывающий на успешное подключение к Redis.
-
-    Methods:
-        init_redis(): Инициализирует соединение с Redis и проверяет его работоспособность.
-        get_tasks(): Проверяет наличие задач в Redis.
-        append_task(task): Добавляет новую задачу в Redis.
-        recover_tasks(process_task_callback): Возобновляет работу задач при помощи внешних ф-ций.
-        delete_task(job_id): Удаляет задачу из Redis по заданному job_id.
+    Репозиторий для работы с отложенными задачами в Redis.
+    Хранит и восстанавливает задачи генерации изображений через process_image_block().
     """
 
-    def __init__(self, redis_client: aioredis.Redis) -> None:
-        self.redis_client = redis_client
-        self.connected = False
+    def __init__(self, redis_client: Optional[aioredis.Redis] = None) -> None:
+        # Используем фабрику для получения клиента, если не передан
+        self.redis: aioredis.Redis = redis_client or get_redis_client()
 
     async def init_redis(self) -> None:
         """
-        Инициализирует соединение с Redis и проверяет его работоспособность.
-
-        Raises:
-            aioredis.ConnectionError: Если не удалось подключиться к Redis.
+        Проверяет доступность Redis.
         """
         try:
-            await self.redis_client.ping()
-            logger.info("Redis connection is healthy.")
-            self.connected = True
-        except aioredis.ConnectionError as e:
-            logger.error(f"Redis connection error: {e}")
-            self.connected = False
-            raise aioredis.ConnectionError(f"Redis connection error: {e}")
-
-    async def get_tasks(self) -> list:
-        """
-        Проверяет наличие незавершенных задач в Redis.
-        Возвращает список задач, которые были найдены в Redis.
-        Если задачи не найдены, возвращает пустой список.
-
-        Returns:
-            list: Список незавершенных задач, найденных в Redis.
-
-        Raises:
-            aioredis.RedisError: Если произошла ошибка при взаимодействии с Redis.
-
-        """
-        unfinished_tasks = await self.redis_client.keys("task:*")
-        logger.info(f"Checking unfinished tasks: {unfinished_tasks}")
-        tasks = []
-        for key in unfinished_tasks:
-            data = await self.redis_client.get(key)
-            if data:
-                try:
-                    task = json.loads(data)
-                    tasks.append(task)
-                except Exception as e:
-                    logger.warning(f"Failed to decode task {key}: {e}")
-        return tasks
-
-    async def append_task(self, task: dict[str, Any]) -> None:
-        """
-        Добавляет новую задачу в Redis.
-        Если ключ задачи уже существует, пропускает добавление.
-        Если задача лежит в Redis более 24 часов, она будет удалена.
-
-        Args:
-            task (dict[str, Any]): Задача, которую нужно добавить в Redis.
-
-        Raises:
-            aioredis.ConnectionError: Если не удалось подключиться к Redis.
-            aioredis.RedisError: Если произошла ошибка при взаимодействии с Redis.
-            Exception: Если возникла неизвестная ошибка при добавлении задачи.
-        """
-        job_id = task.get("job_id")
-        user_id = task.get("user_id")
-        job_type = task.get("job_type")
-        if not job_id or not user_id or not job_type:
-            logger.warning("Нет job_id или user_id или job_type в задаче: %s", task)
-            return
-        key = f"task:{job_id}"
-        try:
-            # Проверка на дублирование ключа
-            exists = await self.redis_client.exists(key)
-            if exists:
-                logger.warning(f"Задача с ключом {key} уже существует. Пропуск добавления.")
-                return
-            try:
-                task_json = json.dumps(task)
-            except (TypeError, ValueError) as e:
-                logger.error(f"Ошибка сериализации задачи {task}: {e}")
-                return
-            await self.redis_client.set(key, task_json, ex=60 * 60 * 24)
-            logger.info(f"Задача успешно добавлена в Redis: {key}")
-        except aioredis.ConnectionError as e:
-            logger.error(f"Ошибка соединения с Redis при добавлении задачи {key}: {e}")
-            raise aioredis.ConnectionError(f"Ошибка соединения с Redis при добавлении задачи {key}: {e}")
-        except aioredis.RedisError as e:
-            logger.error(f"Ошибка Redis при добавлении задачи {key}: {e}")
-            raise aioredis.RedisError(f"Ошибка Redis при добавлении задачи {key}: {e}")
+            await self.redis.ping()
+            logger.info("[RedisTaskRepository] Redis is available")
         except Exception as e:
-            logger.error(f"Неизвестная ошибка при добавлении задачи {key}: {e}")
-            raise Exception(f"Неизвестная ошибка при добавлении задачи {key}: {e}")
+            logger.error(f"[RedisTaskRepository] Redis ping failed: {e}")
+            raise
 
+    async def add_task(
+        self,
+        job_id: str,
+        user_id: int,
+        job_type: str,
+        model_name: str,
+        setting_number: int,
+        is_test_generation: bool,
+        check_other_jobs: bool,
+        chat_id: int,
+        message_id: int,
+    ) -> None:
+        """
+        Сохраняет новую задачу в Redis. Если задача уже есть — пропускает.
+
+        :param job_id: уникальный идентификатор задачи
+        :param user_id: Telegram user_id
+        :param job_type: тип задачи ("generate_image", "upscale" и т.д.)
+        :param model_name: имя модели генерации
+        :param setting_number: номер набора параметров
+        :param is_test_generation: флаг тестовой генерации
+        :param check_other_jobs: флаг проверки других задач
+        :param chat_id: идентификатор чата для ответа
+        :param message_id: идентификатор сообщения для восстановления
+        """
+        key = f"task:{job_id}"
+        exists = await self.redis.exists(key)
+        if exists:
+            logger.warning(f"[RedisTaskRepository] Task {key} already exists, skip adding")
+            return
+        payload = {
+            "job_id": job_id,
+            "user_id": user_id,
+            "job_type": job_type,
+            "model_name": model_name,
+            "setting_number": setting_number,
+            "is_test_generation": is_test_generation,
+            "check_other_jobs": check_other_jobs,
+            "chat_id": chat_id,
+            "message_id": message_id,
+        }
+        data = json.dumps(payload)
+        # Сохраняем на 24 часа
+        await self.redis.set(key, data, ex=24 * 3600)
+        logger.info(f"[RedisTaskRepository] Task saved: {key}")
+
+    async def get_task(self, job_id: str) -> Optional[dict[str, Any]]:
+        """
+        Возвращает словарь задачи по job_id или None.
+        """
+        key = f"task:{job_id}"
+        data = await self.redis.get(key)
+        if not data:
+            return None
+        try:
+            return json.loads(data)
+        except Exception as e:
+            logger.error(f"[RedisTaskRepository] Failed to decode task {key}: {e}")
+            return None
 
     async def delete_task(self, job_id: str) -> None:
         """
-        Удаляет задачу из Redis по заданному job_id.
-
-        Args:
-            job_id (str): Идентификатор задачи, которую нужно удалить.
-
-        Raises:
-            aioredis.ConnectionError: Если не удалось подключиться к Redis.
-            aioredis.RedisError: Если произошла ошибка при взаимодействии с Redis.
+        Удаляет задачу из Redis по job_id.
         """
         key = f"task:{job_id}"
-        try:
-            await self.redis_client.delete(key)
-            logger.info(f"Задача {key} успешно удалена из Redis.")
-        except aioredis.ConnectionError as e:
-            logger.error(f"Ошибка соединения с Redis при удалении задачи {key}: {e}")
-            raise aioredis.ConnectionError(f"Ошибка соединения с Redis при удалении задачи {key}: {e}")
-        except aioredis.RedisError as e:
-            logger.error(f"Ошибка Redis при удалении задачи {key}: {e}")
-            raise aioredis.RedisError(f"Ошибка Redis при удалении задачи {key}: {e}")
+        await self.redis.delete(key)
+        logger.info(f"[RedisTaskRepository] Task deleted: {key}")
 
-    async def recover_tasks(self, process_task_callback) -> None:
-        tasks = await self.check_tasks()
-        if tasks:
-            for task in tasks:
-                logger.info(f"Recovering unfinished task: {task}")
-                await process_task_callback(task)
-        else:
-            logger.info("No unfinished tasks found in Redis.")
+    async def recover_tasks(self, bot: Bot, state_storage, prefix: str = "task:") -> None:
+        """
+        Восстанавливает все задачи из Redis и проигрывает их.
+
+        :param bot: экземпляр aiogram.Bot
+        :param state_storage: хранилище FSMContext (RedisStorage)
+        :param prefix: префикс ключей задач
+        """
+        keys = await self.redis.keys(f"{prefix}*")
+        for key in keys:
+            job_id = key.decode().split("task:")[1]
+            await self.replay_task(job_id, bot, state_storage)
+
+    async def replay_task(
+        self,
+        job_id: str,
+        bot: Bot,
+        state_storage,
+    ) -> bool:
+        """
+        Воспроизводит задачу:
+        - Получает payload из Redis
+        - Создаёт FSMContext
+        - Отправляет новое сообщение (или использует старое message_id для редактирования)
+        - Запускает process_image_block
+        """
+        task = await self.get_task(job_id)
+        if not task:
+            logger.warning(f"[RedisTaskRepository] No task to replay: {job_id}")
+            return False
+
+        try:
+            user_id = task["user_id"]
+            chat_id = task["chat_id"]
+            message_id = task["message_id"]
+
+            # Восстановление FSMContext
+            key = StorageKey(bot_id=bot.id, user_id=user_id, chat_id=chat_id)
+            state = FSMContext(storage=state_storage, key=key)
+
+            # Запускаем обработку блока
+            success = await process_image_block(
+                job_id=task["job_id"],
+                model_name=task["model_name"],
+                setting_number=task["setting_number"],
+                user_id=user_id,
+                state=state,
+                message=message,
+                is_test_generation=task["is_test_generation"],
+                checkOtherJobs=task["check_other_jobs"],
+            )
+
+            if success:
+                await self.delete_task(job_id)
+            return success
+
+        except RetryAfter as e:
+            logger.warning(f"[RedisTaskRepository] RetryAfter for {job_id}, retry in {e.timeout}s")
+            await asyncio.sleep(e.timeout)
+            return await self.replay_task(job_id, bot, state_storage)
+
+        except TelegramAPIError as e:
+            logger.error(f"[RedisTaskRepository] Telegram API error: {e}")
+            return False
+
+        except Exception as e:
+            logger.error(f"[RedisTaskRepository] Error replaying {job_id}: {e}")
+            return False

@@ -3,7 +3,10 @@ import os
 from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.fsm.storage.redis import RedisStorage
 from dotenv import find_dotenv, load_dotenv
+
+from utils.task_storage.redis_factory import create_redis_client
 
 load_dotenv(find_dotenv())
 
@@ -13,7 +16,10 @@ bot = Bot(
     default=DefaultBotProperties(parse_mode="HTML"),
 )
 
-dp = Dispatcher()
+redis_client = create_redis_client()
+storage = RedisStorage(redis_client)
+
+dp = Dispatcher(storage=storage)
 router = Router()
 
 # Увеличиваем таймаут для запросов к Telegram API
