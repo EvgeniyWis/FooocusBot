@@ -1,10 +1,13 @@
 from config import COMMON_NEGATIVE_PROMPT
 from logger import logger
 
-from utils.jobs.getJobID import getJobID
 from aiogram.fsm.context import FSMContext
 
-from utils.generateImages.upscale.check_upscale_status import check_upscale_status
+from utils.jobs.getJobID import getJobID
+
+from utils.generateImages.upscale import check_upscale_status
+
+from utils.handlers import appendDataToStateArray
 
 
 async def upscale_image(input_image: str, base_config_model_name: str, setting_number: int, 
@@ -45,6 +48,13 @@ async def upscale_image(input_image: str, base_config_model_name: str, setting_n
 
     # Делаем запрос на генерацию и получаем id работы
     job_id = await getJobID(dataJSON, setting_number, state, user_id, "upscale")
+    
+    # Сохраняем имя модели и индекс изображения в стейт
+    dataForUpdate = {
+        "model_name": model_name,
+        "image_index": image_index
+    }
+    await appendDataToStateArray(state, "upscale_data", dataForUpdate)
 
     # Проверяем статус работы
     result = await check_upscale_status(job_id, setting_number, state, model_name, image_index, user_id)
