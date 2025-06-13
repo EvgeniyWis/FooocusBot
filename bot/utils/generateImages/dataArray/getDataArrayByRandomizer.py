@@ -21,6 +21,8 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
 
     # Проходимся по всем промптам для каждой переменной рандомайзера и формируем промпт
     for data in dataArray:
+        model_randomizer_prompt = ""
+
         for variable_name in variable_names_for_randomizer:
             # Получаем значения переменной
             variable_values = stateData.get(f"randomizer_{variable_name}_values", [])
@@ -34,11 +36,13 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
             # Применяем значение переменной к промпу
             formated_prompt = f"{variable_name}: {random_variable_value};"
 
-            data["json"]["input"]["prompt"] += " " + formated_prompt
+            model_randomizer_prompt += formated_prompt
 
-            # Сохраняем промпт в стейт для перегенерации
-            dataForUpdate = {f"{data['model_name']}": formated_prompt}
-            await appendDataToStateArray(state, "randomizer_prompts", dataForUpdate)
+        data["json"]["input"]["prompt"] = model_randomizer_prompt
+
+        # Сохраняем промпт в стейт для перегенерации
+        dataForUpdate = {f"{data['model_name']}": model_randomizer_prompt}
+        await appendDataToStateArray(state, "randomizer_prompts", dataForUpdate)
 
     logger.info(f"Массив данных после применения переменных рандомайзера: {dataArray}")
     # Возвращаем массив данных
