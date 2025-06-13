@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class ITaskStorage(ABC):
     @abstractmethod
-    async def append_task(self, task: dict[str, Any]) -> None:
+    async def add_task(self, task: dict[str, Any]) -> None:
         """
         Append a task to the storage.
         """
