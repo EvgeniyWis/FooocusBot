@@ -33,7 +33,7 @@ async def generateImageBlock(
         logger.info(f"Отправляем запрос на генерацию изображений с данными: {dataJSON}")
 
         # Делаем запрос на генерацию и получаем id работы
-        job_id = await getJobID(dataJSON, setting_number, state, user_id)
+        job_id = await getJobID(dataJSON, setting_number, state, user_id, "image_generation")
 
         # Проверяем статус работы
         response_json = await checkJobStatus(
