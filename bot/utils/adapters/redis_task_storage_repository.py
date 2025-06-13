@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from typing import Any, Coroutine, Callable
 
@@ -8,14 +9,14 @@ from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from utils.repository.istorage import ITaskStorage
+from utils.repository.abc_task_storage_repository import AbstractTaskStorageRepository
 from utils.factory.redis_factory import create_redis_client
 from logger import logger
 
 
 ProcessImageCallback: Any = Callable[..., Coroutine]
 
-class RedisTaskRepository(ITaskStorage):
+class RedisTaskStorageRepository(AbstractTaskStorageRepository):
     """
     Репозиторий для работы с задачами генерации, сохранёнными в Redis.
 
@@ -189,6 +190,8 @@ class RedisTaskRepository(ITaskStorage):
                 message_id,
                 task['is_test_generation'],
                 task['check_other_jobs'],
+                task['chat_id'],
+                task_repo=self,
             )
             if success:
                 await self.delete_task(job_id)
@@ -213,7 +216,11 @@ class RedisTaskRepository(ITaskStorage):
             None
         """
         keys = await self.redis.keys('task:*')
+        tasks = []
         for raw in keys:
             job_id = raw.decode().split(':', 1)[1]
             logger.info(f"Восстановление задачи: {job_id}")
-            await self.replay_task(job_id, bot, state_storage)
+            task = asyncio.create_task(self.replay_task(job_id, bot, state_storage))
+            tasks.append(task)
+
+        await asyncio.gather(*tasks, return_exceptions=True)

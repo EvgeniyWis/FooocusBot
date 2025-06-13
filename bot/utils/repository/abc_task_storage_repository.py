@@ -1,17 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Any
 
 
-class ITaskStorage(ABC):
+class AbstractTaskStorageRepository(ABC):
     @abstractmethod
-    async def add_task(self, task: dict[str, Any]) -> None:
+    async def add_task(self) -> None:
         """
         Append a task to the storage.
         """
         raise NotImplementedError()
     
     @abstractmethod
-    async def delete_task(self, job_id: str) -> None:
+    async def delete_task(self) -> None:
         """
         Delete a task from the storage by its job ID.
         """
