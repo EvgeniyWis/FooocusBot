@@ -6,10 +6,10 @@ from logger import logger
 load_dotenv(find_dotenv())
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
-SETTING_1_ENDPOINT_ID = "aelfxb1abgc86i"
-SETTING_2_ENDPOINT_ID = "z8ucydl90zd843"
-SETTING_3_ENDPOINT_ID = "sw0ded20r1mufl"
-SETTING_4_ENDPOINT_ID = "1f0qlar276qtgk"
+SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
+SETTING_2_ENDPOINT_ID = "vmoqasbdvt7wl6"
+SETTING_3_ENDPOINT_ID = "e2u67i0khvang0"
+SETTING_4_ENDPOINT_ID = "if2vaadpx2bo1u"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.info(f"BASE_DIR: {BASE_DIR}")
