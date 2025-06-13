@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from typing import Any, Coroutine, Callable
 
@@ -189,6 +190,8 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
                 message_id,
                 task['is_test_generation'],
                 task['check_other_jobs'],
+                task['chat_id'],
+                task_repo=self,
             )
             if success:
                 await self.delete_task(job_id)
@@ -213,7 +216,11 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
             None
         """
         keys = await self.redis.keys('task:*')
+        tasks = []
         for raw in keys:
             job_id = raw.decode().split(':', 1)[1]
             logger.info(f"Восстановление задачи: {job_id}")
-            await self.replay_task(job_id, bot, state_storage)
+            task = asyncio.create_task(self.replay_task(job_id, bot, state_storage))
+            tasks.append(task)
+
+        await asyncio.gather(*tasks, return_exceptions=True)
