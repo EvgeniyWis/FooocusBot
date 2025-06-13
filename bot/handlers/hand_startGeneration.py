@@ -1,4 +1,3 @@
-import asyncio
 import traceback
 from datetime import datetime
 
@@ -6,7 +5,7 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE, MOCK_FACEFUSION_PATH
-from config import MOCK_MODE, TEMP_FOLDER_PATH, UPSCALE_MODE, FACEFUSION_MODE
+from config import MOCK_MODE, UPSCALE_MODE, FACEFUSION_MODE
 from InstanceBot import bot, router
 from keyboards import (
     randomizer_keyboards,
@@ -14,15 +13,10 @@ from keyboards import (
     video_generation_keyboards,
 )
 from logger import logger
-from PIL import Image
 from states.StartGenerationState import StartGenerationState
 from utils import text
-from utils.facefusion import facefusion_swap
 from utils.generateImages import (
-    base64ToImage,
     generateImageBlock,
-    imageToBase64,
-    upscaleImage,
 )
 from utils.generateImages.dataArray import (
     getAllDataArrays,
@@ -41,12 +35,12 @@ from utils.handlers.startGeneration import (
     generateImagesInHandler,
     regenerateImage,
 )
-from utils.generateImages.dataArray import getSettingNumberByModelName
 from utils.googleDrive.files import convertDriveLink
 
 import os
 
-from utils import retryOperation
+
+from utils.handlers.startGeneration import processUpscaleImage, processFaceswapImage
 
 
 # Обработка выбора количества генераций
@@ -82,7 +76,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         'regenerate_images': [],
         'model_indexes_for_generation': [],
         'saved_images_urls': [],
-        'faceswap_generate_models': [],
+        'faceswap_generated_models': [],
         'imageGeneration_mediagroup_messages_ids': [],
         'videoGeneration_messages_ids': []
     }
@@ -389,150 +383,12 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         
         # Если не в режиме мока, то продолжаем генерацию
         if not MOCK_MODE:
-            # Получаем само изображение по пути
-            image_path = (
-                f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
-            )
-
             # Меняем текст на сообщении о начале upscale
             if UPSCALE_MODE:
-                await editMessageOrAnswer(
-                    call,text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
-
-                # Получаем само изображение по пути
-                image_path = (
-                    f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
-                )
-
-                # Если изображение не найдено, то завершаем генерацию
-                if not os.path.exists(image_path):
-                    await editMessageOrAnswer(
-                        call,
-                        text.IMAGE_NOT_FOUND_TEXT.format(image_index, model_name, model_name_index),
-                    )
-                    return
-
-                image = Image.open(image_path)
-                image_base64 = imageToBase64(image)
-
-                # Получаем базовую модель
-                base_model = data["json"]["input"]["base_model_name"]
-
-                # Получаем номер настройки
-                setting_number = getSettingNumberByModelName(model_name)
-
-                # Делаем upscale изображения
-                images_output_base64 = await upscaleImage(image_base64, base_model, setting_number, state, user_id)
-
-                # Сохраняем изображения по этому же пути
-                await base64ToImage(
-                    images_output_base64,
-                    model_name,
-                    int(image_index) - 1,
-                    user_id,
-                    False,
-                )
+                await processUpscaleImage(call, state, image_index, model_name, model_name_index, user_id)
 
             if FACEFUSION_MODE:
-                # Меняем текст на сообщении об очереди на замену лица
-                await editMessageOrAnswer(
-                    call,
-                    text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index),
-                )
-
-                # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-                faceswap_target_path = (
-                    f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
-                )
-                faceswap_source_path = f"images/faceswap/{model_name}.jpg"
-                logger.info(
-                    f"Путь к исходному изображению для замены лица: {faceswap_target_path}",
-                )
-                logger.info(
-                    f"Путь к целевому изображению для замены лица: {faceswap_source_path}",
-                )
-
-                # Добавляем в стейт путь к изображению для faceswap
-                await appendDataToStateArray(
-                    state,
-                    "faceswap_generate_models",
-                    model_name,
-                )
-
-                # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
-                start_time = datetime.now()
-                last_models_state = []
-
-                while True:
-                    stateData = await state.get_data()
-                    faceswap_generate_models = stateData.get("faceswap_generate_models", [])
-
-                    # Проверяем, изменился ли список моделей
-                    if faceswap_generate_models != last_models_state:
-                        start_time = datetime.now()
-                        last_models_state = faceswap_generate_models.copy()
-
-                    # Проверяем таймаут
-                    current_time = datetime.now()
-                    elapsed_time = (current_time - start_time).total_seconds()
-                    if elapsed_time > 1800:  # 30 минут = 1800 секунд
-                        error_message = f"Таймаут ожидания обновления списка faceswap_generate_models для модели {model_name}"
-                        logger.error(
-                            error_message
-                        )
-                        raise Exception(error_message)
-
-                    logger.info(
-                        f"Список генераций для замены лица: {faceswap_generate_models}",
-                    )
-
-                    # Если список пуст, то завершаем цикл
-                    if not len(faceswap_generate_models):
-                        break
-
-                    # Если в списке генераций настала очередь этой модели, то запускаем генерацию
-                    if model_name == faceswap_generate_models[0]:
-                        await editMessageOrAnswer(
-                            call,
-                            text.FACE_SWAP_PROGRESS_TEXT.format(
-                                image_index,
-                                model_name,
-                                model_name_index,
-                            ),
-                        )
-
-                        try:
-                            result_path = await retryOperation(
-                                facefusion_swap, 5, 2, faceswap_source_path, faceswap_target_path
-                            )
-
-                        except Exception as e:
-                            result_path = None
-                            logger.error(
-                                f"Произошла ошибка при замене лица у модели {model_name} с индексом {model_name_index}: {e}",
-                            )
-                            await editMessageOrAnswer(
-                                call,
-                                text.FACE_SWAP_ERROR_TEXT.format(
-                                    model_name,
-                                    model_name_index,
-                                    e
-                                ),
-                            )
-                            raise e
-
-                        break
-
-                    await asyncio.sleep(10)
-
-                # После генерации удаляем модель из стейта
-                stateData = await state.get_data()
-                faceswap_generate_models = stateData.get("faceswap_generate_models", [])
-                if model_name in faceswap_generate_models:
-                    faceswap_generate_models.remove(model_name)
-                    await state.update_data(
-                        faceswap_models=faceswap_generate_models,
-                    )
+                result_path = await processFaceswapImage(call, state, image_index, model_name, model_name_index, user_id)
             else:
                 result_path = MOCK_FACEFUSION_PATH
 

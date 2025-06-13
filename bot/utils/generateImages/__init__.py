@@ -3,5 +3,6 @@ from .generateImageBlock import generateImageBlock
 from .generateImages import generateImages
 from .generateImagesByAllSettings import generateImagesByAllSettings
 from .getReferenceImage import getReferenceImage
-from .ImageTobase64 import imageToBase64
+from .imageToBase64 import imageToBase64
+from .process_image_block import process_image_block
 from .upscaleImage import upscaleImage

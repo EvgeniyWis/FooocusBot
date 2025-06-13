@@ -17,10 +17,6 @@ from middleware import ErrorHandlingMiddleware
 
 
 async def on_startup() -> None:
-    # Удаляем все файлы в папке temp facefusion
-    if os.path.exists(TEMP_FOLDER_PATH):
-        shutil.rmtree(TEMP_FOLDER_PATH)
-
     # Удаляем все файлы в папке temp
     if os.path.exists(TEMP_DIR):
         shutil.rmtree(TEMP_DIR)
