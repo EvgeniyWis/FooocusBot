@@ -18,7 +18,6 @@ import asyncio
 from utils.handlers.startGeneration.cancelImageGenerationJobs import cancelImageGenerationJobs
 
 
-
 # Функция для генерации изображения в зависимости от настроек
 async def generateImagesInHandler(
     prompt: str,
@@ -29,32 +28,26 @@ async def generateImagesInHandler(
     setting_number: str,
     with_randomizer: bool = False,
 ):
+    # Отправляем сообщение об отмене предыдущих работ
+    message_for_edit = await message.answer(text.CANCEL_PREVIOUS_JOBS_TEXT)
+
     # Отменяем все работы
     await cancelImageGenerationJobs(state)
 
     # Генерируем изображения
     try:
-        # Добавлена проверка на None для переменной message перед использованием
-        if message is None:
-            raise ValueError("message не может быть None")
-
-        # Инициализация переменной message_for_edit перед её использованием
-        message_for_edit = None
-
         if is_test_generation:
             if setting_number == "all":
                 # Заполнение параметра is_test_generation в вызове функции
                 result = await generateImagesByAllSettings(
-                    message,
+                    message_for_edit,
                     state,
                     user_id,
                     is_test_generation,
                 )  # Отправляем сообщение о получении промпта
             else:
-                # Инициализация переменной message_for_edit перед её использованием
-                message_for_edit = await message.answer(
-                    text.GET_PROMPT_SUCCESS_TEXT,
-                )
+                await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
+
                 # Получаем данные для генерации
                 dataArray = getDataArrayBySettingNumber(
                     int(setting_number),
@@ -69,7 +62,7 @@ async def generateImagesInHandler(
                     await generateImageBlock(
                         json,
                         model_name,
-                        message_for_edit,
+                        message_for_edit.message_id,
                         state,
                         user_id,
                         setting_number,
@@ -83,17 +76,15 @@ async def generateImagesInHandler(
 
             if setting_number == "all":
                 result = await generateImagesByAllSettings(
-                    message,
+                    message_for_edit,
                     state,
                     user_id,
                     is_test_generation,
                     True,
                 )
             else:
-                # Инициализация переменной message_for_edit перед её использованием
-                message_for_edit = await message.answer(
-                    text.GET_PROMPT_SUCCESS_TEXT,
-                )
+                await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
+
                 await message_for_edit.pin()
                 result = await generateImages(
                     setting_number,

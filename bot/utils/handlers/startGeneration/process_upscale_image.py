@@ -30,7 +30,7 @@ async def process_upscale_image(call: types.CallbackQuery, state: FSMContext,
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о начале upscale
-    await editMessageOrAnswer(
+    upscale_message = await editMessageOrAnswer(
         call,text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index))
 
     # Получаем само изображение по пути
@@ -59,6 +59,7 @@ async def process_upscale_image(call: types.CallbackQuery, state: FSMContext,
     setting_number = getSettingNumberByModelName(model_name)
 
     # Делаем upscale изображения
-    await upscale_image(image_base64, base_model, setting_number, state, user_id, model_name, image_index)
+    await upscale_image(image_base64, base_model, setting_number, state, user_id, model_name, 
+    image_index, upscale_message.message_id)
 
     return True

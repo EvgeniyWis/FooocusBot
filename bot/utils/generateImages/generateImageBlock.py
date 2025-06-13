@@ -14,7 +14,7 @@ from utils.generateImages.process_image_block import process_image_block
 async def generateImageBlock(
     dataJSON: dict,
     model_name: str,
-    message: types.Message,
+    message_id: int,
     state: FSMContext,
     user_id: int,
     setting_number: str,
@@ -32,6 +32,6 @@ async def generateImageBlock(
         job_id = await getJobID(dataJSON, setting_number, state, user_id, "image_generation")
 
         # Обрабатываем работу
-        result = await process_image_block(job_id, model_name, setting_number, user_id, state, message, is_test_generation, checkOtherJobs)
+        result = await process_image_block(job_id, model_name, setting_number, user_id, state, message_id, is_test_generation, checkOtherJobs)
 
         return result
