@@ -385,10 +385,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         if not MOCK_MODE:
             # Меняем текст на сообщении о начале upscale
             if UPSCALE_MODE:
-                await processUpscaleImage(call, state, image_index, model_name, model_name_index, user_id)
+                await processUpscaleImage(call, state, image_index, model_name)
 
             if FACEFUSION_MODE:
-                result_path = await processFaceswapImage(call, state, image_index, model_name, model_name_index, user_id)
+                result_path = await processFaceswapImage(call, state, image_index, model_name)
             else:
                 result_path = MOCK_FACEFUSION_PATH
 
