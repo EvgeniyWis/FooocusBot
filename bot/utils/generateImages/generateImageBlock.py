@@ -4,7 +4,7 @@ from config import MOCK_MODE
 
 from logger import logger
 
-from utils.jobs.getJobID import getJobID
+from utils.jobs.get_job_ID import get_job_ID
 from utils.generateImages.dataArray import getSettingNumberByModelName
 
 from utils.generateImages.process_image_block import process_image_block
@@ -29,7 +29,7 @@ async def generateImageBlock(
         logger.info(f"Отправляем запрос на генерацию изображений с данными: {dataJSON}")
 
         # Делаем запрос на генерацию и получаем id работы
-        job_id = await getJobID(dataJSON, setting_number, state, user_id, "image_generation")
+        job_id = await get_job_ID(dataJSON, setting_number, state, user_id, "image_generation")
 
         # Обрабатываем работу
         result = await process_image_block(job_id, model_name, setting_number, user_id, state, message_id, is_test_generation, checkOtherJobs)

@@ -1,5 +1,5 @@
 
-from utils.jobs.checkJobStatus import checkJobStatus
+from utils.jobs.check_job_status import check_job_status
 from aiogram.fsm.context import FSMContext
 
 from aiogram.fsm.context import FSMContext
@@ -23,7 +23,7 @@ async def check_upscale_status(job_id: str, setting_number: int, state: FSMConte
     """
 
     # Проверяем статус работы
-    response_json = await checkJobStatus(job_id, setting_number, user_id, message_id, state, 
+    response_json = await check_job_status(job_id, setting_number, user_id, message_id, state, 
     timeout=1000, checkOtherJobs=False)
 
     if not response_json:

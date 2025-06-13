@@ -3,7 +3,7 @@ from logger import logger
 
 from aiogram.fsm.context import FSMContext
 
-from utils.jobs.getJobID import getJobID
+from utils.jobs.get_job_ID import get_job_ID
 
 from utils.generateImages.upscale.check_upscale_status import check_upscale_status
 
@@ -47,7 +47,7 @@ async def upscale_image(input_image: str, base_config_model_name: str, setting_n
     }
 
     # Делаем запрос на генерацию и получаем id работы
-    job_id = await getJobID(dataJSON, setting_number, state, user_id, "upscale")
+    job_id = await get_job_ID(dataJSON, setting_number, state, user_id, "upscale")
     
     # Сохраняем имя модели и индекс изображения в стейт
     dataForUpdate = {

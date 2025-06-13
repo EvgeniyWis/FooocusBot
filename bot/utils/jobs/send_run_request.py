@@ -1,13 +1,13 @@
 from config import RUNPOD_HEADERS, RUNPOD_HOST
 
-from utils.jobs.getEndpointID import getEndpointID
+from utils.jobs.get_endpoint_ID import get_endpoint_ID
 from utils import httpx_post
 
 
 # Функция для отправки запроса на генерацию
-async def sendRunRequest(dataJSON: dict, setting_number: int):
+async def send_run_request(dataJSON: dict, setting_number: int):
     # Получаем ID эндпоинта для генерации изображений
-    ENDPOINT_ID = await getEndpointID(setting_number)
+    ENDPOINT_ID = await get_endpoint_ID(setting_number)
 
     # Формируем URL для отправки запроса
     url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/run"
