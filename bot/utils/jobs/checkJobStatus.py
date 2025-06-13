@@ -10,6 +10,7 @@ from utils.jobs.getEndpointID import getEndpointID
 from utils import httpx_post
 from InstanceBot import bot
 
+CANCELLED_JOB_TEXT = "Работа была отменена"
 
 # Функция для получения статуса работы
 async def checkJobStatus(
@@ -113,7 +114,7 @@ async def checkJobStatus(
                     raise Exception(response_json["error"])
                 
                 elif response_json["status"] == "CANCELLED":
-                    response_json = "Работа была отменена"
+                    response_json = CANCELLED_JOB_TEXT
                 
                 break
 

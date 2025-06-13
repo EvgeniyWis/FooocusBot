@@ -26,14 +26,14 @@ async def start(message: types.Message, state: FSMContext):
 
 # Обработка команды /stop
 async def stop_generation(message: types.Message, state: FSMContext):
-    message_for_edit = await message.answer(text.STOP_GENERATION_TEXT_WITH_WAITING, reply_markup=ReplyKeyboardRemove())
+    await message.answer(text.STOP_GENERATION_TEXT_WITH_WAITING, reply_markup=ReplyKeyboardRemove())
     
     # Начинаем отмену
     await state.update_data(stop_generation=True)
     await cancelImageGenerationJobs(state)
 
     # Завершаем отмену
-    await message_for_edit.edit_text(text.STOP_GENERATION_TEXT)
+    await message.answer(text.STOP_GENERATION_TEXT)
     await asyncio.sleep(5)
     await state.update_data(stop_generation=False)
 
