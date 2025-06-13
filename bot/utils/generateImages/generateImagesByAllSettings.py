@@ -53,7 +53,7 @@ async def generateImagesByAllSettings(
             await generateImageBlock(
                 dataJSON,
                 model_name,
-                message_with_generations_status,
+                message_with_generations_status.message_id,
                 state,
                 user_id,
                 index + 1,

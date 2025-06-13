@@ -191,11 +191,12 @@ async def handle_video_example_buttons(
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
         return
     
-    elif video_path.get("error"):
-        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, video_path.get("error")),
-            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
-        return
-    
+    if isinstance(video_path, dict):
+        if video_path.get("error"):
+            await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, video_path.get("error")),
+                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
+            return
+        
     # Добавляем путь к видео в стейт
     dataForUpdate = {f"{model_name}": video_path}
     await appendDataToStateArray(state, "video_paths", dataForUpdate)

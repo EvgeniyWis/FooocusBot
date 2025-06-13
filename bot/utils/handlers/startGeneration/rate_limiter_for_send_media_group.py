@@ -1,14 +1,15 @@
 import asyncio
 import time
-from aiogram import types
 
 from logger import logger
+from InstanceBot import bot
+
 
 _rate_limiter_lock = asyncio.Lock()
 _last_send_time = 0.0
 _min_delay = 0.15
 
-async def safe_send_media_group(message: types.Message, media_group, *args, **kwargs):
+async def safe_send_media_group(user_id: int, media_group, *args, **kwargs):
     """
     Создает глобальный мьютекс для ограничения частоты отправки медиа-групп.
     
@@ -28,5 +29,5 @@ async def safe_send_media_group(message: types.Message, media_group, *args, **kw
         if elapsed < _min_delay:
             await asyncio.sleep(_min_delay - elapsed)
         _last_send_time = time.time()
-        return await message.answer_media_group(media_group, *args, **kwargs)
+        return await bot.send_media_group(chat_id=user_id, media=media_group, *args, **kwargs)
 
