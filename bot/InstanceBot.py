@@ -6,7 +6,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.fsm.storage.redis import RedisStorage
 from dotenv import find_dotenv, load_dotenv
 
-from utils.task_storage.redis_factory import create_redis_client
+from utils.factory.redis_factory import create_redis_client
 
 load_dotenv(find_dotenv())
 
