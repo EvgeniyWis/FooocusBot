@@ -8,8 +8,8 @@ from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from utils.task_storage.istorage import ITaskStorage
-from utils.task_storage.redis_factory import create_redis_client
+from utils.repository.istorage import ITaskStorage
+from utils.factory.redis_factory import create_redis_client
 from logger import logger
 
 

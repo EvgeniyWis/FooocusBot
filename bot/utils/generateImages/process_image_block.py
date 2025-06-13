@@ -6,7 +6,7 @@ from config import MOCK_MODE
 from ..handlers.startGeneration.sendImageBlock import sendImageBlock
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
-from utils.task_storage.istorage import ITaskStorage
+from utils.repository.istorage import ITaskStorage
 
 
 async def process_image_block(job_id: str, model_name: str, setting_number: int, user_id: int, 
