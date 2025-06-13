@@ -362,8 +362,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             await state.set_state(StartGenerationState.write_new_prompt_for_regenerate_image)
 
             # Просим ввести новый промпт
-            await editMessageOrAnswer(
+            write_new_prompt_for_regenerate_message = await editMessageOrAnswer(
                 call,text.WRITE_NEW_PROMPT_TEXT)
+            await state.update_data(write_new_prompt_message_id=write_new_prompt_for_regenerate_message.message_id)
             return
         
         # Если данные не найдены, ищем во всех доступных массивах
@@ -519,6 +520,11 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     # Удаляем сообщение пользователя
     await message.delete()
 
+    # Удаляем сообщение бота
+    write_new_prompt_message_id = stateData.get("write_new_prompt_message_id", None)
+    if write_new_prompt_message_id:
+        await bot.delete_message(user_id, write_new_prompt_message_id)
+
     # Записываем новый промпт в стейт для этой модели
     dataForUpdate = {f"{model_name}": prompt}
     await appendDataToStateArray(state, "prompts_for_regenerated_models", dataForUpdate)
@@ -527,7 +533,7 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о перегенерации изображения
-    await message.answer(text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(model_name, model_name_index, prompt))
+    regenerate_progress_message = await message.answer(text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(model_name, model_name_index, prompt))
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -537,8 +543,8 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     json["input"]["prompt"] += " " + prompt 
     
     await state.set_state(None)
-    return await generateImageBlock(json, model_name, message, state, user_id, setting_number, is_test_generation, False)
-
+    await generateImageBlock(json, model_name, regenerate_progress_message.message_id, state, user_id, setting_number, is_test_generation, False)
+    await regenerate_progress_message.delete()
 
 # Добавление обработчиков
 def hand_add():
