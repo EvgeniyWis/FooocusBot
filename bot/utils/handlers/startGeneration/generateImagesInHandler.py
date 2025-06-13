@@ -67,6 +67,7 @@ async def generateImagesInHandler(
                         user_id,
                         setting_number,
                         is_test_generation,
+                        chat_id=message.chat.id,
                     ),
                 ]
         else:
