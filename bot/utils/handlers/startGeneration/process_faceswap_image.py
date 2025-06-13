@@ -12,7 +12,7 @@ from utils.facefusion import facefusion_swap
 from utils.generateImages.dataArray import getModelNameIndex
 
 
-async def process_Faceswap_image(call: types.CallbackQuery, state: FSMContext, 
+async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext, 
     image_index: int, model_name: str) -> str:
     """
     Функция для обработки замены лица, обработки процесса в хендлере, циклической проверки очереди на замену лица 
