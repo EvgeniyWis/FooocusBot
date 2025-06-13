@@ -4,7 +4,7 @@ import asyncio
 
 
 # Функция-обёртка для отправки POST-запросов с настройками таймаутов
-async def httpx_post(url: str, headers: dict, json: dict = None, timeout: int = 60, 
+async def httpx_post(url: str, headers: dict, json: dict = None, data: dict = None, files: dict = None, timeout: int = 60, 
     with_response_text_logging: bool = True):
     response_json = None
     
@@ -13,7 +13,9 @@ async def httpx_post(url: str, headers: dict, json: dict = None, timeout: int = 
             response = await client.post(
                 url,
                 headers=headers,
+                data=data,
                 json=json,
+                files=files,
                 timeout=httpx.Timeout(
                     connect=30,  # таймаут на подключение
                     read=120,    # таймаут на чтение
@@ -21,7 +23,6 @@ async def httpx_post(url: str, headers: dict, json: dict = None, timeout: int = 
                     pool=30,     # таймаут на получение соединения из пула
                 ), 
             )
-            logger.info(f"Статус код ответа: {response.status_code}")
             
             if with_response_text_logging:
                 logger.info(f"Тело ответа: {response.text}")
