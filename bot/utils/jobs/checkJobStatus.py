@@ -10,6 +10,8 @@ from utils.jobs.getEndpointID import getEndpointID
 from utils import httpx_post
 from InstanceBot import bot
 
+from RunBot import redis_task_storage
+
 
 # Функция для получения статуса работы
 async def checkJobStatus(
@@ -137,6 +139,8 @@ async def checkJobStatus(
                 image_generation_jobs = [job for job in image_generation_jobs if job['job_id'] != job_id]
                 await state.update_data(image_generation_jobs=image_generation_jobs)
                 logger.info(f"Удаляем id работы {job_id} из стейта {image_generation_jobs}")
+                
+                await redis_task_storage.delete_task(job_id)
             except Exception as e:
                 logger.error(f"Ошибка при очистке состояния для работы {job_id}: {str(e)}")
     

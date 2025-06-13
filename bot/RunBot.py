@@ -10,9 +10,13 @@ from config import (
     TEMP_IMAGE_FILES_DIR,
     TEMP_DIR,
 )
-from InstanceBot import bot, dp
+from InstanceBot import bot, dp, redis_client
 from logger import logger
 from middleware import ErrorHandlingMiddleware
+from utils.task_storage.redis_task_storage import RedisTaskRepository
+
+
+redis_task_storage = RedisTaskRepository(redis_client)
 
 
 async def on_startup() -> None:
