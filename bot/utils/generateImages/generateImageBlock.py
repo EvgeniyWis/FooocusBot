@@ -8,6 +8,8 @@ from utils.jobs.get_job_ID import get_job_ID
 from utils.generateImages.dataArray import getSettingNumberByModelName
 
 from utils.generateImages.process_image_block import process_image_block
+from RunBot import redis_task_storage
+
 
 
 # Функция для генерации изображений по объекту данных
@@ -32,6 +34,6 @@ async def generateImageBlock(
         job_id = await get_job_ID(dataJSON, setting_number, state, user_id, "image_generation")
 
         # Обрабатываем работу
-        result = await process_image_block(job_id, model_name, setting_number, user_id, state, message_id, is_test_generation, checkOtherJobs)
+        result = await process_image_block(job_id, model_name, setting_number, user_id, state, message_id, is_test_generation, checkOtherJobs, task_repo=redis_task_storage)
 
         return result

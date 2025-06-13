@@ -14,12 +14,18 @@ from InstanceBot import bot, dp, redis_client
 from logger import logger
 from middleware import ErrorHandlingMiddleware
 from utils.task_storage.redis_task_storage import RedisTaskRepository
+from utils.generateImages.process_image_block import process_image_block
+from InstanceBot import storage
 
 
 redis_task_storage = RedisTaskRepository(redis_client)
 
 
 async def on_startup() -> None:
+    await redis_task_storage.init_redis()
+    redis_task_storage.set_process_callback(process_image_block)
+    await redis_task_storage.recover_tasks(bot, storage)
+    
     # Удаляем все файлы в папке temp
     if os.path.exists(TEMP_DIR):
         shutil.rmtree(TEMP_DIR)
@@ -71,7 +77,6 @@ async def on_startup() -> None:
             logger.error(f"Ошибка при отправке сообщения разработчику: {e}")
 
     await dp.start_polling(bot, skip_updates=True)
-
-
+    
 if __name__ == "__main__":
     asyncio.run(on_startup())
