@@ -1,0 +1,97 @@
+import os
+
+import aiofiles
+from config import ADMIN_ID
+from InstanceBot import bot
+from logger import logger
+
+from utils import text
+from utils.httpx import httpx_post
+from utils.googleDrive.files import downloadFromGoogleDrive, getGoogleDriveFileID
+from config import KLING_HEADERS
+
+
+async def start_generate_video(prompt: str, image_url: str = None, image_path: str = None) -> dict | None:
+    """
+    Функция для скачивания изображения по ссылке или по пути к файлу и 
+    отправки запроса на генерацию видео с помощью API kling
+
+    Args:
+        prompt (str): Промпт для генерации видео
+        image_url (str): Ссылка на изображение
+        image_path (str): Путь к изображению
+
+    Returns:
+        dict: JSON ответ от API kling
+        None: Если произошла ошибка
+    """
+
+    logger.info(f"Генерация видео с помощью kling: \nПромпт: {prompt}\nСсылка на изображение: {image_url}\nПуть к изображению: {image_path}")
+    
+    if image_url:
+        # Получаем id изображения
+        image_id = getGoogleDriveFileID(image_url)
+        if not image_id:
+            logger.error("Не удалось получить id изображения")
+            return None
+
+        # Скачиваем изображение
+        image_path = await downloadFromGoogleDrive(image_url, image_id)
+        if not image_path:
+            logger.error("Не удалось скачать изображение")
+            return None
+
+    # Формируем данные запроса
+    data = {
+        "prompt": prompt,
+        "model": "standard",
+        "duration": "5",
+        "aspect_ratio": "9:16",
+        "negative_prompt": "cartoon, anime, 3D render, low resolution, blurry, out of focus, pixelated, overexposed, underexposed, oversaturated, flat lighting, unrealistic proportions, unnatural colors, poorly detailed textures, poorly rendered hair, low-quality shadows, distorted features, artificial-looking expressions, plastic skin, unnatural movement, stiff pose, low-quality assets, low frame rate, poorly lit environments, amateur composition, unbalanced colors, noise, grainy image, lack of depth, unnatural anatomy, clipping issues, over-sharpening, artificial glow, mismatched elements.",
+        "cfg_scale": 0.7,
+    }
+
+    # Асинхронное открытие файла для отправки
+    async with aiofiles.open(image_path, "rb") as image_file:
+        files = {
+            "image_url": (
+                "image.jpg",
+                await image_file.read(),
+                "image/jpeg",
+            ),
+        }
+
+    # Отправляем запрос на генерацию видео
+    url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
+    json = await httpx_post(url_endpoint, KLING_HEADERS, data=data, files=files)
+
+    logger.info(f"Ответ на запрос на генерацию видео: {json}")
+
+    if json.get("error"):
+        # Обрабатываем ошибки валидации
+        errors_validation = json.get("errors_validation")
+
+        if errors_validation:
+            logger.error(
+                f"Ошибка валидации: {errors_validation}",
+            )
+
+        # Обрабатываем ошибку недостаточного баланса    
+        NOT_ENOUGH_MONEY_ERROR_TEXT = "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
+
+        if json["error"] == NOT_ENOUGH_MONEY_ERROR_TEXT:
+            try:
+                await bot.send_message(
+                    ADMIN_ID,
+                    text.KLING_INSUFFICIENT_BALANCE_TEXT,
+                )
+            finally:
+                raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
+
+        raise Exception(json["error"])
+
+    logger.info(
+        f"Запрос на генерацию видео отправлен. Ответ: {json}",
+    )
+
+    return json

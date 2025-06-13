@@ -34,6 +34,12 @@ RUNPOD_HEADERS = {
     "Authorization": os.getenv("RUNPOD_API_KEY"),
 }
 
+# Заголовки для запросов на API kling
+KLING_HEADERS = {
+    "Accept": "application/json",
+    "Authorization": f"Bearer {os.getenv('KLING_API_KEY')}",
+}
+
 # URL для запросов на Runpod
 RUNPOD_HOST = f"https://api.runpod.ai/v2"
 
