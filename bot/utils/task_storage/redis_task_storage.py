@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import json
-from typing import Any, Callable, Awaitable
+from typing import Any, Coroutine, Callable
 
 import redis.asyncio as aioredis
 from aiogram import Bot
@@ -11,144 +13,204 @@ from utils.task_storage.redis_factory import create_redis_client
 from logger import logger
 
 
-ProcessImageCallback = Callable[..., Awaitable[bool]]
-
+ProcessImageCallback: Any = Callable[..., Coroutine]
 
 class RedisTaskRepository(ITaskStorage):
     """
-    Репозиторий для управления списком задач в Redis (генерации изображений, upscale, faceswap).
+    Репозиторий для работы с задачами генерации, сохранёнными в Redis.
 
-    Сохраняет, восстанавливает и удаляет задачи пользователей.
-    Позволяет повторно запускать задачи, если они не были обработаны.
-    Использует асинхронный клиент Redis и интегрируется с aiogram FSMContext.
+    - Сохраняет данные задачи под ключом "task:{job_id}" с TTL 24 часа.
+    - Восстанавливает незавершённые задачи после перезапуска.
+    - Вызывает зарегистрированный callback для обработки каждой задачи.
     """
 
-    def __init__(self, redis_client: aioredis.Redis | None = None) -> None:
+    def __init__(
+        self,
+        redis_client: aioredis.Redis | None = None,
+    ) -> None:
         """
-        Инициализация репозитория задач.
+        Инициализация RedisTaskRepository.
 
         Args:
-            redis_client (aioredis.Redis): Экземпляр асинхронного клиента Redis.
-                Если не передан, будет создан новый через фабрику.
+            redis_client (Optional[aioredis.Redis]):
+                Асинхронный клиент Redis. Если None, создаётся новый через create_redis_client().
         """
         self.redis: aioredis.Redis = redis_client or create_redis_client()
-        self._process_image_callback: ProcessImageCallback | None = None
+        self._callback: ProcessImageCallback | None = None
 
     def set_process_callback(self, callback: ProcessImageCallback) -> None:
         """
-        Устанавливает callback-функцию для обработки задач.
+        Устанавливает функцию-обработчик для восстановленных задач.
 
         Args:
-            callback (ProcessImageCallback): Асинхронная функция для обработки задач.
+            callback (ProcessImageCallback):
+                Асинхронная функция с параметрами (job_id, model_name, setting_number,
+                user_id, state, message_id, is_test_generation, check_other_jobs),
+                возвращающая True при успешной обработке.
         """
-        self._process_image_callback = callback
+        self._callback = callback
 
     async def init_redis(self) -> None:
         """
-        Инициализирует подключение к Redis, если это необходимо.
+        Проверяет соединение с Redis командой PING.
 
-        Обычно вызывается при запуске приложения для проверки соединения.
+        Raises:
+            aioredis.RedisError: при сбое PING.
         """
-        try:
-            await self.redis.ping()
-            logger.info("Redis connection initialized.")
-        except Exception as e:
-            logger.error(f"Redis connection failed: {e}")
+        await self.redis.ping()
+        logger.info("Подключение к Redis установлено")
 
-    async def add_task(self, task: dict[str, Any]) -> None:
+    async def add_task(
+        self,
+        job_id: str,
+        user_id: int,
+        message_id: int,
+        model_name: str,
+        setting_number: int,
+        job_type: str,
+        is_test_generation: bool,
+        check_other_jobs: bool,
+    ) -> None:
         """
-        Добавляет новую задачу в Redis.
+        Сохраняет новую задачу в Redis, если она ещё не существует.
 
         Args:
-            task (dict[str, Any]): Словарь с параметрами задачи, должен содержать уникальный job_id.
+            job_id (str): Уникальный идентификатор задачи.
+            user_id (int): ID пользователя Telegram, создающего задачу.
+            message_id (int): ID сообщения для редактирования или ответа.
+            model_name (str): Название модели генерации.
+            setting_number (int): Номер набора параметров.
+            job_type (str): Тип задачи (например, "generate_image").
+            is_test_generation (bool): Флаг тестового режима.
+            check_other_jobs (bool): Флаг обновления стейта по другим задачам.
+
+        Returns:
+            None
         """
-        job_id = task.get("job_id")
-        if not job_id:
-            logger.error("[RedisTaskRepository] Не указан job_id при добавлении задачи.")
+        key = f"task:{job_id}"
+        if await self.redis.exists(key):
+            logger.warning(f"Задача '{job_id}' уже существует, пропускаем")
             return
-        await self.redis.set(f"task:{job_id}", json.dumps(task))
-        logger.debug(f"Задача {job_id} добавлена в Redis.")
+
+        payload = {
+            "job_id": job_id,
+            "user_id": user_id,
+            "message_id": message_id,
+            "model_name": model_name,
+            "setting_number": setting_number,
+            "job_type": job_type,
+            "is_test_generation": is_test_generation,
+            "check_other_jobs": check_other_jobs,
+        }
+        await self.redis.set(key, json.dumps(payload), ex=24 * 3600)
+        logger.debug(f"Задача сохранена: {job_id}")
 
     async def get_task(self, job_id: str) -> dict[str, Any] | None:
         """
-        Получает задачу из Redis по её идентификатору.
+        Получает данные задачи из Redis.
 
         Args:
             job_id (str): Уникальный идентификатор задачи.
 
         Returns:
-            dict[str, Any] | None: Словарь с параметрами задачи или None, если задача не найдена.
+            dict[str, Any] | None: Десериализованные данные задачи или None,
+            если ключ отсутствует или JSON некорректен.
         """
-        data = await self.redis.get(f"task:{job_id}")
-        if data is None:
-            logger.warning(f"Задача {job_id} не найдена в Redis.")
+        key = f"task:{job_id}"
+        raw = await self.redis.get(key)
+        if not raw:
             return None
         try:
-            return json.loads(data)
-        except Exception as e:
-            logger.error(f"Ошибка при разборе задачи {job_id}: {e}")
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            logger.error(f"Не удалось распарсить JSON задачи '{job_id}'")
             return None
 
     async def delete_task(self, job_id: str) -> None:
         """
-        Удаляет задачу из Redis по её идентификатору.
+        Удаляет запись задачи из Redis.
 
         Args:
             job_id (str): Уникальный идентификатор задачи.
+
+        Returns:
+            None
         """
         await self.redis.delete(f"task:{job_id}")
-        logger.debug(f"Задача {job_id} удалена из Redis.")
+        logger.debug(f"Задача удалена: {job_id}")
 
     async def replay_task(
         self,
         job_id: str,
         bot: Bot,
-        state_storage: Any,
+        state_storage,
     ) -> bool:
         """
-        Восстанавливает и повторно запускает задачу по её идентификатору.
-
-        Восстанавливает FSMContext пользователя и вызывает callback для обработки задач.
+        Восстанавливает FSMContext и вызывает callback для одной задачи.
 
         Args:
-            job_id (str): Уникальный идентификатор задачи.
-            bot (Bot): Экземпляр Telegram-бота.
-            state_storage (Any): Хранилище состояний FSM.
+            job_id (str): Идентификатор задачи для восстановления.
+            bot (Bot): Экземпляр бота Aiogram.
+            state_storage: Бэкенд хранения состояний FSM.
 
         Returns:
-            bool: True, если задача успешно выполнена и удалена, иначе False.
+            bool: True, если задача успешно обработана и удалена;
+            False в противном случае.
         """
         task = await self.get_task(job_id)
         if not task:
-            logger.warning(f"[RedisTaskRepository] Нет задачи для повторного запуска: {job_id}")
+            logger.warning(f"Нет задачи '{job_id}' для восстановления")
+            return False
+        if self._callback is None:
+            logger.error("Callback для обработки задач не установлен")
             return False
 
         try:
-            user_id = task["user_id"]
-            chat_id = task["chat_id"]
-            message_id = task["message_id"]
+            user_id = task['user_id']
+            chat_id = task['chat_id']
+            message_id = task['message_id']
 
-            key = StorageKey(bot_id=bot.id, user_id=user_id, chat_id=chat_id)
+            key = StorageKey(
+                bot_id=str(bot.id),
+                chat_id=chat_id,
+                user_id=user_id,
+            )
             state = FSMContext(storage=state_storage, key=key)
 
-            if not self._process_image_callback:
-                logger.error("[RedisTaskRepository] Callback для генерации изображений не установлен.")
-                return False
-
-            success = await self._process_image_callback(
-                job_id=task["job_id"],
-                model_name=task["model_name"],
-                setting_number=task["setting_number"],
-                user_id=user_id,
-                message_id=message_id,
-                is_test_generation=task["is_test_generation"],
-                checkOtherJobs=task["check_other_jobs"],
+            success = await self._callback(
+                task['job_id'],
+                task['model_name'],
+                task['setting_number'],
+                user_id,
+                state,
+                message_id,
+                task['is_test_generation'],
+                task['check_other_jobs'],
             )
-
             if success:
                 await self.delete_task(job_id)
             return success
 
-        except Exception as e:
-            logger.error(f"[RedisTaskRepository] Ошибка при повторном запуске задачи {job_id}: {str(e)}", exc_info=True)
+        except KeyError as e:
+            logger.error(f"В данных задачи '{job_id}' отсутствует поле: {e}")
             return False
+        except Exception:
+            logger.exception(f"Ошибка при восстановлении задачи '{job_id}'")
+            return False
+
+    async def recover_tasks(self, bot: Bot, state_storage) -> None:
+        """
+        Перебирает все задачи в Redis и пытается их восстановить.
+
+        Args:
+            bot (Bot): Экземпляр бота Aiogram для контекста.
+            state_storage: Бэкенд хранения состояний FSM.
+
+        Returns:
+            None
+        """
+        keys = await self.redis.keys('task:*')
+        for raw in keys:
+            job_id = raw.decode().split(':', 1)[1]
+            logger.info(f"Восстановление задачи: {job_id}")
+            await self.replay_task(job_id, bot, state_storage)
