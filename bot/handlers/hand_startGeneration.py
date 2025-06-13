@@ -98,7 +98,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
     stateData = await state.get_data()
-    generations_type = stateData.get("generations_type", "test")
+    generations_type = stateData.get("generations_type", "")
     prompt_exist = stateData.get("prompt_exist", False)
     await state.update_data(specific_model=False)
 
@@ -221,7 +221,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
     prompt = message.text
     user_id = message.from_user.id
     stateData = await state.get_data()
-    is_test_generation = stateData.get("generations_type", "test") == "test"
+    is_test_generation = stateData.get("generations_type", "") == "test"
     await state.update_data(prompt_for_images=prompt)
 
     await state.set_state(None)
@@ -510,7 +510,7 @@ async def write_model_name_for_generation(message: types.Message, state: FSMCont
 async def write_new_prompt_for_regenerate_image(message: types.Message, state: FSMContext):
     # Получаем данные
     stateData = await state.get_data()
-    is_test_generation = stateData.get("generations_type", "test") == "test"
+    is_test_generation = stateData.get("generations_type", "") == "test"
     model_name = stateData.get("model_name_for_regenerate_image", "")
     setting_number = stateData.get("setting_number_for_regenerate_image", 1)
     prompt = message.text

@@ -12,7 +12,7 @@ from utils.handlers import getDataInDictsArray
 # Функция для перегенерации изображения
 async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSMContext, setting_number: str):
     stateData = await state.get_data()
-    is_test_generation = stateData.get("generations_type", "test") == "test"
+    is_test_generation = stateData.get("generations_type", "") == "test"
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
