@@ -1,3 +1,4 @@
+import asyncio
 import json
 from typing import Any, Callable, Optional
 
@@ -5,23 +6,22 @@ import redis.asyncio as aioredis
 from aiogram import Bot, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
-from aiogram.utils.exceptions import RetryAfter, TelegramAPIError
-
+from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 from utils.task_storage.istorage import ITaskStorage
-from utils.redis.redis_factory import get_redis_client
-from utils.generateImages.process_image_block import process_image_block
+from utils.task_storage.redis_factory import create_redis_client
 from logger import logger
 
 
 class RedisTaskRepository(ITaskStorage):
     """
     Репозиторий для работы с отложенными задачами в Redis.
-    Хранит и восстанавливает задачи генерации изображений через process_image_block().
+    Хранит и восстанавливает задачи генерации изображений.
     """
 
     def __init__(self, redis_client: Optional[aioredis.Redis] = None) -> None:
         # Используем фабрику для получения клиента, если не передан
-        self.redis: aioredis.Redis = redis_client or get_redis_client()
+        self.redis: aioredis.Redis = redis_client or create_redis_client()
+        self._process_image_callback = None
 
     async def init_redis(self) -> None:
         """
@@ -43,7 +43,6 @@ class RedisTaskRepository(ITaskStorage):
         setting_number: int,
         is_test_generation: bool,
         check_other_jobs: bool,
-        chat_id: int,
         message_id: int,
     ) -> None:
         """
@@ -56,7 +55,6 @@ class RedisTaskRepository(ITaskStorage):
         :param setting_number: номер набора параметров
         :param is_test_generation: флаг тестовой генерации
         :param check_other_jobs: флаг проверки других задач
-        :param chat_id: идентификатор чата для ответа
         :param message_id: идентификатор сообщения для восстановления
         """
         key = f"task:{job_id}"
@@ -72,7 +70,6 @@ class RedisTaskRepository(ITaskStorage):
             "setting_number": setting_number,
             "is_test_generation": is_test_generation,
             "check_other_jobs": check_other_jobs,
-            "chat_id": chat_id,
             "message_id": message_id,
         }
         data = json.dumps(payload)
@@ -108,12 +105,12 @@ class RedisTaskRepository(ITaskStorage):
 
         :param bot: экземпляр aiogram.Bot
         :param state_storage: хранилище FSMContext (RedisStorage)
-        :param prefix: префикс ключей задач
+        :param prefix: префикс ключей задач        
         """
         keys = await self.redis.keys(f"{prefix}*")
         for key in keys:
             job_id = key.decode().split("task:")[1]
-            await self.replay_task(job_id, bot, state_storage)
+            await self.replay_task(job_id, bot, state_storage)          
 
     async def replay_task(
         self,
@@ -143,13 +140,13 @@ class RedisTaskRepository(ITaskStorage):
             state = FSMContext(storage=state_storage, key=key)
 
             # Запускаем обработку блока
-            success = await process_image_block(
+            success = await self._process_image_callback(
                 job_id=task["job_id"],
                 model_name=task["model_name"],
                 setting_number=task["setting_number"],
                 user_id=user_id,
                 state=state,
-                message=message,
+                message_id=message_id,
                 is_test_generation=task["is_test_generation"],
                 checkOtherJobs=task["check_other_jobs"],
             )
@@ -158,8 +155,8 @@ class RedisTaskRepository(ITaskStorage):
                 await self.delete_task(job_id)
             return success
 
-        except RetryAfter as e:
-            logger.warning(f"[RedisTaskRepository] RetryAfter for {job_id}, retry in {e.timeout}s")
+        except TelegramRetryAfter as e:
+            logger.warning(f"[RedisTaskRepository] TelegramRetryAfter for {job_id}, retry in {e.timeout}s")
             await asyncio.sleep(e.timeout)
             return await self.replay_task(job_id, bot, state_storage)
 

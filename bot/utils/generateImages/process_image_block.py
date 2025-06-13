@@ -7,6 +7,7 @@ from ..handlers.startGeneration.sendImageBlock import sendImageBlock
 from ..jobs.checkJobStatus import checkJobStatus, CANCELLED_JOB_TEXT
 from .base64ToImage import base64ToImage
 from .getReferenceImage import getReferenceImage
+from RunBot import redis_task_storage
 
 
 async def process_image_block(job_id: str, model_name: str, setting_number: int, user_id: int, 
@@ -24,7 +25,17 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         is_test_generation (bool): флаг, указывающий на тестовую генерацию
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
     """
-    
+    data = await state.get_data()
+    await redis_task_storage.add_task(
+        job_id=job_id,
+        model_name=model_name,
+        setting_number=setting_number,
+        user_id=user_id,
+        message_id=message_id,
+        is_test_generation=is_test_generation,
+        check_other_jobs=checkOtherJobs,
+        job_type=data.get("job_type"),
+    )
     # Проверяем статус работы
     response_json = await checkJobStatus(
         job_id,
