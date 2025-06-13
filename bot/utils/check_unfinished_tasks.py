@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+from typing import Any
 
 import redis.asyncio as aioredis
 
@@ -52,15 +53,13 @@ class CheckUnfinishedTasks:
                     logger.warning(f"Failed to decode task {key}: {e}")
         return tasks
      
-    async def append_new_task(self, task) -> None:
+    async def append_new_task(self, task: dict[str, Any]) -> None:
         job_id = task.get("job_id")
         user_id = task.get("user_id")
         if not job_id or not user_id:
             logger.warning("No job_id or user_id in task")
             return
         key = f"task:{job_id}"
-        task["created_at"] = task.get("created_at") or datetime.now().isoformat()
-        task["status"] = task.get("status") or "in_progress"
         await self.redis_client.set(key, json.dumps(task))
 
     async def recover_unfinished_tasks(self, process_task_callback) -> None:
