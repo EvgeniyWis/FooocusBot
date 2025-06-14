@@ -2,7 +2,7 @@ import asyncio
 import time
 from collections import defaultdict
 
-from aiogram.exceptions import RetryAfter, TelegramAPIError
+from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 from aiogram.types import InputMedia
 
 from bot.InstanceBot import bot
@@ -14,7 +14,10 @@ _min_delay = 0.15
 
 
 async def safe_send_media_group(
-    user_id: int, media_group: list[InputMedia], *args, **kwargs
+    user_id: int,
+    media_group: list[InputMedia],
+    *args,
+    **kwargs,
 ):
     """
     Безопасно отправляет медиа-группу в чат с учётом rate-limit Telegram.
@@ -31,7 +34,7 @@ async def safe_send_media_group(
         if elapsed < _min_delay:
             await asyncio.sleep(_min_delay - elapsed)
             logger.warning(
-                f"Ожидаем {_min_delay} секунд перед повторной отправкой медиа-группы юзеру {user_id}..."
+                f"Ожидаем {_min_delay} секунд перед повторной отправкой медиа-группы юзеру {user_id}...",
             )
         _last_send_time_per_chat[user_id] = time.time()
 
@@ -44,11 +47,11 @@ async def safe_send_media_group(
             )
             return result
 
-        except RetryAfter as e:
+        except TelegramRetryAfter as e:
             logger.warning(
-                f"Telegram просит подождать {e.timeout} секунд перед повторной отправкой"
+                f"Telegram просит подождать {e.retry_after} секунд перед повторной отправкой",
             )
-            await asyncio.sleep(e.timeout)
+            await asyncio.sleep(e.retry_after)
             try:
                 return await bot.send_media_group(
                     chat_id=user_id,
@@ -58,7 +61,7 @@ async def safe_send_media_group(
                 )
             except Exception as retry_exception:
                 logger.error(
-                    f"Ошибка при повторной попытке отправки медиа-группы: {retry_exception}"
+                    f"Ошибка при повторной попытке отправки медиа-группы: {retry_exception}",
                 )
                 return None
 
@@ -68,6 +71,6 @@ async def safe_send_media_group(
 
         except Exception as e:
             logger.exception(
-                f"Неизвестная ошибка при отправке медиа-группы: {e}"
+                f"Неизвестная ошибка при отправке медиа-группы: {e}",
             )
             return None
