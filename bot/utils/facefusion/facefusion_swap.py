@@ -7,8 +7,6 @@ import aiofiles
 from bot.config import FACEFUSION_RESULTS_DIR
 from bot.logger import logger
 
-CONTAINER_NAME = "facefusion-docker-facefusion-cpu-1"
-
 
 async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     """
@@ -24,7 +22,7 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     docker_cmd = [
         "docker",
         "exec",
-        CONTAINER_NAME,
+        os.environ["FACEFUSION_CONTAINER_NAME"],
         "python",
         "facefusion.py",
         "headless-run",
