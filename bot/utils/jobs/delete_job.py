@@ -1,7 +1,7 @@
 from aiogram.fsm.context import FSMContext
 
 from bot.logger import logger
-from bot.storage import get_redis_storage
+from bot.storage import get_task_service
 
 
 async def delete_job(job_id: str, state: FSMContext) -> bool:
@@ -27,16 +27,16 @@ async def delete_job(job_id: str, state: FSMContext) -> bool:
         ]
         await state.update_data(image_generation_jobs=image_generation_jobs)
         logger.info(
-            f"Удаляем id работы {job_id} из стейта {image_generation_jobs}"
+            f"Удаляем id работы {job_id} из стейта {image_generation_jobs}",
         )
 
         # Удаляем задачу из Redis
-        redis_storage = get_redis_storage()
-        await redis_storage.delete_task(job_id)
+        task_service = get_task_service()
+        await task_service.delete_task(job_id)
 
         return True
     except Exception as e:
         logger.error(
-            f"Ошибка при очистке состояния для работы {job_id}: {str(e)}"
+            f"Ошибка при очистке состояния для работы {job_id}: {str(e)}",
         )
         return False
