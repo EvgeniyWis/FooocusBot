@@ -2,6 +2,9 @@ from aiogram.fsm.context import FSMContext
 
 from bot.InstanceBot import bot
 from bot.utils import text
+from bot.utils.jobs.rate_limiter_for_edit_job_message import (
+    safe_bot_edit_job_message,
+)
 
 
 async def edit_job_message(
@@ -60,10 +63,11 @@ async def edit_job_message(
         await state.update_data(total_images_count=total_images_count)
 
         try:
-            await bot.edit_message_text(
+            await safe_bot_edit_job_message(
+                bot,
                 chat_id=user_id,
                 message_id=message_id,
-                text=text.GENERATE_IMAGES_PROCESS_TEXT.format(
+                safe_text=text.GENERATE_IMAGES_PROCESS_TEXT.format(
                     success_images_count,
                     error_images_count,
                     cancelled_images_count,

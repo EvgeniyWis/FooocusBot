@@ -2,11 +2,16 @@ from aiogram import types
 
 from bot.logger import logger
 from bot.utils.handlers.messages.preserve_code_tags import preserve_code_tags
+from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
+    safe_edit_message,
+)
 
 
 # Функция для редактирования сообщения и при случаи ошибки отправки сообщения
 async def editMessageOrAnswer(
-    call: types.CallbackQuery, text: str, reply_markup=None
+    call: types.CallbackQuery,
+    text: str,
+    reply_markup=None,
 ):
     try:
         # Экранируем специальные символы в тексте, сохраняя теги code
@@ -16,13 +21,18 @@ async def editMessageOrAnswer(
         safe_text = text
 
     try:
-        message = await call.message.edit_text(
-            safe_text, reply_markup=reply_markup, parse_mode="HTML"
+        message = await safe_edit_message(
+            call,
+            safe_text,
+            reply_markup=reply_markup,
+            parse_mode="HTML",
         )
     except Exception as e:
         logger.warning(f"Ошибка при редактировании сообщения: {e}")
         message = await call.message.answer(
-            safe_text, reply_markup=reply_markup, parse_mode="HTML"
+            safe_text,
+            reply_markup=reply_markup,
+            parse_mode="HTML",
         )
 
     return message
