@@ -516,7 +516,7 @@ async def handle_model_name_for_video_generation_from_image(
     video_path = stateData.get("video_path", "")
 
     # Получаем название модели по индексу
-    model_name = await getModelNameByIndex(model_index)
+    model_name = getModelNameByIndex(model_index)
 
     # Сохраняем видео
     await state.set_state(None)
