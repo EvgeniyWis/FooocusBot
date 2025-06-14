@@ -3,7 +3,12 @@ import os
 from dotenv import find_dotenv, load_dotenv
 from logger import logger
 
-load_dotenv(find_dotenv())
+# Загружаем .env файл из родительской директории
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), '.env')
+logger.info(f"Путь к .env файлу: {env_path}")
+logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
+load_dotenv(env_path)
+logger.info(f"FACEFUSION_CONTAINER_NAME после загрузки .env: {os.getenv('FACEFUSION_CONTAINER_NAME')}")
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
