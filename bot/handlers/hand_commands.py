@@ -8,8 +8,8 @@ from aiogram.types import ReplyKeyboardRemove
 from bot.config import ALLOWED_USERS
 from bot.InstanceBot import router
 from bot.keyboards import start_generation_keyboards
-from bot.utils import text
-from bot.utils.handlers.startGeneration.cancelImageGenerationJobs import (
+from bot.helpers import text
+from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
 

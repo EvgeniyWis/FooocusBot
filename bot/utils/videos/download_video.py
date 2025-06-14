@@ -2,6 +2,8 @@ import os
 
 from bot.utils.httpx import httpx_get
 
+from bot.config import VIDEOS_TEMP_DIR  
+
 
 async def download_video(url: str) -> str:
     """
@@ -14,12 +16,11 @@ async def download_video(url: str) -> str:
         str: Путь к сгенерированному видео
     """
     try:
-        temp_folder_path = "FocuuusBot/temp/videos"
         # Создаем временную директорию, если её нет
-        os.makedirs(temp_folder_path, exist_ok=True)
+        os.makedirs(VIDEOS_TEMP_DIR, exist_ok=True)
 
         # Генерируем уникальное имя файла
-        video_path = f"{temp_folder_path}/{os.urandom(8).hex()}.mp4"
+        video_path = f"{VIDEOS_TEMP_DIR}/{os.urandom(8).hex()}.mp4"
 
         # Скачиваем видео
         response = await httpx_get(url, timeout=180, stream=True)

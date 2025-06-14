@@ -6,16 +6,17 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
+from bot.helpers import text
 from bot.config import MOCK_MODE, TEMP_IMAGE_FILES_DIR
 from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
-from bot.utils import retryOperation, text
-from bot.utils.generateImages.dataArray import (
+from bot.utils import retryOperation
+from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
 )
-from bot.utils.generateImages.dataArray.getModelNameByIndex import (
+from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
     getModelNameByIndex,
 )
 from bot.utils.handlers import (
@@ -23,10 +24,11 @@ from bot.utils.handlers import (
     getDataInDictsArray,
 )
 from bot.utils.handlers.messages import (
-    deleteMessageFromState,
     editMessageOrAnswer,
 )
-from bot.utils.handlers.videoGeneration import saveVideo
+from bot.helpers.handlers.messages import deleteMessageFromState
+
+from bot.helpers.handlers.videoGeneration import saveVideo
 from bot.utils.videos import generate_video
 
 

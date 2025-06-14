@@ -19,11 +19,11 @@ from bot.keyboards import (
 )
 from bot.logger import logger
 from bot.states.StartGenerationState import StartGenerationState
-from bot.utils import text
-from bot.utils.generateImages import (
+from bot.helpers import text
+from bot.helpers.generateImages import (
     generateImageBlock,
 )
-from bot.utils.generateImages.dataArray import (
+from bot.helpers.generateImages.dataArray import (
     getAllDataArrays,
     getDataArrayBySettingNumber,
     getDataByModelName,
@@ -36,10 +36,10 @@ from bot.utils.handlers import (
     appendDataToStateArray,
 )
 from bot.utils.handlers.messages import (
-    deleteMessageFromState,
     editMessageOrAnswer,
 )
-from bot.utils.handlers.startGeneration import (
+from bot.helpers.handlers.messages import deleteMessageFromState
+from bot.helpers.handlers.startGeneration import (
     generateImagesInHandler,
     process_faceswap_image,
     process_upscale_image,

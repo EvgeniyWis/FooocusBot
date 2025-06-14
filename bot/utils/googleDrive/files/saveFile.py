@@ -2,13 +2,12 @@ import asyncio
 
 from bot.logger import logger
 from bot.utils.googleDrive.auth import service
-from bot.utils.googleDrive.files.delete_temp_files_with_delay import (
-    delete_temp_files_with_delay,
-)
 from bot.utils.googleDrive.files.uploadFile import uploadFile
 from bot.utils.googleDrive.folders.createFolder import createFolder
 from bot.utils.googleDrive.folders.deleteParentFolder import deleteParentFolder
 from bot.utils.retryOperation import retryOperation
+from bot.config import TEMP_FOLDER_PATH
+import shutil
 
 
 # Сохранение одного файла
@@ -76,9 +75,9 @@ async def saveFile(
         )
 
         if with_deleting_temp_folder:
-            # Удаляем папку с файлами через 1 час
-            asyncio.create_task(
-                delete_temp_files_with_delay(folder_name, user_id)
+            # Удаляем папку с файлами
+            shutil.rmtree(
+                f"{TEMP_FOLDER_PATH}\\{f'{folder_name}_{user_id}' if folder_name else ''}",
             )
 
             # Через 1 час удаляем и папку в более верхнем уровне

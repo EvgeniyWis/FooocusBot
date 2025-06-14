@@ -3,7 +3,7 @@ import aiofiles
 from bot.config import ADMIN_ID, KLING_HEADERS
 from bot.InstanceBot import bot
 from bot.logger import logger
-from bot.utils import text
+from bot.helpers import text
 from bot.utils.googleDrive.files import (
     downloadFromGoogleDrive,
     getGoogleDriveFileID,
