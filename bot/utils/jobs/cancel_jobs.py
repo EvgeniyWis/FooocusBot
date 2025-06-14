@@ -1,7 +1,7 @@
 from config import RUNPOD_HEADERS, RUNPOD_HOST
 
 from bot.logger import logger
-from bot.torage import get_task_service
+from bot.storage import get_task_service
 from bot.utils import httpx_post
 from bot.utils.jobs.get_endpoint_ID import get_endpoint_ID
 
