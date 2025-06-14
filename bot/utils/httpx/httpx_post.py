@@ -3,6 +3,8 @@ import asyncio
 import httpx
 
 from bot.logger import logger
+from bot.storage import get_redis_storage
+
 
 
 # Функция-обёртка для отправки POST-запросов с настройками таймаутов
@@ -39,9 +41,18 @@ async def httpx_post(
                 logger.info(f"Тело ответа: {response.text}")
 
             if response.status_code != 200:
-                raise Exception(
-                    f"Сервер вернул ошибку: {response.status_code}"
-                )
+                if response.status_code == 404:
+                    # Получаем job_id из url
+                    job_id = response.url.split("/")[-1]
+                    logger.info(f"Удаляем задачу из Redis, как недействительную: {job_id}")
+                    
+                    # Удаляем задачу из Redis, как недействительную
+                    redis_storage = get_redis_storage()
+                    await redis_storage.delete_task(job_id)
+                else:
+                    raise Exception(
+                        f"Сервер вернул ошибку: {response.status_code}"
+                    )
 
             try:
                 response_json = response.json()
