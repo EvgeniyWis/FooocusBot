@@ -1,6 +1,6 @@
 import os
 
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv
 from logger import logger
 
 import os
@@ -14,8 +14,6 @@ if 'BOT_API_TOKEN' in os.environ:
     del os.environ['BOT_API_TOKEN']
 
 load_dotenv(env_path, override=True)
-
-
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
