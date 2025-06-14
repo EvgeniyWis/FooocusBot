@@ -18,7 +18,7 @@ from bot.storage.redis_storage import (
     get_task_service,
     init_redis_storage,
 )
-from bot.utils.generateImages.process_image_block import process_image_block
+from bot.helpers.generateImages.process_image_block import process_image_block
 
 
 async def on_startup() -> None:

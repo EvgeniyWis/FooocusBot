@@ -5,9 +5,9 @@ from aiogram.fsm.context import FSMContext
 from bot.InstanceBot import router
 from bot.keyboards import randomizer_keyboards
 from bot.states.RandomizerState import RandomizerState
-from bot.utils import text
+from bot.helpers import text
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.utils.handlers.startGeneration import generateImagesInHandler
+from bot.helpers.handlers.startGeneration import generateImagesInHandler
 
 
 # Обработка кнопок в меню
