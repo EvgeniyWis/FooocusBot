@@ -1,18 +1,16 @@
 import asyncio
 import os
 
-from logger import logger
-
-from utils.httpx import httpx_get
-from utils.videos import download_video
-
-from config import KLING_HEADERS
+from bot.config import KLING_HEADERS
+from bot.logger import logger
+from bot.utils.httpx import httpx_get
+from bot.utils.videos import download_video
 
 
 async def check_video_generation_status(json: dict) -> str | None:
     """
     Функция для проверки статуса задания на генерацию видео с помощью API kling
-    
+
     Args:
         request_id (str): ID задания на генерацию видео
 
@@ -39,13 +37,16 @@ async def check_video_generation_status(json: dict) -> str | None:
                 f"{json['status']}",
             )
 
-            if json["status"] == "error":                  
+            if json["status"] == "error":
                 # Обрабатываем ошибку промпта, непройденного модераций
                 PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT = "Параметры сформированы некорректно. Пожалуйста, убедитесь в правильности введенных данных и отсутствии неприемлемого контента в подсказках."
 
-                if json["result"][0] == PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT:
+                if (
+                    json["result"][0]
+                    == PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT
+                ):
                     return {"error": PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT}
-                
+
                 logger.error(f"Ошибка при генерации видео: {json}")
                 raise Exception(json["result"][0])
 

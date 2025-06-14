@@ -1,3 +1,5 @@
-from .editMessageOrAnswer import editMessageOrAnswer
-from .deleteMessageFromState import deleteMessageFromState
-from .preserve_code_tags import preserve_code_tags
+from bot.utils.handlers.messages.editMessageOrAnswer import editMessageOrAnswer
+from bot.utils.handlers.messages.deleteMessageFromState import (
+    deleteMessageFromState,
+)
+from bot.utils.handlers.messages.preserve_code_tags import preserve_code_tags

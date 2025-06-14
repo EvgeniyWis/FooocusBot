@@ -1,4 +1,4 @@
-from config import COMMON_NEGATIVE_PROMPT
+from bot.config import COMMON_NEGATIVE_PROMPT
 
 
 # Глобальная функция для генерации данных для запроса

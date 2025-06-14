@@ -1,13 +1,18 @@
 from aiogram.fsm.context import FSMContext
-from logger import logger
 
-from .getAllDataArrays import getAllDataArrays
-from .getDataArrayBySettingNumber import getDataArrayBySettingNumber
+from bot.logger import logger
+from bot.utils.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
+from bot.utils.generateImages.dataArray.getDataArrayBySettingNumber import (
+    getDataArrayBySettingNumber,
+)
 
 
 # Функция для получения следующей модели в настройке
 async def getNextModelInSetting(
-    current_model: str, dataArrayBySettingNumber: list[dict],
+    current_model: str,
+    dataArrayBySettingNumber: list[dict],
 ):
     for index, dataArray in enumerate(dataArrayBySettingNumber):
         if current_model == dataArray["model_name"]:
@@ -19,7 +24,9 @@ async def getNextModelInSetting(
 
 # Функция для получения следующей модели
 async def getNextModel(
-    current_model: str, setting_number: str, state: FSMContext,
+    current_model: str,
+    setting_number: str,
+    state: FSMContext,
 ):
     if setting_number == "all":
         # Получаем все настройки
@@ -58,7 +65,8 @@ async def getNextModel(
                 return dataArraysByNextSettingNumber[0]["model_name"]
         else:  # Если текущая модель не является последней в настройке, то получаем следующую модель в настройке
             return await getNextModelInSetting(
-                current_model, dataArrayBySettingNumber,
+                current_model,
+                dataArrayBySettingNumber,
             )
     else:
         # Получаем данные по номеру настройки
@@ -67,5 +75,6 @@ async def getNextModel(
         )
 
         return await getNextModelInSetting(
-            current_model, dataArrayBySettingNumber,
+            current_model,
+            dataArrayBySettingNumber,
         )

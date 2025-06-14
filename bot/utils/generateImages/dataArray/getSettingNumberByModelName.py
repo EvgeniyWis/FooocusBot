@@ -1,4 +1,6 @@
-from .getAllDataArrays import getAllDataArrays
+from bot.utils.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
 
 
 # Функция для получения номера настройки по названию модели

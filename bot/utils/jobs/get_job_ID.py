@@ -1,19 +1,28 @@
-from logger import logger
-
-from .. import retryOperation
-from .send_run_request import send_run_request
-from utils.handlers.appendDataToStateArray import appendDataToStateArray
 from aiogram.fsm.context import FSMContext
+from logger import logger
+from utils.handlers.appendDataToStateArray import appendDataToStateArray
+
+from bot.utils.jobs.send_run_request import send_run_request
+from bot.utils.retryOperation import retryOperation
+
 # from utils.check_unfinished_tasks import check_unfinished_tasks
 
 
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы
-async def get_job_ID(dataJSON: dict, setting_number: int, state: FSMContext, user_id: int, job_type: str):
+async def get_job_ID(
+    dataJSON: dict,
+    setting_number: int,
+    state: FSMContext,
+    user_id: int,
+    job_type: str,
+):
     # Делаем запрос на генерацию
     logger.info("Отправка запроса на генерацию...")
 
     # Получаем id работы
-    response_json = await retryOperation(send_run_request, 10, 2, dataJSON, setting_number)
+    response_json = await retryOperation(
+        send_run_request, 10, 2, dataJSON, setting_number
+    )
 
     logger.info(f"Ответ на запрос: {response_json}")
 
@@ -22,10 +31,15 @@ async def get_job_ID(dataJSON: dict, setting_number: int, state: FSMContext, use
     logger.info(f"Получен id работы: {job_id}")
 
     # Сохраняем его в стейт
-    dataForUpdate = {"job_id": job_id, "setting_number": setting_number, "user_id": user_id, "job_type": job_type}
+    dataForUpdate = {
+        "job_id": job_id,
+        "setting_number": setting_number,
+        "user_id": user_id,
+        "job_type": job_type,
+    }
     logger.info(f"Сохраняем id работы в стейт: {job_id}")
     await appendDataToStateArray(state, "image_generation_jobs", dataForUpdate)
-    
+
     # await check_unfinished_tasks.append_new_task(dataForUpdate)
 
     return job_id

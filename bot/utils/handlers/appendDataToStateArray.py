@@ -1,5 +1,6 @@
-from aiogram.fsm.context import FSMContext
 from typing import Any
+
+from aiogram.fsm.context import FSMContext
 
 
 # Функция для добавления данных в массив в стейте
@@ -12,4 +13,3 @@ async def appendDataToStateArray(state: FSMContext, key: str, value: Any):
         data = stateData.get(key, [])
         data.append(value)
         await state.update_data(**{key: data})
-

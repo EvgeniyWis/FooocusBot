@@ -1,4 +1,6 @@
-from .getAllDataArrays import getAllDataArrays
+from bot.utils.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
 
 
 # Функция для получения имени модели по его номеру
@@ -28,7 +30,3 @@ def getModelNameByIndex(index):
 
     # Если индекс больше, чем общее количество моделей
     return None
-
-
-
-
