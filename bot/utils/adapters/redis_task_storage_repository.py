@@ -217,7 +217,6 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
                 task["is_test_generation"],
                 task["check_other_jobs"],
                 task["chat_id"],
-                task_repo=self,
             )
             if success:
                 await self.delete_task(job_id)
@@ -255,7 +254,7 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
             job_id = raw.decode().split(":", 1)[1]
             logger.info(f"Восстановление задачи: {job_id}")
             task = asyncio.create_task(
-                self.replay_task(job_id, bot, state_storage)
+                self.replay_task(job_id, bot, state_storage),
             )
             tasks.append(task)
 

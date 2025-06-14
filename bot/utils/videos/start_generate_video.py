@@ -12,7 +12,9 @@ from bot.utils.httpx import httpx_post
 
 
 async def start_generate_video(
-    prompt: str, image_url: str = None, image_path: str = None
+    prompt: str,
+    image_url: str = None,
+    image_path: str = None,
 ) -> dict | None:
     """
     Функция для скачивания изображения по ссылке или по пути к файлу и
@@ -29,7 +31,7 @@ async def start_generate_video(
     """
 
     logger.info(
-        f"Генерация видео с помощью kling: \nПромпт: {prompt}\nСсылка на изображение: {image_url}\nПуть к изображению: {image_path}"
+        f"Генерация видео с помощью kling: \nПромпт: {prompt}\nСсылка на изображение: {image_url}\nПуть к изображению: {image_path}",
     )
 
     if image_url:
@@ -68,7 +70,10 @@ async def start_generate_video(
     # Отправляем запрос на генерацию видео
     url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
     json = await httpx_post(
-        url_endpoint, KLING_HEADERS, data=data, files=files
+        url_endpoint,
+        KLING_HEADERS,
+        data=data,
+        files=files,
     )
 
     logger.info(f"Ответ на запрос на генерацию видео: {json}")
