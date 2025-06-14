@@ -43,7 +43,7 @@ async def httpx_post(
             if response.status_code != 200:
                 if response.status_code == 404:
                     # Получаем job_id из url
-                    job_id = response.url.split("/")[-1]
+                    job_id = url.split("/")[-1]
                     logger.info(f"Удаляем задачу из Redis, как недействительную: {job_id}")
                     
                     # Удаляем задачу из Redis, как недействительную
