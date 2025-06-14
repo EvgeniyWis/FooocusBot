@@ -1,5 +1,7 @@
 # Функция для получения данных генерации по названию модели
-from .getAllDataArrays import getAllDataArrays
+from bot.utils.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
 
 
 async def getDataByModelName(model_name: str) -> dict:

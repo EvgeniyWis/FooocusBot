@@ -1,4 +1,6 @@
-from .getAllDataArrays import getAllDataArrays
+from bot.utils.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
 
 
 # Функция для получения индекса модели
@@ -14,8 +16,11 @@ def getModelNameIndex(model_name: str):
                     return setting.index(dataArray) + 1
                 else:
                     # Берём длины всех массивов предыдущих настроек и суммируем их
-                    return sum(len(setting) for setting in all_settings[:index]) + setting.index(dataArray) + 1
+                    return (
+                        sum(len(setting) for setting in all_settings[:index])
+                        + setting.index(dataArray)
+                        + 1
+                    )
 
     # Если модель не найдена, то возвращаем None
     return None
-

@@ -1,4 +1,4 @@
-from .getVideoExamplesData import getVideoExamplesData
+from bot.utils.videoExamples.getVideoExamplesData import getVideoExamplesData
 
 
 # Функция для получения видео-примера по его индексу

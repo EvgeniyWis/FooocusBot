@@ -3,8 +3,9 @@ import os
 import uuid
 
 import aiofiles
-from config import FACEFUSION_RESULTS_DIR
-from logger import logger
+
+from bot.config import FACEFUSION_RESULTS_DIR
+from bot.logger import logger
 
 CONTAINER_NAME = "facefusion-docker-facefusion-cpu-1"
 

@@ -1,21 +1,31 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from config import MOCK_MODE
+from bot.config import MOCK_MODE
+from bot.storage import get_redis_storage
+from bot.utils.generateImages.base64ToImage import base64ToImage
+from bot.utils.generateImages.getReferenceImage import getReferenceImage
+from bot.utils.handlers.startGeneration.sendImageBlock import sendImageBlock
+from bot.utils.jobs.check_job_status import (
+    CANCELLED_JOB_TEXT,
+    check_job_status,
+)
 
-from ..handlers.startGeneration.sendImageBlock import sendImageBlock
-from .base64ToImage import base64ToImage
-from .getReferenceImage import getReferenceImage
-from utils.repository.abc_task_storage_repository import AbstractTaskStorageRepository 
-from utils.adapters.redis_task_storage_repository import RedisTaskStorageRepository
 
-
-async def process_image_block(job_id: str, model_name: str, setting_number: int, user_id: int, 
-    state: FSMContext, message_id: int, is_test_generation: bool, checkOtherJobs: bool,
-    chat_id: int, task_repo: AbstractTaskStorageRepository = RedisTaskStorageRepository) -> bool:
+async def process_image_block(
+    job_id: str,
+    model_name: str,
+    setting_number: int,
+    user_id: int,
+    state: FSMContext,
+    message_id: int,
+    is_test_generation: bool,
+    checkOtherJobs: bool,
+    chat_id: int,
+) -> bool:
     """
     Функция для обработки работы по её id и после удачного завершения - отправки сообщения с изображениями
-    
+
     Attributes:
         job_id (str): id работы
         model_name (str): название модели
@@ -25,11 +35,11 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         message (types.Message): сообщение
         is_test_generation (bool): флаг, указывающий на тестовую генерацию
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
-        task_repo (ITaskStorage): репозиторий задач
         chat_id (int): id чата
     """
     data = await state.get_data()
-    await task_repo.add_task(
+    redis_storage = get_redis_storage()
+    await redis_storage.add_task(
         job_id=job_id,
         user_id=user_id,
         message_id=message_id,
@@ -40,7 +50,6 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
         check_other_jobs=checkOtherJobs,
         chat_id=chat_id,
     )
-    from ..jobs.check_job_status import check_job_status, CANCELLED_JOB_TEXT
     # Проверяем статус работы
     response_json = await check_job_status(
         job_id,
@@ -94,7 +103,7 @@ async def process_image_block(job_id: str, model_name: str, setting_number: int,
 
         # Если изображение первое в очереди, то отправляем его и инициализуем стейт (либо если это изображение, которое перегенерируется)
         stateData = await state.get_data()
-        
+
         # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
         regenerated_models = stateData.get("regenerated_models", [])
         if model_name in regenerated_models:

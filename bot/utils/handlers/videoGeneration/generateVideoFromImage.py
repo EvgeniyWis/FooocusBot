@@ -4,12 +4,14 @@ import traceback
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from InstanceBot import bot
-from keyboards.videoGeneration import keyboards as video_generation_keyboards
 
-from utils import text
-from utils.retryOperation import retryOperation
-from utils.videos.generate_video import generate_video
+from bot.InstanceBot import bot
+from bot.keyboards.videoGeneration import (
+    keyboards as video_generation_keyboards,
+)
+from bot.utils import text
+from bot.utils.retryOperation import retryOperation
+from bot.utils.videos.generate_video import generate_video
 
 
 # Функция для генерации видео из изображения
@@ -22,7 +24,9 @@ async def generateVideoFromImage(
     try:
         # Получаем данные из стейта и file id изображения
         stateData = await state.get_data()
-        image_file_ids = stateData.get("image_file_ids_for_videoGenerationFromImage", [])
+        image_file_ids = stateData.get(
+            "image_file_ids_for_videoGenerationFromImage", []
+        )
         image_file_id = image_file_ids[file_id_index]
 
         # Скачиваем изображение (file_id) и получаем путь к файлу с таймаутом
@@ -78,11 +82,13 @@ async def generateVideoFromImage(
         await state.set_state(None)
 
         # Удаляем временное изображение
-        if os.path.exists(temp_path):   
+        if os.path.exists(temp_path):
             os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
         await message.answer(
             text.GENERATE_VIDEO_FROM_IMAGE_ERROR_TEXT.format(e),
         )
-        raise Exception(f"Произошла ошибка при генерации видео из изображения: {e}")
+        raise Exception(
+            f"Произошла ошибка при генерации видео из изображения: {e}"
+        )

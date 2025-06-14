@@ -1,18 +1,19 @@
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from InstanceBot import router
-from keyboards import randomizer_keyboards
-from logger import logger
-from states.RandomizerState import RandomizerState
-from utils import text
-from utils.handlers.messages import editMessageOrAnswer
-from utils.handlers.startGeneration import generateImagesInHandler
+
+from bot.InstanceBot import router
+from bot.keyboards import randomizer_keyboards
+from bot.states.RandomizerState import RandomizerState
+from bot.utils import text
+from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.handlers.startGeneration import generateImagesInHandler
 
 
 # Обработка кнопок в меню
 async def handle_randomizer_buttons(
-    call: types.CallbackQuery, state: FSMContext
+    call: types.CallbackQuery,
+    state: FSMContext,
 ):
     action = call.data.split("|")[1]
 
@@ -28,7 +29,8 @@ async def handle_randomizer_buttons(
     # Если была выбрана кнопка "💬 Одно сообщение"
     elif action == "one_message":
         await call.message.edit_text(
-            text.ONE_MESSAGE_FOR_RANDOMIZER_TEXT, parse_mode="HTML"
+            text.ONE_MESSAGE_FOR_RANDOMIZER_TEXT,
+            parse_mode="HTML",
         )
         await state.set_state(RandomizerState.write_one_message_for_randomizer)
 
@@ -39,7 +41,8 @@ async def handle_randomizer_buttons(
         # Если нету переменных для рандомайзера, то отправляем сообщение с ошибкой
         if len(variable_names) == 0:
             await call.answer(
-                text.VARIABLES_FOR_RANDOMIZER_NOT_WRITTEN_TEXT, show_alert=True
+                text.VARIABLES_FOR_RANDOMIZER_NOT_WRITTEN_TEXT,
+                show_alert=True,
             )
             return
 
@@ -67,17 +70,18 @@ async def handle_randomizer_buttons(
         await editMessageOrAnswer(
             call,
             text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(
-                variable_names[variable_index]
+                variable_names[variable_index],
             ),
             reply_markup=randomizer_keyboards.variableActionKeyboard(
-                variable_index
+                variable_index,
             ),
         )
 
 
 # Обработка нажатия кнопок в меню действий с переменной
 async def handle_variable_action_buttons(
-    call: types.CallbackQuery, state: FSMContext
+    call: types.CallbackQuery,
+    state: FSMContext,
 ):
     # Получаем данные
     action = call.data.split("|")[1]
@@ -90,7 +94,7 @@ async def handle_variable_action_buttons(
             call,
             text.RANDOMIZER_MENU_TEXT,
             reply_markup=randomizer_keyboards.randomizerKeyboard(
-                variable_names
+                variable_names,
             ),
         )
         return
@@ -102,11 +106,11 @@ async def handle_variable_action_buttons(
         await editMessageOrAnswer(
             call,
             text.ADD_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(
-                variable_names[variable_index]
+                variable_names[variable_index],
             ),
         )
         await state.set_state(
-            RandomizerState.write_value_for_variable_for_randomizer
+            RandomizerState.write_value_for_variable_for_randomizer,
         )
 
     # Если была выбрана кнопка "🗑️ Удалить значение"
@@ -118,10 +122,11 @@ async def handle_variable_action_buttons(
         await editMessageOrAnswer(
             call,
             text.DELETE_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(
-                variable_names[variable_index]
+                variable_names[variable_index],
             ),
             reply_markup=randomizer_keyboards.deleteValuesForVariableKeyboard(
-                values, variable_index
+                values,
+                variable_index,
             ),
         )
 
@@ -129,7 +134,8 @@ async def handle_variable_action_buttons(
     elif action == "delete_var":
         stateData = await state.get_data()
         variable_names_for_randomizer = stateData.get(
-            "variable_names_for_randomizer", []
+            "variable_names_for_randomizer",
+            [],
         )
         variable_names_for_randomizer.remove(variable_names[variable_index])
         await state.update_data(**stateData)
@@ -137,14 +143,15 @@ async def handle_variable_action_buttons(
             call,
             text.RANDOMIZER_MENU_TEXT,
             reply_markup=randomizer_keyboards.randomizerKeyboard(
-                variable_names_for_randomizer
+                variable_names_for_randomizer,
             ),
         )
 
 
 # Обработка нажатия кнопок для удаления значения из переменной
 async def handle_delete_value_for_variable_buttons(
-    call: types.CallbackQuery, state: FSMContext
+    call: types.CallbackQuery,
+    state: FSMContext,
 ):
     # Если была выбрана кнопка "🔙 Назад"
     stateData = await state.get_data()
@@ -152,16 +159,16 @@ async def handle_delete_value_for_variable_buttons(
 
     if call.data == "randomizer_delete_value|back":
         selected_variable_index = int(
-            stateData.get("selected_variable_index", 0)
+            stateData.get("selected_variable_index", 0),
         )
         selected_variable_name = variable_names[selected_variable_index]
         await editMessageOrAnswer(
             call,
             text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(
-                selected_variable_name
+                selected_variable_name,
             ),
             reply_markup=randomizer_keyboards.variableActionKeyboard(
-                selected_variable_index
+                selected_variable_index,
             ),
         )
         return
@@ -184,17 +191,19 @@ async def handle_delete_value_for_variable_buttons(
     await editMessageOrAnswer(
         call,
         text.DELETE_VALUES_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(
-            variable_name
+            variable_name,
         ),
         reply_markup=randomizer_keyboards.deleteValuesForVariableKeyboard(
-            values, variable_index
+            values,
+            variable_index,
         ),
     )
 
 
 # Обработка ввода переменных
 async def write_variable_for_randomizer(
-    message: types.Message, state: FSMContext
+    message: types.Message,
+    state: FSMContext,
 ):
     # Получаем данные
     stateData = await state.get_data()
@@ -204,16 +213,17 @@ async def write_variable_for_randomizer(
     if "variable_names_for_randomizer" not in stateData:
         variable_names_for_randomizer = [variable_name]
         await state.update_data(
-            variable_names_for_randomizer=variable_names_for_randomizer
+            variable_names_for_randomizer=variable_names_for_randomizer,
         )
     else:
         variable_names_for_randomizer = stateData.get(
-            "variable_names_for_randomizer", []
+            "variable_names_for_randomizer",
+            [],
         )
         if variable_name not in variable_names_for_randomizer:
             variable_names_for_randomizer.append(variable_name)
             await state.update_data(
-                variable_names_for_randomizer=variable_names_for_randomizer
+                variable_names_for_randomizer=variable_names_for_randomizer,
             )
         else:
             await message.answer(text.VARIABLE_ALREADY_EXISTS_TEXT)
@@ -221,7 +231,7 @@ async def write_variable_for_randomizer(
 
     # Устанавливаем значение для стейта, что выбрана переменная с данным индексом
     await state.update_data(
-        selected_variable_index=len(variable_names_for_randomizer) - 1
+        selected_variable_index=len(variable_names_for_randomizer) - 1,
     )
 
     # Отправляем сообщение
@@ -231,13 +241,14 @@ async def write_variable_for_randomizer(
         reply_markup=randomizer_keyboards.stopInputValuesForVariableKeyboard(),
     )
     await state.set_state(
-        RandomizerState.write_value_for_variable_for_randomizer
+        RandomizerState.write_value_for_variable_for_randomizer,
     )
 
 
 # Обработка ввода значения для переменной
 async def write_value_for_variable_for_randomizer(
-    message: types.Message, state: FSMContext
+    message: types.Message,
+    state: FSMContext,
 ):
     # Получаем данные
     stateData = await state.get_data()
@@ -252,14 +263,14 @@ async def write_value_for_variable_for_randomizer(
             await message.answer(
                 text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name),
                 reply_markup=randomizer_keyboards.variableActionKeyboard(
-                    variable_index
+                    variable_index,
                 ),
             )
         else:
             await message.answer(
                 text.RANDOMIZER_MENU_TEXT,
                 reply_markup=randomizer_keyboards.randomizerKeyboard(
-                    all_variable_names
+                    all_variable_names,
                 ),
             )
         return
@@ -279,18 +290,20 @@ async def write_value_for_variable_for_randomizer(
     value = value[:10] + "..."
     await message.answer(
         text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(
-            value, variable_name
+            value,
+            variable_name,
         ),
         reply_markup=randomizer_keyboards.stopInputValuesForVariableKeyboard(),
     )
     await state.set_state(
-        RandomizerState.write_value_for_variable_for_randomizer
+        RandomizerState.write_value_for_variable_for_randomizer,
     )
 
 
 # Обработка ввода одного сообщения для рандомайзера
 async def write_one_message_for_randomizer(
-    message: types.Message, state: FSMContext
+    message: types.Message,
+    state: FSMContext,
 ):
     """
     Переменная 1: значение 1/значение 2/значение 3;
@@ -303,7 +316,7 @@ async def write_one_message_for_randomizer(
     # Проверяем, что есть хотя бы одна строка
     if not lines:
         await message.answer(
-            "Сообщение пустое. Пожалуйста, введите данные в правильном формате."
+            "Сообщение пустое. Пожалуйста, введите данные в правильном формате.",
         )
         return
 
@@ -317,7 +330,7 @@ async def write_one_message_for_randomizer(
         # Проверяем формат строки (должна содержать ":")
         if ":" not in line:
             await message.answer(
-                f"Неправильный формат строки: {line}\nКаждая строка должна содержать название переменной, двоеточие и значения."
+                f"Неправильный формат строки: {line}\nКаждая строка должна содержать название переменной, двоеточие и значения.",
             )
             return
 
@@ -328,7 +341,7 @@ async def write_one_message_for_randomizer(
         # Проверяем, что строка заканчивается на точку с запятой
         if not values_str.strip().endswith(";"):
             await message.answer(
-                f"Строка должна заканчиваться точкой с запятой (;): {line}"
+                f"Строка должна заканчиваться точкой с запятой (;): {line}",
             )
             return
 
@@ -339,14 +352,14 @@ async def write_one_message_for_randomizer(
         # Проверяем, что есть хотя бы одно значение
         if not values:
             await message.answer(
-                f"Не указаны значения для переменной: {variable_name}"
+                f"Не указаны значения для переменной: {variable_name}",
             )
             return
 
         # Добавляем переменную и её значения в state
         variable_names.append(variable_name)
         await state.update_data(
-            **{f"randomizer_{variable_name}_values": values}
+            **{f"randomizer_{variable_name}_values": values},
         )
 
     # Сохраняем список имен переменных

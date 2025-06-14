@@ -5,8 +5,11 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from .dataArray import getDataArrayByRandomizer, getDataArrayWithRootPrompt
-from .generateImageBlock import generateImageBlock
+from bot.utils.generateImages.dataArray import (
+    getDataArrayByRandomizer,
+    getDataArrayWithRootPrompt,
+)
+from bot.utils.generateImages.generateImageBlock import generateImageBlock
 
 
 # Функция для генерации изображений с помощью API
@@ -23,9 +26,13 @@ async def generateImages(
     if not with_randomizer:
         # Прибавляем к каждому элементу массива корневой промпт
         if model_indexes_for_generation:
-            dataArray = await getDataArrayWithRootPrompt(setting_number, prompt, model_indexes_for_generation)
+            dataArray = await getDataArrayWithRootPrompt(
+                setting_number, prompt, model_indexes_for_generation
+            )
         else:
-            dataArray = await getDataArrayWithRootPrompt(setting_number, prompt)
+            dataArray = await getDataArrayWithRootPrompt(
+                setting_number, prompt
+            )
     else:
         dataArray = await getDataArrayByRandomizer(state, setting_number)
 
@@ -65,7 +72,9 @@ async def generateImages(
             return image, None
         except Exception as e:
             traceback.print_exc()
-            raise Exception(f"Произошла ошибка при генерации изображения во внутренней функции: {e}")
+            raise Exception(
+                f"Произошла ошибка при генерации изображения во внутренней функции: {e}"
+            )
 
     # Создаем список задач, выполняющихся параллельно
     tasks = [asyncio.create_task(process_image(data)) for data in dataArray]

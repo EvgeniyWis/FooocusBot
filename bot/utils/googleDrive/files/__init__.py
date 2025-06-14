@@ -1,6 +1,10 @@
-from .downloadFromGoogleDrive import downloadFromGoogleDrive
-from .encodeFileToBase64 import encodeFileToBase64
-from .saveFile import saveFile
-from .getGoogleDriveFileID import getGoogleDriveFileID
-from .uploadFile import uploadFile
-from .convertLink import convertDriveLink
+from bot.utils.googleDrive.files.downloadFromGoogleDrive import (
+    downloadFromGoogleDrive,
+)
+from bot.utils.googleDrive.files.encodeFileToBase64 import encodeFileToBase64
+from bot.utils.googleDrive.files.saveFile import saveFile
+from bot.utils.googleDrive.files.getGoogleDriveFileID import (
+    getGoogleDriveFileID,
+)
+from bot.utils.googleDrive.files.uploadFile import uploadFile
+from bot.utils.googleDrive.files.convertLink import convertDriveLink

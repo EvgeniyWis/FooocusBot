@@ -1,23 +1,28 @@
+import asyncio
+from datetime import datetime
+
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from utils.handlers.messages import editMessageOrAnswer
-from logger import logger
-from datetime import datetime
-import asyncio
 
-from utils import text
-from utils.handlers import appendDataToStateArray
-from utils.retryOperation import retryOperation
-from utils.facefusion import facefusion_swap
-from utils.generateImages.dataArray import getModelNameIndex
+from bot.logger import logger
+from bot.utils import text
+from bot.utils.facefusion import facefusion_swap
+from bot.utils.generateImages.dataArray import getModelNameIndex
+from bot.utils.handlers import appendDataToStateArray
+from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.retryOperation import retryOperation
 
 
-async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext, 
-    image_index: int, model_name: str) -> str:
+async def process_faceswap_image(
+    call: types.CallbackQuery,
+    state: FSMContext,
+    image_index: int,
+    model_name: str,
+) -> str:
     """
-    Функция для обработки замены лица, обработки процесса в хендлере, циклической проверки очереди на замену лица 
+    Функция для обработки замены лица, обработки процесса в хендлере, циклической проверки очереди на замену лица
     и удаления модели из стейта
-    
+
     Attributes:
         call (types.CallbackQuery): callback-запрос
         state (FSMContext): контекст состояния
@@ -27,10 +32,10 @@ async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext,
 
     # Получаем айдишник пользователя
     user_id = call.from_user.id
-    
+
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
-    
+
     # Меняем текст на сообщении об очереди на замену лица
     await editMessageOrAnswer(
         call,
@@ -50,7 +55,11 @@ async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext,
     )
 
     # Добавляем в стейт путь к изображению для faceswap
-    dataForUpdate = {"user_id": user_id, "image_index": image_index, "model_name": model_name}
+    dataForUpdate = {
+        "user_id": user_id,
+        "image_index": image_index,
+        "model_name": model_name,
+    }
     await appendDataToStateArray(
         state,
         "faceswap_generated_models",
@@ -63,7 +72,9 @@ async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext,
 
     while True:
         stateData = await state.get_data()
-        faceswap_generated_models = stateData.get("faceswap_generated_models", [])
+        faceswap_generated_models = stateData.get(
+            "faceswap_generated_models", []
+        )
 
         # Проверяем, изменился ли список моделей
         if len(faceswap_generated_models) != len(last_models_state):
@@ -76,7 +87,7 @@ async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext,
         if elapsed_time > 1800:  # 30 минут = 1800 секунд
             error_message = f"Таймаут ожидания обновления списка faceswap_generated_models для модели {model_name}"
             logger.error(
-                error_message
+                error_message,
             )
             raise Exception(error_message)
 
@@ -101,7 +112,11 @@ async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext,
 
             try:
                 result_path = await retryOperation(
-                    facefusion_swap, 5, 2, faceswap_source_path, faceswap_target_path
+                    facefusion_swap,
+                    5,
+                    2,
+                    faceswap_source_path,
+                    faceswap_target_path,
                 )
 
             except Exception as e:
@@ -114,7 +129,7 @@ async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext,
                     text.FACE_SWAP_ERROR_TEXT.format(
                         model_name,
                         model_name_index,
-                        e
+                        e,
                     ),
                 )
                 raise e
@@ -127,7 +142,9 @@ async def process_faceswap_image(call: types.CallbackQuery, state: FSMContext,
     stateData = await state.get_data()
     faceswap_generated_models = stateData.get("faceswap_generated_models", [])
     faceswap_generated_models_without_current_model = [
-        model for model in faceswap_generated_models if model["model_name"] != model_name
+        model
+        for model in faceswap_generated_models
+        if model["model_name"] != model_name
     ]
     await state.update_data(
         faceswap_generated_models=faceswap_generated_models_without_current_model,
