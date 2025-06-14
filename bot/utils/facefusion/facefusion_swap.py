@@ -22,7 +22,7 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     docker_cmd = [
         "docker",
         "exec",
-        os.environ["FACEFUSION_CONTAINER_NAME"],
+        os.getenv("FACEFUSION_CONTAINER_NAME"),
         "python",
         "facefusion.py",
         "headless-run",
