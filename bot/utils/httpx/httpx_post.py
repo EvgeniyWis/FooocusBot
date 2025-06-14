@@ -3,8 +3,7 @@ import asyncio
 import httpx
 
 from bot.logger import logger
-from bot.storage import get_redis_storage
-
+from bot.storage import get_task_service
 
 
 # Функция-обёртка для отправки POST-запросов с настройками таймаутов
@@ -20,7 +19,8 @@ async def httpx_post(
     response_json = None
 
     async with httpx.AsyncClient(
-        timeout=httpx.Timeout(timeout), follow_redirects=True
+        timeout=httpx.Timeout(timeout),
+        follow_redirects=True,
     ) as client:
         try:
             response = await client.post(
@@ -47,11 +47,11 @@ async def httpx_post(
                     logger.info(f"Удаляем задачу из Redis, как недействительную: {job_id}")
                     
                     # Удаляем задачу из Redis, как недействительную
-                    redis_storage = get_redis_storage()
-                    await redis_storage.delete_task(job_id)
+                    task_service = get_task_service()
+                    await task_service.delete_task(job_id)
                 else:
                     raise Exception(
-                        f"Сервер вернул ошибку: {response.status_code}"
+                        f"Сервер вернул ошибку: {response.status_code}",
                     )
 
             try:
@@ -73,7 +73,7 @@ async def httpx_post(
             await asyncio.sleep(10)
         except httpx.RequestError as e:
             logger.error(
-                f"Ошибка при выполнении запроса: {str(e)} \nТело ответа: {response.text if response else 'нет ответа'}"
+                f"Ошибка при выполнении запроса: {str(e)} \nТело ответа: {response.text if response else 'нет ответа'}",
             )
             await asyncio.sleep(10)
 
