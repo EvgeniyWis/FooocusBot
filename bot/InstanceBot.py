@@ -4,6 +4,18 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 
+from dotenv import load_dotenv
+from logger import logger
+
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'FocuuusBot', '.env')
+logger.info(f"Путь к .env файлу: {env_path}")
+logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
+
+if 'BOT_API_TOKEN' in os.environ:
+    del os.environ['BOT_API_TOKEN']
+
+load_dotenv(env_path, override=True)
+
 # Создаём бота
 bot = Bot(
     token=os.getenv("BOT_API_TOKEN"),
