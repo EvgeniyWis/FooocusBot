@@ -1,4 +1,5 @@
 import asyncio
+import httpx
 
 from aiogram.fsm.context import FSMContext
 
@@ -56,9 +57,9 @@ async def check_job_status(
                     url, RUNPOD_HEADERS, with_response_text_logging=False
                 )
 
-            except Exception as e:
+            except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadTimeout) as e:
                 logger.error(
-                    f"Неожиданная ошибка при получении статуса работы: {e}",
+                    f"Ошибка соединения при получении статуса работы: {e}",
                 )
                 await asyncio.sleep(10)
                 continue
