@@ -1,7 +1,6 @@
 from config import RUNPOD_HEADERS, RUNPOD_HOST
 
 from bot.logger import logger
-from bot.storage import get_task_service
 from bot.utils import httpx_post
 from bot.utils.jobs.get_endpoint_ID import get_endpoint_ID
 
@@ -28,9 +27,6 @@ async def cancel_jobs(jobs_ids: list[dict]):
             # Отправляем запрос на отмену работы
             await httpx_post(url, RUNPOD_HEADERS)
 
-            # Удаляем задачу из Redis
-            task_service = get_task_service()
-            await task_service.delete_task(job_id)
         except Exception as e:
             logger.error(
                 f"Неожиданная ошибка при отмене работы {job_id}: {str(e)}",
