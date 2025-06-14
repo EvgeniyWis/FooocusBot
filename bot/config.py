@@ -8,6 +8,7 @@ env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.
 logger.info(f"Путь к .env файлу: {env_path}")
 logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
 load_dotenv(env_path)
+logger.info(f"BOT_API_TOKEN: {os.getenv('BOT_API_TOKEN')}")
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
