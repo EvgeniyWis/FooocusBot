@@ -1,6 +1,4 @@
-from bot.utils.generateImages.dataArray.setting_3.generateData import (
-    setting3_generateData,
-)
+from .generateData import setting3_generateData
 
 
 # Функция для генерации массива данных для запроса для настройки 3
@@ -14,7 +12,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 3.00, 0.75, -1.00],
+            [-1.50, 1.30, 1.00, 3.00, 1.25, -1.70],
             8,
             "score_6, score_5, score_4, Negative_&_Positive_Embeddings_By_Stable_Yogi, negative_hand, pony, negativeXL_D, low quality, oversaturated, disfigured, poorly, bad, wrong, mutated, worst quality, normal quality, ugly face, mutated hands, extra fingers, poorly drawn hands, fused fingers, too many fingers, long neck, bad hands, text, signature, signature artist, multiple female, multiple male, bad anatomy, low res, blurry face, blurry eyes, tiny hands, tiny feet, multiple women, disproportionately large head, disproportionately long torso, six fingers, low quality hands, hat, multicolored hair, pubic hair, asian, tan lines, makeup, lipstick, playing cards, black skin, steering wheel, (man), (((naked nipples))), (((naked breasts))), (((penis))), (((dick))), (((naked pussy))), (((naked))), (((naked ass))), cartoon, anime, 3d, cgi, illustration, doll-like, overly muscular, chubby, plastic skin, waxy texture, blurry, jpeg artifacts, extra limbs, distorted proportions, unnatural face, unrealistic anatomy, deformed eyes, exaggerated curves, barbie face, uncanny valley, big head, overexposed, underexposed, low-quality shading, unnatural smile",
         ),
@@ -25,7 +23,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 2.20, 1.90, -0.70],
+            [-1.50, 1.30, 1.00, 2.20, 2.40, -1.70],
         ),
         setting3_generateData(
             "rubynoirelle",
@@ -34,7 +32,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair, long hair, ponytail hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 0.60, 1.20, 0.50],
+            [-1.50, 1.30, 1.00, 0.60, 1.70, -0.20],
         ),
         setting3_generateData(
             "heather_noelle.xo",
@@ -43,7 +41,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 0.03, 0.48, 2.25],
+            [-1.50, 1.30, 1.00, 0.03, 0.98, 1.55],
         ),
         setting3_generateData(
             "sonyadolly.xo",
@@ -52,7 +50,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous  platinum-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 1.90, 0.53, -0.55],
+            [-1.50, 1.30, 1.00, 1.90, 1.03, -1.25],
         ),
         setting3_generateData(
             "bridget_laurent.xo",
@@ -61,7 +59,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous white-platinum hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 2.50, 0.80, -0.45],
+            [-1.50, 1.30, 1.00, 2.50, 1.30, -1.15],
         ),
         setting3_generateData(
             "noellebriar.xo",
@@ -70,7 +68,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair with white curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 2.05, 0.75, -0.70],
+            [-1.50, 1.30, 1.00, 2.05, 1.25, -1.40],
         ),
         setting3_generateData(
             "bianca_mirell",
@@ -79,7 +77,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, armenian girl, sorority girl, volumnous black hair with white curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 1.80, 0.90, 0.45],
+            [-1.50, 1.30, 1.00, 1.80, 1.40, -0.25],
         ),
         setting3_generateData(
             "dasharomanova.xo",
@@ -88,7 +86,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, armenian girl, sorority girl, volumnous platinum-blonde hair with black curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 2.40, 2.10, -0.85],
+            [-1.50, 1.30, 1.00, 2.40, 2.60, -1.55],
         ),
         setting3_generateData(
             "sofiavogel.xo",
@@ -97,7 +95,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, armenian girl, sorority girl, volumnous platinum-blonde hair with black curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 1.85, 1.00, -0.20],
+            [-1.50, 1.30, 1.00, 1.85, 1.50, -0.90],
         ),
         setting3_generateData(
             "zlatapavlova.xo",
@@ -106,7 +104,7 @@ def setting3_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, armenian girl, sorority girl, volumnous platinum-blonde hair with black curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 1.80, 1.85, -1.00],
+            [-1.50, 1.30, 1.00, 1.80, 2.35, -1.70],
         ),
         setting3_generateData(
             "simona.caramella",
@@ -115,7 +113,7 @@ def setting3_getDataArray():
             """score9, high quality, photorealistic, bright lighting, skin detail, BREAK
 
         1girl, 18 years old, Armenian, long brown hair, big breasts, slim waist, hourglass figure, tan skin, cute face, big lips, smirk, brown eyes, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 3.25, 0.60, -0.35],
+            [-1.50, 1.30, 1.00, 3.25, 1.10, -1.05],
         ),
         setting3_generateData(
             "alinacute.xo",
@@ -124,7 +122,7 @@ def setting3_getDataArray():
             """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
         realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright brown eyes, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 3.40, 0.60, -0.80],
+            [-1.50, 1.30, 1.00, 3.40, 1.10, -1.50],
         ),
         setting3_generateData(
             "sasha_no_limit",
@@ -133,7 +131,7 @@ def setting3_getDataArray():
             """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
         realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum-blonde hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright brown eyes, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 1.50, 1.15, -0.45],
+            [-1.50, 1.30, 1.00, 1.50, 1.65, -1.15],
         ),
         setting3_generateData(
             "paulinacute.xo",
@@ -142,7 +140,7 @@ def setting3_getDataArray():
             """score9, high quality, photorealistic, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
 realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blonde hair, big breasts, slim waist, hourglass figure, toned legs, tan skin, cute face, big lips, smirk, bright blue eyes, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 2.00, 0.60, -0.30],
+            [-1.50, 1.30, 1.00, 2.00, 1.10, -1.00],
         ),
         setting3_generateData(
             "callieroux",
@@ -151,7 +149,7 @@ realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blo
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-platinum blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 3.45, 0.60, 0.30],
+            [-1.50, 1.30, 1.00, 3.45, 1.10, -0.40],
         ),
         setting3_generateData(
             "aveline_lion",
@@ -160,7 +158,7 @@ realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blo
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 2.40, 0.95, -0.35],
+            [-1.50, 1.30, 1.00, 2.40, 1.45, -1.05],
         ),
         setting3_generateData(
             "lolavexley",
@@ -169,7 +167,7 @@ realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blo
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous brown hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 2.75, 2.25, -1.00],
+            [-1.50, 1.30, 1.00, 2.75, 2.75, -1.70],
         ),
         setting3_generateData(
             "elinarayne.xo",
@@ -178,7 +176,7 @@ realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blo
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 0.35, 0.85, 0.55],
+            [-1.50, 1.30, 1.00, 0.35, 1.35, -0.15],
         ),
         setting3_generateData(
             "leonaclaive",
@@ -187,7 +185,7 @@ realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blo
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous platinum-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
-            [-1.50, 1.30, 1.00, 0.75, 2.05, -0.25],
+            [-1.50, 1.30, 1.00, 0.75, 2.55, -0.95],
         ),
     ]
 
