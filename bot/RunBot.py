@@ -26,10 +26,12 @@ async def on_startup() -> None:
 
     task_service = get_task_service()
     task_service.set_process_callback(process_image_block)
-    await task_service.recover_tasks(
-        bot,
-        storage,
-        process_callback=process_image_block,
+    asyncio.create_task(
+        task_service.recover_tasks(
+            bot,
+            storage,
+            process_callback=process_image_block,
+        ),
     )
 
     # Удаляем все файлы в папке temp
