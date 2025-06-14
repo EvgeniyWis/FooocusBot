@@ -3,9 +3,6 @@ import os
 from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
-from dotenv import find_dotenv, load_dotenv
-
-load_dotenv(find_dotenv())
 
 # Создаём бота
 bot = Bot(

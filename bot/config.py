@@ -15,8 +15,6 @@ if 'BOT_API_TOKEN' in os.environ:
 
 load_dotenv(env_path, override=True)
 
-logger.info(f"BOT_API_TOKEN: {os.getenv('BOT_API_TOKEN')}")
-
 
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
