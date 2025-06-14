@@ -14,18 +14,14 @@ from bot.config import (
 from bot.InstanceBot import bot, dp, redis_client, storage
 from bot.logger import logger
 from bot.middleware import ErrorHandlingMiddleware
-from bot.storage.redis_storage import init_redis_storage, get_redis_storage
-from bot.utils.adapters.redis_task_storage_repository import RedisTaskStorageRepository
+from bot.storage.redis_storage import get_redis_storage, init_redis_storage
 from bot.utils.generateImages.process_image_block import process_image_block
 
 
 async def on_startup() -> None:
-    # Initialize Redis storage
-    init_redis_storage(redis_client)
+    await init_redis_storage(redis_client)
     redis_storage = get_redis_storage()
-    
-    # Initialize Redis storage
-    await redis_storage.init_redis()
+
     redis_storage.set_process_callback(process_image_block)
     await redis_storage.recover_tasks(bot, storage)
 
@@ -66,7 +62,8 @@ async def on_startup() -> None:
     commands = [
         BotCommand(command="/start", description="Перезапустить бота"),
         BotCommand(
-            command="/stop", description="Остановить генерацию изображений"
+            command="/stop",
+            description="Остановить генерацию изображений",
         ),
     ]
 
