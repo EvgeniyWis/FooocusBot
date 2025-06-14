@@ -59,12 +59,12 @@ async def upscale_image(
     )
 
     # Сохраняем имя модели и индекс изображения в стейт
-    dataForUpdate = {
+    data_for_update = {
         "model_name": model_name,
         "image_index": image_index,
         "job_id": job_id,
     }
-    await appendDataToStateArray(state, "upscale_data", dataForUpdate)
+    await appendDataToStateArray(state, "upscale_data", data_for_update)
 
     # Проверяем статус работы
     result = await check_upscale_status(

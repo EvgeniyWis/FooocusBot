@@ -5,11 +5,11 @@ from aiogram.fsm.context import FSMContext
 
 # Функция для добавления данных в массив в стейте
 async def appendDataToStateArray(state: FSMContext, key: str, value: Any):
-    stateData = await state.get_data()
-    if key not in stateData:
+    state_data = await state.get_data()
+    if key not in state_data:
         await state.update_data(**{key: [value]})
     else:
         # Добавляем в стейт путь к изображению для faceswap
-        data = stateData.get(key, [])
+        data = state_data.get(key, [])
         data.append(value)
         await state.update_data(**{key: data})

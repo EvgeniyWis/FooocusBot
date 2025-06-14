@@ -23,8 +23,8 @@ async def generateVideoFromImage(
 ):
     try:
         # Получаем данные из стейта и file id изображения
-        stateData = await state.get_data()
-        image_file_ids = stateData.get(
+        state_data = await state.get_data()
+        image_file_ids = state_data.get(
             "image_file_ids_for_videoGenerationFromImage", []
         )
         image_file_id = image_file_ids[file_id_index]
@@ -62,10 +62,10 @@ async def generateVideoFromImage(
         )
 
         # Сохраняем путь к видео в стейт
-        if "video_paths" not in stateData:
+        if "video_paths" not in state_data:
             await state.update_data(video_paths=[video_path])
         else:
-            video_paths = stateData.get("video_paths", [])
+            video_paths = state_data.get("video_paths", [])
             video_paths.append(video_path)
             await state.update_data(video_paths=video_paths)
 

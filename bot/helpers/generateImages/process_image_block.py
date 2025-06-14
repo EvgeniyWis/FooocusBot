@@ -103,10 +103,10 @@ async def process_image_block(
                 )
 
         # Если изображение первое в очереди, то отправляем его и инициализуем стейт (либо если это изображение, которое перегенерируется)
-        stateData = await state.get_data()
+        state_data = await state.get_data()
 
         # Если изображение перегенерируется, то удаляем его из списка перегенерируемых изображений
-        regenerated_models = stateData.get("regenerated_models", [])
+        regenerated_models = state_data.get("regenerated_models", [])
         if model_name in regenerated_models:
             regenerated_models.remove(model_name)
             await state.update_data(

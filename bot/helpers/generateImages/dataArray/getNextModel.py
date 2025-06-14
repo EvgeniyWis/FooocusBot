@@ -33,8 +33,8 @@ async def getNextModel(
         dataArrays = getAllDataArrays()
 
         # Получаем текущую настройку
-        stateData = await state.get_data()
-        current_setting_number = stateData[
+        state_data = await state.get_data()
+        current_setting_number = state_data[
             "current_setting_number_for_unique_prompt"
         ]
 

@@ -31,15 +31,15 @@ async def get_job_ID(
     logger.info(f"Получен id работы: {job_id}")
 
     # Сохраняем его в стейт
-    dataForUpdate = {
+    data_for_update = {
         "job_id": job_id,
         "setting_number": setting_number,
         "user_id": user_id,
         "job_type": job_type,
     }
     logger.info(f"Сохраняем id работы в стейт: {job_id}")
-    await appendDataToStateArray(state, "image_generation_jobs", dataForUpdate)
+    await appendDataToStateArray(state, "image_generation_jobs", data_for_update)
 
-    # await check_unfinished_tasks.append_new_task(dataForUpdate)
+    # await check_unfinished_tasks.append_new_task(data_for_update)
 
     return job_id

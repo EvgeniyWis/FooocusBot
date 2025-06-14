@@ -10,8 +10,8 @@ async def deleteMessageFromState(
     state: FSMContext, key: str, model_name: str, chat_id: int
 ):
     # Получаем сообщение из стейта
-    stateData = await state.get_data()
-    messages_ids = stateData.get(key, [])
+    state_data = await state.get_data()
+    messages_ids = state_data.get(key, [])
     logger.info(
         f"Стейт сообщений для модели {model_name} по ключу {key}: {messages_ids}"
     )
