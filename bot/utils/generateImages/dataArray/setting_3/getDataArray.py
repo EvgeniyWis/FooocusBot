@@ -1,4 +1,6 @@
-from .generateData import setting3_generateData
+from bot.utils.generateImages.dataArray.setting_3.generateData import (
+    setting3_generateData,
+)
 
 
 # Функция для генерации массива данных для запроса для настройки 3
