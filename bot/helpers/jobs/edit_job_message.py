@@ -2,9 +2,7 @@ from aiogram.fsm.context import FSMContext
 
 from bot.InstanceBot import bot
 from bot.helpers import text
-from bot.helpers.jobs import (
-    safe_bot_edit_job_message,
-)
+from bot.helpers.jobs.rate_limiter_for_edit_job_message import safe_bot_edit_job_message
 
 
 async def edit_job_message(
@@ -25,11 +23,11 @@ async def edit_job_message(
         user_id (int): ID пользователя
     """
 
-    stateData = await state.get_data()
+    state_data = await state.get_data()
 
-    if "jobs" in stateData:
-        jobs = stateData.get("jobs", {})
-        total_jobs_count = stateData.get("total_jobs_count", 0)
+    if "jobs" in state_data:
+        jobs = state_data.get("jobs", {})
+        total_jobs_count = state_data.get("total_jobs_count", 0)
         jobs[job_id] = response_json["status"]
         await state.update_data(jobs=jobs)
 

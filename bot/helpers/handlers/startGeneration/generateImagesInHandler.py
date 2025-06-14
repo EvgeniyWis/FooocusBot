@@ -71,8 +71,8 @@ async def generateImagesInHandler(
                     ),
                 ]
         else:
-            stateData = await state.get_data()
-            model_indexes_for_generation = stateData.get(
+            state_data = await state.get_data()
+            model_indexes_for_generation = state_data.get(
                 "model_indexes_for_generation", []
             )
             logger.info(
@@ -106,8 +106,8 @@ async def generateImagesInHandler(
         if not result:
             raise Exception("Произошла ошибка при генерации изображения")
         else:
-            stateData = await state.get_data()
-            stop_generation = stateData.get("stop_generation", False)
+            state_data = await state.get_data()
+            stop_generation = state_data.get("stop_generation", False)
 
             if not stop_generation and len(model_indexes_for_generation) > 1:
                 await message.answer(text.GENERATION_SUCCESS_TEXT)

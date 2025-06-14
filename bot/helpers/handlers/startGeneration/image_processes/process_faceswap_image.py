@@ -55,7 +55,7 @@ async def process_faceswap_image(
     )
 
     # Добавляем в стейт путь к изображению для faceswap
-    dataForUpdate = {
+    data_for_update = {
         "user_id": user_id,
         "image_index": image_index,
         "model_name": model_name,
@@ -63,7 +63,7 @@ async def process_faceswap_image(
     await appendDataToStateArray(
         state,
         "faceswap_generated_models",
-        dataForUpdate,
+        data_for_update,
     )
 
     # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
@@ -71,8 +71,8 @@ async def process_faceswap_image(
     last_models_state = []
 
     while True:
-        stateData = await state.get_data()
-        faceswap_generated_models = stateData.get(
+        state_data = await state.get_data()
+        faceswap_generated_models = state_data.get(
             "faceswap_generated_models", []
         )
 
@@ -139,8 +139,8 @@ async def process_faceswap_image(
         await asyncio.sleep(10)
 
     # После генерации удаляем модель из стейта
-    stateData = await state.get_data()
-    faceswap_generated_models = stateData.get("faceswap_generated_models", [])
+    state_data = await state.get_data()
+    faceswap_generated_models = state_data.get("faceswap_generated_models", [])
     faceswap_generated_models_without_current_model = [
         model
         for model in faceswap_generated_models

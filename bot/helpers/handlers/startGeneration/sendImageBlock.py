@@ -34,7 +34,7 @@ async def sendImageBlock(
         media_group_message = await safe_send_media_group(user_id, media_group)
 
         # Сохраняем их в стейт
-        dataForUpdate = {
+        data_for_update = {
             f"{model_name}": [
                 media.message_id for media in media_group_message
             ],
@@ -42,7 +42,7 @@ async def sendImageBlock(
         await appendDataToStateArray(
             state,
             "imageGeneration_mediagroup_messages_ids",
-            dataForUpdate,
+            data_for_update,
         )
     except Exception as e:
         logger.error(f"Ошибка при отправке медиагруппы: {e}")
@@ -62,11 +62,11 @@ async def sendImageBlock(
 
     try:
         # Получаем данные из стейта
-        stateData = await state.get_data()
+        state_data = await state.get_data()
 
         # Если номер настройки все, то получаем номер настройки из стейта
         if setting_number == "all":
-            setting_number = stateData.get(
+            setting_number = state_data.get(
                 "current_setting_number_for_unique_prompt",
                 1,
             )
@@ -96,7 +96,7 @@ async def sendImageBlock(
                 else start_generation_keyboards.testGenerationImagesKeyboard(
                     setting_number,
                 )
-                if stateData.get("setting_number", 1) != "all"
+                if state_data.get("setting_number", 1) != "all"
                 else None,
             )
         except Exception as e:

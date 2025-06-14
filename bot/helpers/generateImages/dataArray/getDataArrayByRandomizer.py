@@ -13,10 +13,10 @@ from bot.utils.handlers import appendDataToStateArray
 # Функция для применения переменных рандомайзера к промптам массива данных
 async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     # Получаем массив данных
-    stateData = await state.get_data()
+    state_data = await state.get_data()
 
     # Получаем переменные рандомайзера
-    variable_names_for_randomizer = stateData.get(
+    variable_names_for_randomizer = state_data.get(
         "variable_names_for_randomizer", []
     )
 
@@ -25,7 +25,7 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
 
     generators = {}
     for variable_name in variable_names_for_randomizer:
-        variable_values = stateData.get(
+        variable_values = state_data.get(
             f"randomizer_{variable_name}_values", []
         )
         if variable_values:
@@ -52,9 +52,9 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
         data["json"]["input"]["prompt"] += model_randomizer_prompt + " "
 
         # Сохраняем промпт в стейт для перегенерации
-        dataForUpdate = {f"{data['model_name']}": model_randomizer_prompt}
+        data_for_update = {f"{data['model_name']}": model_randomizer_prompt}
         await appendDataToStateArray(
-            state, "randomizer_prompts", dataForUpdate
+            state, "randomizer_prompts", data_for_update
         )
 
     logger.info(

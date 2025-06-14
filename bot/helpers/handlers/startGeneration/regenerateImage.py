@@ -19,8 +19,8 @@ async def regenerateImage(
     state: FSMContext,
     setting_number: str,
 ):
-    stateData = await state.get_data()
-    is_test_generation = stateData.get("generations_type", "") == "test"
+    state_data = await state.get_data()
+    is_test_generation = state_data.get("generations_type", "") == "test"
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
@@ -37,12 +37,12 @@ async def regenerateImage(
     data = await getDataByModelName(model_name)
 
     # Получаем промпт для перегенерации изображения в зависимости от режима генерации
-    randomizer_prompts = stateData.get("randomizer_prompts", [])
+    randomizer_prompts = state_data.get("randomizer_prompts", [])
     randomizer_prompt = await getDataInDictsArray(
         randomizer_prompts, model_name
     )
-    prompt_for_images = stateData.get("prompt_for_images", "")
-    prompts_for_regenerated_models = stateData.get(
+    prompt_for_images = state_data.get("prompt_for_images", "")
+    prompts_for_regenerated_models = state_data.get(
         "prompts_for_regenerated_models", []
     )
     prompt_for_regenerate_image = await getDataInDictsArray(
