@@ -14,16 +14,23 @@ from bot.config import (
 from bot.InstanceBot import bot, dp, redis_client, storage
 from bot.logger import logger
 from bot.middleware import ErrorHandlingMiddleware
-from bot.storage.redis_storage import get_redis_storage, init_redis_storage
+from bot.storage.redis_storage import (
+    get_task_service,
+    init_redis_storage,
+)
 from bot.utils.generateImages.process_image_block import process_image_block
 
 
 async def on_startup() -> None:
     await init_redis_storage(redis_client)
-    redis_storage = get_redis_storage()
 
-    redis_storage.set_process_callback(process_image_block)
-    await redis_storage.recover_tasks(bot, storage)
+    task_service = get_task_service()
+    task_service.set_process_callback(process_image_block)
+    await task_service.recover_tasks(
+        bot,
+        storage,
+        process_callback=process_image_block,
+    )
 
     # Удаляем все файлы в папке temp
     if os.path.exists(TEMP_DIR):

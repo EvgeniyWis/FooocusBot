@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.config import MOCK_MODE
-from bot.storage import get_redis_storage
+from bot.storage import get_task_service
 from bot.utils.generateImages.base64ToImage import base64ToImage
 from bot.utils.generateImages.getReferenceImage import getReferenceImage
 from bot.utils.handlers.startGeneration.sendImageBlock import sendImageBlock
@@ -38,14 +38,16 @@ async def process_image_block(
         chat_id (int): id чата
     """
     data = await state.get_data()
-    redis_storage = get_redis_storage()
-    await redis_storage.add_task(
+    task_service = get_task_service()
+
+    # Create and store the task using the service
+    await task_service.create_task(
         job_id=job_id,
         user_id=user_id,
         message_id=message_id,
         model_name=model_name,
         setting_number=setting_number,
-        job_type=data.get("job_type"),
+        job_type=data.get("job_type", "image_generation"),
         is_test_generation=is_test_generation,
         check_other_jobs=checkOtherJobs,
         chat_id=chat_id,
