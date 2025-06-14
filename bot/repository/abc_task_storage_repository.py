@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Callable, Awaitable, Any
+from collections.abc import Awaitable
+from typing import Callable, Optional
 
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
@@ -12,7 +13,7 @@ class AbstractTaskStorageRepository(ABC):
     Абстрактный репозиторий для работы с хранилищем задач.
     Определяет интерфейс для операций с задачами.
     """
-    
+
     @abstractmethod
     async def add_task(self, task: TaskDTO) -> None:
         """
@@ -51,7 +52,6 @@ class AbstractTaskStorageRepository(ABC):
         self,
         bot: Bot,
         state_storage: FSMContext,
-        process_callback: Callable[..., Awaitable[bool]]
     ) -> None:
         """
         Восстанавливает незавершенные задачи при перезапуске бота.
@@ -59,10 +59,9 @@ class AbstractTaskStorageRepository(ABC):
         Args:
             bot: Экземпляр бота
             state_storage: Контекст состояния FSM
-            process_callback: Функция для обработки восстановленных задач
         """
         pass
-        
+
     def set_process_callback(self, callback: Callable[..., Awaitable[bool]]):
         """
         Устанавливает колбэк для обработки задач.
