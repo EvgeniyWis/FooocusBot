@@ -40,7 +40,6 @@ async def process_image_block(
     data = await state.get_data()
     task_service = get_task_service()
 
-    # Create and store the task using the service
     await task_service.create_task(
         job_id=job_id,
         user_id=user_id,
