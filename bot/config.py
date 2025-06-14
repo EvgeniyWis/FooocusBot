@@ -1,7 +1,8 @@
 import os
 
 from dotenv import find_dotenv, load_dotenv
-from logger import logger
+
+from bot.logger import logger
 
 load_dotenv(find_dotenv())
 
@@ -23,7 +24,9 @@ logger.info(f"FACEFUSION_DIR: {FACEFUSION_DIR}")
 TEMP_FOLDER_PATH = os.path.join(FACEFUSION_DIR, ".assets", "images", "temp")
 logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH}")
 
-FACEFUSION_RESULTS_DIR = os.path.join(FACEFUSION_DIR, ".assets", "images", "results")
+FACEFUSION_RESULTS_DIR = os.path.join(
+    FACEFUSION_DIR, ".assets", "images", "results"
+)
 logger.info(f"FACEFUSION_RESULTS_DIR: {FACEFUSION_RESULTS_DIR}")
 
 TEMP_DIR = os.path.join(BASE_DIR, "temp")
@@ -41,7 +44,7 @@ KLING_HEADERS = {
 }
 
 # URL для запросов на Runpod
-RUNPOD_HOST = f"https://api.runpod.ai/v2"
+RUNPOD_HOST = "https://api.runpod.ai/v2"
 
 # ID чата разработчика
 DEV_CHAT_IDS = [1979922062, 5046166133]
@@ -59,7 +62,7 @@ ALLOWED_USERS = [
     5046166133,
     866512502,
     7313424156,
-    7687069152, 
+    7687069152,
     7787997166,
     7515433330,
 ]

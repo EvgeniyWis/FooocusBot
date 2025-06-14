@@ -1,10 +1,15 @@
 import httpx
-from logger import logger
+
+from bot.logger import logger
 
 
 # Функция для отправки GET-запросов с настройками таймаутов
-async def httpx_get(url: str, headers: dict = None, timeout: int = 60, stream: bool = False):
-    async with httpx.AsyncClient(timeout=httpx.Timeout(timeout), follow_redirects=True) as client:
+async def httpx_get(
+    url: str, headers: dict = None, timeout: int = 60, stream: bool = False
+):
+    async with httpx.AsyncClient(
+        timeout=httpx.Timeout(timeout), follow_redirects=True
+    ) as client:
         response = await client.get(url, headers=headers)
 
         if response.status_code == 200:
@@ -18,8 +23,3 @@ async def httpx_get(url: str, headers: dict = None, timeout: int = 60, stream: b
 
         logger.error(f"Ошибка при выполнении запроса: {response.status_code}")
         return None
-
-
-
-
-

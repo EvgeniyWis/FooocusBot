@@ -1,6 +1,6 @@
 import os
 
-from utils.httpx import httpx_get
+from bot.utils.httpx import httpx_get
 
 
 async def download_video(url: str) -> str:
@@ -30,6 +30,8 @@ async def download_video(url: str) -> str:
                     f.write(chunk)
             return video_path
         else:
-            raise Exception(f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'}")
+            raise Exception(
+                f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'}"
+            )
     except Exception as e:
         raise Exception(f"Произошла ошибка при скачивании видео: {e}")

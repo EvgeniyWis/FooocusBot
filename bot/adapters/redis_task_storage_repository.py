@@ -2,27 +2,27 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Any, Coroutine, Callable
+from collections.abc import Coroutine
+from typing import Any, Callable
 
 import redis.asyncio as aioredis
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from utils.repository.abc_task_storage_repository import AbstractTaskStorageRepository
-from utils.factory.redis_factory import create_redis_client
-from logger import logger
-
+from bot.domain.entities.task import TaskDTO
+from bot.factory.redis_factory import create_redis_client
+from bot.logger import logger
+from bot.repository.abc_task_storage_repository import (
+    AbstractTaskStorageRepository,
+)
 
 ProcessImageCallback: Any = Callable[..., Coroutine]
+
 
 class RedisTaskStorageRepository(AbstractTaskStorageRepository):
     """
     Репозиторий для работы с задачами генерации, сохранёнными в Redis.
-
-    - Сохраняет данные задачи под ключом "task:{job_id}" с TTL 24 часа.
-    - Восстанавливает незавершённые задачи после перезапуска.
-    - Вызывает зарегистрированный callback для обработки каждой задачи.
     """
 
     def __init__(
@@ -63,83 +63,75 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
 
     async def add_task(
         self,
-        job_id: str,
-        user_id: int,
-        message_id: int,
-        model_name: str,
-        setting_number: int,
-        job_type: str,
-        is_test_generation: bool,
-        check_other_jobs: bool,
-        chat_id: int,
+        task: TaskDTO,
     ) -> None:
         """
-        Сохраняет новую задачу в Redis, если она ещё не существует.
+        Сохраняет новую задачу в Redis с проверкой существования.
+
+        Метод создает уникальный ключ для задачи в формате "task:{job_id}"
+        и сохраняет сериализованные данные задачи в Redis с TTL 24 часа.
+        Если задача с таким ID уже существует, она не будет перезаписана.
 
         Args:
-            job_id (str): Уникальный идентификатор задачи.
-            user_id (int): ID пользователя Telegram, создающего задачу.
-            message_id (int): ID сообщения для редактирования или ответа.
-            model_name (str): Название модели генерации.
-            setting_number (int): Номер набора параметров.
-            job_type (str): Тип задачи (например, "generate_image").
-            is_test_generation (bool): Флаг тестового режима.
-            check_other_jobs (bool): Флаг обновления стейта по другим задачам.
-            chat_id (int): ID чата.
+            task (TaskDTO): Объект задачи для сохранения
 
         Returns:
             None
+
+        Raises:
+            RedisError: Если возникают проблемы с подключением к Redis
         """
-        key = f"task:{job_id}"
+        key = f"task:{task.job_id}"
         if await self.redis.exists(key):
-            logger.warning(f"Задача '{job_id}' уже существует, пропускаем")
+            logger.warning(
+                f"Задача '{task.job_id}' уже существует, пропускаем",
+            )
             return
 
-        payload = {
-            "job_id": job_id,
-            "user_id": user_id,
-            "message_id": message_id,
-            "model_name": model_name,
-            "setting_number": setting_number,
-            "job_type": job_type,
-            "chat_id": chat_id,
-            "is_test_generation": is_test_generation,
-            "check_other_jobs": check_other_jobs,
-        }
+        # Используем метод to_dict() для сериализации
+        payload = task.to_dict()
         await self.redis.set(key, json.dumps(payload), ex=24 * 3600)
-        logger.debug(f"Задача сохранена: {job_id}")
+        logger.debug(f"Задача сохранена: {task.job_id}")
 
-    async def get_task(self, job_id: str) -> dict[str, Any] | None:
+    async def get_task(self, job_id: str) -> TaskDTO | None:
         """
-        Получает данные задачи из Redis.
+        Получает задачу по ID.
+
+        Метод ищет задачу в Redis по её уникальному идентификатору,
+        десериализует её из JSON и возвращает как объект TaskDTO.
+        Если задача не найдена или JSON некорректен, возвращает None.
 
         Args:
-            job_id (str): Уникальный идентификатор задачи.
+            job_id (str): ID задачи
 
         Returns:
-            dict[str, Any] | None: Десериализованные данные задачи или None,
-            если ключ отсутствует или JSON некорректен.
+            Optional[TaskDTO]: Объект TaskDTO с данными задачи или None, если задача не найдена
         """
         key = f"task:{job_id}"
-        raw = await self.redis.get(key)
-        if not raw:
+        task_data = await self.redis.get(key)
+        if not task_data:
             return None
-        try:
-            return json.loads(raw)
-        except json.JSONDecodeError:
-            logger.error(f"Не удалось распарсить JSON задачи '{job_id}'")
-            return None
+
+        task_dict = json.loads(task_data)
+        return TaskDTO.from_dict(task_dict)
 
     async def delete_task(self, job_id: str) -> None:
         """
         Удаляет запись задачи из Redis.
 
+        Удаляет задачу из хранилища Redis по её уникальному идентификатору.
+        Ключ задачи формируется в формате "task:<job_id>".
+
         Args:
-            job_id (str): Уникальный идентификатор задачи.
+            job_id (str): Уникальный идентификатор задачи для удаления.
 
         Returns:
             None
+
+        Raises:
+            RedisError: В случае возникновения ошибки при работе с Redis.
         """
+
         await self.redis.delete(f"task:{job_id}")
         logger.debug(f"Задача удалена: {job_id}")
 
@@ -161,6 +153,7 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
             bool: True, если задача успешно обработана и удалена;
             False в противном случае.
         """
+
         task = await self.get_task(job_id)
         if not task:
             logger.warning(f"Нет задачи '{job_id}' для восстановления")
@@ -170,35 +163,30 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
             return False
 
         try:
-            user_id = task['user_id']
-            chat_id = task['chat_id']
-            message_id = task['message_id']
-
             key = StorageKey(
                 bot_id=bot.id,
-                chat_id=chat_id,
-                user_id=user_id,
+                chat_id=task.chat_id,
+                user_id=task.user_id,
             )
             state = FSMContext(storage=state_storage, key=key)
 
             success = await self._callback(
-                task['job_id'],
-                task['model_name'],
-                task['setting_number'],
-                user_id,
-                state,
-                message_id,
-                task['is_test_generation'],
-                task['check_other_jobs'],
-                task['chat_id'],
-                task_repo=self,
+                job_id=task.job_id,
+                model_name=task.model_name,
+                setting_number=task.setting_number,
+                user_id=task.user_id,
+                state=state,
+                message_id=task.message_id,
+                is_test_generation=task.is_test_generation,
+                checkOtherJobs=task.check_other_jobs,
+                chat_id=task.chat_id,
             )
             if success:
                 await self.delete_task(job_id)
             return success
 
-        except KeyError as e:
-            logger.error(f"В данных задачи '{job_id}' отсутствует поле: {e}")
+        except AttributeError as e:
+            logger.error(f"Некорректные данные в задаче '{job_id}': {e}")
             return False
         except Exception:
             logger.exception(f"Ошибка при восстановлении задачи '{job_id}'")
@@ -206,7 +194,11 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
 
     async def recover_tasks(self, bot: Bot, state_storage) -> None:
         """
-        Перебирает все задачи в Redis и пытается их восстановить.
+        Восстанавливает все незавершенные задачи из Redis после перезапуска бота.
+
+        Метод ищет все ключи, начинающиеся с "task:", и пытается восстановить
+        каждую задачу через метод replay_task. Если задача успешно восстановлена,
+        она удаляется из Redis.
 
         Args:
             bot (Bot): Экземпляр бота Aiogram для контекста.
@@ -214,13 +206,19 @@ class RedisTaskStorageRepository(AbstractTaskStorageRepository):
 
         Returns:
             None
+
+        Raises:
+            RedisError: Если возникают проблемы с подключением к Redis
         """
-        keys = await self.redis.keys('task:*')
+
+        keys = await self.redis.keys("task:*")
         tasks = []
         for raw in keys:
-            job_id = raw.decode().split(':', 1)[1]
+            job_id = raw.decode().split(":", 1)[1]
             logger.info(f"Восстановление задачи: {job_id}")
-            task = asyncio.create_task(self.replay_task(job_id, bot, state_storage))
+            task = asyncio.create_task(
+                self.replay_task(job_id, bot, state_storage),
+            )
             tasks.append(task)
 
         await asyncio.gather(*tasks, return_exceptions=True)

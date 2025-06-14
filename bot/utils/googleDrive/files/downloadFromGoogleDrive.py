@@ -1,9 +1,8 @@
 import os
 
-import httpx
-from logger import logger
-from utils.httpx import httpx_get
-from config import FACEFUSION_RESULTS_DIR
+from bot.config import FACEFUSION_RESULTS_DIR
+from bot.logger import logger
+from bot.utils.httpx import httpx_get
 
 
 # Скачивание файла из Google Drive
@@ -24,4 +23,6 @@ async def downloadFromGoogleDrive(url: str, file_id: str) -> str | None:
 
         return None
     except Exception as e:
-        raise Exception(f"Произошла ошибка при скачивании файла из Google Drive: {e}")
+        raise Exception(
+            f"Произошла ошибка при скачивании файла из Google Drive: {e}"
+        )

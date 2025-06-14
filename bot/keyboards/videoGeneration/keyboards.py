@@ -1,11 +1,20 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from keyboards.startGeneration.buttons import getGenerationsTypeButtons
+
+from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
 # Инлайн-клавиатура для генерации видео
 def generateVideoKeyboard(model_name: str):
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='📹 Сгенерировать видео', callback_data=f'start_generate_video|{model_name}')]])
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📹 Сгенерировать видео",
+                    callback_data=f"start_generate_video|{model_name}",
+                )
+            ]
+        ]
+    )
 
     return kb
 
@@ -14,7 +23,14 @@ def generateVideoKeyboard(model_name: str):
 def videoWritePromptKeyboard(model_name: str):
     prefix = f"generate_video_mode|{model_name}"
 
-    inline_keyboard = [[InlineKeyboardButton(text="✒️ Написать свой промпт", callback_data=f"{prefix}|write_prompt")]]
+    inline_keyboard = [
+        [
+            InlineKeyboardButton(
+                text="✒️ Написать свой промпт",
+                callback_data=f"{prefix}|write_prompt",
+            )
+        ]
+    ]
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
@@ -23,7 +39,6 @@ def videoWritePromptKeyboard(model_name: str):
 
 # Инлайн-клавиатура для выбора типа генерации видео
 def generatedVideoKeyboard(prefix: str, with_test_generation: bool = True):
-
     inline_keyboard = getGenerationsTypeButtons(prefix, with_test_generation)
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -32,21 +47,38 @@ def generatedVideoKeyboard(prefix: str, with_test_generation: bool = True):
 
 
 # Инлайн-клавиатура для выбора типа генерации видео
-def videoGenerationTypeKeyboard(model_name: str, with_test_generation: bool = False):
+def videoGenerationTypeKeyboard(
+    model_name: str, with_test_generation: bool = False
+):
     prefix = f"generate_video|{model_name}"
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        *getGenerationsTypeButtons(prefix, with_test_generation),
-    ])
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            *getGenerationsTypeButtons(prefix, with_test_generation),
+        ]
+    )
 
     return kb
 
+
 # Инлайн-клавиатура для выбора корректности генерации видео
 def videoCorrectnessKeyboard(model_name: str):
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✅ Сохранить видео", callback_data=f"video_correctness|correct|{model_name}")],
-        [InlineKeyboardButton(text="❌ Перегенерировать видео", callback_data=f"start_generate_video|{model_name}")],
-    ])
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Сохранить видео",
+                    callback_data=f"video_correctness|correct|{model_name}",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="❌ Перегенерировать видео",
+                    callback_data=f"start_generate_video|{model_name}",
+                )
+            ],
+        ]
+    )
 
     return kb
 
@@ -55,10 +87,17 @@ def videoCorrectnessKeyboard(model_name: str):
 def videoGenerationModeKeyboard(model_name: str):
     prefix = f"generate_video_mode|{model_name}"
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✒️ Написать свой промпт", callback_data=f"{prefix}|write_prompt")],
-        # TODO: режим генерации видео с видео-примерами временно отключен
-        # [InlineKeyboardButton(text='⚙️ Использовать заготовленные примеры', callback_data=f'{prefix}|use_examples')]
-    ])
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✒️ Написать свой промпт",
+                    callback_data=f"{prefix}|write_prompt",
+                )
+            ],
+            # TODO: режим генерации видео с видео-примерами временно отключен
+            # [InlineKeyboardButton(text='⚙️ Использовать заготовленные примеры', callback_data=f'{prefix}|use_examples')]
+        ]
+    )
 
     return kb

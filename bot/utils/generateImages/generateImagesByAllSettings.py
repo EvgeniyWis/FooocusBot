@@ -3,12 +3,15 @@ import traceback
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from logger import logger
 
-from .. import text
-from .dataArray.getAllDataArrays import getAllDataArrays
-from .dataArray.getDataArrayByRandomizer import getDataArrayByRandomizer
-from .generateImageBlock import generateImageBlock
+from bot.utils import text
+from bot.utils.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
+from bot.utils.generateImages.dataArray.getDataArrayByRandomizer import (
+    getDataArrayByRandomizer,
+)
+from bot.utils.generateImages.generateImageBlock import generateImageBlock
 
 
 # Функция для генерации изображений по всем настройкам
@@ -34,7 +37,10 @@ async def generateImagesByAllSettings(
     # Создаём сообщение с прогрессом генерации настроек
     message_with_settings = await message.answer(
         text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT.format(
-            "❌", "❌", "❌", "❌",
+            "❌",
+            "❌",
+            "❌",
+            "❌",
         ),
     )
 
@@ -107,4 +113,6 @@ async def generateImagesByAllSettings(
         await message_with_settings.unpin()
         await message_with_generations_status.unpin()
         traceback.print_exc()
-        raise Exception(f"Произошла ошибка при генерации изображений по всем настройкам: {e}")
+        raise Exception(
+            f"Произошла ошибка при генерации изображений по всем настройкам: {e}"
+        )

@@ -2,9 +2,10 @@ import base64
 import io
 import os
 
-from config import TEMP_FOLDER_PATH
-from logger import logger
 from PIL import Image
+
+from bot.config import TEMP_FOLDER_PATH
+from bot.logger import logger
 
 
 # Функция для преобразования изображения из base64 в PIL Image
@@ -59,7 +60,9 @@ async def base64ToImage(
             image.save(f, format="PNG")
         image.close()  # Закрываем изображение после сохранения
 
-        logger.info(f"Изображение успешно загружено: {image} по пути {file_path}")
+        logger.info(
+            f"Изображение успешно загружено: {image} по пути {file_path}"
+        )
 
         # Возвращаем изображение
         return file_path

@@ -1,10 +1,16 @@
 from aiogram.fsm.context import FSMContext
-from InstanceBot import bot
-from utils import text
+
+from bot.InstanceBot import bot
+from bot.utils import text
 
 
-async def edit_job_message(job_id: str, message_id: int, state: FSMContext, 
-    response_json: dict, user_id: int) -> None:
+async def edit_job_message(
+    job_id: str,
+    message_id: int,
+    state: FSMContext,
+    response_json: dict,
+    user_id: int,
+) -> None:
     """
     Редактирование сообщения о процессе и статистике генерации изображений
 
@@ -15,7 +21,7 @@ async def edit_job_message(job_id: str, message_id: int, state: FSMContext,
         response_json (dict): JSON ответ от API
         user_id (int): ID пользователя
     """
-    
+
     stateData = await state.get_data()
 
     if "jobs" in stateData:

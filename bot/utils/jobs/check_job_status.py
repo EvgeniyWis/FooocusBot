@@ -1,16 +1,16 @@
 import asyncio
 
 from aiogram.fsm.context import FSMContext
-from config import RUNPOD_HEADERS, RUNPOD_HOST
-from logger import logger
 
-from utils.jobs.get_endpoint_ID import get_endpoint_ID
-from utils import httpx_post
-
-from utils.jobs.delete_job import delete_job
-from utils.jobs.edit_job_message import edit_job_message
+from bot.config import RUNPOD_HEADERS, RUNPOD_HOST
+from bot.logger import logger
+from bot.utils import httpx_post
+from bot.utils.jobs.delete_job import delete_job
+from bot.utils.jobs.edit_job_message import edit_job_message
+from bot.utils.jobs.get_endpoint_ID import get_endpoint_ID
 
 CANCELLED_JOB_TEXT = "Работа была отменена"
+
 
 async def check_job_status(
     job_id: str,
@@ -36,7 +36,7 @@ async def check_job_status(
     """
 
     response_json = None
-    
+
     try:
         start_time = asyncio.get_event_loop().time()
 
@@ -52,7 +52,9 @@ async def check_job_status(
 
                 # Формируем URL для отправки запроса
                 url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
-                response_json = await httpx_post(url, RUNPOD_HEADERS, with_response_text_logging=False)
+                response_json = await httpx_post(
+                    url, RUNPOD_HEADERS, with_response_text_logging=False
+                )
 
             except Exception as e:
                 logger.error(
@@ -62,7 +64,9 @@ async def check_job_status(
                 continue
 
             if state and not is_test_generation and checkOtherJobs:
-                await edit_job_message(job_id, message_id, state, response_json, user_id)
+                await edit_job_message(
+                    job_id, message_id, state, response_json, user_id
+                )
 
             if response_json["status"] == "COMPLETED":
                 break
@@ -70,17 +74,19 @@ async def check_job_status(
             elif response_json["status"] in ["FAILED", "CANCELLED"]:
                 if response_json["status"] == "FAILED":
                     response_json = response_json["error"]
-                
+
                 elif response_json["status"] == "CANCELLED":
                     response_json = CANCELLED_JOB_TEXT
-                
+
                 break
 
             await asyncio.sleep(10)
 
     except Exception as e:
         await delete_job(job_id, state)
-        logger.error(f"Критическая ошибка при проверке статуса работы {job_id}: {str(e)}")
+        logger.error(
+            f"Критическая ошибка при проверке статуса работы {job_id}: {str(e)}"
+        )
         raise e
 
     # Когда работа завершена, получаем изображение

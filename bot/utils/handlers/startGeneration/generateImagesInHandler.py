@@ -1,21 +1,21 @@
-import asyncio
 import traceback
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from logger import logger
 
-from ... import text
-from ...generateImages import (
+from bot.logger import logger
+from bot.utils import text
+from bot.utils.generateImages import (
     generateImageBlock,
     generateImages,
     generateImagesByAllSettings,
 )
-from ...generateImages.dataArray import (
+from bot.utils.generateImages.dataArray import (
     getDataArrayBySettingNumber,
 )
-import asyncio
-from utils.handlers.startGeneration.cancelImageGenerationJobs import cancelImageGenerationJobs
+from bot.utils.handlers.startGeneration.cancelImageGenerationJobs import (
+    cancelImageGenerationJobs,
+)
 
 
 # Функция для генерации изображения в зависимости от настроек
@@ -72,8 +72,12 @@ async def generateImagesInHandler(
                 ]
         else:
             stateData = await state.get_data()
-            model_indexes_for_generation = stateData.get("model_indexes_for_generation", [])
-            logger.info(f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}")
+            model_indexes_for_generation = stateData.get(
+                "model_indexes_for_generation", []
+            )
+            logger.info(
+                f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}"
+            )
 
             if setting_number == "all":
                 result = await generateImagesByAllSettings(
@@ -95,7 +99,7 @@ async def generateImagesInHandler(
                     user_id,
                     is_test_generation,
                     with_randomizer,
-                    model_indexes_for_generation
+                    model_indexes_for_generation,
                 )
                 await message_for_edit.unpin()
 
@@ -104,7 +108,7 @@ async def generateImagesInHandler(
         else:
             stateData = await state.get_data()
             stop_generation = stateData.get("stop_generation", False)
-            
+
             if not stop_generation and len(model_indexes_for_generation) > 1:
                 await message.answer(text.GENERATION_SUCCESS_TEXT)
 
