@@ -1,11 +1,8 @@
 import os
 
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv
 
 from bot.logger import logger
-
-import os
-from dotenv import load_dotenv
 
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'FocuuusBot', '.env')
 logger.info(f"Путь к .env файлу: {env_path}")
@@ -15,8 +12,6 @@ if 'BOT_API_TOKEN' in os.environ:
     del os.environ['BOT_API_TOKEN']
 
 load_dotenv(env_path, override=True)
-
-
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
