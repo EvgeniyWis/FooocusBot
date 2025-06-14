@@ -8,7 +8,9 @@ from bot.states.RandomizerState import RandomizerState
 from bot.helpers import text
 from bot.utils.handlers.messages import editMessageOrAnswer
 from bot.helpers.handlers.startGeneration import generateImagesInHandler
-
+from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
+    safe_edit_message,
+)
 
 # Обработка кнопок в меню
 async def handle_randomizer_buttons(
@@ -28,7 +30,8 @@ async def handle_randomizer_buttons(
 
     # Если была выбрана кнопка "💬 Одно сообщение"
     elif action == "one_message":
-        await call.message.edit_text(
+        await safe_edit_message(
+            call,
             text.ONE_MESSAGE_FOR_RANDOMIZER_TEXT,
             parse_mode="HTML",
         )

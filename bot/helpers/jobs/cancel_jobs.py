@@ -4,8 +4,6 @@ from bot.logger import logger
 from bot.utils import httpx_post
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
 
-# from utils.check_unfinished_tasks import check_unfinished_tasks
-
 
 # Функция для отмены всех работ
 async def cancel_jobs(jobs_ids: list[dict]):
@@ -29,10 +27,9 @@ async def cancel_jobs(jobs_ids: list[dict]):
             # Отправляем запрос на отмену работы
             await httpx_post(url, RUNPOD_HEADERS)
 
-            # await check_unfinished_tasks.delete_task(job_id)
         except Exception as e:
             logger.error(
-                f"Неожиданная ошибка при отмене работы {job_id}: {str(e)}"
+                f"Неожиданная ошибка при отмене работы {job_id}: {str(e)}",
             )
             continue
 
