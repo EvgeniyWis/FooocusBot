@@ -1,7 +1,9 @@
 import asyncio
+
 from aiogram.fsm.context import FSMContext
-from utils.jobs import cancel_jobs
-from logger import logger
+
+from bot.logger import logger
+from bot.utils.jobs import cancel_jobs
 
 
 # Функция для отмены всех работ по генерации изображений
@@ -21,6 +23,6 @@ async def cancelImageGenerationJobs(state: FSMContext):
     await asyncio.sleep(10)
     stateData = await state.get_data()
     image_generation_jobs = stateData.get("image_generation_jobs", [])
-    
+
     if len(image_generation_jobs) > 0:
         await cancel_jobs(image_generation_jobs)

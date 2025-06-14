@@ -4,28 +4,34 @@ import shutil
 
 import handlers
 from aiogram.types import BotCommand
-from config import (
+
+from bot.config import (
     DEV_CHAT_IDS,
     FACEFUSION_RESULTS_DIR,
-    TEMP_IMAGE_FILES_DIR,
     TEMP_DIR,
+    TEMP_IMAGE_FILES_DIR,
 )
-from InstanceBot import bot, dp, redis_client
-from logger import logger
-from middleware import ErrorHandlingMiddleware
-from utils.adapters.redis_task_storage_repository import RedisTaskStorageRepository
-from utils.generateImages.process_image_block import process_image_block
-from InstanceBot import storage
-
-
-redis_task_storage = RedisTaskStorageRepository(redis_client)
+from bot.InstanceBot import bot, dp, redis_client, storage
+from bot.logger import logger
+from bot.middleware import ErrorHandlingMiddleware
+from bot.storage.redis_storage import (
+    get_task_service,
+    init_redis_storage,
+)
+from bot.utils.generateImages.process_image_block import process_image_block
 
 
 async def on_startup() -> None:
-    await redis_task_storage.init_redis()
-    redis_task_storage.set_process_callback(process_image_block)
-    await redis_task_storage.recover_tasks(bot, storage)
-    
+    await init_redis_storage(redis_client)
+
+    task_service = get_task_service()
+    task_service.set_process_callback(process_image_block)
+    await task_service.recover_tasks(
+        bot,
+        storage,
+        process_callback=process_image_block,
+    )
+
     # Удаляем все файлы в папке temp
     if os.path.exists(TEMP_DIR):
         shutil.rmtree(TEMP_DIR)
@@ -62,7 +68,10 @@ async def on_startup() -> None:
     # Определяем команды и добавляем их в бота
     commands = [
         BotCommand(command="/start", description="Перезапустить бота"),
-        BotCommand(command="/stop", description="Остановить генерацию изображений"),
+        BotCommand(
+            command="/stop",
+            description="Остановить генерацию изображений",
+        ),
     ]
 
     await bot.set_my_commands(commands)
@@ -77,6 +86,7 @@ async def on_startup() -> None:
             logger.error(f"Ошибка при отправке сообщения разработчику: {e}")
 
     await dp.start_polling(bot, skip_updates=True)
-    
+
+
 if __name__ == "__main__":
     asyncio.run(on_startup())

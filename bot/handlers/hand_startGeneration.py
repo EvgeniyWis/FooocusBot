@@ -1,46 +1,50 @@
+import os
 import traceback
 from datetime import datetime
 
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE, MOCK_FACEFUSION_PATH
-from config import MOCK_MODE, UPSCALE_MODE, FACEFUSION_MODE
-from InstanceBot import bot, router
-from keyboards import (
+
+from bot.assets.mocks.links import (
+    MOCK_FACEFUSION_PATH,
+    MOCK_LINK_FOR_SAVE_IMAGE,
+)
+from bot.config import FACEFUSION_MODE, MOCK_MODE, UPSCALE_MODE
+from bot.InstanceBot import bot, router
+from bot.keyboards import (
     randomizer_keyboards,
     start_generation_keyboards,
     video_generation_keyboards,
 )
-from logger import logger
-from states.StartGenerationState import StartGenerationState
-from utils import text
-from utils.generateImages import (
+from bot.logger import logger
+from bot.states.StartGenerationState import StartGenerationState
+from bot.utils import text
+from bot.utils.generateImages import (
     generateImageBlock,
 )
-from utils.generateImages.dataArray import (
+from bot.utils.generateImages.dataArray import (
     getAllDataArrays,
     getDataArrayBySettingNumber,
     getDataByModelName,
     getModelNameIndex,
     getNextModel,
 )
-from utils.googleDrive.files import saveFile
-from utils.googleDrive.folders import getFolderDataByID
-from utils.handlers import (
+from bot.utils.googleDrive.files import convertDriveLink, saveFile
+from bot.utils.googleDrive.folders import getFolderDataByID
+from bot.utils.handlers import (
     appendDataToStateArray,
 )
-from utils.handlers.messages import deleteMessageFromState, editMessageOrAnswer
-from utils.handlers.startGeneration import (
+from bot.utils.handlers.messages import (
+    deleteMessageFromState,
+    editMessageOrAnswer,
+)
+from bot.utils.handlers.startGeneration import (
     generateImagesInHandler,
+    process_faceswap_image,
+    process_upscale_image,
     regenerateImage,
 )
-from utils.googleDrive.files import convertDriveLink
-
-import os
-
-
-from utils.handlers.startGeneration import process_upscale_image, process_faceswap_image
 
 
 # Обработка выбора количества генераций
@@ -71,28 +75,30 @@ async def choose_generations_type(
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Очищаем стейт
     initial_state = {
-        'generation_step': 1,
-        'prompts_for_regenerated_models': [],
-        'regenerated_models': [],
-        'model_indexes_for_generation': [],
-        'saved_images_urls': [],
-        'faceswap_generated_models': [],
-        'imageGeneration_mediagroup_messages_ids': [],
-        'videoGeneration_messages_ids': []
+        "generation_step": 1,
+        "prompts_for_regenerated_models": [],
+        "regenerated_models": [],
+        "model_indexes_for_generation": [],
+        "saved_images_urls": [],
+        "faceswap_generated_models": [],
+        "imageGeneration_mediagroup_messages_ids": [],
+        "videoGeneration_messages_ids": [],
     }
-    
+
     await state.update_data(**initial_state)
 
     # Если выбрана конкретная модель, то просим ввести название модели
     if call.data == "select_setting|specific_model":
         await editMessageOrAnswer(
             call,
-            text.WRITE_MODELS_NAME_TEXT
+            text.WRITE_MODELS_NAME_TEXT,
         )
         await state.update_data(specific_model=True)
         # Очищаем стейт
-        await state.set_state(StartGenerationState.write_model_name_for_generation)
-        return 
+        await state.set_state(
+            StartGenerationState.write_model_name_for_generation
+        )
+        return
 
     # Если выбрана другая настройка, то продолжаем генерацию
     setting_number = call.data.split("|")[1]
@@ -231,13 +237,17 @@ async def write_prompt(message: types.Message, state: FSMContext):
         setting_number = stateData.get("setting_number", 1)
 
         # Генерируем изображения
-        await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, setting_number)
+        await generateImagesInHandler(
+            prompt, message, state, user_id, is_test_generation, setting_number
+        )
     else:
         model_indexes = stateData.get("model_indexes_for_generation", [])
         logger.info(f"Список моделей для генерации: {model_indexes}")
 
         # Генерируем изображения
-        await generateImagesInHandler(prompt, message, state, user_id, is_test_generation, "individual")
+        await generateImagesInHandler(
+            prompt, message, state, user_id, is_test_generation, "individual"
+        )
 
 
 # Обработка ввода промпта для конкретной модели
@@ -273,7 +283,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
         user_id,
         setting_number,
         False,
-        False
+        False,
     )
 
     # Получаем следующую модель
@@ -345,33 +355,48 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     data = await getDataByModelName(model_name)
 
     # Удаляем медиагруппу
-    await deleteMessageFromState(state, "imageGeneration_mediagroup_messages_ids", model_name, call.message.chat.id)
+    await deleteMessageFromState(
+        state,
+        "imageGeneration_mediagroup_messages_ids",
+        model_name,
+        call.message.chat.id,
+    )
 
     try:
-
         # Если индекс изображения равен "regenerate", то перегенерируем изображение
         if image_index == "regenerate":
-            return await regenerateImage(model_name, call, state, setting_number)
-        
+            return await regenerateImage(
+                model_name, call, state, setting_number
+            )
+
         # Если индекс изображения равен "regenerate_with_new_prompt", то перегенерируем изображение с новым промптом
         elif image_index == "regenerate_with_new_prompt":
             # Устанавливаем стейт для ввода нового промпта
             await state.update_data(model_name_for_regenerate_image=model_name)
-            await state.update_data(setting_number_for_regenerate_image=setting_number)
+            await state.update_data(
+                setting_number_for_regenerate_image=setting_number
+            )
 
-            await state.set_state(StartGenerationState.write_new_prompt_for_regenerate_image)
+            await state.set_state(
+                StartGenerationState.write_new_prompt_for_regenerate_image
+            )
 
             # Просим ввести новый промпт
-            write_new_prompt_for_regenerate_message = await editMessageOrAnswer(
-                call,text.WRITE_NEW_PROMPT_TEXT)
-            await state.update_data(write_new_prompt_message_id=write_new_prompt_for_regenerate_message.message_id)
+            write_new_prompt_for_regenerate_message = (
+                await editMessageOrAnswer(call, text.WRITE_NEW_PROMPT_TEXT)
+            )
+            await state.update_data(
+                write_new_prompt_message_id=write_new_prompt_for_regenerate_message.message_id
+            )
             return
-        
+
         # Если данные не найдены, ищем во всех доступных массивах
         if data is None:
             all_data_arrays = getAllDataArrays()
             for arr in all_data_arrays:
-                data = next((d for d in arr if d["model_name"] == model_name), None)
+                data = next(
+                    (d for d in arr if d["model_name"] == model_name), None
+                )
                 if data is not None:
                     break
 
@@ -380,15 +405,19 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Инициализируем результирующий путь
         result_path = None
-        
+
         # Если не в режиме мока, то продолжаем генерацию
         if not MOCK_MODE:
             # Меняем текст на сообщении о начале upscale
             if UPSCALE_MODE:
-                await process_upscale_image(call, state, image_index, model_name)
+                await process_upscale_image(
+                    call, state, image_index, model_name
+                )
 
             if FACEFUSION_MODE:
-                result_path = await process_faceswap_image(call, state, image_index, model_name)
+                result_path = await process_faceswap_image(
+                    call, state, image_index, model_name
+                )
             else:
                 result_path = MOCK_FACEFUSION_PATH
 
@@ -447,7 +476,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         )
 
         # Отправляем сообщение о сохранении изображения
-        logger.info(f"Отправляем сообщение о сохранении изображения: {direct_url}")
+        logger.info(
+            f"Отправляем сообщение о сохранении изображения: {direct_url}"
+        )
         await call.message.answer_photo(
             direct_url,
             text.SAVE_IMAGES_SUCCESS_TEXT.format(
@@ -456,7 +487,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 parent_folder["webViewLink"],
                 model_name_index,
             ),
-            reply_markup=video_generation_keyboards.generateVideoKeyboard(model_name)
+            reply_markup=video_generation_keyboards.generateVideoKeyboard(
+                model_name
+            ),
         )
 
         # Удаляем сообщение о сохранении изображения
@@ -476,14 +509,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
 
 # Обработка ввода названия модели для генерации
-async def write_model_name_for_generation(message: types.Message, state: FSMContext):
+async def write_model_name_for_generation(
+    message: types.Message, state: FSMContext
+):
     # Если в сообщении есть запятые, то записываем массив моделей в стейт
     model_indexes = message.text.split(",")
-    
+
     # Если запятых нет, то записываем одну модель в стейт
     if len(model_indexes) == 1:
         model_indexes = [message.text]
-    
+
     # Удаляем пробелы из названий моделей
     model_indexes = [model_index.strip() for model_index in model_indexes]
 
@@ -492,23 +527,29 @@ async def write_model_name_for_generation(message: types.Message, state: FSMCont
         if not model_index.isdigit():
             await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
             return
-    
+
     # Проверяем, существует ли такие модели
     for model_index in model_indexes:
         # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
         if int(model_index) > 100 or int(model_index) < 1:
             await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
             return
-        
+
     await state.update_data(model_indexes_for_generation=model_indexes)
 
     await state.set_state(None)
-    await message.answer(text.GET_MODEL_INDEX_SUCCESS_TEXT if len(model_indexes) == 1 else text.GET_MODEL_INDEXES_SUCCESS_TEXT)
+    await message.answer(
+        text.GET_MODEL_INDEX_SUCCESS_TEXT
+        if len(model_indexes) == 1
+        else text.GET_MODEL_INDEXES_SUCCESS_TEXT
+    )
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
 
 # Обработка ввода нового промпта для перегенерации изображения
-async def write_new_prompt_for_regenerate_image(message: types.Message, state: FSMContext):
+async def write_new_prompt_for_regenerate_image(
+    message: types.Message, state: FSMContext
+):
     # Получаем данные
     stateData = await state.get_data()
     is_test_generation = stateData.get("generations_type", "") == "test"
@@ -521,31 +562,49 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
     await message.delete()
 
     # Удаляем сообщение бота
-    write_new_prompt_message_id = stateData.get("write_new_prompt_message_id", None)
+    write_new_prompt_message_id = stateData.get(
+        "write_new_prompt_message_id", None
+    )
     if write_new_prompt_message_id:
         await bot.delete_message(user_id, write_new_prompt_message_id)
 
     # Записываем новый промпт в стейт для этой модели
     dataForUpdate = {f"{model_name}": prompt}
-    await appendDataToStateArray(state, "prompts_for_regenerated_models", dataForUpdate)
+    await appendDataToStateArray(
+        state, "prompts_for_regenerated_models", dataForUpdate
+    )
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о перегенерации изображения
-    regenerate_progress_message = await message.answer(text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(model_name, model_name_index, prompt))
+    regenerate_progress_message = await message.answer(
+        text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(
+            model_name, model_name_index, prompt
+        )
+    )
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
 
     # Прибавляем к каждому элементу массива корневой промпт
     json = data["json"].copy()
-    json["input"]["prompt"] += " " + prompt 
-    
+    json["input"]["prompt"] += " " + prompt
+
     await state.set_state(None)
-    await generateImageBlock(json, model_name, regenerate_progress_message.message_id, 
-    state, user_id, setting_number, is_test_generation, False, chat_id=message.chat.id)
+    await generateImageBlock(
+        json,
+        model_name,
+        regenerate_progress_message.message_id,
+        state,
+        user_id,
+        setting_number,
+        is_test_generation,
+        False,
+        chat_id=message.chat.id,
+    )
     await regenerate_progress_message.delete()
+
 
 # Добавление обработчиков
 def hand_add():
@@ -591,6 +650,14 @@ def hand_add():
         lambda call: call.data.startswith("select_image"),
     )
 
-    router.message.register(write_model_name_for_generation, StateFilter(StartGenerationState.write_model_name_for_generation))
+    router.message.register(
+        write_model_name_for_generation,
+        StateFilter(StartGenerationState.write_model_name_for_generation),
+    )
 
-    router.message.register(write_new_prompt_for_regenerate_image, StateFilter(StartGenerationState.write_new_prompt_for_regenerate_image))
+    router.message.register(
+        write_new_prompt_for_regenerate_image,
+        StateFilter(
+            StartGenerationState.write_new_prompt_for_regenerate_image
+        ),
+    )

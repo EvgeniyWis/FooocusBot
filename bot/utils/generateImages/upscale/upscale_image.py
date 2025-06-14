@@ -1,17 +1,24 @@
-from config import COMMON_NEGATIVE_PROMPT
-from logger import logger
-
 from aiogram.fsm.context import FSMContext
 
-from utils.jobs.get_job_ID import get_job_ID
+from bot.config import COMMON_NEGATIVE_PROMPT
+from bot.logger import logger
+from bot.utils.generateImages.upscale.check_upscale_status import (
+    check_upscale_status,
+)
+from bot.utils.handlers import appendDataToStateArray
+from bot.utils.jobs.get_job_ID import get_job_ID
 
-from utils.generateImages.upscale.check_upscale_status import check_upscale_status
 
-from utils.handlers import appendDataToStateArray
-
-
-async def upscale_image(input_image: str, base_config_model_name: str, setting_number: int, 
-    state: FSMContext, user_id: int, model_name: str, image_index: int, message_id: int) -> str:
+async def upscale_image(
+    input_image: str,
+    base_config_model_name: str,
+    setting_number: int,
+    state: FSMContext,
+    user_id: int,
+    model_name: str,
+    image_index: int,
+    message_id: int,
+) -> str:
     """
     Функция для посылания запроса на upscale сгенерированного изображения и проверки его статуса работы
 
@@ -47,17 +54,27 @@ async def upscale_image(input_image: str, base_config_model_name: str, setting_n
     }
 
     # Делаем запрос на генерацию и получаем id работы
-    job_id = await get_job_ID(dataJSON, setting_number, state, user_id, "upscale")
-    
+    job_id = await get_job_ID(
+        dataJSON, setting_number, state, user_id, "upscale"
+    )
+
     # Сохраняем имя модели и индекс изображения в стейт
     dataForUpdate = {
         "model_name": model_name,
         "image_index": image_index,
-        "job_id": job_id
+        "job_id": job_id,
     }
     await appendDataToStateArray(state, "upscale_data", dataForUpdate)
 
     # Проверяем статус работы
-    result = await check_upscale_status(job_id, setting_number, state, model_name, image_index, user_id, message_id)
+    result = await check_upscale_status(
+        job_id,
+        setting_number,
+        state,
+        model_name,
+        image_index,
+        user_id,
+        message_id,
+    )
 
     return result

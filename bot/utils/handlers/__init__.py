@@ -1,2 +1,2 @@
-from .appendDataToStateArray import appendDataToStateArray
-from .getDataInDictsArray import getDataInDictsArray
+from bot.utils.handlers.appendDataToStateArray import appendDataToStateArray
+from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray

@@ -1,8 +1,12 @@
-from ..auth import service
+from bot.utils.googleDrive.auth import service
 
 
 # Создание папки
-async def createFolder(folder_name: str, nested_folder_names: list[str] = None, parent_folder_id: str = None) -> tuple[str, str]:
+async def createFolder(
+    folder_name: str,
+    nested_folder_names: list[str] = None,
+    parent_folder_id: str = None,
+) -> tuple[str, str]:
     # Создание метаданных для новой папки
     folder_metadata = {
         "name": folder_name,  # Имя вашей папки
@@ -13,11 +17,15 @@ async def createFolder(folder_name: str, nested_folder_names: list[str] = None, 
         folder_metadata["parents"] = [parent_folder_id]
 
     # Создание папки
-    folder = service.files().create(
-        body=folder_metadata,
-        fields="id,webViewLink",
-        supportsAllDrives=True,
-    ).execute()
+    folder = (
+        service.files()
+        .create(
+            body=folder_metadata,
+            fields="id,webViewLink",
+            supportsAllDrives=True,
+        )
+        .execute()
+    )
 
     # Установка публичного доступа
     permission = {
@@ -42,12 +50,18 @@ async def createFolder(folder_name: str, nested_folder_names: list[str] = None, 
                 "mimeType": "application/vnd.google-apps.folder",
                 "parents": [folder["id"]],
             }
-            nested_folder = service.files().create(body=nested_folder_metadata, fields="id,webViewLink").execute()
+            nested_folder = (
+                service.files()
+                .create(body=nested_folder_metadata, fields="id,webViewLink")
+                .execute()
+            )
 
-            nested_folders_array.append({
-                "id": nested_folder["id"],
-                "webViewLink": nested_folder["webViewLink"],
-            })
+            nested_folders_array.append(
+                {
+                    "id": nested_folder["id"],
+                    "webViewLink": nested_folder["webViewLink"],
+                }
+            )
 
         return nested_folders_array
     else:

@@ -1,19 +1,23 @@
-import os
-
 import aiofiles
-from config import ADMIN_ID
-from InstanceBot import bot
-from logger import logger
 
-from utils import text
-from utils.httpx import httpx_post
-from utils.googleDrive.files import downloadFromGoogleDrive, getGoogleDriveFileID
-from config import KLING_HEADERS
+from bot.config import ADMIN_ID, KLING_HEADERS
+from bot.InstanceBot import bot
+from bot.logger import logger
+from bot.utils import text
+from bot.utils.googleDrive.files import (
+    downloadFromGoogleDrive,
+    getGoogleDriveFileID,
+)
+from bot.utils.httpx import httpx_post
 
 
-async def start_generate_video(prompt: str, image_url: str = None, image_path: str = None) -> dict | None:
+async def start_generate_video(
+    prompt: str,
+    image_url: str = None,
+    image_path: str = None,
+) -> dict | None:
     """
-    Функция для скачивания изображения по ссылке или по пути к файлу и 
+    Функция для скачивания изображения по ссылке или по пути к файлу и
     отправки запроса на генерацию видео с помощью API kling
 
     Args:
@@ -26,8 +30,10 @@ async def start_generate_video(prompt: str, image_url: str = None, image_path: s
         None: Если произошла ошибка
     """
 
-    logger.info(f"Генерация видео с помощью kling: \nПромпт: {prompt}\nСсылка на изображение: {image_url}\nПуть к изображению: {image_path}")
-    
+    logger.info(
+        f"Генерация видео с помощью kling: \nПромпт: {prompt}\nСсылка на изображение: {image_url}\nПуть к изображению: {image_path}",
+    )
+
     if image_url:
         # Получаем id изображения
         image_id = getGoogleDriveFileID(image_url)
@@ -63,7 +69,12 @@ async def start_generate_video(prompt: str, image_url: str = None, image_path: s
 
     # Отправляем запрос на генерацию видео
     url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
-    json = await httpx_post(url_endpoint, KLING_HEADERS, data=data, files=files)
+    json = await httpx_post(
+        url_endpoint,
+        KLING_HEADERS,
+        data=data,
+        files=files,
+    )
 
     logger.info(f"Ответ на запрос на генерацию видео: {json}")
 
@@ -76,7 +87,7 @@ async def start_generate_video(prompt: str, image_url: str = None, image_path: s
                 f"Ошибка валидации: {errors_validation}",
             )
 
-        # Обрабатываем ошибку недостаточного баланса    
+        # Обрабатываем ошибку недостаточного баланса
         NOT_ENOUGH_MONEY_ERROR_TEXT = "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
 
         if json["error"] == NOT_ENOUGH_MONEY_ERROR_TEXT:

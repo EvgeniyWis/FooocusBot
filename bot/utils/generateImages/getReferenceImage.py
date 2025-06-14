@@ -1,7 +1,8 @@
 import os
 
 import aiofiles
-from logger import logger
+
+from bot.logger import logger
 
 
 # Функция для получения референсного изображения

@@ -5,24 +5,29 @@ import traceback
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from config import MOCK_MODE, TEMP_IMAGE_FILES_DIR
-from InstanceBot import bot, router
-from keyboards import video_generation_keyboards
-from logger import logger
-from states import StartGenerationState
-from utils import retryOperation, text
-from utils.generateImages.dataArray import (
+
+from bot.config import MOCK_MODE, TEMP_IMAGE_FILES_DIR
+from bot.InstanceBot import bot, router
+from bot.keyboards import video_generation_keyboards
+from bot.logger import logger
+from bot.states import StartGenerationState
+from bot.utils import retryOperation, text
+from bot.utils.generateImages.dataArray import (
     getModelNameIndex,
 )
-from utils.handlers import (
+from bot.utils.generateImages.dataArray.getModelNameByIndex import (
+    getModelNameByIndex,
+)
+from bot.utils.handlers import (
+    appendDataToStateArray,
     getDataInDictsArray,
 )
-from utils.handlers.messages import deleteMessageFromState, editMessageOrAnswer
-from utils.handlers.videoGeneration import saveVideo
-from utils.videos import generate_video
-from utils.handlers import appendDataToStateArray
-from utils.generateImages.dataArray.getModelNameByIndex import getModelNameByIndex
-
+from bot.utils.handlers.messages import (
+    deleteMessageFromState,
+    editMessageOrAnswer,
+)
+from bot.utils.handlers.videoGeneration import saveVideo
+from bot.utils.videos import generate_video
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -41,8 +46,14 @@ async def start_generate_video(call: types.CallbackQuery):
 
     # Отправляем сообщение для выбора видео-примеров
     await editMessageOrAnswer(
-        call,text.SELECT_VIDEO_TYPE_GENERATION_TEXT.format(model_name, model_name_index),
-        reply_markup=video_generation_keyboards.videoWritePromptKeyboard(model_name))
+        call,
+        text.SELECT_VIDEO_TYPE_GENERATION_TEXT.format(
+            model_name, model_name_index
+        ),
+        reply_markup=video_generation_keyboards.videoWritePromptKeyboard(
+            model_name
+        ),
+    )
 
 
 # Обработка нажатия кнопок режима генерации видео
@@ -70,7 +81,9 @@ async def handle_video_generation_mode_buttons(
         )
         # Сохраняем в стейт сообщение о написании промпта для последующего удаления
         dataForUpdate = {f"{model_name}": write_prompt_message.message_id}
-        await appendDataToStateArray(state, "write_prompt_messages_ids", dataForUpdate)
+        await appendDataToStateArray(
+            state, "write_prompt_messages_ids", dataForUpdate
+        )
 
         # Переключаем стейт
         await state.set_state(StartGenerationState.write_prompt_for_video)
@@ -119,7 +132,7 @@ async def handle_video_example_buttons(
     stateData = await state.get_data()
     saved_images_urls = stateData.get("saved_images_urls", [])
     image_url = await getDataInDictsArray(saved_images_urls, model_name)
-    
+
     # Удаляем сообщение с выбором видео-примера
     # TODO: режим генерации видео с видео-примерами временно отключен
     # try:
@@ -182,21 +195,39 @@ async def handle_video_example_buttons(
             traceback.print_exc()
             logger.error(f"Произошла ошибка при генерации видео: {e}")
             await editMessageOrAnswer(
-            call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, e),
-            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
+                call,
+                text.GENERATE_VIDEO_ERROR_TEXT.format(
+                    model_name, model_name_index, e
+                ),
+                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
+                    model_name, False
+                ),
+            )
             raise e
-    
+
     if not video_path:
-        await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, "Не удалось сгенерировать видео"),
-            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
+        await call.message.answer(
+            text.GENERATE_VIDEO_ERROR_TEXT.format(
+                model_name, model_name_index, "Не удалось сгенерировать видео"
+            ),
+            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
+                model_name, False
+            ),
+        )
         return
-    
+
     if isinstance(video_path, dict):
         if video_path.get("error"):
-            await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, video_path.get("error")),
-                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
+            await call.message.answer(
+                text.GENERATE_VIDEO_ERROR_TEXT.format(
+                    model_name, model_name_index, video_path.get("error")
+                ),
+                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
+                    model_name, False
+                ),
+            )
             return
-        
+
     # Добавляем путь к видео в стейт
     dataForUpdate = {f"{model_name}": video_path}
     await appendDataToStateArray(state, "video_paths", dataForUpdate)
@@ -233,7 +264,9 @@ async def handle_video_example_buttons(
 
     # Сохраняем сообщение в стейт для последующего удаления
     dataForUpdate = {f"{model_name}": video_message.message_id}
-    await appendDataToStateArray(state, "videoGeneration_messages_ids", dataForUpdate)
+    await appendDataToStateArray(
+        state, "videoGeneration_messages_ids", dataForUpdate
+    )
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -245,21 +278,25 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     model_name = stateData.get("model_name_for_video_generation", "")
     saved_images_urls = stateData.get("saved_images_urls", [])
     image_url = await getDataInDictsArray(saved_images_urls, model_name)
-    
+
     if not image_url:
         await message.answer("Ошибка: не удалось найти URL изображения")
         return
-    
+
     # Удаляем сообщение пользователя
     await message.delete()
-    
+
     # Удаляем сообщение о написании промпта
-    await deleteMessageFromState(state, "write_prompt_messages_ids", model_name, message.chat.id)
+    await deleteMessageFromState(
+        state, "write_prompt_messages_ids", model_name, message.chat.id
+    )
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
-    logger.info(f"URL изображения для генерации видео модели {model_name}: {image_url}")
+    logger.info(
+        f"URL изображения для генерации видео модели {model_name}: {image_url}"
+    )
     try:
         await message.answer_photo(
             photo=image_url,
@@ -318,7 +355,9 @@ async def handle_video_correctness_buttons(
     await saveVideo(video_path, model_name, call.message)
 
     # Удаляем сообщение о генерации видео
-    await deleteMessageFromState(state, "videoGeneration_messages_ids", model_name, call.message.chat.id)
+    await deleteMessageFromState(
+        state, "videoGeneration_messages_ids", model_name, call.message.chat.id
+    )
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"
@@ -420,7 +459,9 @@ async def handle_prompt_for_videoGenerationFromImage(
             None,
             temp_path,
         )
-        await state.update_data(video_path_for_videoGenerationFromImage=video_path)
+        await state.update_data(
+            video_path_for_videoGenerationFromImage=video_path
+        )
 
         video = types.FSInputFile(video_path)
         await message.answer_video(
@@ -476,7 +517,6 @@ async def handle_model_name_for_video_generation_from_image(
 
     # Получаем название модели по индексу
     model_name = await getModelNameByIndex(model_index)
-
 
     # Сохраняем видео
     await state.set_state(None)

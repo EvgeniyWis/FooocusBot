@@ -1,4 +1,10 @@
-from config import SETTING_1_ENDPOINT_ID, SETTING_2_ENDPOINT_ID, SETTING_3_ENDPOINT_ID, SETTING_4_ENDPOINT_ID
+from bot.config import (
+    SETTING_1_ENDPOINT_ID,
+    SETTING_2_ENDPOINT_ID,
+    SETTING_3_ENDPOINT_ID,
+    SETTING_4_ENDPOINT_ID,
+)
+
 
 # Получение ID эндпоинта для генерации изображений с помощью номера настройки
 async def get_endpoint_ID(setting_number: int):
@@ -12,4 +18,3 @@ async def get_endpoint_ID(setting_number: int):
         return SETTING_4_ENDPOINT_ID
     else:
         raise Exception(f"Неверный номер настройки: {setting_number}")
-

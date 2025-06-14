@@ -1,3 +1,4 @@
-from .saveVideo import saveVideo
-from .generateVideoFromImage import generateVideoFromImage
-
+from bot.utils.handlers.videoGeneration.saveVideo import saveVideo
+from bot.utils.handlers.videoGeneration.generateVideoFromImage import (
+    generateVideoFromImage,
+)

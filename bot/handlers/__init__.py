@@ -1,1 +1,6 @@
-from handlers import hand_randomizer, hand_startGeneration, hand_videoGeneration, hand_commands
+from bot.handlers import (
+    hand_randomizer,
+    hand_startGeneration,
+    hand_videoGeneration,
+    hand_commands,
+)
