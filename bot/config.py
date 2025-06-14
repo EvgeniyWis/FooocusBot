@@ -5,7 +5,7 @@ from dotenv import find_dotenv, load_dotenv
 from bot.logger import logger
 
 # Загружаем .env файл из родительской директории
-env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), '.env')
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'FocuuusBot', '.env')
 logger.info(f"Путь к .env файлу: {env_path}")
 logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
 load_dotenv(env_path)
