@@ -3,11 +3,21 @@ import os
 from dotenv import find_dotenv, load_dotenv
 from logger import logger
 
-# Загружаем .env файл из родительской директории
+import os
+from dotenv import load_dotenv
+
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'FocuuusBot', '.env')
 logger.info(f"Путь к .env файлу: {env_path}")
 logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
+
+if 'BOT_API_TOKEN' in os.environ:
+    del os.environ['BOT_API_TOKEN']
+
 load_dotenv(env_path, override=True)
+
+logger.info(f"BOT_API_TOKEN: {os.getenv('BOT_API_TOKEN')}")
+
+
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
