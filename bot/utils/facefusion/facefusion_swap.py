@@ -17,11 +17,15 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     """
     output_filename = f"{uuid.uuid4()}_output.jpg"
     output_path = os.path.join(FACEFUSION_RESULTS_DIR, output_filename)
+    
+    FACEFUSION_CONTAINER_NAME = os.getenv("FACEFUSION_CONTAINER_NAME")
+
+    logger.info(f"FACEFUSION_CONTAINER_NAME: {FACEFUSION_CONTAINER_NAME}")
 
     docker_cmd = [
         "docker",
         "exec",
-        os.getenv("FACEFUSION_CONTAINER_NAME"),
+        FACEFUSION_CONTAINER_NAME,
         "python",
         "facefusion.py",
         "headless-run",
