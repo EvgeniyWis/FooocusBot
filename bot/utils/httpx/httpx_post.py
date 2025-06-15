@@ -3,7 +3,6 @@ import asyncio
 import httpx
 
 from bot.logger import logger
-from bot.storage import get_task_service
 
 
 # Функция-обёртка для отправки POST-запросов с настройками таймаутов
@@ -19,11 +18,11 @@ async def httpx_post(
     response = None
     response_json = None
 
-    async with httpx.AsyncClient(
-        timeout=httpx.Timeout(timeout),
-        follow_redirects=True,
-    ) as client:
-        try:
+    try:
+        async with httpx.AsyncClient(
+            timeout=httpx.Timeout(timeout),
+            follow_redirects=True,
+        ) as client:
             response = await client.post(
                 url,
                 headers=headers,
@@ -42,18 +41,9 @@ async def httpx_post(
                 logger.info(f"Тело ответа: {response.text}")
 
             if response.status_code != 200:
-                if response.status_code == 404:
-                    # Получаем job_id из url
-                    job_id = url.split("/")[-1]
-                    logger.info(f"Удаляем задачу из Redis, как недействительную: {job_id}")
-                    
-                    # Удаляем задачу из Redis, как недействительную
-                    task_service = get_task_service()
-                    await task_service.delete_task(job_id)
-                else:
-                    raise Exception(
-                        f"Сервер вернул ошибку: {response.status_code}",
-                    )
+                raise Exception(
+                    f"Сервер вернул ошибку: {response.status_code}",
+                )
 
             try:
                 response_json = response.json()
@@ -66,16 +56,17 @@ async def httpx_post(
                 )
                 raise Exception("Сервер вернул невалидный JSON")
 
-        except httpx.ReadTimeout:
-            logger.error("Превышено время ожидания ответа от сервера!")
-            await asyncio.sleep(10)
-        except httpx.ConnectTimeout:
-            logger.error("Превышено время ожидания подключения к серверу!")
-            await asyncio.sleep(10)
-        except httpx.RequestError as e:
-            logger.error(
-                f"Ошибка при выполнении запроса: {str(e)} \nТело ответа: {response.text if response else 'нет ответа'}",
-            )
-            await asyncio.sleep(10)
+    except httpx.ReadTimeout:
+        logger.error("Превышено время ожидания ответа от сервера!")
+        await asyncio.sleep(10)
+        raise
+    except httpx.ConnectTimeout:
+        logger.error("Превышено время ожидания подключения к серверу!")
+        await asyncio.sleep(10)
+        raise
+    except httpx.RequestError as e:
+        logger.error(f"Ошибка при выполнении запроса: {str(e)}")
+        await asyncio.sleep(10)
+        raise
 
     return response_json
