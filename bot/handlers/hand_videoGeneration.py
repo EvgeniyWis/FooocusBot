@@ -33,10 +33,13 @@ async def start_generate_video(call: types.CallbackQuery):
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
-    
+
+    # Удаляем сообщение
+    await call.message.delete()
+
     # Отправляем сообщение для выбора видео-примеров
-    await editMessageOrAnswer(
-        call,text.SELECT_VIDEO_TYPE_GENERATION_TEXT.format(model_name, model_name_index),
+    await call.message.answer(
+        text.SELECT_VIDEO_TYPE_GENERATION_TEXT.format(model_name, model_name_index),
         reply_markup=video_generation_keyboards.videoWritePromptKeyboard(model_name))
 
 
