@@ -256,21 +256,14 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
         text.GENERATE_IMAGE_PROGRESS_TEXT.format(model_name, model_name_index),
     )
 
-    # Получаем данные генерации по названию модели
-    data = await getDataByModelName(model_name)
-
-    # Прибавляем к каждому элементу массива корневой промпт
-    json = data["json"].copy()
-    json["input"]["prompt"] += " " + prompt
-
     # Генерируем изображения
     await generateImageBlock(
-        json,
         model_name,
         message_for_edit,
         state,
         user_id,
         setting_number,
+        prompt,
         False,
         False,
     )
@@ -474,21 +467,14 @@ async def write_new_prompt_for_regenerate_image(
         )
     )
 
-    # Получаем данные генерации по названию модели
-    data = await getDataByModelName(model_name)
-
-    # Прибавляем к каждому элементу массива корневой промпт
-    json = data["json"].copy()
-    json["input"]["prompt"] += " " + prompt
-
     await state.set_state(None)
     await generateImageBlock(
-        json,
         model_name,
         regenerate_progress_message.message_id,
         state,
         user_id,
         setting_number,
+        prompt,
         is_test_generation,
         False,
         chat_id=message.chat.id,

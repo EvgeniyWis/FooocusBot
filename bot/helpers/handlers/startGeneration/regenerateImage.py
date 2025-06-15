@@ -33,9 +33,6 @@ async def regenerateImage(
         call, text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index)
     )
 
-    # Получаем данные генерации по названию модели
-    data = await getDataByModelName(model_name)
-
     # Получаем промпт для перегенерации изображения в зависимости от режима генерации
     randomizer_prompts = state_data.get("randomizer_prompts", [])
     randomizer_prompt = await getDataInDictsArray(
@@ -69,18 +66,14 @@ async def regenerateImage(
     else:
         prompt = ""
 
-    # Прибавляем к каждому элементу массива корневой промпт
-    json = data["json"].copy()
-    json["input"]["prompt"] += " " + prompt
-
     try:
         return await generateImageBlock(
-            json,
             model_name,
             call.message.message_id,
             state,
             user_id,
             setting_number,
+            prompt,
             is_test_generation,
             False,
             chat_id=call.message.chat.id,
