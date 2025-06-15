@@ -54,7 +54,7 @@ def setting1_getDataArray():
             "1mwT7N1Ck5VdgJGS6eRYRQ97mczaLGi6b",
             "1YJB-tQCJVARYdWx23KatB-I8zXTDjZDn",
             """blonde hair, brown eyes, slightly tanned skin""",
-            [2, 2.65, -0.90, -0.85, 1.40, 0.8, 1.00, 0.80],
+            [2, 2.65, -0.90, -0.85, 1.40, 0.6, 1.00, 0.80],
         ),
         setting1_generateData(
             "brookenixon.xo",
@@ -75,7 +75,7 @@ def setting1_getDataArray():
             "1BpqfTJSNs8EbdyTTIBo0vvE5LgIsQvSH",
             "1jP2yTDmgpxXxdnmStmBcSMfG89_60ZdL",
             """brown hair, blue eyes, slightly tanned skin""",
-            [2, 1.60, -0.90, -1.70, 3.00, 1.00, 2.65, 0.80],
+            [2, 1.60, -0.90, -1.70, 3.00, 0.8, 2.65, 0.80],
         ),
         setting1_generateData(
             "roxie_foxx.xo",
@@ -117,7 +117,7 @@ def setting1_getDataArray():
             "1J39NtE4ovUiklcTW_t8NMZHTidCoTZNJ",
             "1jpaYrZUUKeh2sL5e3W3Nx0UaJX5fk9BB",
             """brown hair, green eyes, slightly tanned skin""",
-            [2, 1.60, -0.90, -1.70, 1.55, 1.00, 3.00, 1.00],
+            [2, 1.60, -0.90, -1.70, 1.55, 1.10, 3.00, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
