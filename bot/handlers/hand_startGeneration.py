@@ -4,13 +4,6 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from bot.InstanceBot import bot, router
-from bot.keyboards import (
-    randomizer_keyboards,
-    start_generation_keyboards,
-)
-from bot.logger import logger
-from bot.states.StartGenerationState import StartGenerationState
 from bot.helpers import text
 from bot.helpers.generateImages import (
     generateImageBlock,
@@ -22,17 +15,24 @@ from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
     getNextModel,
 )
+from bot.helpers.handlers.messages import deleteMessageFromState
+from bot.helpers.handlers.startGeneration import (
+    generateImagesInHandler,
+    process_image,
+    regenerateImage,
+)
+from bot.InstanceBot import bot, router
+from bot.keyboards import (
+    randomizer_keyboards,
+    start_generation_keyboards,
+)
+from bot.logger import logger
+from bot.states.StartGenerationState import StartGenerationState
 from bot.utils.handlers import (
     appendDataToStateArray,
 )
 from bot.utils.handlers.messages import (
     editMessageOrAnswer,
-)
-from bot.helpers.handlers.messages import deleteMessageFromState
-from bot.helpers.handlers.startGeneration import (
-    generateImagesInHandler,
-    regenerateImage,
-    process_image,
 )
 
 
@@ -85,7 +85,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(specific_model=True)
         # Очищаем стейт
         await state.set_state(
-            StartGenerationState.write_model_name_for_generation
+            StartGenerationState.write_model_name_for_generation,
         )
         return
 
@@ -227,7 +227,12 @@ async def write_prompt(message: types.Message, state: FSMContext):
 
         # Генерируем изображения
         await generateImagesInHandler(
-            prompt, message, state, user_id, is_test_generation, setting_number
+            prompt,
+            message,
+            state,
+            user_id,
+            is_test_generation,
+            setting_number,
         )
     else:
         model_indexes = state_data.get("model_indexes_for_generation", [])
@@ -235,7 +240,12 @@ async def write_prompt(message: types.Message, state: FSMContext):
 
         # Генерируем изображения
         await generateImagesInHandler(
-            prompt, message, state, user_id, is_test_generation, "individual"
+            prompt,
+            message,
+            state,
+            user_id,
+            is_test_generation,
+            "individual",
         )
 
 
@@ -349,7 +359,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         # Если индекс изображения равен "regenerate", то перегенерируем изображение
         if image_index == "regenerate":
             return await regenerateImage(
-                model_name, call, state, setting_number
+                model_name,
+                call,
+                state,
+                setting_number,
             )
 
         # Если индекс изображения равен "regenerate_with_new_prompt", то перегенерируем изображение с новым промптом
@@ -357,11 +370,11 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             # Устанавливаем стейт для ввода нового промпта
             await state.update_data(model_name_for_regenerate_image=model_name)
             await state.update_data(
-                setting_number_for_regenerate_image=setting_number
+                setting_number_for_regenerate_image=setting_number,
             )
 
             await state.set_state(
-                StartGenerationState.write_new_prompt_for_regenerate_image
+                StartGenerationState.write_new_prompt_for_regenerate_image,
             )
 
             # Просим ввести новый промпт
@@ -369,7 +382,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 await editMessageOrAnswer(call, text.WRITE_NEW_PROMPT_TEXT)
             )
             await state.update_data(
-                write_new_prompt_message_id=write_new_prompt_for_regenerate_message.message_id
+                write_new_prompt_message_id=write_new_prompt_for_regenerate_message.message_id,
             )
             return
 
@@ -378,7 +391,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             all_data_arrays = getAllDataArrays()
             for arr in all_data_arrays:
                 data = next(
-                    (d for d in arr if d["model_name"] == model_name), None
+                    (d for d in arr if d["model_name"] == model_name),
+                    None,
                 )
                 if data is not None:
                     break
@@ -387,7 +401,12 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(model_name=model_name)
 
         # Обрабатываем изображение
-        await process_image(call, state, model_name, image_index)
+        await process_image(
+            call,
+            state,
+            model_name,
+            image_index,
+        )
 
     except Exception as e:
         traceback.print_exc()
@@ -400,7 +419,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
 # Обработка ввода названия модели для генерации
 async def write_model_name_for_generation(
-    message: types.Message, state: FSMContext
+    message: types.Message,
+    state: FSMContext,
 ):
     # Если в сообщении есть запятые, то записываем массив моделей в стейт
     model_indexes = message.text.split(",")
@@ -431,14 +451,15 @@ async def write_model_name_for_generation(
     await message.answer(
         text.GET_MODEL_INDEX_SUCCESS_TEXT
         if len(model_indexes) == 1
-        else text.GET_MODEL_INDEXES_SUCCESS_TEXT
+        else text.GET_MODEL_INDEXES_SUCCESS_TEXT,
     )
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
 
 # Обработка ввода нового промпта для перегенерации изображения
 async def write_new_prompt_for_regenerate_image(
-    message: types.Message, state: FSMContext
+    message: types.Message,
+    state: FSMContext,
 ):
     # Получаем данные
     state_data = await state.get_data()
@@ -453,7 +474,8 @@ async def write_new_prompt_for_regenerate_image(
 
     # Удаляем сообщение бота
     write_new_prompt_message_id = state_data.get(
-        "write_new_prompt_message_id", None
+        "write_new_prompt_message_id",
+        None,
     )
     if write_new_prompt_message_id:
         await bot.delete_message(user_id, write_new_prompt_message_id)
@@ -461,7 +483,9 @@ async def write_new_prompt_for_regenerate_image(
     # Записываем новый промпт в стейт для этой модели
     data_for_update = {f"{model_name}": prompt}
     await appendDataToStateArray(
-        state, "prompts_for_regenerated_models", data_for_update
+        state,
+        "prompts_for_regenerated_models",
+        data_for_update,
     )
 
     # Получаем индекс модели
@@ -470,8 +494,10 @@ async def write_new_prompt_for_regenerate_image(
     # Отправляем сообщение о перегенерации изображения
     regenerate_progress_message = await message.answer(
         text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(
-            model_name, model_name_index, prompt
-        )
+            model_name,
+            model_name_index,
+            prompt,
+        ),
     )
 
     # Получаем данные генерации по названию модели
@@ -548,6 +574,6 @@ def hand_add():
     router.message.register(
         write_new_prompt_for_regenerate_image,
         StateFilter(
-            StartGenerationState.write_new_prompt_for_regenerate_image
+            StartGenerationState.write_new_prompt_for_regenerate_image,
         ),
     )

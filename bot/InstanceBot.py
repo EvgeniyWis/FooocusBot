@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
@@ -17,7 +18,12 @@ bot = Bot(
 )
 
 redis_client = create_redis_client()
-storage = RedisStorage(redis_client)
+
+storage = RedisStorage(
+    redis=redis_client,
+    state_ttl=timedelta(days=15),
+    data_ttl=timedelta(days=3),
+)
 
 dp = Dispatcher(storage=storage)
 router = Router()

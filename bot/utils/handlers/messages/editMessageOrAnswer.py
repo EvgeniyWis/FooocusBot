@@ -1,4 +1,5 @@
 from aiogram import types
+from InstanceBot import bot
 
 from bot.logger import logger
 from bot.utils.handlers.messages.preserve_code_tags import preserve_code_tags
@@ -20,16 +21,18 @@ async def editMessageOrAnswer(
         logger.warning(f"Ошибка при экранировании текста: {e}")
         safe_text = text
 
-    try:
-        message = await safe_edit_message(
-            call,
-            safe_text,
-            reply_markup=reply_markup,
-            parse_mode="HTML",
+    message = await safe_edit_message(
+        call,
+        safe_text,
+        reply_markup=reply_markup,
+        parse_mode="HTML",
+    )
+    if message is None:
+        logger.warning(
+            f"Не удалось редактировать сообщение {call.message.message_id}, отправляем новое",
         )
-    except Exception as e:
-        logger.warning(f"Ошибка при редактировании сообщения: {e}")
-        message = await call.message.answer(
+        message = await bot.send_message(
+            call.message.chat.id,
             safe_text,
             reply_markup=reply_markup,
             parse_mode="HTML",
