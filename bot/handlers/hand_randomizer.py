@@ -6,7 +6,7 @@ from InstanceBot import router
 from keyboards import randomizer_keyboards
 from states.RandomizerState import RandomizerState
 from utils import text
-from utils.handlers.messages import editMessageOrAnswer
+from utils.handlers import editMessageOrAnswer
 from utils.handlers.rate_limiter_for_edit_message import (
     safe_edit_message,
 )
