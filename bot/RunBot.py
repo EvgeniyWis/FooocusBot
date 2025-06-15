@@ -4,6 +4,8 @@ import shutil
 
 import handlers
 from aiogram.types import BotCommand
+from helpers.generateImages import process_image_block
+from helpers.handlers.startGeneration import process_image
 
 from bot.config import (
     DEV_CHAT_IDS,
@@ -11,9 +13,10 @@ from bot.config import (
     TEMP_DIR,
     TEMP_IMAGE_FILES_DIR,
 )
-from bot.InstanceBot import bot, dp
+from bot.InstanceBot import bot, dp, redis_client, storage
 from bot.logger import logger
 from bot.middleware import ErrorHandlingMiddleware
+from bot.storage import get_redis_storage, init_redis_storage
 
 
 async def on_startup() -> None:

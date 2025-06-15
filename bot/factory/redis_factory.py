@@ -14,6 +14,6 @@ def create_redis_client() -> aioredis.Redis:
 
     if _redis_client is None:
         _redis_client = aioredis.from_url(
-            f"redis://:{redis_password}@{redis_host}:{redis_port}/{redis_db}"
+            f"redis://:{redis_password}@{redis_host}:{redis_port}/{redis_db}",
         )
     return _redis_client
