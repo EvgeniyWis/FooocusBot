@@ -25,7 +25,7 @@ async def generate_video(
     try:
         json = await start_generate_video(prompt, image_url, image_path)
 
-        video_path = await check_video_generation_status(json)
+        video_path = await check_video_generation_status(json["request_id"])
 
         return video_path
 
