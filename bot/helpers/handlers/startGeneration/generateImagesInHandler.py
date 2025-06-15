@@ -44,6 +44,7 @@ async def generateImagesInHandler(
                     state,
                     user_id,
                     is_test_generation,
+                    prompt,
                 )  # Отправляем сообщение о получении промпта
             else:
                 await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
@@ -53,19 +54,15 @@ async def generateImagesInHandler(
                     int(setting_number),
                 )
 
-                # Прибавляем корневой промпт
-                json = dataArray[0]["json"].copy()
-                json["input"]["prompt"] += " " + prompt
-
                 model_name = dataArray[0]["model_name"]
                 result = [
                     await generateImageBlock(
-                        json,
                         model_name,
                         message_for_edit.message_id,
                         state,
                         user_id,
                         setting_number,
+                        prompt,
                         is_test_generation,
                         chat_id=message.chat.id,
                     ),
@@ -85,6 +82,7 @@ async def generateImagesInHandler(
                     state,
                     user_id,
                     is_test_generation,
+                    prompt,
                     True,
                 )
             else:
