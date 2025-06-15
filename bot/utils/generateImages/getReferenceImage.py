@@ -3,7 +3,7 @@ import os
 import aiofiles
 from logger import logger
 
-from bot.helpers.generateImages.dataArray import getModelNameIndex
+from utils.generateImages.dataArray import getModelNameIndex
 
 
 # Функция для получения референсного изображения
