@@ -20,6 +20,7 @@ async def generateImagesByAllSettings(
     state: FSMContext,
     user_id: int,
     is_test_generation: bool,
+    variable_prompt: str,
     with_randomizer: bool = False,
 ):
     # Получаем все настройки
@@ -54,15 +55,15 @@ async def generateImagesByAllSettings(
     if not is_test_generation:
         await message_with_generations_status.pin()
 
-    async def process_generation(dataJSON, model_name, index):
+    async def process_generation(model_name, index, prompt):
         async with semaphore:
             await generateImageBlock(
-                dataJSON,
                 model_name,
                 message_with_generations_status.message_id,
                 state,
                 user_id,
                 index + 1,
+                prompt,
                 is_test_generation,
                 chat_id=message.chat.id,
             )
@@ -74,7 +75,7 @@ async def generateImagesByAllSettings(
                 dataJSON = dataArray[0]["json"]
                 model_name = dataArray[0]["model_name"]
                 task = asyncio.create_task(
-                    process_generation(dataJSON, model_name, index),
+                    process_generation(model_name, index, variable_prompt),
                 )
                 tasks.append(task)
             else:
