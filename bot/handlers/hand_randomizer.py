@@ -2,15 +2,15 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from bot.InstanceBot import router
-from bot.keyboards import randomizer_keyboards
-from bot.states.RandomizerState import RandomizerState
-from bot.utils import text
-from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.utils.handlers.rate_limiter_for_edit_message import (
+from InstanceBot import router
+from keyboards import randomizer_keyboards
+from states.RandomizerState import RandomizerState
+from utils import text
+from utils.handlers.messages import editMessageOrAnswer
+from utils.handlers.rate_limiter_for_edit_message import (
     safe_edit_message,
 )
-from bot.utils.handlers.startGeneration import generateImagesInHandler
+from utils.handlers.startGeneration import generateImagesInHandler
 
 
 # Обработка кнопок в меню
