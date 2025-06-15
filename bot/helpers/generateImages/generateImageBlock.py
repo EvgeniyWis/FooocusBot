@@ -25,7 +25,7 @@ async def generateImageBlock(
 
     # Прибавляем к постоянному промпту переменный промпт
     json = data["json"].copy()
-    json["input"]["prompt"] += " " + variable_prompt
+    json["input"]["prompt"] = variable_prompt.replace("\n", " ") + " " + json["input"]["prompt"]
 
     if not MOCK_MODE:
         # Получаем номер настройки по имени модели
