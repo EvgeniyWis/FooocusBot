@@ -3,9 +3,14 @@ import os
 import aiofiles
 from logger import logger
 
+from bot.helpers.generateImages.dataArray import getModelNameIndex
+
 
 # Функция для получения референсного изображения
 async def getReferenceImage(model_name: str) -> str:
+    # Получаем индекс модели
+    model_index = getModelNameIndex(model_name)
+
     reference_image_path = os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
@@ -13,7 +18,7 @@ async def getReferenceImage(model_name: str) -> str:
             "..",
             "assets",
             "reference_images",
-            f"{model_name}.jpeg",
+            f"{model_index}. {model_name}.jpg",
         ),
     )
 
