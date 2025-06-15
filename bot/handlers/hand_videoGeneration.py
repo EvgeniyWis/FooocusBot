@@ -158,8 +158,7 @@ async def handle_video_example_buttons(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение про генерацию видео
-    video_progress_message = await editMessageOrAnswer(
-        call,
+    video_progress_message = await call.message.answer(
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
     )
 
@@ -178,8 +177,7 @@ async def handle_video_example_buttons(
         except Exception as e:
             # Отправляем сообщение об ошибке
             traceback.print_exc()
-            await editMessageOrAnswer(
-            call,text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, e),
+            await call.message.answer(text.GENERATE_VIDEO_ERROR_TEXT.format(model_name, model_name_index, e),
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(model_name, False))
             raise e
     
