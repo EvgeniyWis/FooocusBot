@@ -1,14 +1,14 @@
 import asyncio
-import httpx
 
+import httpx
 from aiogram.fsm.context import FSMContext
 
 from bot.config import RUNPOD_HEADERS, RUNPOD_HOST
-from bot.logger import logger
-from bot.utils import httpx_post
 from bot.helpers.jobs.delete_job import delete_job
 from bot.helpers.jobs.edit_job_message import edit_job_message
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
+from bot.logger import logger
+from bot.utils import httpx_post
 
 CANCELLED_JOB_TEXT = "Работа была отменена"
 
@@ -54,10 +54,16 @@ async def check_job_status(
                 # Формируем URL для отправки запроса
                 url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
                 response_json = await httpx_post(
-                    url, RUNPOD_HEADERS, with_response_text_logging=False
+                    url,
+                    RUNPOD_HEADERS,
+                    with_response_text_logging=False,
                 )
 
-            except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadTimeout) as e:
+            except (
+                httpx.ConnectError,
+                httpx.ConnectTimeout,
+                httpx.ReadTimeout,
+            ) as e:
                 logger.error(
                     f"Ошибка соединения при получении статуса работы: {e}",
                 )
@@ -66,7 +72,11 @@ async def check_job_status(
 
             if state and not is_test_generation and checkOtherJobs:
                 await edit_job_message(
-                    job_id, message_id, state, response_json, user_id
+                    job_id,
+                    message_id,
+                    state,
+                    response_json,
+                    user_id,
                 )
 
             if response_json["status"] == "COMPLETED":
@@ -86,7 +96,7 @@ async def check_job_status(
     except Exception as e:
         await delete_job(job_id, state)
         logger.error(
-            f"Критическая ошибка при проверке статуса работы {job_id}: {str(e)}"
+            f"Критическая ошибка при проверке статуса работы {job_id}: {str(e)}",
         )
         raise e
 
