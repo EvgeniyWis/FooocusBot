@@ -7,7 +7,7 @@ from bot.utils.httpx import httpx_get
 from bot.utils.videos import download_video
 
 
-async def check_video_generation_status(json: dict) -> str | None:
+async def check_video_generation_status(request_id: str) -> str | None:
     """
     Функция для проверки статуса задания на генерацию видео с помощью API kling
 
@@ -17,13 +17,6 @@ async def check_video_generation_status(json: dict) -> str | None:
     Returns:
         str: Путь к сгенерированному видео
     """
-
-    # Проверяем статус задания в цикле
-    request_id = json["request_id"]
-    if not request_id:
-        logger.error("Не получен request_id в ответе API")
-        return None
-
     url_status_endpoint = (
         f"https://api.gen-api.ru/api/v1/request/get/{request_id}"
     )
