@@ -1,7 +1,7 @@
 from aiogram.fsm.context import FSMContext
+from storage import get_redis_storage
 
 from bot.logger import logger
-from bot.storage import get_task_service
 
 
 async def delete_job(job_id: str, state: FSMContext) -> bool:
@@ -31,8 +31,8 @@ async def delete_job(job_id: str, state: FSMContext) -> bool:
         )
 
         # Удаляем задачу из Redis
-        task_service = get_task_service()
-        await task_service.delete_task(job_id)
+        redis_storage = get_redis_storage()
+        await redis_storage.delete_task_process_image_block(job_id)
 
         return True
     except Exception as e:

@@ -2,14 +2,15 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.config import MOCK_MODE
-from bot.storage import get_task_service
-from bot.utils.images.base64_to_image import base64_to_image
+from bot.domain.entities.task import TaskImageBlockDTO
 from bot.helpers.generateImages.getReferenceImage import getReferenceImage
 from bot.helpers.handlers.startGeneration.sendImageBlock import sendImageBlock
 from bot.helpers.jobs.check_job_status import (
     CANCELLED_JOB_TEXT,
     check_job_status,
 )
+from bot.storage import get_redis_storage
+from bot.utils.images.base64_to_image import base64_to_image
 
 
 async def process_image_block(
@@ -37,20 +38,19 @@ async def process_image_block(
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
         chat_id (int): id чата
     """
-    data = await state.get_data()
-    task_service = get_task_service()
-
-    await task_service.create_task(
+    redis_storage = get_redis_storage()
+    task_image_block_dto = TaskImageBlockDTO(
         job_id=job_id,
-        user_id=user_id,
-        message_id=message_id,
         model_name=model_name,
         setting_number=setting_number,
-        job_type=data.get("job_type", "image_generation"),
+        user_id=user_id,
+        message_id=message_id,
         is_test_generation=is_test_generation,
         check_other_jobs=checkOtherJobs,
         chat_id=chat_id,
     )
+    await redis_storage.add_task_process_image_block(task_image_block_dto)
+
     # Проверяем статус работы
     response_json = await check_job_status(
         job_id,

@@ -11,26 +11,21 @@ from bot.config import (
     TEMP_DIR,
     TEMP_IMAGE_FILES_DIR,
 )
-from bot.InstanceBot import bot, dp, redis_client, storage
+from bot.InstanceBot import bot, dp
 from bot.logger import logger
 from bot.middleware import ErrorHandlingMiddleware
-from bot.storage.redis_storage import (
-    get_task_service,
-    init_redis_storage,
-)
-from bot.helpers.generateImages.process_image_block import process_image_block
 
 
 async def on_startup() -> None:
     await init_redis_storage(redis_client)
 
-    task_service = get_task_service()
-    task_service.set_process_callback(process_image_block)
+    repo = get_redis_storage()
+    repo.set_process_callback(process_image, "process_image")
+    repo.set_process_callback(process_image_block, "process_image_block")
     asyncio.create_task(
-        task_service.recover_tasks(
+        repo.recover_tasks(
             bot,
             storage,
-            process_callback=process_image_block,
         ),
     )
 
