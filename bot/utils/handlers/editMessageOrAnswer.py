@@ -1,7 +1,7 @@
 from aiogram import types
 
-from bot.logger import logger
-from bot.utils.handlers.rate_limiter_for_edit_message import (
+from logger import logger
+from utils.handlers.rate_limiter_for_edit_message import (
     safe_edit_message,
 )
 

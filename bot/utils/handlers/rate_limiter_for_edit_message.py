@@ -5,7 +5,7 @@ from collections import defaultdict
 from aiogram import types
 from aiogram.exceptions import TelegramRetryAfter
 
-from bot.logger import logger
+from logger import logger
 
 _rate_locks = defaultdict(asyncio.Lock)
 _last_edit_times = defaultdict(lambda: 0.0)
