@@ -2,7 +2,7 @@ from .getSettingNumberByModelName import getSettingNumberByModelName
 from .getModelNameIndex import getModelNameIndex
 from .getDataArrayBySettingNumber import getDataArrayBySettingNumber
 from .getDataByModelName import getDataByModelName
-from .getDataArrayWithRootPrompt import getDataArrayWithRootPrompt
+from .getModelNameByIndex import getModelNameByIndex
 from .generateData import generateData
 from .generateLoras import generateLoras
 from .getAllDataArrays import getAllDataArrays

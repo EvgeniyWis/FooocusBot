@@ -49,6 +49,7 @@ async def generateImagesInHandler(
                     state,
                     user_id,
                     is_test_generation,
+                    prompt
                 )  # Отправляем сообщение о получении промпта
             else:
                 # Инициализация переменной message_for_edit перед её использованием
@@ -68,6 +69,7 @@ async def generateImagesInHandler(
                         state,
                         user_id,
                         setting_number,
+                        prompt,
                         is_test_generation,
                     ),
                 ]
@@ -82,6 +84,7 @@ async def generateImagesInHandler(
                     state,
                     user_id,
                     is_test_generation,
+                    prompt,
                     True,
                 )
             else:
