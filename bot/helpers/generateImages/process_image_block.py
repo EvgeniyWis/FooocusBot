@@ -12,6 +12,9 @@ from bot.helpers.jobs.check_job_status import (
 from bot.storage import get_redis_storage
 from bot.utils.images.base64_to_image import base64_to_image
 
+from bot.utils import retryOperation
+
+
 
 async def process_image_block(
     job_id: str,
@@ -52,7 +55,10 @@ async def process_image_block(
     await redis_storage.add_task_process_image_block(task_image_block_dto)
 
     # Проверяем статус работы
-    response_json = await check_job_status(
+    response_json = await retryOperation(
+        check_job_status,
+        3,
+        2,
         job_id,
         setting_number,
         user_id,
