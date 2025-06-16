@@ -1,5 +1,5 @@
 from aiogram.fsm.context import FSMContext
-from config import MOCK_MODE
+from bot.settings import MOCK_MODE
 from logger import logger
 
 from bot.helpers.generateImages.dataArray import getSettingNumberByModelName
