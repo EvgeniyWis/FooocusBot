@@ -1,4 +1,4 @@
-from config import MOCK_MODE
+from bot.settings import MOCK_MODE
 
 from bot.helpers.generateImages.dataArray.setting_1.generateData import (
     setting1_generateData,

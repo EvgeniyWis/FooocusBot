@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.config import MOCK_MODE
+from bot.settings import MOCK_MODE
 from bot.domain.entities.task import TaskImageBlockDTO
 from bot.helpers.generateImages.getReferenceImage import getReferenceImage
 from bot.helpers.handlers.startGeneration.sendImageBlock import sendImageBlock

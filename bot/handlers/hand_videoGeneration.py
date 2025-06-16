@@ -6,7 +6,8 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from bot.config import MOCK_MODE, TEMP_IMAGE_FILES_DIR
+from bot.settings import MOCK_MODE
+from bot.config import TEMP_IMAGE_FILES_DIR
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
