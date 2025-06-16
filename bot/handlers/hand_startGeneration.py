@@ -274,6 +274,7 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
         state,
         user_id,
         setting_number,
+        prompt,
         False,
         False
     )
@@ -678,10 +679,6 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
-
-    # Прибавляем к каждому элементу массива корневой промпт
-    json = data["json"].copy()
-    json["input"]["prompt"] += " " + prompt 
     
     await state.set_state(None)
 
@@ -697,7 +694,6 @@ async def write_new_prompt_for_regenerate_image(message: types.Message, state: F
         prompt,
         is_test_generation,
         False,
-        chat_id=message.chat.id,
     )
     await regenerate_progress_message.delete()
 

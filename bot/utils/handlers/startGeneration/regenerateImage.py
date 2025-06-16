@@ -54,6 +54,6 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     data = await getDataByModelName(model_name)
 
     try:
-        return await generateImageBlock(data, call.message, state, user_id, setting_number, is_test_generation, False)
+        return await generateImageBlock(data, call.message, state, user_id, setting_number, prompt, is_test_generation, False)
     finally:
         await regenerate_message.delete()
