@@ -14,7 +14,6 @@ from logger import logger
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(
     dataJSON: dict,
-    model_name: str,
     message: types.Message,
     state: FSMContext,
     user_id: int,
@@ -24,6 +23,9 @@ async def generateImageBlock(
 ):
     # Получаем данные из стейта
     stateData = await state.get_data()
+
+    # Получаем имя настройки
+    model_name = dataJSON["model_name"]
 
     if not MOCK_MODE:
         # Получаем номер настройки по имени модели
