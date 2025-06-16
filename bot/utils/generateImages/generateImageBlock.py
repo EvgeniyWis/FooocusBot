@@ -10,10 +10,12 @@ from .getReferenceImage import getReferenceImage
 from .dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 from logger import logger
 
+from bot.utils import retryOperation
+
 
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(
-    dataJSON: dict,
+    data: dict,
     message: types.Message,
     state: FSMContext,
     user_id: int,
@@ -25,27 +27,30 @@ async def generateImageBlock(
     stateData = await state.get_data()
 
     # Получаем имя настройки
-    model_name = dataJSON["model_name"]
+    model_name = data["model_name"]
 
     if not MOCK_MODE:
         # Получаем номер настройки по имени модели
         setting_number = getSettingNumberByModelName(model_name)
 
         # Логируем наш json
-        logger.info(f"Отправляем запрос на генерацию изображений с данными: {dataJSON}")
+        logger.info(f"Отправляем запрос на генерацию изображений с данными: {data}")
 
         # Делаем запрос на генерацию и получаем id работы
-        job_id = await getJobID(dataJSON, setting_number, state)
+        job_id = await getJobID(data["json"], setting_number, state)
 
         # Проверяем статус работы
-        response_json = await checkJobStatus(
+        response_json = await retryOperation(
+            checkJobStatus,
+            3,
+            2,
             job_id,
             setting_number,
             state,
             message,
             is_test_generation,
             checkOtherJobs,
-            500
+            500,
         )
 
         if not response_json:
