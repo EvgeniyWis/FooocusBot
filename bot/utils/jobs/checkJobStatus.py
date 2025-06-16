@@ -8,6 +8,7 @@ from logger import logger
 from .. import text
 from .getEndpointID import getEndpointID
 
+CANCELLED_JOB_TEXT = "Работа была отменена"
 
 # Функция для получения статуса работы
 async def checkJobStatus(
@@ -132,5 +133,15 @@ async def checkJobStatus(
             image_generation_jobs = [job for job in image_generation_jobs if job['job_id'] != job_id]
             await state.update_data(image_generation_jobs=image_generation_jobs)
             logger.info(f"Удаляем id работы {job_id} из стейта {image_generation_jobs}")
-    
+
+    # Если работа не завершена, то возвращаем False
+    if not response_json or response_json == CANCELLED_JOB_TEXT:
+        return False
+
+    # Проверяем наличие выходных данных
+    images_output = response_json.get("output", [])
+
+    if images_output == []: # Если их нет, то кидаем ошибку
+        raise Exception("Не удалось сгенерировать изображения")
+
     return response_json
