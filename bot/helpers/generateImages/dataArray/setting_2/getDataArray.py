@@ -38,20 +38,14 @@ def setting2_getDataArray():
             "gracelowell.xo",
             "1KQZimxqXua-vF8-_7gUIenrU5C544r5M",
             "1OG4YeEvj2Rlo4CrUWtvtVciT-DMQpaFZ",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, photorealistic, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
-
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous long blonde hair, huge breasts, slim waist, big bubble butt, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright green eyes.
-        """,
+            """photorealistic portrait of an 18-year-old sorority girl with voluminous long blonde hair, slim waist, huge breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright green eyes, high quality and detail.""",
             [1, 1, 2.05, 0.05, -0.85, -1.5],
         ),
         setting2_generateData(
             "valeriagomez.xo",
             "1ksAaqiUNxX_8AcxLNcZGFgyGNjuz97fo",
             "1-VU7GIe8nV4hTNRhk9X4c62fGQ1pWwln",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, photorealistic, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
-
-        real_beauty, igbaddie, 1girl, arabian girl, 18 years old, sorority girl, voluminous long black hair, huge breasts, slim waist, big bubble butt, toned legs, high tan skin, skinny, cute, big plump lips, smirk, bright brown eyes.
-        """,
+            """photorealistic portrait of an 18-year-old Arabian girl with voluminous long black hair, slim waist, large breasts and hips, toned legs, high tan skin, big plump lips, smirk, bright brown eyes, realistic style, high quality and detail.""",
             [1, 1, 2.40, 0.55, -0.35, -1.5],
         ),
         setting2_generateData(
@@ -94,22 +88,14 @@ def setting2_getDataArray():
             "briaclaire.xo",
             "1yRr_qWf3oi0Re9MRSCFuNx96WZltPcx_",
             "1_w-ME7mXI5GbkbmKUzSBIongXPL-NEmO",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, photorealistic, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
-
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous long brown hair, medium breasts, slim waist, big bubble butt, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright blue eyes.
-        """,
+            """photorealistic portrait of an 18-year-old sorority girl with voluminous long brown hair, slim waist, medium breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright blue eyes, high quality and detail.""",
             [1, 1, 4.00, 0.50, -1.70, -1.5],
         ),
         setting2_generateData(
             "rinazuri.xo",
             "16kfOvHl49oYtjQwWCti-6XQFbaFhmk4R",
             "1A9x1vWllbCV0RdkTIgaXH-tw5uYhtd3p",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, photorealistic, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
-
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, ash-blonde long hair, medium breasts, slim waist, toned legs, tan skin, cute, big lips, smirk, bright blue eyes.
-
-        Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright indirect light.
-        """,
+            """photorealistic portrait of an 18-year-old girl with ash-blonde long hair, slim figure, tan skin, bright blue eyes, slight smile, realistic photography style with soft natural light, high detail and quality.""",
             [1, 1, 3.00, 0.30, -0.80, -1.50],
         ),
         setting2_generateData(
@@ -161,10 +147,7 @@ def setting2_getDataArray():
             "kenzienoir",
             "17lnjZ_ZB6wtssENq97wK8mjAmXPPyL_r",
             "1sIIRN-fFycdrzGZ5TplcgBeagBc_ThiX",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, photorealistic, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
-
-        real_beauty, igbaddie, 1girl, 18 years old, asian girl, sorority girl, voluminous long ash-blonde hair, medium breasts, slim waist, saggy breasts, big bubble butt, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright blue eyes, sharp facial features, sharp cheekbones.
-        """,
+            "photorealistic portrait of an 18-year-old Asian girl with voluminous long ash-blonde hair, slim waist, medium saggy breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright blue eyes, sharp facial features and cheekbones, high quality and detail.",
             [1, 1, 1.55, 0.75, -0.75, -1.5, 1.1],
         ),
         setting2_generateData(
@@ -180,10 +163,7 @@ def setting2_getDataArray():
             "monikaroxley",
             "1qZhjbfxJOu2Ugrg6p6e4ALdKtbEsT2cO",
             "1lrvYzT3UJ2MSIhjMLZZrSxlGoRKFn3Q_",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, photorealistic, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
-
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous long black hair, medium breasts, slim waist, saggy breasts, big bubble butt, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright blue eyes, sharp facial features, sharp cheekbones.
-        """,
+            """photorealistic portrait of an 18-year-old sorority girl with voluminous long black hair, slim waist, medium saggy breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright blue eyes, sharp facial features and cheekbones, high quality and detail.""",
             [1, 1, 0.90, 2.35, 0.50, -1.5],
         ),
         setting2_generateData(
