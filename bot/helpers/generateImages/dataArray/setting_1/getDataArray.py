@@ -207,12 +207,7 @@ Style: Instagram photo style, warm vibrant filter, high-resolution, Canon DSLR s
             "daisyknoxen",
             "1BfBUv1bUHaGsWmBg8Oxv4r_wniQu2_VO",
             "1XReaJxJA2wRiJNbyjOZOdJC3lBNtpX5j",
-            """score9, score8up, score7up, sourcephoto, sourcereal, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
-
-        realbeauty, igbaddie, 1girl, redhead, (red hair), (ginger hair), (long voluminous fiery red hair), bright orange hair, vibrant red hair, no blonde hair, no brown hair, no black hair, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face, plump lips, realistic blue eyes, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, face well lit by bright sunlight, big wide hips, hourglass body, clothed, wearing clothes, modest clothing, no nudity, no naked, no nude, no explicit, no cleavage, no underwear, no swimsuit, no lingerie, no transparent clothes, no see-through, no bare skin, no exposed skin, no partially nude, no topless, no bottomless, no skin showing, no midriff, no shoulders exposed, no back exposed, no thighs exposed, no legs exposed
-
-        Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight creating warm highlights and accentuating features, sunlight from outdoor courtyard.
-        """,
+            """photorealistic portrait of an 18-year-old athletic Caucasian redhead girl with long voluminous fiery red hair, medium teardrop-shaped breasts, toned abdomen, narrow waist, wide hips, thin legs, tanned skin with natural texture and fine pores, plump lips, realistic blue eyes, slightly smiling, wearing modest clothing with no exposed skin, in bright natural sunlight outdoors, Instagram photo style, vibrant colors, high resolution, Canon DSLR simulation, shallow depth of field."""
             [2, 2.60, -0.90, -1.70, 0.05, 1.00, 4.85, 1.00],
             8,
         ),
