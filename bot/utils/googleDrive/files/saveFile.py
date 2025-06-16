@@ -1,13 +1,14 @@
 import asyncio
+import os
+import shutil
 
+from bot.config import TEMP_FOLDER_PATH
 from bot.logger import logger
 from bot.utils.googleDrive.auth import service
 from bot.utils.googleDrive.files.uploadFile import uploadFile
 from bot.utils.googleDrive.folders.createFolder import createFolder
 from bot.utils.googleDrive.folders.deleteParentFolder import deleteParentFolder
 from bot.utils.retryOperation import retryOperation
-from bot.config import TEMP_FOLDER_PATH
-import shutil
 
 
 # Сохранение одного файла
@@ -22,7 +23,7 @@ async def saveFile(
     try:
         if not initial_folder_id:
             logger.error(
-                f"Некорректный initial_folder_id: {initial_folder_id}"
+                f"Некорректный initial_folder_id: {initial_folder_id}",
             )
             raise ValueError("Некорректный initial_folder_id")
 
@@ -42,10 +43,12 @@ async def saveFile(
             date_folder_id = results.get("files", [])[0].get("id")
         else:  # Если папки с сегодняшней датой нет, то создаём её
             date_folder_id, date_folder_link = await createFolder(
-                current_date, None, initial_folder_id
+                current_date,
+                None,
+                initial_folder_id,
             )
             logger.info(
-                f"Полученный folder_id для папки с датой: {date_folder_id} и ссылка на папку: {date_folder_link}"
+                f"Полученный folder_id для папки с датой: {date_folder_id} и ссылка на папку: {date_folder_link}",
             )
 
         # Получаем кол-во файлов в папке
@@ -71,14 +74,23 @@ async def saveFile(
 
         # Загружаем файл
         file = await retryOperation(
-            uploadFile, 10, 2, file_path, file_metadata, name, folder_name
+            uploadFile,
+            10,
+            2,
+            file_path,
+            file_metadata,
+            name,
+            folder_name,
         )
 
         if with_deleting_temp_folder:
             # Удаляем папку с файлами
-            shutil.rmtree(
-                f"{TEMP_FOLDER_PATH}\\{f'{folder_name}_{user_id}' if folder_name else ''}",
+            temp_path = (
+                os.path.join(TEMP_FOLDER_PATH, f"{folder_name}_{user_id}")
+                if folder_name
+                else TEMP_FOLDER_PATH
             )
+            shutil.rmtree(temp_path)
 
             # Через 1 час удаляем и папку в более верхнем уровне
             asyncio.create_task(deleteParentFolder(folder_name, user_id))

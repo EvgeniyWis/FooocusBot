@@ -12,6 +12,12 @@ def generateVideoKeyboard(model_name: str):
                     text="📹 Сгенерировать видео",
                     callback_data=f"start_generate_video|{model_name}",
                 )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="⚡️Генерация видео с промптом",
+                    callback_data=f"quick_video_generation|{model_name}",
+                )
             ]
         ]
     )

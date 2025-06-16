@@ -1,17 +1,8 @@
 import os
 
-from dotenv import load_dotenv
+# if "BOT_API_TOKEN" in os.environ:  # fixme: нужно ли?
+#     del os.environ["BOT_API_TOKEN"]
 
-from bot.logger import logger
-
-env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'FocuuusBot', '.env')
-logger.info(f"Путь к .env файлу: {env_path}")
-logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
-
-if 'BOT_API_TOKEN' in os.environ:
-    del os.environ['BOT_API_TOKEN']
-
-load_dotenv(env_path, override=True)
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
@@ -20,24 +11,22 @@ SETTING_3_ENDPOINT_ID = "e2u67i0khvang0"
 SETTING_4_ENDPOINT_ID = "if2vaadpx2bo1u"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-logger.info(f"BASE_DIR: {BASE_DIR}")
+env_path = os.path.join(BASE_DIR, ".env")
 
 TEMP_IMAGE_FILES_DIR = os.path.join(BASE_DIR, "bot", "temp", "images")
-logger.info(f"TEMP_IMAGE_FILES_DIR: {TEMP_IMAGE_FILES_DIR}")
 
 FACEFUSION_DIR = os.path.join(os.path.dirname(BASE_DIR), "facefusion-docker")
-logger.info(f"FACEFUSION_DIR: {FACEFUSION_DIR}")
 
 TEMP_FOLDER_PATH = os.path.join(FACEFUSION_DIR, ".assets", "images", "temp")
-logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH}")
 
 VIDEOS_TEMP_DIR = os.path.join(BASE_DIR, "bot", "temp", "videos")
-logger.info(f"VIDEOS_TEMP_DIR: {VIDEOS_TEMP_DIR}")
 
 FACEFUSION_RESULTS_DIR = os.path.join(
-    FACEFUSION_DIR, ".assets", "images", "results"
+    FACEFUSION_DIR,
+    ".assets",
+    "images",
+    "results",
 )
-logger.info(f"FACEFUSION_RESULTS_DIR: {FACEFUSION_RESULTS_DIR}")
 
 TEMP_DIR = os.path.join(BASE_DIR, "temp")
 
