@@ -3,6 +3,7 @@ from datetime import datetime
 from aiogram.types import CallbackQuery, Chat, Message, User
 
 from bot.domain.entities.task import TaskProcessImageDTO
+from bot.InstanceBot import bot
 
 
 def rebuild_callback_query_from_task(
@@ -17,11 +18,14 @@ def rebuild_callback_query_from_task(
         message_id=task.message_id,
         date=datetime.now(),
         chat=chat,
+        bot=bot,
     )
-    return CallbackQuery(
+    callback = CallbackQuery(
         id="dummy",
         from_user=user,
         chat_instance="dummy",
         message=message,
         data=task.callback_data,
+        bot=bot,
     )
+    return callback

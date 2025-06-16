@@ -6,19 +6,21 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from bot.helpers import text
 from bot.config import MOCK_MODE, TEMP_IMAGE_FILES_DIR
-from bot.InstanceBot import bot, router
-from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
-from bot.states import StartGenerationState
-from bot.utils import retryOperation
+from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
 )
 from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
     getModelNameByIndex,
 )
+from bot.helpers.handlers.messages import deleteMessageFromState
+from bot.helpers.handlers.videoGeneration import saveVideo
+from bot.InstanceBot import bot, router
+from bot.keyboards import video_generation_keyboards
+from bot.logger import logger
+from bot.states import StartGenerationState
+from bot.utils import retryOperation
 from bot.utils.handlers import (
     appendDataToStateArray,
     getDataInDictsArray,
@@ -26,9 +28,6 @@ from bot.utils.handlers import (
 from bot.utils.handlers.messages import (
     editMessageOrAnswer,
 )
-from bot.helpers.handlers.messages import deleteMessageFromState
-
-from bot.helpers.handlers.videoGeneration import saveVideo
 from bot.utils.videos import generate_video
 
 
@@ -50,11 +49,48 @@ async def start_generate_video(call: types.CallbackQuery):
     await editMessageOrAnswer(
         call,
         text.SELECT_VIDEO_TYPE_GENERATION_TEXT.format(
-            model_name, model_name_index
+            model_name,
+            model_name_index,
         ),
         reply_markup=video_generation_keyboards.videoWritePromptKeyboard(
-            model_name
+            model_name,
         ),
+    )
+
+
+# Обработка нажатия кнопки "⚡️Генерация видео с промптом"
+async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
+    model_name = call.data.split("|")[1]
+
+    if not call.message.photo:
+        await call.answer("Ошибка: не найдено изображение в сообщении")
+        return
+
+    photo = call.message.photo[-1]
+    file_id = photo.file_id
+
+    try:
+        await call.message.delete()
+    except Exception as e:
+        logger.error(f"Ошибка при удалении сообщения: {e}")
+
+    state_data = await state.get_data()
+
+    await state.update_data(
+        model_name_for_video_generation=model_name,
+        image_file_id_for_videoGenerationFromImage=file_id,
+        saved_images_urls=state_data.get("saved_images_urls", []),
+    )
+
+    await editMessageOrAnswer(
+        call,
+        text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(
+            model_name,
+            getModelNameIndex(model_name),
+        ),
+    )
+    await state.set_state(
+        StartGenerationState.write_prompt_for_videoGenerationFromImage,
     )
 
 
@@ -84,7 +120,9 @@ async def handle_video_generation_mode_buttons(
         # Сохраняем в стейт сообщение о написании промпта для последующего удаления
         data_for_update = {f"{model_name}": write_prompt_message.message_id}
         await appendDataToStateArray(
-            state, "write_prompt_messages_ids", data_for_update
+            state,
+            "write_prompt_messages_ids",
+            data_for_update,
         )
 
         # Переключаем стейт
@@ -199,10 +237,13 @@ async def handle_video_example_buttons(
             await editMessageOrAnswer(
                 call,
                 text.GENERATE_VIDEO_ERROR_TEXT.format(
-                    model_name, model_name_index, e
+                    model_name,
+                    model_name_index,
+                    e,
                 ),
                 reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                    model_name, False
+                    model_name,
+                    False,
                 ),
             )
             raise e
@@ -210,10 +251,13 @@ async def handle_video_example_buttons(
     if not video_path:
         await call.message.answer(
             text.GENERATE_VIDEO_ERROR_TEXT.format(
-                model_name, model_name_index, "Не удалось сгенерировать видео"
+                model_name,
+                model_name_index,
+                "Не удалось сгенерировать видео",
             ),
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                model_name, False
+                model_name,
+                False,
             ),
         )
         return
@@ -222,10 +266,13 @@ async def handle_video_example_buttons(
         if video_path.get("error"):
             await call.message.answer(
                 text.GENERATE_VIDEO_ERROR_TEXT.format(
-                    model_name, model_name_index, video_path.get("error")
+                    model_name,
+                    model_name_index,
+                    video_path.get("error"),
                 ),
                 reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                    model_name, False
+                    model_name,
+                    False,
                 ),
             )
             return
@@ -267,7 +314,9 @@ async def handle_video_example_buttons(
     # Сохраняем сообщение в стейт для последующего удаления
     data_for_update = {f"{model_name}": video_message.message_id}
     await appendDataToStateArray(
-        state, "videoGeneration_messages_ids", data_for_update
+        state,
+        "videoGeneration_messages_ids",
+        data_for_update,
     )
 
 
@@ -290,14 +339,17 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
 
     # Удаляем сообщение о написании промпта
     await deleteMessageFromState(
-        state, "write_prompt_messages_ids", model_name, message.chat.id
+        state,
+        "write_prompt_messages_ids",
+        model_name,
+        message.chat.id,
     )
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
     logger.info(
-        f"URL изображения для генерации видео модели {model_name}: {image_url}"
+        f"URL изображения для генерации видео модели {model_name}: {image_url}",
     )
     try:
         await message.answer_photo(
@@ -358,7 +410,10 @@ async def handle_video_correctness_buttons(
 
     # Удаляем сообщение о генерации видео
     await deleteMessageFromState(
-        state, "videoGeneration_messages_ids", model_name, call.message.chat.id
+        state,
+        "videoGeneration_messages_ids",
+        model_name,
+        call.message.chat.id,
     )
 
 
@@ -411,7 +466,9 @@ async def handle_prompt_for_videoGenerationFromImage(
 
     await state.update_data(prompt_for_videoGenerationFromImage=prompt)
     state_data = await state.get_data()
-    image_file_id = state_data.get("image_file_id_for_videoGenerationFromImage")
+    image_file_id = state_data.get(
+        "image_file_id_for_videoGenerationFromImage",
+    )
 
     if not image_file_id:
         await message.answer(text.NO_IMAGE_FOR_VIDEO_GENERATION_ERROR_TEXT)
@@ -462,7 +519,7 @@ async def handle_prompt_for_videoGenerationFromImage(
             temp_path,
         )
         await state.update_data(
-            video_path_for_videoGenerationFromImage=video_path
+            video_path_for_videoGenerationFromImage=video_path,
         )
 
         video = types.FSInputFile(video_path)
@@ -555,6 +612,11 @@ def hand_add():
     router.callback_query.register(
         start_generate_video,
         lambda call: call.data.startswith("start_generate_video"),
+    )
+
+    router.callback_query.register(
+        quick_generate_video,
+        lambda call: call.data.startswith("quick_video_generation"),
     )
 
     router.callback_query.register(

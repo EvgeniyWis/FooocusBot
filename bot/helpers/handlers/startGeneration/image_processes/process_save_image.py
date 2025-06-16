@@ -1,26 +1,32 @@
-from aiogram import types
-from aiogram.fsm.context import FSMContext
-from datetime import datetime
 import os
 import traceback
+from datetime import datetime
 
-from bot.logger import logger
+from aiogram import types
+from aiogram.fsm.context import FSMContext
 
+from bot.assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
 from bot.config import MOCK_MODE
-from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.helpers import text
+from bot.helpers.generateImages.dataArray import (
+    getDataByModelName,
+    getModelNameIndex,
+)
+from bot.keyboards import video_generation_keyboards
+from bot.logger import logger
+from bot.utils.googleDrive.files import convertDriveLink
 from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.helpers.generateImages.dataArray import getDataByModelName, getModelNameIndex
-from bot.helpers import text
-from bot.assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
-from bot.utils.googleDrive.files import convertDriveLink
-
-from bot.keyboards import video_generation_keyboards
 
 
-async def process_save_image(call: types.CallbackQuery, state: FSMContext, model_name: str, result_path: str):
+async def process_save_image(
+    call: types.CallbackQuery,
+    state: FSMContext,
+    model_name: str,
+    result_path: str,
+):
     """
     Обрабатывает сохранение изображения после этапа замены лица.
 
@@ -30,7 +36,7 @@ async def process_save_image(call: types.CallbackQuery, state: FSMContext, model
         - model_name: str, название модели
         - result_path: str, путь к результату, полученный с замены лица
     """
-    
+
     # Получаем данные пользователя
     user_id = call.from_user.id
 
@@ -84,9 +90,11 @@ async def process_save_image(call: types.CallbackQuery, state: FSMContext, model
 
     # Отправляем сообщение о сохранении изображения
     logger.info(
-        f"Отправляем сообщение о сохранении изображения: {direct_url}"
+        f"Отправляем сообщение о сохранении изображения: {direct_url}",
     )
-    await call.message.answer_photo(
+
+    bot = call.bot
+    method = call.message.answer_photo(
         direct_url,
         text.SAVE_IMAGES_SUCCESS_TEXT.format(
             link,
@@ -95,9 +103,11 @@ async def process_save_image(call: types.CallbackQuery, state: FSMContext, model
             model_name_index,
         ),
         reply_markup=video_generation_keyboards.generateVideoKeyboard(
-            model_name
+            model_name,
         ),
     )
+
+    await bot(method)
 
     # Удаляем сообщение о сохранении изображения
     await saving_progress_message.delete()

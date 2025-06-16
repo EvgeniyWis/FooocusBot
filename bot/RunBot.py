@@ -9,9 +9,13 @@ from helpers.handlers.startGeneration import process_image
 
 from bot.config import (
     DEV_CHAT_IDS,
+    FACEFUSION_DIR,
     FACEFUSION_RESULTS_DIR,
     TEMP_DIR,
+    TEMP_FOLDER_PATH,
     TEMP_IMAGE_FILES_DIR,
+    VIDEOS_TEMP_DIR,
+    env_path,
 )
 from bot.InstanceBot import bot, dp, redis_client, storage
 from bot.logger import logger
@@ -20,6 +24,9 @@ from bot.storage import get_redis_storage, init_redis_storage
 
 
 async def on_startup() -> None:
+    logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
+    logger.info(f"Путь к .env файлу: {env_path}")
+
     await init_redis_storage(redis_client)
 
     repo = get_redis_storage()
@@ -31,6 +38,13 @@ async def on_startup() -> None:
             storage,
         ),
     )
+
+    logger.info(f"TEMP_IMAGE_FILES_DIR: {TEMP_IMAGE_FILES_DIR}")
+    logger.info(f"FACEFUSION_DIR: {FACEFUSION_DIR}")
+    logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH}")
+    logger.info(f"VIDEOS_TEMP_DIR: {VIDEOS_TEMP_DIR}")
+    logger.info(f"FACEFUSION_RESULTS_DIR: {FACEFUSION_RESULTS_DIR}")
+    logger.info(f"TEMP_DIR: {TEMP_DIR})")
 
     # Удаляем все файлы в папке temp
     if os.path.exists(TEMP_DIR):
