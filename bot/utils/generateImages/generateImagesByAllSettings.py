@@ -18,6 +18,7 @@ async def generateImagesByAllSettings(
     state: FSMContext,
     user_id: int,
     is_test_generation: bool,
+    prompt: str,
     with_randomizer: bool = False,
 ):
     # Получаем все настройки
@@ -49,7 +50,7 @@ async def generateImagesByAllSettings(
     if not is_test_generation:
         await message_with_generations_status.pin()
 
-    async def process_generation(dataJSON, model_name, index):
+    async def process_generation(model_name, index):
         async with semaphore:
             # Получаем данные генерации по названию модели
             data = await getDataByModelName(model_name)
@@ -60,6 +61,7 @@ async def generateImagesByAllSettings(
                 state,
                 user_id,
                 index + 1,
+                prompt, 
                 is_test_generation,
             )
 
