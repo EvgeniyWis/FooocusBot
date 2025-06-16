@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from .dataArray import getDataArrayByRandomizer, getDataArrayWithRootPrompt
+from .dataArray import getDataArrayByRandomizer, getModelNameByIndex, getDataByModelName, getDataArrayBySettingNumber
 from .generateImageBlock import generateImageBlock
 
 
@@ -21,11 +21,19 @@ async def generateImages(
     model_indexes_for_generation: list[int] = None,
 ):
     if not with_randomizer:
-        # Прибавляем к каждому элементу массива корневой промпт
+        # Если модели для индивидуальной генерации есть, то формируем из них массив
         if model_indexes_for_generation:
-            dataArray = await getDataArrayWithRootPrompt(setting_number, prompt, model_indexes_for_generation)
+            # Получаем имена моделей по их номерам
+            model_names_for_generation = [
+                getModelNameByIndex(model_index)
+                for model_index in model_indexes_for_generation
+            ]
+            dataArray = [
+                await getDataByModelName(model_name)
+                for model_name in model_names_for_generation
+            ]
         else:
-            dataArray = await getDataArrayWithRootPrompt(setting_number, prompt)
+            dataArray = getDataArrayBySettingNumber(int(setting_number))
     else:
         dataArray = await getDataArrayByRandomizer(state, setting_number)
 
@@ -47,16 +55,13 @@ async def generateImages(
                 f"Генерация изображения с изначальными данными: {data}",
             )
 
-            # Прибавляем к каждому элементу массива корневой промпт
-            json = data["json"].copy()
-            json["input"]["prompt"] += " " + prompt
-
             image = await generateImageBlock(
                 data,
                 message,
                 state,
                 user_id,
                 setting_number,
+                prompt,
                 is_test_generation,
             )
             images.append(image)

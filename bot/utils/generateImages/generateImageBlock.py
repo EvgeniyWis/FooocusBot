@@ -10,7 +10,7 @@ from .getReferenceImage import getReferenceImage
 from .dataArray.getSettingNumberByModelName import getSettingNumberByModelName
 from logger import logger
 
-from bot.utils import retryOperation
+from utils import retryOperation
 
 
 # Функция для генерации изображений по объекту данных
@@ -20,11 +20,16 @@ async def generateImageBlock(
     state: FSMContext,
     user_id: int,
     setting_number: str,
+    variable_prompt: str,
     is_test_generation: bool = False,
     checkOtherJobs: bool = True,
 ):
     # Получаем данные из стейта
     stateData = await state.get_data()
+
+    # Прибавляем к постоянному промпту переменный промпт
+    json = data["json"].copy()
+    json["input"]["prompt"] = variable_prompt.replace("\n", " ") + " " + json["input"]["prompt"]
 
     # Получаем имя настройки
     model_name = data["model_name"]
@@ -37,7 +42,7 @@ async def generateImageBlock(
         logger.info(f"Отправляем запрос на генерацию изображений с данными: {data}")
 
         # Делаем запрос на генерацию и получаем id работы
-        job_id = await getJobID(data["json"], setting_number, state)
+        job_id = await getJobID(json, setting_number, state)
 
         # Проверяем статус работы
         response_json = await retryOperation(
