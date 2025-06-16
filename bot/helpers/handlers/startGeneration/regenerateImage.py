@@ -66,9 +66,12 @@ async def regenerateImage(
     else:
         prompt = ""
 
+    # Получаем данные генерации по названию модели
+    data = await getDataByModelName(model_name)
+
     try:
         return await generateImageBlock(
-            model_name,
+            data,
             call.message.message_id,
             state,
             user_id,

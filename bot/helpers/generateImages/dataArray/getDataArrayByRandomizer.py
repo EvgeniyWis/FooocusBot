@@ -49,7 +49,8 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
 
             model_randomizer_prompt += formated_prompt
 
-        data["json"]["input"]["prompt"] += model_randomizer_prompt + " "
+        # Прибавляем к постоянному промпту промпт рандомайзера      
+        data["json"]["input"]["prompt"] = model_randomizer_prompt.replace("\n", " ") + " " + data["json"]["input"]["prompt"]
 
         # Сохраняем промпт в стейт для перегенерации
         data_for_update = {f"{data['model_name']}": model_randomizer_prompt}

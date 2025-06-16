@@ -207,7 +207,7 @@ Style: Instagram photo style, warm vibrant filter, high-resolution, Canon DSLR s
             "daisyknoxen",
             "1BfBUv1bUHaGsWmBg8Oxv4r_wniQu2_VO",
             "1XReaJxJA2wRiJNbyjOZOdJC3lBNtpX5j",
-            """photorealistic portrait of an 18-year-old athletic Caucasian redhead girl with long voluminous fiery red hair, medium teardrop-shaped breasts, toned abdomen, narrow waist, wide hips, thin legs, tanned skin with natural texture and fine pores, plump lips, realistic blue eyes, slightly smiling, wearing modest clothing with no exposed skin, in bright natural sunlight outdoors, Instagram photo style, vibrant colors, high resolution, Canon DSLR simulation, shallow depth of field."""
+            """photorealistic portrait of an 18-year-old athletic Caucasian redhead girl with long voluminous fiery red hair, medium teardrop-shaped breasts, toned abdomen, narrow waist, wide hips, thin legs, tanned skin with natural texture and fine pores, plump lips, realistic blue eyes, slightly smiling, wearing modest clothing with no exposed skin, in bright natural sunlight outdoors, Instagram photo style, vibrant colors, high resolution, Canon DSLR simulation, shallow depth of field.""",
             [2, 2.60, -0.90, -1.70, 0.05, 1.00, 4.85, 1.00],
             8,
         ),
