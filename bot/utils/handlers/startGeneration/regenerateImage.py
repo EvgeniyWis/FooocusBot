@@ -50,11 +50,10 @@ async def regenerateImage(model_name: str, call: types.CallbackQuery, state: FSM
     else:
         prompt = ""
 
-    # Прибавляем к каждому элементу массива корневой промпт
-    json = data["json"].copy()
-    json["input"]["prompt"] += " " + prompt
+    # Получаем данные генерации по названию модели
+    data = await getDataByModelName(model_name)
 
     try:
-        return await generateImageBlock(json, model_name, call.message, state, user_id, setting_number, is_test_generation, False)
+        return await generateImageBlock(data, call.message, state, user_id, setting_number, is_test_generation, False)
     finally:
         await regenerate_message.delete()

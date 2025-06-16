@@ -8,6 +8,7 @@ from logger import logger
 from .. import text
 from .dataArray.getAllDataArrays import getAllDataArrays
 from .dataArray.getDataArrayByRandomizer import getDataArrayByRandomizer
+from .dataArray.getDataByModelName import getDataByModelName
 from .generateImageBlock import generateImageBlock
 
 
@@ -50,9 +51,11 @@ async def generateImagesByAllSettings(
 
     async def process_generation(dataJSON, model_name, index):
         async with semaphore:
+            # Получаем данные генерации по названию модели
+            data = await getDataByModelName(model_name)
+
             await generateImageBlock(
-                dataJSON,
-                model_name,
+                data,
                 message_with_generations_status,
                 state,
                 user_id,

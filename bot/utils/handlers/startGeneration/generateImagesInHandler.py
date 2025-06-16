@@ -60,15 +60,10 @@ async def generateImagesInHandler(
                     int(setting_number),
                 )
 
-                # Прибавляем корневой промпт
-                json = dataArray[0]["json"].copy()
-                json["input"]["prompt"] += " " + prompt
-
-                model_name = dataArray[0]["model_name"]
+                data = dataArray[0]
                 result = [
                     await generateImageBlock(
-                        json,
-                        model_name,
+                        data,
                         message_for_edit,
                         state,
                         user_id,

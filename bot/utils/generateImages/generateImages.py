@@ -52,8 +52,7 @@ async def generateImages(
             json["input"]["prompt"] += " " + prompt
 
             image = await generateImageBlock(
-                json,
-                data["model_name"],
+                data,
                 message,
                 state,
                 user_id,
