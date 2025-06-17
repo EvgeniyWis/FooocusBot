@@ -6,7 +6,7 @@ from storage import get_redis_storage
 from bot.assets.mocks.links import (
     MOCK_FACEFUSION_PATH,
 )
-from bot.config import FACEFUSION_MODE, MOCK_MODE, UPSCALE_MODE
+from bot.settings import FACEFUSION_MODE, MOCK_MODE, UPSCALE_MODE
 from bot.helpers.handlers.startGeneration.image_processes import (
     ProcessImageStep,
     get_current_process_image_step,

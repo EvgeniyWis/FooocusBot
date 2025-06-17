@@ -54,10 +54,10 @@ async def generateImagesInHandler(
                     int(setting_number),
                 )
 
-                model_name = dataArray[0]["model_name"]
+                data = dataArray[0]
                 result = [
                     await generateImageBlock(
-                        model_name,
+                        data,
                         message_for_edit.message_id,
                         state,
                         user_id,

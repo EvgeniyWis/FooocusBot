@@ -6,7 +6,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
-from bot.config import MOCK_MODE
+from bot.settings import MOCK_MODE
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
