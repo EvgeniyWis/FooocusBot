@@ -6,7 +6,6 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from bot.settings import MOCK_MODE
 from bot.config import TEMP_IMAGE_FILES_DIR
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
@@ -16,7 +15,7 @@ from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
     getModelNameByIndex,
 )
 from bot.helpers.handlers.messages import deleteMessageFromState
-from bot.helpers.handlers.videoGeneration import saveVideo
+from bot.helpers.handlers.videoGeneration import saveVideo, process_video
 from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
@@ -210,115 +209,7 @@ async def handle_video_example_buttons(
     #         except Exception as e:
     #             logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
 
-    # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
-
-    # Отправляем сообщение про генерацию видео
-    video_progress_message = await editMessageOrAnswer(
-        call,
-        text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
-    )
-
-    # Генерируем видео
-    if MOCK_MODE:
-        video_path = "FocuuusBot/bot/assets/mocks/mock_video.mp4"
-    else:
-        try:
-            video_path = await retryOperation(
-                generate_video,
-                10,
-                1.5,
-                video_example_prompt,
-                image_url,
-            )
-        except Exception as e:
-            # Отправляем сообщение об ошибке
-            traceback.print_exc()
-            logger.error(f"Произошла ошибка при генерации видео: {e}")
-            await editMessageOrAnswer(
-                call,
-                text.GENERATE_VIDEO_ERROR_TEXT.format(
-                    model_name,
-                    model_name_index,
-                    e,
-                ),
-                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                    model_name,
-                    False,
-                ),
-            )
-            raise e
-
-    if not video_path:
-        await call.message.answer(
-            text.GENERATE_VIDEO_ERROR_TEXT.format(
-                model_name,
-                model_name_index,
-                "Не удалось сгенерировать видео",
-            ),
-            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                model_name,
-                False,
-            ),
-        )
-        return
-
-    if isinstance(video_path, dict):
-        if video_path.get("error"):
-            await call.message.answer(
-                text.GENERATE_VIDEO_ERROR_TEXT.format(
-                    model_name,
-                    model_name_index,
-                    video_path.get("error"),
-                ),
-                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                    model_name,
-                    False,
-                ),
-            )
-            return
-
-    # Добавляем путь к видео в стейт
-    data_for_update = {f"{model_name}": video_path}
-    await appendDataToStateArray(state, "video_paths", data_for_update)
-
-    # Отправляем видео юзеру
-    video = types.FSInputFile(video_path)
-    prefix = f"generate_video|{model_name}"
-    if type_for_video_generation == "work":
-        video_message = await call.message.answer_video(
-            video=video,
-            caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(
-                model_name,
-                model_name_index,
-            ),
-            reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
-                model_name,
-            ),
-        )
-    else:  # При тестовой просто отправляем юзеру результат генерации
-        video_message = await call.message.answer_video(
-            video=video,
-            caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(
-                model_name,
-                model_name_index,
-            ),
-            reply_markup=video_generation_keyboards.generatedVideoKeyboard(
-                prefix,
-                False,
-            ),
-        )
-
-    # Удаляем сообщение о генерации видео
-    await video_progress_message.delete()
-
-    # Сохраняем сообщение в стейт для последующего удаления
-    data_for_update = {f"{model_name}": video_message.message_id}
-    await appendDataToStateArray(
-        state,
-        "videoGeneration_messages_ids",
-        data_for_update,
-    )
+    await process_video(call, state, model_name, video_example_prompt, type_for_video_generation, image_url)
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
