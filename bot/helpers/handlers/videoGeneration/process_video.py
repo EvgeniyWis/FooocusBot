@@ -1,14 +1,15 @@
 import traceback
 
 from aiogram import types
+from aiogram.fsm.context import FSMContext
 
-from bot.settings import MOCK_MODE
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
 )
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
+from bot.settings import MOCK_MODE
 from bot.utils import retryOperation
 from bot.utils.handlers import (
     appendDataToStateArray,
@@ -16,12 +17,20 @@ from bot.utils.handlers import (
 from bot.utils.handlers.messages import (
     editMessageOrAnswer,
 )
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
+)
 from bot.utils.videos import generate_video
-from aiogram.fsm.context import FSMContext
 
 
-async def process_video(call: types.CallbackQuery, state: FSMContext,
-    model_name: str, prompt: str, type_for_video_generation: str, image_url: str):
+async def process_video(
+    call: types.CallbackQuery,
+    state: FSMContext,
+    model_name: str,
+    prompt: str,
+    type_for_video_generation: str,
+    image_url: str,
+):
     """
     Обработка видео после генерации в основной рабочей генерации.
     Включает в себя работу с сообщениями, сохранением в стейт, генерацией и отправкой видео юзеру.
@@ -74,12 +83,13 @@ async def process_video(call: types.CallbackQuery, state: FSMContext,
             raise e
 
     if not video_path:
-        await call.message.answer(
+        await safe_send_message(
             text.GENERATE_VIDEO_ERROR_TEXT.format(
                 model_name,
                 model_name_index,
                 "Не удалось сгенерировать видео",
             ),
+            call,
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
                 False,
@@ -89,12 +99,13 @@ async def process_video(call: types.CallbackQuery, state: FSMContext,
 
     if isinstance(video_path, dict):
         if video_path.get("error"):
-            await call.message.answer(
+            await safe_send_message(
                 text.GENERATE_VIDEO_ERROR_TEXT.format(
                     model_name,
                     model_name_index,
                     video_path.get("error"),
                 ),
+                call,
                 reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                     model_name,
                     False,

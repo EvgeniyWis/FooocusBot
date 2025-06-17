@@ -15,7 +15,7 @@ from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
     getModelNameByIndex,
 )
 from bot.helpers.handlers.messages import deleteMessageFromState
-from bot.helpers.handlers.videoGeneration import saveVideo, process_video
+from bot.helpers.handlers.videoGeneration import process_video, saveVideo
 from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
@@ -27,6 +27,9 @@ from bot.utils.handlers import (
 )
 from bot.utils.handlers.messages import (
     editMessageOrAnswer,
+)
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
 )
 from bot.utils.videos import generate_video
 
@@ -209,7 +212,14 @@ async def handle_video_example_buttons(
     #         except Exception as e:
     #             logger.error(f"Произошла ошибка при удалении сообщения с id {message_id}: {e}")
 
-    await process_video(call, state, model_name, video_example_prompt, type_for_video_generation, image_url)
+    await process_video(
+        call,
+        state,
+        model_name,
+        video_example_prompt,
+        type_for_video_generation,
+        image_url,
+    )
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -223,7 +233,10 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     image_url = await getDataInDictsArray(saved_images_urls, model_name)
 
     if not image_url:
-        await message.answer("Ошибка: не удалось найти URL изображения")
+        await safe_send_message(
+            "Ошибка: не удалось найти URL изображения",
+            message,
+        )
         return
 
     # Удаляем сообщение пользователя
@@ -257,11 +270,12 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         )
     except Exception as e:
         # Если не удалось отправить фото, отправляем только текст
-        await message.answer(
+        await safe_send_message(
             text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(
                 model_name,
                 model_name_index,
             ),
+            message,
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
                 True,
@@ -331,7 +345,10 @@ async def write_prompt_for_videoGenerationFromImage(
 ):
     # Проверяем, есть ли изображение в сообщении
     if not message.photo:
-        await message.answer(text.NO_IMAGE_FOR_VIDEO_GENERATION_ERROR_TEXT)
+        await safe_send_message(
+            text.NO_IMAGE_FOR_VIDEO_GENERATION_ERROR_TEXT,
+            message,
+        )
         return
 
     # Получаем file_id самого большого изображения
@@ -342,7 +359,10 @@ async def write_prompt_for_videoGenerationFromImage(
 
     # Просим пользователя ввести промпт для генерации видео
     await state.set_state(None)
-    await message.answer(text.WRITE_PROMPT_FOR_VIDEO_GENERATION_FOR_IMAGE_TEXT)
+    await safe_send_message(
+        text.WRITE_PROMPT_FOR_VIDEO_GENERATION_FOR_IMAGE_TEXT,
+        message,
+    )
     await state.set_state(
         StartGenerationState.write_prompt_for_videoGenerationFromImage,
     )
@@ -363,11 +383,17 @@ async def handle_prompt_for_videoGenerationFromImage(
     )
 
     if not image_file_id:
-        await message.answer(text.NO_IMAGE_FOR_VIDEO_GENERATION_ERROR_TEXT)
+        await safe_send_message(
+            text.NO_IMAGE_FOR_VIDEO_GENERATION_ERROR_TEXT,
+            message,
+        )
         return
 
     # Отправляем сообщение о прогрессе
-    await message.answer(text.GENERATE_VIDEO_FROM_IMAGE_PROGRESS_TEXT)
+    await safe_send_message(
+        text.GENERATE_VIDEO_FROM_IMAGE_PROGRESS_TEXT,
+        message,
+    )
 
     try:
         # Скачиваем изображение (file_id) и получаем путь к файлу
@@ -378,8 +404,9 @@ async def handle_prompt_for_videoGenerationFromImage(
                 timeout=30,
             )
         except TimeoutError:
-            await message.answer(
+            await safe_send_message(
                 "⏰ Время ожидания получения файла Telegram истекло. Попробуйте позже.",
+                message,
             )
             raise TimeoutError(
                 "Время ожидания получения файла Telegram истекло.",
@@ -394,8 +421,9 @@ async def handle_prompt_for_videoGenerationFromImage(
                 timeout=60,
             )
         except TimeoutError:
-            await message.answer(
+            await safe_send_message(
                 "⏰ Время ожидания скачивания файла Telegram истекло. Попробуйте позже.",
+                message,
             )
             raise TimeoutError(
                 "Время ожидания скачивания файла Telegram истекло.",
@@ -422,8 +450,9 @@ async def handle_prompt_for_videoGenerationFromImage(
 
         # Спрашиваем, в папку какой модели сохранить видео
         await state.set_state(None)
-        await message.answer(
+        await safe_send_message(
             text.ASK_FOR_MODEL_NAME_FOR_VIDEO_GENERATION_FROM_IMAGE_TEXT,
+            message,
         )
         await state.set_state(
             StartGenerationState.ask_for_model_name_for_video_generation_from_image,
@@ -433,8 +462,9 @@ async def handle_prompt_for_videoGenerationFromImage(
         os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
-        await message.answer(
+        await safe_send_message(
             text.GENERATE_VIDEO_FROM_IMAGE_ERROR_TEXT.format(e),
+            message,
         )
         raise e
 
@@ -453,12 +483,17 @@ async def handle_model_name_for_video_generation_from_image(
         model_index = int(message.text)
     except Exception as e:
         logger.error(f"Произошла ошибка при получении индекса модели: {e}")
-        await message.answer(text.WRONG_MODEL_INDEX_TEXT.format(message.text))
+        await safe_send_message(
+            text.WRONG_MODEL_INDEX_TEXT.format(message.text),
+            message,
+        )
         return
 
     # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
     if model_index > 100 or model_index < 1:
-        await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
+        await safe_send_message(
+            text.MODEL_NOT_FOUND_TEXT.format(model_index), message
+        )
         return
 
     # Получаем путь к видео

@@ -41,11 +41,15 @@ FACEFUSION_RESULTS_DIR = os.path.join(
 
 TEMP_DIR = os.path.join(BASE_DIR, "temp")
 
-# Заголовки для запросов на Runpod
-RUNPOD_HEADERS = {
-    "Content-Type": "application/json",
-    "Authorization": os.getenv("RUNPOD_API_KEY"),
-}
+def get_runpod_headers() -> dict:
+    """Get headers for Runpod API requests with validation."""
+    api_key = os.getenv("RUNPOD_API_KEY")
+    if not api_key:
+        raise ValueError("RUNPOD_API_KEY environment variable is not set")
+    return {
+        "Content-Type": "application/json",
+        "Authorization": api_key
+    }
 
 # Заголовки для запросов на API kling
 KLING_HEADERS = {

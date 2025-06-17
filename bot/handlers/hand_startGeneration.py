@@ -34,6 +34,9 @@ from bot.utils.handlers import (
 from bot.utils.handlers.messages import (
     editMessageOrAnswer,
 )
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
+)
 
 
 # Обработка выбора количества генераций
@@ -262,8 +265,12 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о начале генерации
-    message_for_edit = await message.answer(
-        text.GENERATE_IMAGE_PROGRESS_TEXT.format(model_name, model_name_index),
+    message_for_edit = await safe_send_message(
+        text=text.GENERATE_IMAGE_PROGRESS_TEXT.format(
+            model_name,
+            model_name_index,
+        ),
+        message=message,
     )
 
     # Получаем данные генерации по названию модели
@@ -286,8 +293,13 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
 
     # Если следующая модель не найдена, то завершаем генерацию
     if not next_model:
-        await message.answer(text.GENERATION_SUCCESS_TEXT)
+        await safe_send_message(
+            text=text.GENERATION_SUCCESS_TEXT,
+            message=message,
+        )
         return
+
+    await message.answer()
 
     # Выводим в лог следующую модель
     logger.info(f"Следующая модель: {next_model}")
@@ -297,8 +309,12 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
 
     await state.set_state(None)
     # Просим пользователя отправить промпт для следующей модели
-    await message.answer(
-        text.WRITE_PROMPT_FOR_MODEL_TEXT.format(next_model, next_model_index),
+    await safe_send_message(
+        text=text.WRITE_PROMPT_FOR_MODEL_TEXT.format(
+            next_model,
+            next_model_index,
+        ),
+        message=message,
         reply_markup=start_generation_keyboards.confirmWriteUniquePromptForNextModelKeyboard(),
     )
     await state.update_data(current_model_for_unique_prompt=next_model)
@@ -431,23 +447,30 @@ async def write_model_name_for_generation(
     # Проверяем, что это число
     for model_index in model_indexes:
         if not model_index.isdigit():
-            await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
+            await safe_send_message(
+                text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
+                message=message,
+            )
             return
 
     # Проверяем, существует ли такие модели
     for model_index in model_indexes:
         # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
         if int(model_index) > 100 or int(model_index) < 1:
-            await message.answer(text.MODEL_NOT_FOUND_TEXT.format(model_index))
+            await safe_send_message(
+                text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
+                message=message,
+            )
             return
 
     await state.update_data(model_indexes_for_generation=model_indexes)
 
     await state.set_state(None)
-    await message.answer(
-        text.GET_MODEL_INDEX_SUCCESS_TEXT
+    await safe_send_message(
+        text=text.GET_MODEL_INDEX_SUCCESS_TEXT
         if len(model_indexes) == 1
         else text.GET_MODEL_INDEXES_SUCCESS_TEXT,
+        message=message,
     )
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
@@ -488,12 +511,13 @@ async def write_new_prompt_for_regenerate_image(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о перегенерации изображения
-    regenerate_progress_message = await message.answer(
-        text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(
+    regenerate_progress_message = await safe_send_message(
+        text=text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(
             model_name,
             model_name_index,
             prompt,
         ),
+        message=message,
     )
 
     await state.set_state(None)
