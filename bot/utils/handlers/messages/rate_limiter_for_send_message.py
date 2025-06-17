@@ -1,94 +1,58 @@
 import asyncio
 import time
-from collections import defaultdict
-from typing import Optional
 
 from aiogram import types
-from aiogram.exceptions import TelegramRetryAfter
+from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 
 from bot.logger import logger
 
-_rate_locks = defaultdict(asyncio.Lock)
-_last_message_times = defaultdict(lambda: 0.0)
-_min_delay = 1.0
+_send_lock = asyncio.Lock()
+_last_send_time = 0.0
 
-_last_messages = defaultdict(str)
+MIN_DELAY = 1.5
 
 
 async def safe_send_message(
-    message: types.Message,
     text: str,
-    reply_markup: types.InlineKeyboardMarkup | None = None,
-    parse_mode: str | None = "HTML",
-    disable_web_page_preview: bool = True,
-    disable_notification: bool = False,
-) -> Optional[types.Message]:
-    """
-    Безопасная отправка сообщения с защитой от флуда.
+    message: types.Message | types.CallbackQuery,
+    reply_markup: types.InlineKeyboardMarkup
+    | types.ReplyKeyboardMarkup
+    | types.ReplyKeyboardRemove
+    | None = None,
+) -> types.Message | None:
+    logger.info(
+        f"safe_send_message called with text={text!r}, reply_markup={reply_markup!r}",
+    )
+    global _last_send_time
 
-    Args:
-        message: Объект сообщения
-        text: Текст сообщения
-        reply_markup: Клавиатура (опционально)
-        parse_mode: Режим парсинга (по умолчанию HTML)
-        disable_web_page_preview: Отключить предпросмотр веб-страниц
-        disable_notification: Отключить уведомление
+    if isinstance(message, types.CallbackQuery):
+        message = message.message
 
-    Returns:
-        Объект сообщения или None в случае ошибки
-    """
-    chat_id = str(message.chat.id)
-
-    async with _rate_locks[chat_id]:
-        if _last_messages[chat_id] == text:
-            return None
-
-        now = time.time()
-        elapsed = now - _last_message_times[chat_id]
-
-        if elapsed < _min_delay:
-            wait_time = _min_delay - elapsed
-            logger.debug(
-                f"Ожидаем {wait_time:.2f} секунд перед отправкой сообщения в чат {chat_id}",
+    async with _send_lock:
+        now = time.monotonic()
+        elapsed = now - _last_send_time
+        if elapsed < MIN_DELAY:
+            await asyncio.sleep(MIN_DELAY - elapsed)
+            logger.warning(
+                f"Ожидаем {MIN_DELAY} сек перед отправкой сообщения (ответ на {message.message_id})",
             )
-            await asyncio.sleep(wait_time)
-
-        _last_message_times[chat_id] = time.time()
 
         try:
-            msg = await message.answer(
-                text=text,
-                reply_markup=reply_markup,
-                parse_mode=parse_mode,
-                disable_web_page_preview=disable_web_page_preview,
-                disable_notification=disable_notification,
-            )
-            _last_messages[chat_id] = text
+            msg = await message.answer(text, reply_markup=reply_markup)
+            _last_send_time = time.monotonic()
             return msg
-
         except TelegramRetryAfter as e:
-            retry_after = e.retry_after
-            logger.warning(
-                f"Флуд-контроль от Telegram. Ожидаем {retry_after} секунд перед повторной попыткой отправки сообщения в чат {chat_id}",
-            )
-            await asyncio.sleep(retry_after)
-
+            logger.warning(f"Telegram RetryAfter: {e.retry_after}s")
+            await asyncio.sleep(e.retry_after)
             try:
-                msg = await message.answer(
-                    text=text,
-                    reply_markup=reply_markup,
-                    parse_mode=parse_mode,
-                    disable_web_page_preview=disable_web_page_preview,
-                    disable_notification=disable_notification,
-                )
-                _last_messages[chat_id] = text
+                msg = await message.answer(text, reply_markup=reply_markup)
+                _last_send_time = time.monotonic()
                 return msg
-            except Exception as e:
-                logger.error(
-                    f"Ошибка при повторной отправке сообщения в чат {chat_id}: {e}",
-                )
-                return None
+            except Exception:
+                logger.exception("RetryAfter повторная попытка не удалась")
+        except TelegramAPIError as e:
+            logger.warning(f"Telegram API ошибка: {e}")
+        except Exception:
+            logger.exception("Неожиданная ошибка в safe_send_message")
 
-        except Exception as e:
-            logger.error(f"Ошибка при отправке сообщения в чат {chat_id}: {e}")
-            return None
+    return None

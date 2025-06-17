@@ -4,14 +4,17 @@ from datetime import datetime
 from aiogram import types
 from logger import logger
 
-from bot.settings import MOCK_MODE
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
+from bot.settings import MOCK_MODE
 from bot.utils.googleDrive.files import saveFile
 from bot.utils.googleDrive.folders import getFolderDataByID
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
+)
 
 
 # Функция для сохранения видео в папку модели
@@ -26,8 +29,9 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о начале сохранения видео
-    message_for_delete = await message.answer(
-        text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index)
+    message_for_delete = await safe_send_message(
+        text.SAVE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
+        message,
     )
 
     # Получаем данные о модели по имени
@@ -46,8 +50,9 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     )
 
     if not link:
-        await message.answer(
-            text.SAVE_FILE_ERROR_TEXT.format(model_name, model_name_index)
+        await safe_send_message(
+            text.SAVE_FILE_ERROR_TEXT.format(model_name, model_name_index),
+            message,
         )
         return
 
@@ -57,7 +62,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     parent_folder = getFolderDataByID(parent_folder_id)
 
     logger.info(
-        f"Данные папки по id {model_data['video_folder_id']}: {folder}"
+        f"Данные папки по id {model_data['video_folder_id']}: {folder}",
     )
 
     # Удаляем сообщение о начале сохранения видео
@@ -65,7 +70,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
         await message_for_delete.delete()
     except Exception as e:
         logger.error(
-            f"Ошибка при удалении сообщения о начале сохранения видео: {e}"
+            f"Ошибка при удалении сообщения о начале сохранения видео: {e}",
         )
 
     # Отправляем сообщение о сохранении видео
@@ -73,7 +78,10 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     await message.answer_video(
         video=video,
         caption=text.SAVE_VIDEO_SUCCESS_TEXT.format(
-            link, model_name, parent_folder["webViewLink"], model_name_index
+            link,
+            model_name,
+            parent_folder["webViewLink"],
+            model_name_index,
         ),
     )
 

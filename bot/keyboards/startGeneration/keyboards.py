@@ -5,20 +5,24 @@ from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 # Инлайн-клавиатура для выбора количества генераций
 def generationsTypeKeyboard(
-    with_work_generation: bool = True, with_test_generation: bool = True
+    with_work_generation: bool = True,
+    with_test_generation: bool = True,
 ):
     inline_keyboard = getGenerationsTypeButtons(
-        "generations_type", with_test_generation, with_work_generation
+        "generations_type",
+        with_test_generation,
+        with_work_generation,
     )
-    inline_keyboard.append(
+    inline_keyboard.extend(
         [
-            InlineKeyboardButton(
-                text="📹 Сгенерировать видео из изображения",
-                callback_data="generateVideoFromImage",
-            ),
-        ],
+            [
+                InlineKeyboardButton(
+                    text="📹 Сгенерировать видео из изображения",
+                    callback_data="generateVideoFromImage",
+                ),
+            ],
+        ]
     )
-
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
@@ -51,16 +55,16 @@ def selectImageKeyboard(
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
                 callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
-            )
-        ]
+            ),
+        ],
     )
     inline_keyboard.append(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
                 callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt",
-            )
-        ]
+            ),
+        ],
     )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -98,8 +102,8 @@ def selectSettingKeyboard(is_test_generation: bool = False):
                 InlineKeyboardButton(
                     text="🔄 Индивидуальная генерация",
                     callback_data="select_setting|specific_model",
-                )
-            ]
+                ),
+            ],
         )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -203,9 +207,9 @@ def regenerateVideoKeyboard(model_name: str):
                 InlineKeyboardButton(
                     text="🔄 Перегенерировать видео",
                     callback_data=f"start_generate_video|{model_name}",
-                )
+                ),
             ],
-        ]
+        ],
     )
 
     return kb
