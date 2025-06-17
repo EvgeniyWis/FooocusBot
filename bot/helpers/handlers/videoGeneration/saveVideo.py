@@ -4,7 +4,7 @@ from datetime import datetime
 from aiogram import types
 from logger import logger
 
-from bot.config import MOCK_MODE
+from bot.settings import MOCK_MODE
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,

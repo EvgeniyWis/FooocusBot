@@ -3,7 +3,8 @@ import shutil
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 
-from bot.config import MOCK_MODE, TEMP_FOLDER_PATH
+from bot.config import TEMP_FOLDER_PATH
+from bot.settings import MOCK_MODE
 from bot.InstanceBot import bot
 from bot.keyboards import start_generation_keyboards
 from bot.logger import logger

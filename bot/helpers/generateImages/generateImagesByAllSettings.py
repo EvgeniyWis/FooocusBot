@@ -12,6 +12,7 @@ from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
+from bot.helpers.generateImages.dataArray import getDataByModelName
 
 
 # Функция для генерации изображений по всем настройкам
@@ -57,8 +58,11 @@ async def generateImagesByAllSettings(
 
     async def process_generation(model_name, index, prompt):
         async with semaphore:
+            # Получаем данные генерации по названию модели
+            data = await getDataByModelName(model_name)
+
             await generateImageBlock(
-                model_name,
+                data,
                 message_with_generations_status.message_id,
                 state,
                 user_id,

@@ -106,4 +106,14 @@ async def check_job_status(
     # Удаляем задачу из стейта и Redis
     await delete_job(job_id, state)
 
+    # Если работа не завершена, то возвращаем False
+    if not response_json or response_json == CANCELLED_JOB_TEXT:
+        return False
+
+    # Проверяем наличие выходных данных
+    images_output = response_json.get("output", [])
+
+    if images_output == []: # Если их нет, то кидаем ошибку
+        raise Exception("Не удалось сгенерировать изображения")
+
     return response_json
