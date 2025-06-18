@@ -60,7 +60,7 @@ async def generateVideo(
                 }
 
                 # Отправляем запрос на генерацию видео
-                url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
+                url_endpoint = "https://gen-api-back.backendtester.ru/api/v1/networks/kling-v2-1"
                 response = await client.post(
                     url_endpoint,
                     data=data,
@@ -101,7 +101,7 @@ async def generateVideo(
                     return None
 
                 url_status_endpoint = (
-                    f"https://api.gen-api.ru/api/v1/request/get/{request_id}"
+                    f"https://gen-api-back.backendtester.ru/api/v1/request/get/{request_id}"
                 )
 
                 while True:
