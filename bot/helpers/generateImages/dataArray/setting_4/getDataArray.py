@@ -29,9 +29,10 @@ def setting4_getDataArray():
             "karine_montclair",
             "1jgBSpQ3B6d099UNijzTQK86j96DYIsHl",
             "12T0xGW2S8DX3RClWiWawm9sy1nh3oyeJ",
-            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, ash-blonde hair, long hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, blue eyes.""",
+            real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, ash-blonde hair, long hair, medium-large breasts, natural breasts, tan skin, skinny, cute, big lips, blue eyes, facing forward, frontal pose, no emphasis on buttocks
+            """,
             [2, 1.40, 0.50, 1.00, 2.50, 2.00, -0.70, 0.35],
             8,
             "score_6, score_5, score_4, Negative_&_Positive_Embeddings_By_Stable_Yogi, negative_hand, pony, negativeXL_D, low quality, oversaturated, disfigured, poorly, bad, wrong, mutated, worst quality, normal quality, ugly face, mutated hands, extra fingers, poorly drawn hands, fused fingers, too many fingers, long neck, bad hands, text, signature, signature artist, multiple female, multiple male, bad anatomy, low res, blurry face, blurry eyes, tiny hands, tiny feet, multiple women, disproportionately large head, disproportionately long torso, six fingers, low quality hands, hat, multicolored hair, pubic hair, asian, tan lines, makeup, lipstick, playing cards, black skin, steering wheel, (man), (((naked nipples))), (((naked breasts))), (((penis))), (((dick))), (((naked pussy))), (((naked))), (((naked ass))), cartoon, anime, 3d, cgi, illustration, doll-like, overly muscular, chubby, plastic skin, waxy texture, blurry, jpeg artifacts, extra limbs, distorted proportions, unnatural face, unrealistic anatomy, deformed eyes, exaggerated curves, barbie face, uncanny valley, big head, overexposed, underexposed, low-quality shading, unnatural smile",
@@ -94,9 +95,10 @@ def setting4_getDataArray():
             "melissaxlaine",
             "1-emjLPMenbVaDkMlASydigtIU0fEQddh",
             "1-5VWCZ9FPnx6SATqvFa2PvinmZ5HQMYZ",
-            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, volumnous black hair, platinum-blonde hair, short hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
+            real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, voluminous black hair, platinum-blonde hair, short hair, sharp bob haircut, defined bob hairstyle, sleek bob, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))
+            """,
             [2, 1.65, -0.80, 1.75, 1.50, 2.00, -0.70, 0.35],
         ),
         setting4_generateData(

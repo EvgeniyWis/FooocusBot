@@ -83,7 +83,7 @@ realbeauty, 1girl, 18 years old, sorority girl, long voluminous ash-platinum blo
             setting3_generateData("callieroux", "1oMwvePG5pSnbquF6wEr6yGWw45EjaeyO", "1u9fE_nQdDVSnbucs95u1kqcn0vwMGRFM", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-platinum blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-        [-1.50, 1.30, 1.00, 3.45, 1.10, 0.60]),
+        [-1.50, 1.30, 1.00, 3.45, 0.6, 0.60]),
 
         setting3_generateData("aveline_lion", "1ryKfs0xEbcgWw3j35E1hBFsP_vSnuKiD", "1MxgVRtb9qxnZY__yeX1Cj-uEkZQX8Rda", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
