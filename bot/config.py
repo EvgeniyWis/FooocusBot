@@ -3,13 +3,15 @@ import os
 from dotenv import load_dotenv
 from logger import logger
 
-env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "FocuuusBot", ".env")
+import os
+from dotenv import load_dotenv
+
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'FocuuusBot', '.env')
 logger.info(f"Путь к .env файлу: {env_path}")
 logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
 
-if "BOT_API_TOKEN" in os.environ:
-    del os.environ["BOT_API_TOKEN"]
-    del os.environ["KLING_API_KEY"]
+if 'BOT_API_TOKEN' in os.environ:
+    del os.environ['BOT_API_TOKEN']
 
 load_dotenv(env_path, override=True)
 
@@ -43,7 +45,7 @@ RUNPOD_HEADERS = {
 }
 
 # URL для запросов на Runpod
-RUNPOD_HOST = "https://api.runpod.ai/v2"
+RUNPOD_HOST = f"https://api.runpod.ai/v2"
 
 # ID чата разработчика
 DEV_CHAT_ID = 1979922062
@@ -61,7 +63,7 @@ ALLOWED_USERS = [
     5046166133,
     866512502,
     7313424156,
-    7687069152,
+    7687069152, 
     7787997166,
     7515433330,
 ]
