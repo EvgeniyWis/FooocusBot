@@ -9,8 +9,8 @@ def setting2_getDataArray():
     dataArray = [
         setting2_generateData(
             "vanessadior.xo",
-            "1IP_aPES-NB60xVctiovJd5oEDjVqGV3G",
-            "1T4WxLRaQWeIf8m-JSts07-k4dFKmfq5O",
+            "1GiD7hC0VDQQxNjsUbRclit4KfSSgCn_q",
+            "1w0AeHks_msQ6GDQxiS7JZC1pv2hcpqSY",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, huge breasts, slim waist, sagging breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, plump lips, smirk, blue eyes.""",
@@ -18,8 +18,8 @@ def setting2_getDataArray():
         ),
         setting2_generateData(
             "cleawynn",
-            "1zkKTh7qhTT3iGhPm1gzS6U52_5w7lRwl",
-            "1piJm_qahhVFKwUY6FBaWC0KW_-ar-Jcl",
+            "18wnNGqkVPhvACuG9RV4uj8qSKYbFVWnE",
+            "1ywl1Re84dB8ruVVt_X4-HQuxja-S0592",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, huge breasts, slim waist, sagging breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, plump lips, smirk, blue eyes.""",

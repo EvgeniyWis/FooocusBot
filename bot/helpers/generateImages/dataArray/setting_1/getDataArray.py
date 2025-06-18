@@ -271,8 +271,8 @@ Style: Instagram photo style, warm vibrant filter, high-resolution, Canon DSLR s
         ),
         setting1_generateData(
             "sasharoxelle",
-            "1DbpoHrZcEbdVLtlGoQKev7Tdv9sE0vFY",
-            "1k0GwrVzoluvXZ8_Z1ZtBq-xBAQVyijwh",
+            "1jMZnHt32aDHJZU7Ihr84b7eXlFi_M9mE",
+            "1R8zwFg_U52IZPR-546-HZdtSw3DzrUWK",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), ((extra-skinny girl with big boobs)), thin legs, beautiful face, plump lips, realistic blue eyes, long straight brown hair, ponytail hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), big wide hips, hourglass body.
