@@ -1,67 +1,64 @@
-from __future__ import annotations
-
 import asyncio
 import json
-from typing import Callable
+import time
+from typing import Callable, TypeVar
 
-import redis.asyncio as aioredis
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
-from utils.task_storage.rebuild_callback_query_from_task import (
+from config import PROCESS_VIDEO_TASK
+from factory.redis_factory import create_redis_client
+
+from bot.config import PROCESS_IMAGE_BLOCK_TASK, PROCESS_IMAGE_TASK
+from bot.domain.entities.task import (
+    TaskImageBlockDTO,
+    TaskProcessImageDTO,
+    TaskProcessVideoDTO,
+)
+from bot.logger import logger
+from bot.utils.task_storage.rebuild_callback_query_from_task import (
     rebuild_callback_query_from_task,
 )
 
-from bot.domain.entities.task import TaskImageBlockDTO, TaskProcessImageDTO
-from bot.factory.redis_factory import create_redis_client
-from bot.logger import logger
+T = TypeVar("T")
+
+
+def key_for_image_block(job_id: str) -> str:
+    return f"{PROCESS_IMAGE_BLOCK_TASK}:{job_id}"
+
+
+def key_for_image(user_id: int, image_index: int, model_name: str) -> str:
+    return f"{PROCESS_IMAGE_TASK}:{user_id}:{image_index}:{model_name}"
+
+
+def key_for_video(
+    type_for_video: str,
+    user_id: int,
+    image_url: str,
+    model_name: str,
+) -> str:
+    return f"{PROCESS_VIDEO_TASK}:{type_for_video}:{user_id}:{image_url}:{model_name}"
 
 
 class RedisTaskStorageRepository:
     """
-    Асинхронный репозиторий для работы с задачами генерации изображений в Redis.
+    Репозиторий для хранения и управления фоновыми задачами в Redis.
 
-    Предоставляет методы для сохранения, извлечения и управления задачами двух типов:
-    - process_image: задачи обработки одного изображения
-    - process_image_block: задачи обработки блока изображений
-
-    Все задачи автоматически удаляются через 24 часа после создания.
+    Предоставляет интерфейс для сохранения, извлечения и управления
+    длительными задачами с использованием Redis в качестве хранилища.
+    Поддерживает автоматическое восстановление задач при перезапуске системы.
     """
 
-    def __init__(
-        self,
-        redis_client: aioredis.Redis | None = None,
-    ) -> None:
-        """
-        Инициализирует репозиторий для работы с задачами в Redis.
+    def __init__(self, redis_client=None):
+        """Инициализация репозитория задач Redis.
 
-        Args:
-            redis_client:
-                Существующий асинхронный клиент Redis.
-                Если не указан, будет создан новый через create_redis_client().
-                По умолчанию None.
+        Params:
+            - redis_client: Опциональный клиент Redis. Если не указан,
+                        будет создан новый клиент через фабрику.
         """
-        self.redis: aioredis.Redis = redis_client or create_redis_client()
+        self.redis = redis_client or create_redis_client()
         self._callbacks: dict[str, Callable] = {}
-
-    def set_process_callback(self, callback: Callable, job_type: str) -> None:
-        """
-        Регистрирует обработчик для указанного типа задач.
-
-        Обработчик будет вызываться при восстановлении задач соответствующего типа.
-
-        Args:
-            callback:
-                Асинхронная функция-обработчик, принимающая параметры задачи
-            job_type:
-                Тип задачи, для которого регистрируется обработчик.
-                Допустимые значения: 'process_image' или 'process_image_block'
-
-        Raises:
-            ValueError: Если передан некорректный тип задачи
-        """
-        self._callbacks[job_type] = callback
-        logger.info(f"Установлен обработчик для типа задачи: {job_type}")
+        logger.info(f"Инициализирован {self.__class__.__name__}")
 
     async def init_redis(self) -> None:
         """
@@ -79,179 +76,113 @@ class RedisTaskStorageRepository:
         await self.redis.ping()
         logger.info("Подключение к Redis установлено")
 
-    async def add_task_process_image_block(
-        self,
-        task_image_block: TaskImageBlockDTO,
-    ) -> None:
+    async def add_task(self, task_type: str, dto) -> bool:
+        """Добавляет новую задачу в хранилище Redis.
+
+        Params:
+            - task_type: Тип задачи (например, 'process_image', 'process_video')
+            - dto: Объект передачи данных с деталями задачи
+
+        Returns:
+            bool: True если задача успешно добавлена, иначе False
         """
-        Сохраняет задачу обработки блока изображений в Redis.
+        start_time = time.monotonic()
+        key = self._build_key(task_type, dto)
+        try:
+            exists = await self.redis.exists(key)
+            if exists:
+                logger.info(
+                    f"Задача с ключом {key} уже существует, пропускаем добавление",
+                )
+                return False
 
-        Ключ задачи формируется по шаблону "task:{job_id}".
-        Срок хранения задачи - 24 часа с момента создания.
+            serialized = json.dumps(dto.__dict__)
+            ttl = 24 * 60 * 60  # 24 часа
+            result = await self.redis.setex(key, ttl, serialized)
 
-        Args:
-            task_image_block:
-                DTO с данными задачи обработки блока изображений.
-                Должен содержать уникальный job_id.
-
-        Note:
-            Если задача с таким job_id уже существует в Redis,
-            новая запись создана не будет.
-        """
-        key = f"task:{task_image_block.job_id}"
-        if await self.redis.exists(key):
-            logger.warning(
-                f"Задача '{task_image_block.job_id}' уже существует, пропускаем",
+            logger.info(
+                f"Задача добавлена | тип={task_type} | ключ={key} | "
+                f"время={(time.monotonic() - start_time):.3f}с",
             )
-            return
+            return result
+        except Exception as e:
+            logger.error(
+                f"Ошибка при добавлении задачи | тип={task_type} | ключ={key} | ошибка={str(e)}",
+                exc_info=True,
+            )
+            return False
 
-        payload = task_image_block.to_dict()
-        await self.redis.set(key, json.dumps(payload), ex=24 * 3600)
-        logger.debug(f"Задача сохранена: {task_image_block.job_id}")
-
-    async def add_task_process_image(
+    async def get_task(
         self,
-        task_process_image: TaskProcessImageDTO,
-    ) -> None:
-        """
-        Сохраняет задачу upscale/faceswap/save_drive изображения в Redis.
+        task_type: str,
+        key: str,
+    ) -> TaskImageBlockDTO | TaskProcessImageDTO | TaskProcessVideoDTO | None:
+        """Извлекает задачу из хранилища Redis.
 
-        Ключ формируется по шаблону "{user_id}:{image_index}:{model_name}".
-        Срок хранения задачи - 24 часа с момента создания.
-
-        Args:
-            task_process_image:
-                DTO с данными задачи обработки изображения.
-                Должен содержать user_id, image_index и model_name.
-
-        Note:
-            Если задача с таким составным ключом уже существует в Redis,
-            новая запись создана не будет.
-        """
-        key = f"{task_process_image.user_id}:{task_process_image.image_index}:{task_process_image.model_name}"
-        if await self.redis.exists(key):
-            logger.warning(f"Задача '{key}' уже существует, пропускаем")
-            return
-
-        payload = task_process_image.to_dict()
-        await self.redis.set(key, json.dumps(payload), ex=24 * 3600)
-        logger.debug(f"Задача сохранена: {key}")
-
-    async def get_task_process_image_block(
-        self,
-        job_id: str,
-    ) -> TaskImageBlockDTO | None:
-        """
-        Извлекает задачу обработки блока изображений по её идентификатору.
-
-        Ищет задачу в Redis по ключу "task:{job_id}" и возвращает
-        десериализованный объект TaskImageBlockDTO.
-
-        Args:
-            job_id:
-                Уникальный идентификатор задачи.
-                Должен соответствовать формату, используемому при сохранении.
+        Params:
+            - task_type: Тип задачи
+            - key: Ключ Redis задачи
 
         Returns:
-                Объект задачи, если она найдена в Redis.
-                None, если задача с указанным ID не существует.
-
-        Note:
-            Внутренние данные обратного вызова (callback_data) удаляются
-            из результата при десериализации.
+            TaskImageBlockDTO | TaskProcessImageDTO | TaskProcessVideoDTO | None:
+                DTO задачи если найдена, иначе None
         """
-        key = f"task:{job_id}"
-        task_data = await self.redis.get(key)
-        if not task_data:
+        start_time = time.monotonic()
+        try:
+            data = await self.redis.get(key)
+            if not data:
+                logger.debug(f"Задача не найдена | ключ={key}")
+                return None
+
+            dto_class = self._get_dto_class(task_type)
+            task_data = json.loads(data)
+            task = dto_class(**task_data)
+
+            logger.debug(
+                f"Задача получена | тип={task_type} | ключ={key} | "
+                f"время={(time.monotonic() - start_time):.3f}с",
+            )
+            return task
+        except Exception as e:
+            logger.error(
+                f"Ошибка при получении задачи | ключ={key} | ошибка={str(e)}",
+                exc_info=True,
+            )
             return None
 
-        task_dict = json.loads(task_data)
-        task_dict.pop("callback_data", None)
-        return TaskImageBlockDTO.from_dict(task_dict)
+    async def delete_task(self, task_type: str, key) -> bool:
+        """Удаляет задачу из хранилища Redis.
 
-    async def get_task_process_image(
-        self,
-        user_id: int,
-        image_index: int,
-        model_name: str,
-    ) -> TaskProcessImageDTO | None:
-        """
-        Извлекает задачу upsacale/faceswap/save_drive по составному ключу.
-
-        Формирует ключ в формате "{user_id}:{image_index}:{model_name}" и ищет
-        соответствующую задачу в Redis. Возвращает десериализованный объект TaskProcessImageDTO.
-
-        Args:
-            user_id:
-                Идентификатор пользователя, которому принадлежит задача.
-            image_index:
-                Порядковый номер изображения в рамках сессии пользователя.
-            model_name:
-                Название модели, используемой для обработки изображения.
+        Params:
+            - task_type: Тип задачи
+            - key: Ключ Redis задачи или DTO объект задачи
 
         Returns:
-                Объект задачи, если она найдена в Redis.
-                None, если задача с указанными параметрами не существует.
-
-        Note:
-            В отличие от get_task_process_image_block, не удаляет
-            callback_data из результата, так как он может потребоваться
-            для восстановления контекста.
+            bool: True если задача успешно удалена, иначе False
         """
-        key = f"{user_id}:{image_index}:{model_name}"
-        task_data = await self.redis.get(key)
-        if not task_data:
-            return None
+        try:
+            # Если передан DTO объект, а не ключ, строим ключ
+            if not isinstance(key, str):
+                redis_key = self._build_key(task_type, key)
+            else:
+                redis_key = key
 
-        task_dict = json.loads(task_data)
-        return TaskProcessImageDTO.from_dict(task_dict)
-
-    async def delete_task_process_image_block(self, job_id: str) -> None:
-        """
-        Удаляет задачу обработки блока изображений из Redis.
-
-        Удаляет задачу по ключу "task:{job_id}". Если задача не существует,
-        операция завершается без ошибок.
-
-        Args:
-            job_id:
-                Уникальный идентификатор задачи, которую необходимо удалить.
-
-        Note:
-            После удаления задачи, попытка её повторного получения
-            с помощью get_task_process_image_block вернёт None.
-        """
-        await self.redis.delete(f"task:{job_id}")
-        logger.debug(f"Задача удалена: {job_id}")
-
-    async def delete_task_process_image(
-        self,
-        user_id: int,
-        image_index: int,
-        model_name: str,
-    ) -> None:
-        """
-        Удаляет задачу upsacale/faceswap/save_drive из Redis по составному ключу.
-
-        Формирует ключ в формате "{user_id}:{image_index}:{model_name}" и удаляет
-        соответствующую запись из Redis. Если задача не существует, операция
-        завершается без ошибок.
-
-        Args:
-            user_id:
-                Идентификатор пользователя, которому принадлежит задача.
-            image_index:
-                Порядковый номер изображения в рамках сессии пользователя.
-            model_name:
-                Название модели, используемой для обработки изображения.
-
-        Note:
-            После удаления задачи, попытка её повторного получения
-            с помощью get_task_process_image вернёт None.
-        """
-        key = f"{user_id}:{image_index}:{model_name}"
-        await self.redis.delete(key)
-        logger.debug(f"Задача удалена: {key}")
+            result = await self.redis.delete(redis_key)
+            if result > 0:
+                logger.info(
+                    f"Задача удалена | тип={task_type} | ключ={redis_key}",
+                )
+                return True
+            logger.warning(
+                f"Задача не найдена для удаления | ключ={redis_key}",
+            )
+            return False
+        except Exception as e:
+            logger.error(
+                f"Ошибка при удалении задачи | тип={task_type} | ключ={key} | ошибка={str(e)}",
+                exc_info=True,
+            )
+            return False
 
     async def replay_task(
         self,
@@ -259,72 +190,36 @@ class RedisTaskStorageRepository:
         bot: Bot,
         state_storage: FSMContext,
     ) -> bool:
-        """
-        Восстанавливает контекст FSM и выполняет обработчик для указанной задачи.
+        """Воспроизводит задачу из хранилища Redis.
 
-        В зависимости от формата ключа задачи определяет её тип (process_image или process_image_block),
-        загружает данные из Redis, восстанавливает контекст FSM и вызывает соответствующий обработчик.
+        Метод извлекает задачу, восстанавливает её состояние и выполняет
+        соответствующий обработчик.
 
-        Args:
-            key:
-                Ключ задачи в Redis. Может быть двух форматов:
-                - "task:{job_id}" для задач типа process_image_block
-                - "{user_id}:{image_index}:{model_name}" для задач типа process_image
-            bot:
-                Экземпляр бота Aiogram, используемый для восстановления контекста.
-            state_storage:
-                Хранилище состояний FSM, используемое для восстановления контекста.
+        Params:
+            - key: Ключ Redis задачи
+            - bot: Экземпляр бота
+            - state_storage: Хранилище состояний FSM
 
         Returns:
-            True - если задача успешно обработана и удалена из Redis.
-            False - если возникла ошибка или обработчик не найден.
-
-        Note:
-            В случае успешной обработки задача автоматически удаляется из Redis.
-            Для задач process_image используется вспомогательная функция
-            rebuild_callback_query_from_task для восстановления callback-запроса.
+            bool: True если задача успешно воспроизведена, иначе False
         """
+        logger.info(f"Попытка воспроизвести задачу | ключ={key}")
+        start_time = time.monotonic()
+
         try:
-            if (
-                ":" in key
-                and key.count(":") == 2
-                and not key.startswith("task:")
-            ):
-                task_type = "process_image"
-                try:
-                    user_id, image_index, model_name = key.split(":", 2)
-                    task = await self.get_task_process_image(
-                        int(user_id),
-                        int(image_index),
-                        model_name,
-                    )
-                    if not task:
-                        logger.warning(
-                            f"Не найдена задача process_image: {key}",
-                        )
-                        return False
-                except (ValueError, AttributeError) as e:
-                    logger.error(
-                        f"Неверный формат ключа задачи process_image '{key}': {e}",
-                    )
-                    return False
-            else:
-                task_type = "process_image_block"
-                task_key = (
-                    key.split(":", 1)[1] if key.startswith("task:") else key
-                )
-                task = await self.get_task_process_image_block(task_key)
-                if not task:
-                    logger.warning(
-                        f"Не найдена задача process_image_block: {task_key}",
-                    )
-                    return False
+            task_type = self._detect_task_type_by_prefix(key)
+            logger.debug(
+                f"Определен тип задачи | тип={task_type} | ключ={key}",
+            )
+
+            task = await self.get_task(task_type, key)
+            if not task:
+                logger.warning(f"Задача не найдена в хранилище | ключ={key}")
+                return False
 
             callback = self._callbacks.get(task_type)
             if not callback:
-                logger.error(
-                    f"Не найден обработчик для типа задачи: {task_type}",
-                )
+                logger.error(f"Нет обработчика для задачи | тип={task_type}")
                 return False
 
             key_storage = StorageKey(
@@ -334,97 +229,251 @@ class RedisTaskStorageRepository:
             )
             state = FSMContext(storage=state_storage, key=key_storage)
 
-            if task_type == "process_image_block":
-                success = await callback(
-                    job_id=task.job_id,
-                    model_name=task.model_name,
-                    setting_number=task.setting_number,
-                    user_id=task.user_id,
-                    state=state,
-                    message_id=task.message_id,
-                    is_test_generation=getattr(
-                        task,
-                        "is_test_generation",
-                        False,
-                    ),
-                    checkOtherJobs=getattr(task, "check_other_jobs", False),
-                    chat_id=task.chat_id,
-                )
-                if success:
-                    await self.delete_task_process_image_block(task.job_id)
-            else:
-                fake_call = rebuild_callback_query_from_task(task)
-                success = await callback(
-                    call=fake_call,
-                    state=state,
-                    model_name=task.model_name,
-                    image_index=task.image_index,
-                )
-                if success:
-                    await self.delete_task_process_image(
-                        task.user_id,
-                        task.image_index,
-                        task.model_name,
+            # Вызов соответствующего обработчика
+            match task_type:
+                case "process_image_block":
+                    logger.info(
+                        f"Воспроизведение задачи блока | job_id={task.job_id}",
                     )
+                    success = await callback(
+                        job_id=task.job_id,
+                        model_name=task.model_name,
+                        setting_number=task.setting_number,
+                        is_test_generation=getattr(
+                            task,
+                            "is_test_generation",
+                            False,
+                        ),
+                        checkOtherJobs=getattr(
+                            task,
+                            "check_other_jobs",
+                            False,
+                        ),
+                        chat_id=task.chat_id,
+                        state=state,
+                        user_id=task.user_id,
+                        message_id=task.message_id,
+                    )
+                case "process_image":
+                    logger.info(
+                        f"Воспроизведение задачи изображения | user_id={task.user_id}",
+                    )
+                    call = rebuild_callback_query_from_task(
+                        task,
+                    )
+                    success = await callback(
+                        model_name=task.model_name,
+                        image_index=task.image_index,
+                        state=state,
+                        call=call,
+                    )
+                case "process_video":
+                    logger.info(
+                        f"Воспроизведение задачи видео | user_id={task.user_id}",
+                    )
+                    call = rebuild_callback_query_from_task(
+                        task,
+                    )
+                    success = await callback(
+                        call=call,
+                        model_name=task.model_name,
+                        prompt=task.prompt,
+                        type_for_video_generation=task.type_for_video_generation,
+                        image_url=task.image_url,
+                        state=state,
+                    )
+                case _:
+                    logger.error(f"Неизвестный тип задачи: {task_type}")
+                    return False
+
+            if success:
+                await self.delete_task(task_type, key)
 
             return bool(success)
 
         except Exception as e:
-            logger.exception(f"Ошибка при обработке задачи {key}: {str(e)}")
+            logger.error(
+                f"Ошибка при воспроизведении задачи | ключ={key} | ошибка={str(e)}",
+                exc_info=True,
+            )
             return False
 
     async def recover_tasks(self, bot: Bot, state_storage: FSMContext) -> None:
+        """Восстанавливает и воспроизводит все незавершенные задачи из Redis.
+
+        Метод сканирует Redis на наличие задач с известными префиксами
+        и пытается восстановить и воспроизвести их.
+
+        Params:
+            - bot: Экземпляр бота
+            - state_storage: Хранилище состояний FSM
         """
-        Восстанавливает все незавершенные задачи из Redis после перезапуска бота.
+        start_time = time.monotonic()
+        restored = 0
+        failed = 0
 
-        Находит все сохранённые задачи в Redis (как process_image, так и process_image_block),
-        и для каждой из них асинхронно запускает процесс восстановления через replay_task.
-
-        Args:
-            bot:
-                Экземпляр бота Aiogram, передаваемый в replay_task.
-            state_storage:
-                Хранилище состояний FSM, используемое для восстановления контекста.
-
-        Note:
-            - Игнорирует задачи, для которых не зарегистрирован обработчик.
-            - Обрабатывает задачи конкурентно с помощью asyncio.gather.
-            - Логирует статистику по успешным и неудачным попыткам восстановления.
-            - Выводит предупреждение, если не найдено ни одного обработчика задач.
-        """
-        if not self._callbacks:
-            logger.warning("Нет зарегистрированных обработчиков задач")
-            return
-
-        task_keys = await self.redis.keys("task:*")
-        all_process_keys = await self.redis.keys("*:*:*")
-        process_keys = [
-            k
-            for k in all_process_keys
-            if k.count(b":") == 2 and not k.startswith(b"task:")
+        prefixes = [
+            PROCESS_IMAGE_BLOCK_TASK,
+            PROCESS_IMAGE_TASK,
+            PROCESS_VIDEO_TASK,
         ]
-        all_keys = task_keys + process_keys
-
-        if not all_keys:
-            logger.info("Незавершенных задач для восстановления не найдено")
-            return
-
-        logger.info(f"Найдено {len(all_keys)} задач для восстановления")
 
         tasks = []
-        for raw in all_keys:
-            key_str = raw.decode()
-            logger.info(f"Планируем восстановление задачи: {key_str}")
-            task = self.replay_task(key_str, bot, state_storage)
-            tasks.append(task)
+        for prefix in prefixes:
+            try:
+                async for key in self.redis.scan_iter(match=f"{prefix}:*"):
+                    key_str = key.decode() if isinstance(key, bytes) else key
+                    logger.info(
+                        f"Найдена задача для восстановления | ключ={key_str}",
+                    )
+                    tasks.append(
+                        asyncio.create_task(
+                            self._safe_replay_task(
+                                key_str,
+                                bot,
+                                state_storage,
+                            ),
+                        ),
+                    )
+            except Exception as e:
+                logger.error(
+                    f"Ошибка при сканировании задач с префиксом {prefix}: {str(e)}",
+                    exc_info=True,
+                )
 
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        if tasks:
+            logger.info(f"Восстановление {len(tasks)} задач...")
+            results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        success_count = sum(1 for r in results if r is True)
-        error_count = sum(
-            1 for r in results if r is False or isinstance(r, Exception)
-        )
+            for result in results:
+                if isinstance(result, Exception):
+                    logger.error(
+                        "Ошибка при восстановлении задачи",
+                        exc_info=result,
+                    )
+                    failed += 1
+                elif result:
+                    restored += 1
+                else:
+                    failed += 1
 
+    async def _safe_replay_task(
+        self,
+        key: str,
+        bot: Bot,
+        state_storage: FSMContext,
+    ) -> bool:
+        """Безопасно воспроизводит одну задачу с обработкой ошибок.
+
+        Params:
+            - key: Ключ Redis задачи
+            - bot: Экземпляр бота
+            - state_storage: Хранилище состояний FSM
+
+        Returns:
+            bool: True если задача успешно воспроизведена, иначе False
+        """
+        try:
+            return await self.replay_task(key, bot, state_storage)
+        except Exception as e:
+            logger.error(
+                f"Критическая ошибка при восстановлении задачи | ключ={key} | ошибка={str(e)}",
+                exc_info=True,
+            )
+            return False
+
+    def _detect_task_type_by_prefix(self, key: str) -> str:
+        """Определяет тип задачи по префиксу ключа.
+
+        Params:
+            - key: Ключ Redis задачи
+
+        Returns:
+            - str: Тип задачи
+
+        Exceptions:
+            - ValueError: Если префикс ключа не соответствует ни одному известному типу
+        """
+        if key.startswith(PROCESS_IMAGE_BLOCK_TASK):
+            return "process_image_block"
+        elif key.startswith(PROCESS_IMAGE_TASK):
+            return "process_image"
+        elif key.startswith(PROCESS_VIDEO_TASK):
+            return "process_video"
+        else:
+            error_msg = f"Неизвестный префикс ключа задачи: {key}"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+
+    def _get_dto_class(self, task_type: str):
+        """Возвращает класс DTO для указанного типа задачи.
+
+        Params:
+            - task_type: Тип задачи
+
+        Returns:
+            Type: Класс DTO
+
+        Exceptions:
+            - ValueError: Если тип задачи неизвестен
+        """
+        match task_type:
+            case "process_image_block":
+                return TaskImageBlockDTO
+            case "process_image":
+                return TaskProcessImageDTO
+            case "process_video":
+                return TaskProcessVideoDTO
+            case _:
+                error_msg = f"Неизвестный тип задачи: {task_type}"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+
+    def _build_key(self, task_type: str, dto) -> str:
+        """Строит ключ Redis на основе типа задачи и DTO.
+
+        Params:
+            - task_type: Тип задачи
+            - dto: Объект передачи данных с деталями задачи
+
+        Returns:
+            str: Сформированный ключ Redis
+
+        Exceptions:
+            - ValueError: Если тип задачи неизвестен
+        """
+        try:
+            if task_type == "process_image_block":
+                return key_for_image_block(dto.job_id)
+            elif task_type == "process_image":
+                return key_for_image(
+                    dto.user_id,
+                    dto.image_index,
+                    dto.model_name,
+                )
+            elif task_type == "process_video":
+                return key_for_video(
+                    dto.type_for_video_generation,
+                    dto.user_id,
+                    dto.image_url,
+                    dto.model_name,
+                )
+            else:
+                raise ValueError(f"Неизвестный тип задачи: {task_type}")
+        except Exception as e:
+            logger.error(
+                f"Ошибка при построении ключа | тип={task_type} | ошибка={str(e)}",
+            )
+            raise
+
+    def set_process_callback(self, callback: Callable, task_type: str) -> None:
+        """Устанавливает обработчик для определенного типа задачи.
+
+        Params:
+            - callback: Функция-обработчик
+            - task_type: Тип задачи, для которой устанавливается обработчик
+        """
+        self._callbacks[task_type] = callback
         logger.info(
-            f"Восстановление завершено. Успешно: {success_count}, Ошибок: {error_count}, Всего: {len(all_keys)}",
+            f"Установлен обработчик для типа задачи | тип={task_type}",
         )

@@ -20,9 +20,6 @@ async def safe_send_message(
     | types.ReplyKeyboardRemove
     | None = None,
 ) -> types.Message | None:
-    logger.info(
-        f"safe_send_message called with text={text!r}, reply_markup={reply_markup!r}",
-    )
     global _last_send_time
 
     if isinstance(message, types.CallbackQuery):

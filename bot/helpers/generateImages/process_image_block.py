@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.settings import MOCK_MODE
+from bot.config import PROCESS_IMAGE_BLOCK_TASK
 from bot.domain.entities.task import TaskImageBlockDTO
 from bot.helpers.generateImages.getReferenceImage import getReferenceImage
 from bot.helpers.handlers.startGeneration.sendImageBlock import sendImageBlock
@@ -9,11 +9,10 @@ from bot.helpers.jobs.check_job_status import (
     CANCELLED_JOB_TEXT,
     check_job_status,
 )
+from bot.settings import MOCK_MODE
 from bot.storage import get_redis_storage
-from bot.utils.images.base64_to_image import base64_to_image
-
 from bot.utils import retryOperation
-
+from bot.utils.images.base64_to_image import base64_to_image
 
 
 async def process_image_block(
@@ -42,7 +41,7 @@ async def process_image_block(
         chat_id (int): id чата
     """
     redis_storage = get_redis_storage()
-    task_image_block_dto = TaskImageBlockDTO(
+    task_dto = TaskImageBlockDTO(
         job_id=job_id,
         model_name=model_name,
         setting_number=setting_number,
@@ -52,7 +51,7 @@ async def process_image_block(
         check_other_jobs=checkOtherJobs,
         chat_id=chat_id,
     )
-    await redis_storage.add_task_process_image_block(task_image_block_dto)
+    await redis_storage.add_task(PROCESS_IMAGE_BLOCK_TASK, task_dto)
 
     # Проверяем статус работы
     response_json = await retryOperation(

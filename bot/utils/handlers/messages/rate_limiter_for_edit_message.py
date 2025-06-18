@@ -3,6 +3,7 @@ import time
 
 from aiogram import types
 from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
+from InstanceBot import bot
 
 from bot.logger import logger
 
@@ -32,24 +33,28 @@ async def safe_edit_message(
             )
 
         try:
-            msg = await call.message.edit_text(
+            method = call.message.edit_text(
                 safe_text,
                 reply_markup=reply_markup,
                 parse_mode=parse_mode,
             )
+            method = method.as_(bot)
+            result = await method
             _last_edit_time = time.monotonic()
-            return msg
+            return result
         except TelegramRetryAfter as e:
             logger.warning(f"Telegram RetryAfter: {e.retry_after}s")
             await asyncio.sleep(e.retry_after)
             try:
-                msg = await call.message.edit_text(
+                method = call.message.edit_text(
                     safe_text,
                     reply_markup=reply_markup,
                     parse_mode=parse_mode,
                 )
+                method = method.as_(bot)
+                result = await method
                 _last_edit_time = time.monotonic()
-                return msg
+                return result
             except Exception:
                 logger.exception("RetryAfter second attempt failed")
         except TelegramAPIError as e:

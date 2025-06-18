@@ -1,9 +1,10 @@
 import aiofiles
+from config import get_kling_headers
 
-from bot.config import ADMIN_ID, KLING_HEADERS
+from bot.config import ADMIN_ID
+from bot.helpers import text
 from bot.InstanceBot import bot
 from bot.logger import logger
-from bot.helpers import text
 from bot.utils.googleDrive.files import (
     downloadFromGoogleDrive,
     getGoogleDriveFileID,
@@ -71,7 +72,7 @@ async def start_generate_video(
     url_endpoint = "https://api.gen-api.ru/api/v1/networks/kling-v2-1"
     json = await httpx_post(
         url_endpoint,
-        KLING_HEADERS,
+        get_kling_headers(),
         data=data,
         files=files,
     )

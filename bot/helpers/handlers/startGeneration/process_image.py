@@ -1,3 +1,4 @@
+from adapters.redis_task_storage_repository import key_for_image
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from domain.entities.task import TaskProcessImageDTO
@@ -6,7 +7,7 @@ from storage import get_redis_storage
 from bot.assets.mocks.links import (
     MOCK_FACEFUSION_PATH,
 )
-from bot.settings import FACEFUSION_MODE, MOCK_MODE, UPSCALE_MODE
+from bot.config import PROCESS_IMAGE_TASK
 from bot.helpers.handlers.startGeneration.image_processes import (
     ProcessImageStep,
     get_current_process_image_step,
@@ -16,6 +17,7 @@ from bot.helpers.handlers.startGeneration.image_processes import (
     update_process_image_step,
 )
 from bot.logger import logger
+from bot.settings import FACEFUSION_MODE, MOCK_MODE, UPSCALE_MODE
 
 
 async def process_image(
@@ -39,8 +41,8 @@ async def process_image(
         - bool, True если изображение успешно обработано, False если нет
     """
 
-    repo = get_redis_storage()
-    task_process_image_dto = TaskProcessImageDTO(
+    redis_storage = get_redis_storage()
+    task_dto = TaskProcessImageDTO(
         user_id=call.from_user.id,
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
@@ -48,7 +50,7 @@ async def process_image(
         model_name=model_name,
         image_index=image_index,
     )
-    await repo.add_task_process_image(task_process_image_dto)
+    await redis_storage.add_task(PROCESS_IMAGE_TASK, task_dto)
 
     # Инициализируем результирующий путь
     result_path = None
@@ -109,9 +111,10 @@ async def process_image(
     if process_image_step == ProcessImageStep.SAVE:
         await process_save_image(call, state, model_name, result_path)
 
-    await repo.delete_task_process_image(
-        user_id=call.from_user.id,
-        image_index=image_index,
-        model_name=model_name,
+    redis_storage = get_redis_storage()
+    await redis_storage.delete_task(
+        PROCESS_IMAGE_TASK,
+        key_for_image(call.from_user.id, image_index, model_name),
     )
+
     return True

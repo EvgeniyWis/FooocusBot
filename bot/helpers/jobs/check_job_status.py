@@ -3,7 +3,7 @@ import asyncio
 import httpx
 from aiogram.fsm.context import FSMContext
 
-from bot.config import get_runpod_headers, RUNPOD_HOST
+from bot.config import RUNPOD_HOST, get_runpod_headers
 from bot.helpers.jobs.delete_job import delete_job
 from bot.helpers.jobs.edit_job_message import edit_job_message
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
@@ -113,7 +113,7 @@ async def check_job_status(
     # Проверяем наличие выходных данных
     images_output = response_json.get("output", [])
 
-    if images_output == []: # Если их нет, то кидаем ошибку
+    if images_output == []:  # Если их нет, то кидаем ошибку
         raise Exception("Не удалось сгенерировать изображения")
 
     return response_json
