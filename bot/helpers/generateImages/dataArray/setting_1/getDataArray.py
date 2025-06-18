@@ -69,9 +69,10 @@ def setting1_getDataArray():
             "1gDi92Np8hE8hML2wq-nB6uXt2REmuMIg",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)).
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)), no white clothing, wearing casual colorful clothes
 
-                Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
+            Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).
+            """,
             [2, 3.10, -0.90, -1.10, 1.75, 1.00, 0.65, 0.80],
         ),
         setting1_generateData(
@@ -79,10 +80,10 @@ def setting1_getDataArray():
             "1mwT7N1Ck5VdgJGS6eRYRQ97mczaLGi6b",
             "1YJB-tQCJVARYdWx23KatB-I8zXTDjZDn",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, small teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)), no emerald clothing, wearing neutral or pastel colored clothes
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, small teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)).
-
-                Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
+            Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).
+            """,
             [2, 2.65, -0.90, -0.85, 1.40, 1.00, 1.00, 0.80],
         ),
         setting1_generateData(
@@ -247,11 +248,11 @@ def setting1_getDataArray():
             "naomiruelle",
             "1EECavlAfyk-zA7iR0HAnDkH5H9qHMhbm",
             "1FBfwLfIDCiNPDQ7gF-14l5znrS_X49Xw",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic, hourglass figure, very narrow waist, wide hips, medium breasts, thin legs, long voluminous blonde hair, tanned skin, natural skin texture, plump lips, green eyes, slightly smiling, face well lit by bright sunlight
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), ((extra-skinny girl with big boobs)), thin legs, beautiful face, plump lips, realistic green eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), big wide hips, hourglass body.
-
-                Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard.""",
+            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
+            """,
             [2, 0.65, -0.90, -1.70, 3.65, 1.00, 1.75, 1.00],
         ),
         setting1_generateData(
@@ -267,8 +268,8 @@ def setting1_getDataArray():
         ),
         setting1_generateData(
             "sasharoxelle",
-            "1DbpoHrZcEbdVLtlGoQKev7Tdv9sE0vFY",
-            "1k0GwrVzoluvXZ8_Z1ZtBq-xBAQVyijwh",
+            "1jMZnHt32aDHJZU7Ihr84b7eXlFi_M9mE",
+            "1R8zwFg_U52IZPR-546-HZdtSw3DzrUWK",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
                 real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), ((extra-skinny girl with big boobs)), thin legs, beautiful face, plump lips, realistic blue eyes, long straight brown hair, ponytail hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), big wide hips, hourglass body.
