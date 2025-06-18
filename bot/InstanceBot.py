@@ -16,10 +16,6 @@ if "BOT_API_TOKEN" in os.environ:
 
 load_dotenv(env_path, override=True)
 
-# Выводим KLING_API_KEY для проверки
-kling_api_key = os.environ.get("KLING_API_KEY")
-logger.info(f"KLING_API_KEY из .env: {kling_api_key}")
-
 # Создаём бота
 bot = Bot(
     token=os.getenv("BOT_API_TOKEN"),
