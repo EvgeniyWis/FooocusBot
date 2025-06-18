@@ -3,7 +3,6 @@ import traceback
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.logger import logger
 from bot.helpers import text
 from bot.helpers.generateImages import (
     generateImageBlock,
@@ -15,6 +14,10 @@ from bot.helpers.generateImages.dataArray import (
 )
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
+)
+from bot.logger import logger
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
 )
 
 
@@ -29,7 +32,10 @@ async def generateImagesInHandler(
     with_randomizer: bool = False,
 ):
     # Отправляем сообщение об отмене предыдущих работ
-    message_for_edit = await message.answer(text.CANCEL_PREVIOUS_JOBS_TEXT)
+    message_for_edit = await safe_send_message(
+        text=text.CANCEL_PREVIOUS_JOBS_TEXT,
+        message=message,
+    )
 
     # Отменяем все работы
     await cancelImageGenerationJobs(state)
@@ -70,10 +76,11 @@ async def generateImagesInHandler(
         else:
             state_data = await state.get_data()
             model_indexes_for_generation = state_data.get(
-                "model_indexes_for_generation", []
+                "model_indexes_for_generation",
+                [],
             )
             logger.info(
-                f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}"
+                f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}",
             )
 
             if setting_number == "all":
@@ -108,7 +115,7 @@ async def generateImagesInHandler(
             stop_generation = state_data.get("stop_generation", False)
 
             if not stop_generation and len(model_indexes_for_generation) > 1:
-                await message.answer(text.GENERATION_SUCCESS_TEXT)
+                await safe_send_message(text.GENERATION_SUCCESS_TEXT, message)
 
     except Exception as e:
         try:
@@ -117,6 +124,6 @@ async def generateImagesInHandler(
             pass
         logger.error(f"Ошибка при генерации изображения: {e}")
         traceback.print_exc()
-        await message.answer(text.GENERATION_IMAGE_ERROR_TEXT)
+        await safe_send_message(text.GENERATION_IMAGE_ERROR_TEXT, message)
         await state.clear()
         raise e

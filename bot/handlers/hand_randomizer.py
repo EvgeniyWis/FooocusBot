@@ -2,15 +2,19 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
+from bot.helpers import text
+from bot.helpers.handlers.startGeneration import generateImagesInHandler
 from bot.InstanceBot import router
 from bot.keyboards import randomizer_keyboards
 from bot.states.RandomizerState import RandomizerState
-from bot.helpers import text
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.helpers.handlers.startGeneration import generateImagesInHandler
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
     safe_edit_message,
 )
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
+)
+
 
 # Обработка кнопок в меню
 async def handle_randomizer_buttons(
@@ -229,7 +233,7 @@ async def write_variable_for_randomizer(
                 variable_names_for_randomizer=variable_names_for_randomizer,
             )
         else:
-            await message.answer(text.VARIABLE_ALREADY_EXISTS_TEXT)
+            await safe_send_message(text.VARIABLE_ALREADY_EXISTS_TEXT, message)
             return
 
     # Устанавливаем значение для стейта, что выбрана переменная с данным индексом
@@ -239,8 +243,9 @@ async def write_variable_for_randomizer(
 
     # Отправляем сообщение
     await state.set_state(None)
-    await message.answer(
+    await safe_send_message(
         text.WRITE_VARIABLE_FOR_RANDOMIZER_TEXT,
+        message,
         reply_markup=randomizer_keyboards.stopInputValuesForVariableKeyboard(),
     )
     await state.set_state(
@@ -263,15 +268,17 @@ async def write_value_for_variable_for_randomizer(
     # Если пользователь нажал на кнопку "🚫 Остановить ввод значений", то прекращаем ввод значений для переменной
     if message.text == "🚫 Остановить ввод значений":
         if variable_name:
-            await message.answer(
+            await safe_send_message(
                 text.SELECT_VARIABLE_FOR_RANDOMIZER_TEXT.format(variable_name),
+                message,
                 reply_markup=randomizer_keyboards.variableActionKeyboard(
                     variable_index,
                 ),
             )
         else:
-            await message.answer(
+            await safe_send_message(
                 text.RANDOMIZER_MENU_TEXT,
+                message,
                 reply_markup=randomizer_keyboards.randomizerKeyboard(
                     all_variable_names,
                 ),
@@ -291,11 +298,12 @@ async def write_value_for_variable_for_randomizer(
 
     await state.set_state(None)
     value = value[:10] + "..."
-    await message.answer(
+    await safe_send_message(
         text.WRITE_VALUE_FOR_VARIABLE_FOR_RANDOMIZER_TEXT.format(
             value,
             variable_name,
         ),
+        message,
         reply_markup=randomizer_keyboards.stopInputValuesForVariableKeyboard(),
     )
     await state.set_state(
@@ -318,8 +326,9 @@ async def write_one_message_for_randomizer(
 
     # Проверяем, что есть хотя бы одна строка
     if not lines:
-        await message.answer(
+        await safe_send_message(
             "Сообщение пустое. Пожалуйста, введите данные в правильном формате.",
+            message,
         )
         return
 
@@ -332,8 +341,9 @@ async def write_one_message_for_randomizer(
     for line in lines:
         # Проверяем формат строки (должна содержать ":")
         if ":" not in line:
-            await message.answer(
+            await safe_send_message(
                 f"Неправильный формат строки: {line}\nКаждая строка должна содержать название переменной, двоеточие и значения.",
+                message,
             )
             return
 
@@ -343,8 +353,9 @@ async def write_one_message_for_randomizer(
 
         # Проверяем, что строка заканчивается на точку с запятой
         if not values_str.strip().endswith(";"):
-            await message.answer(
+            await safe_send_message(
                 f"Строка должна заканчиваться точкой с запятой (;): {line}",
+                message,
             )
             return
 
@@ -354,8 +365,9 @@ async def write_one_message_for_randomizer(
 
         # Проверяем, что есть хотя бы одно значение
         if not values:
-            await message.answer(
+            await safe_send_message(
                 f"Не указаны значения для переменной: {variable_name}",
+                message,
             )
             return
 
@@ -369,10 +381,14 @@ async def write_one_message_for_randomizer(
     await state.update_data(variable_names_for_randomizer=variable_names)
 
     # Отправляем сообщение об успешном добавлении
-    await message.answer(text.ONE_MESSAGE_FOR_RANDOMIZER_SUCCESS_TEXT)
+    await safe_send_message(
+        text.ONE_MESSAGE_FOR_RANDOMIZER_SUCCESS_TEXT,
+        message,
+    )
 
-    await message.answer(
+    await safe_send_message(
         text.RANDOMIZER_MENU_TEXT,
+        message,
         reply_markup=randomizer_keyboards.randomizerKeyboard(variable_names),
     )
     await state.set_state(None)

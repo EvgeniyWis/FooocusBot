@@ -1,4 +1,4 @@
-from config import RUNPOD_HEADERS, RUNPOD_HOST
+from bot.config import get_runpod_headers, RUNPOD_HOST
 
 from bot.logger import logger
 from bot.utils import httpx_post
@@ -25,7 +25,7 @@ async def cancel_jobs(jobs_ids: list[dict]):
             url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/cancel/{job_id}"
 
             # Отправляем запрос на отмену работы
-            await httpx_post(url, RUNPOD_HEADERS)
+            await httpx_post(url, get_runpod_headers())
 
         except Exception as e:
             logger.error(

@@ -4,13 +4,17 @@ import shutil
 
 import handlers
 from aiogram.types import BotCommand
+from config import PROCESS_VIDEO_TASK
 from helpers.generateImages import process_image_block
 from helpers.handlers.startGeneration import process_image
+from helpers.handlers.videoGeneration import process_video
 
 from bot.config import (
     DEV_CHAT_IDS,
     FACEFUSION_DIR,
     FACEFUSION_RESULTS_DIR,
+    PROCESS_IMAGE_BLOCK_TASK,
+    PROCESS_IMAGE_TASK,
     TEMP_DIR,
     TEMP_FOLDER_PATH,
     TEMP_IMAGE_FILES_DIR,
@@ -30,8 +34,9 @@ async def on_startup() -> None:
     await init_redis_storage(redis_client)
 
     repo = get_redis_storage()
-    repo.set_process_callback(process_image, "process_image")
-    repo.set_process_callback(process_image_block, "process_image_block")
+    repo.set_process_callback(process_image, PROCESS_IMAGE_TASK)
+    repo.set_process_callback(process_image_block, PROCESS_IMAGE_BLOCK_TASK)
+    repo.set_process_callback(process_video, PROCESS_VIDEO_TASK)
     asyncio.create_task(
         repo.recover_tasks(
             bot,

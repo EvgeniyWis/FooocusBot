@@ -41,6 +41,10 @@ async def httpx_post(
                 logger.info(f"Тело ответа: {response.text}")
 
             if response.status_code != 200:
+                if response.status_code == 404:
+                    logger.info(
+                        f"Найдена завершенная/удаленная генерация. Статус код: {response.status_code}",
+                    )
                 raise Exception(
                     f"Сервер вернул ошибку: {response.status_code}",
                 )

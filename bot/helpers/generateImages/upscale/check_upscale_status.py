@@ -1,7 +1,8 @@
 from aiogram.fsm.context import FSMContext
+from storage import get_redis_storage
 
-from bot.utils.images.base64_to_image import base64_to_image
 from bot.helpers.jobs.check_job_status import check_job_status
+from bot.utils.images.base64_to_image import base64_to_image
 
 
 async def check_upscale_status(
@@ -39,10 +40,40 @@ async def check_upscale_status(
     if not response_json:
         raise Exception("Не удалось сделать upscale для изображения")
 
-    # Получаем изображение
-    image_data = response_json["output"][0]["base64"]
+    # Проверяем структуру ответа
+    if isinstance(response_json, str):
+        if response_json == "Работа была отменена":
+            redis_storage = get_redis_storage()
+            await redis_storage.delete_task_process_image(
+                user_id,
+                model_name,
+                image_index,
+            )
+            return None
+        raise Exception(f"Ошибка при апскейле изображения: {response_json}")
+
+    if (
+        "output" not in response_json
+        or not isinstance(response_json["output"], list)
+        or not response_json["output"]
+    ):
+        raise Exception(f"Некорректный формат ответа: {response_json}")
+
+    # Получаем изображение из ответа
+    output = response_json["output"][0]
+    if isinstance(output, dict) and "base64" in output:
+        image_data = output["base64"]
+    elif isinstance(output, str):
+        # Если пришел сразу base64 строкой
+        image_data = output
+    else:
+        raise Exception(f"Неподдерживаемый формат выходных данных: {output}")
 
     # Сохраняем изображения по этому же пути
     return await base64_to_image(
-        image_data, model_name, int(image_index) - 1, user_id, False
+        image_data,
+        model_name,
+        int(image_index) - 1,
+        user_id,
+        False,
     )

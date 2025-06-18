@@ -4,9 +4,9 @@ from datetime import datetime
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+from aiogram.methods import SendPhoto
 
 from bot.assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
-from bot.settings import MOCK_MODE
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
@@ -14,6 +14,7 @@ from bot.helpers.generateImages.dataArray import (
 )
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
+from bot.settings import MOCK_MODE
 from bot.utils.googleDrive.files import convertDriveLink
 from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
@@ -93,10 +94,10 @@ async def process_save_image(
         f"Отправляем сообщение о сохранении изображения: {direct_url}",
     )
 
-    bot = call.bot
-    method = call.message.answer_photo(
-        direct_url,
-        text.SAVE_IMAGES_SUCCESS_TEXT.format(
+    method = SendPhoto(
+        chat_id=call.message.chat.id,
+        photo=direct_url,
+        caption=text.SAVE_IMAGES_SUCCESS_TEXT.format(
             link,
             model_name,
             parent_folder["webViewLink"],
@@ -105,9 +106,11 @@ async def process_save_image(
         reply_markup=video_generation_keyboards.generateVideoKeyboard(
             model_name,
         ),
+        parse_mode="HTML",
     )
 
-    await bot(method)
+    # Отправляем фото с помощью бота
+    await call.bot(method)
 
     # Удаляем сообщение о сохранении изображения
     await saving_progress_message.delete()
