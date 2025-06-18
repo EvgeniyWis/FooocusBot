@@ -1,15 +1,20 @@
 import traceback
 
+from adapters.redis_task_storage_repository import key_for_video
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
+from bot.config import PROCESS_VIDEO_TASK
+from bot.domain.entities.task import TaskProcessVideoDTO
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
 )
+from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.settings import MOCK_MODE
+from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.handlers import (
     appendDataToStateArray,
@@ -43,6 +48,19 @@ async def process_video(
         type_for_video_generation: str - Тип генерации видео (Рабочий или Тестовый)
         image_url: str - Ссылка на изображение, из которого будет генерироваться видео
     """
+    redis_storage = get_redis_storage()
+    task_dto = TaskProcessVideoDTO(
+        user_id=call.from_user.id,
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        callback_data=call.data,
+        model_name=model_name,
+        prompt=prompt,
+        type_for_video_generation=type_for_video_generation,
+        image_url=image_url,
+    )
+    await redis_storage.add_task(PROCESS_VIDEO_TASK, task_dto)
+
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
@@ -120,8 +138,9 @@ async def process_video(
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
     prefix = f"generate_video|{model_name}"
+
     if type_for_video_generation == "work":
-        video_message = await call.message.answer_video(
+        method = call.message.answer_video(
             video=video,
             caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(
                 model_name,
@@ -131,8 +150,9 @@ async def process_video(
                 model_name,
             ),
         )
+        video_message = await bot(method)
     else:  # При тестовой просто отправляем юзеру результат генерации
-        video_message = await call.message.answer_video(
+        method = call.message.answer_video(
             video=video,
             caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(
                 model_name,
@@ -143,6 +163,7 @@ async def process_video(
                 False,
             ),
         )
+        video_message = await bot(method)
 
     # Удаляем сообщение о генерации видео
     await video_progress_message.delete()
@@ -153,4 +174,15 @@ async def process_video(
         state,
         "videoGeneration_messages_ids",
         data_for_update,
+    )
+
+    redis_storage = get_redis_storage()
+    await redis_storage.delete_task(
+        PROCESS_VIDEO_TASK,
+        key_for_video(
+            type_for_video=type_for_video_generation,
+            user_id=call.from_user.id,
+            image_url=image_url,
+            model_name=model_name,
+        ),
     )

@@ -10,7 +10,7 @@ from bot.logger import logger
 
 _chat_locks = defaultdict(asyncio.Lock)
 _last_send_time_per_chat = defaultdict(lambda: 0.0)
-_min_delay = 0.15
+_min_delay = 1.5
 
 
 async def safe_send_media_group(
@@ -19,14 +19,6 @@ async def safe_send_media_group(
     *args,
     **kwargs,
 ):
-    """
-    Безопасно отправляет медиа-группу в чат с учётом rate-limit Telegram.
-    Поддерживает отправку в разные чаты параллельно, но ограничивает частоту отправки в пределах одного чата.
-
-    :param user_id: ID чата (пользователя/группы), куда отправлять.
-    :param media_group: Список InputMedia (фото/видео и т.п.)
-    :return: Результат вызова send_media_group или None в случае ошибки.
-    """
     lock = _chat_locks[user_id]
     async with lock:
         now = time.time()
