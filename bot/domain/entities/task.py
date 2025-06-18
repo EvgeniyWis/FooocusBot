@@ -31,3 +31,15 @@ class TaskProcessImageDTO(BaseTaskDTO):
     callback_data: str
     model_name: str
     image_index: int
+
+
+@dataclass
+class TaskProcessVideoDTO(BaseTaskDTO):
+    user_id: int
+    chat_id: int
+    message_id: int
+    callback_data: str
+    model_name: str
+    prompt: str
+    type_for_video_generation: str
+    image_url: str

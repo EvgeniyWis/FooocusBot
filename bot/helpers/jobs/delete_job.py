@@ -1,7 +1,9 @@
 from aiogram.fsm.context import FSMContext
-from storage import get_redis_storage
 
+from bot.adapters.redis_task_storage_repository import key_for_image_block
+from bot.config import PROCESS_IMAGE_BLOCK_TASK
 from bot.logger import logger
+from bot.storage import get_redis_storage
 
 
 async def delete_job(job_id: str, state: FSMContext) -> bool:
@@ -32,7 +34,10 @@ async def delete_job(job_id: str, state: FSMContext) -> bool:
 
         # Удаляем задачу из Redis
         redis_storage = get_redis_storage()
-        await redis_storage.delete_task_process_image_block(job_id)
+        await redis_storage.delete_task(
+            PROCESS_IMAGE_BLOCK_TASK,
+            key_for_image_block(job_id),
+        )
 
         return True
     except Exception as e:

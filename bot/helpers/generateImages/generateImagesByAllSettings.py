@@ -5,6 +5,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
+from bot.helpers.generateImages.dataArray import getDataByModelName
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )
@@ -12,7 +13,9 @@ from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
-from bot.helpers.generateImages.dataArray import getDataByModelName
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
+)
 
 
 # Функция для генерации изображений по всем настройкам
@@ -37,20 +40,22 @@ async def generateImagesByAllSettings(
         ]
 
     # Создаём сообщение с прогрессом генерации настроек
-    message_with_settings = await message.answer(
-        text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT.format(
+    message_with_settings = await safe_send_message(
+        text=text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT.format(
             "❌",
             "❌",
             "❌",
             "❌",
         ),
+        message=message,
     )
 
     await message_with_settings.pin()
 
     # Создаём сообщение с прогрессом генерации изображений
-    message_with_generations_status = await message.answer(
-        text.GET_PROMPT_SUCCESS_TEXT,
+    message_with_generations_status = await safe_send_message(
+        text=text.GET_PROMPT_SUCCESS_TEXT,
+        message=message,
     )
 
     if not is_test_generation:
@@ -119,5 +124,5 @@ async def generateImagesByAllSettings(
         await message_with_generations_status.unpin()
         traceback.print_exc()
         raise Exception(
-            f"Произошла ошибка при генерации изображений по всем настройкам: {e}"
+            f"Произошла ошибка при генерации изображений по всем настройкам: {e}",
         )

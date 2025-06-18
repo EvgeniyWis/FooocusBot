@@ -1,7 +1,8 @@
 import asyncio
 import os
 
-from bot.config import KLING_HEADERS
+from config import get_kling_headers
+
 from bot.logger import logger
 from bot.utils.httpx import httpx_get
 from bot.utils.videos import download_video
@@ -23,7 +24,9 @@ async def check_video_generation_status(request_id: str) -> str | None:
 
     while True:
         try:
-            json = await httpx_get(url_status_endpoint, headers=KLING_HEADERS)
+            json = await httpx_get(
+                url_status_endpoint, headers=get_kling_headers()
+            )
 
             logger.info(
                 f"Статус задания на генерацию видео с id {request_id}: "

@@ -1,5 +1,5 @@
 """
-Файл для хранения конфигурационных данных бота, таких как: 
+Файл для хранения конфигурационных данных бота, таких как:
 - ID Runpod эндпоинтов - используются для обращения к Runpod, на котором хостится нейросеть для генерации изображений.
 Каждый эндпоинт относится к конкретной настройке.
 
@@ -32,6 +32,10 @@ TEMP_FOLDER_PATH = os.path.join(FACEFUSION_DIR, ".assets", "images", "temp")
 
 VIDEOS_TEMP_DIR = os.path.join(BASE_DIR, "bot", "temp", "videos")
 
+PROCESS_IMAGE_TASK = "process_image"
+PROCESS_VIDEO_TASK = "process_video"
+PROCESS_IMAGE_BLOCK_TASK = "process_image_block"
+
 FACEFUSION_RESULTS_DIR = os.path.join(
     FACEFUSION_DIR,
     ".assets",
@@ -41,17 +45,28 @@ FACEFUSION_RESULTS_DIR = os.path.join(
 
 TEMP_DIR = os.path.join(BASE_DIR, "temp")
 
-# Заголовки для запросов на Runpod
-RUNPOD_HEADERS = {
-    "Content-Type": "application/json",
-    "Authorization": os.getenv("RUNPOD_API_KEY"),
-}
 
-# Заголовки для запросов на API kling
-KLING_HEADERS = {
-    "Accept": "application/json",
-    "Authorization": f"Bearer {os.getenv('KLING_API_KEY')}",
-}
+def get_runpod_headers() -> dict:
+    """Get headers for Runpod API requests with validation."""
+    api_key = os.getenv("RUNPOD_API_KEY")
+    if not api_key:
+        raise ValueError("RUNPOD_API_KEY environment variable is not set")
+    return {
+        "Content-Type": "application/json",
+        "Authorization": api_key,
+    }
+
+
+def get_kling_headers() -> dict:
+    """Get headers for kling API requests with validation."""
+    api_key = os.getenv("KLING_API_KEY")
+    if not api_key:
+        raise ValueError("KLING_API_KEY environment variable is not set")
+    return {
+        "Accept": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+
 
 # URL для запросов на Runpod
 RUNPOD_HOST = "https://api.runpod.ai/v2"
