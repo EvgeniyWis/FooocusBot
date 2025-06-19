@@ -31,6 +31,9 @@ async def editMessageOrAnswer(
         logger.warning(
             f"Не удалось редактировать сообщение {call.message.message_id}, отправляем новое",
         )
+        logger.debug(
+            f"Отправляем новое сообщение с reply_markup: {reply_markup}",
+        )
         message = await bot.send_message(
             call.message.chat.id,
             safe_text,

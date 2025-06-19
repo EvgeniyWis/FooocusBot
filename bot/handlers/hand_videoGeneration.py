@@ -16,7 +16,7 @@ from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
 )
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.videoGeneration import process_video, saveVideo
-from bot.InstanceBot import bot, router
+from bot.InstanceBot import bot, dp, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
@@ -95,6 +95,31 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
     await state.set_state(
         StartGenerationState.write_prompt_for_videoGenerationFromImage,
     )
+
+
+@dp.callback_query(lambda call: call.data.startswith("rewrite_prompt|"))
+async def handle_rewrite_prompt_button(
+    call: types.CallbackQuery,
+    state: FSMContext,
+):
+    _, model_name = call.data.split("|")
+    model_name_index = getModelNameIndex(model_name)
+
+    state_data = await state.get_data()
+    current_prompt = state_data.get("prompt_for_video", "")
+
+    # Обновляем сообщение
+    await editMessageOrAnswer(
+        call,
+        f"✏️ Текущий промпт: {current_prompt}\n\nВведите новый промпт для генерации видео:",
+        reply_markup=None,
+    )
+
+    # Сохраняем model_name, чтобы потом знать куда применить
+    await state.update_data(model_name_for_video_generation=model_name)
+
+    # Ставим стейт для обработки ввода
+    await state.set_state(StartGenerationState.write_prompt_for_video)
 
 
 # Обработка нажатия кнопок режима генерации видео
@@ -190,6 +215,7 @@ async def handle_video_example_buttons(
     # Получаем кастомный промпт, если он есть, а если нет, то берем промпт из видео-примера
     if "prompt_for_video" in state_data:
         custom_prompt = state_data.get("prompt_for_video", "")
+        await state.update_data(prompt_for_video=custom_prompt)
     else:
         custom_prompt = None
 
@@ -492,7 +518,8 @@ async def handle_model_name_for_video_generation_from_image(
     # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
     if model_index > 100 or model_index < 1:
         await safe_send_message(
-            text.MODEL_NOT_FOUND_TEXT.format(model_index), message
+            text.MODEL_NOT_FOUND_TEXT.format(model_index),
+            message,
         )
         return
 
