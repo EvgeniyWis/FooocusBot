@@ -48,6 +48,8 @@ async def process_video(
         type_for_video_generation: str - Тип генерации видео (Рабочий или Тестовый)
         image_url: str - Ссылка на изображение, из которого будет генерироваться видео
     """
+    await state.update_data(prompt_for_video=prompt)
+
     redis_storage = get_redis_storage()
     task_dto = TaskProcessVideoDTO(
         user_id=call.from_user.id,
@@ -96,6 +98,7 @@ async def process_video(
                 reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                     model_name,
                     False,
+                    rewrite_prompt=True,
                 ),
             )
             raise e
@@ -111,6 +114,7 @@ async def process_video(
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
                 False,
+                rewrite_prompt=True,
             ),
         )
         return
@@ -127,6 +131,7 @@ async def process_video(
                 reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                     model_name,
                     False,
+                    rewrite_prompt=True,
                 ),
             )
             return
