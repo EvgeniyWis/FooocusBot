@@ -16,7 +16,7 @@ from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
 )
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.videoGeneration import process_video, saveVideo
-from bot.InstanceBot import bot, dp, router
+from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
@@ -97,7 +97,6 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
     )
 
 
-@dp.callback_query(lambda call: call.data.startswith("rewrite_prompt|"))
 async def handle_rewrite_prompt_button(
     call: types.CallbackQuery,
     state: FSMContext,
@@ -582,7 +581,10 @@ def hand_add():
         handle_video_example_buttons,
         lambda call: call.data.startswith("generate_video"),
     )
-
+    router.callback_query.register(
+        handle_rewrite_prompt_button,
+        lambda call: call.data.startswith("rewrite_prompt|"),
+    )
     router.message.register(
         write_prompt_for_video,
         StateFilter(StartGenerationState.write_prompt_for_video),
