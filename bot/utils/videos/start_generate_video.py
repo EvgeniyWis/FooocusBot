@@ -1,10 +1,10 @@
 import aiofiles
-from config import get_kling_headers
 
-from bot.config import ADMIN_ID
 from bot.helpers import text
 from bot.InstanceBot import bot
 from bot.logger import logger
+from bot.settings import settings
+from bot.utils.get_api_headers import get_kling_headers
 from bot.utils.googleDrive.files import (
     downloadFromGoogleDrive,
     getGoogleDriveFileID,
@@ -94,7 +94,7 @@ async def start_generate_video(
         if json["error"] == NOT_ENOUGH_MONEY_ERROR_TEXT:
             try:
                 await bot.send_message(
-                    ADMIN_ID,
+                    settings.ADMIN_ID,
                     text.KLING_INSUFFICIENT_BALANCE_TEXT,
                 )
             finally:

@@ -1,18 +1,23 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.config import PROCESS_IMAGE_BLOCK_TASK
 from bot.domain.entities.task import TaskImageBlockDTO
 from bot.helpers.generateImages.getReferenceImage import getReferenceImage
-from bot.helpers.handlers.startGeneration.sendImageBlock import sendImageBlock
 from bot.helpers.jobs.check_job_status import (
     CANCELLED_JOB_TEXT,
     check_job_status,
 )
-from bot.settings import MOCK_MODE
+from bot.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.images.base64_to_image import base64_to_image
+
+# Lazy import to avoid circular dependency
+sendImageBlock = None
+def set_send_image_block(module):
+    global sendImageBlock
+    from bot.helpers.handlers.startGeneration.sendImageBlock import sendImageBlock as sib
+    sendImageBlock = sib
 
 
 async def process_image_block(
@@ -51,7 +56,7 @@ async def process_image_block(
         check_other_jobs=checkOtherJobs,
         chat_id=chat_id,
     )
-    await redis_storage.add_task(PROCESS_IMAGE_BLOCK_TASK, task_dto)
+    await redis_storage.add_task(settings.PROCESS_IMAGE_BLOCK_TASK, task_dto)
 
     # Проверяем статус работы
     response_json = await retryOperation(
@@ -74,7 +79,7 @@ async def process_image_block(
 
     # Если работа завершена, то обрабатываем результаты
     try:
-        if not MOCK_MODE:
+        if not settings.MOCK_MODE:
             images_output = response_json.get("output", [])
 
             if images_output == []:
@@ -92,7 +97,7 @@ async def process_image_block(
             )
 
         # Обрабатываем результаты
-        if not MOCK_MODE:
+        if not settings.MOCK_MODE:
             for i, image_data in enumerate(images_output):
                 file_path = await base64_to_image(
                     image_data["base64"],

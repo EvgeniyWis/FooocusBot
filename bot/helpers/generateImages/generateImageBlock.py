@@ -1,10 +1,20 @@
 from aiogram.fsm.context import FSMContext
-from bot.settings import MOCK_MODE
 from logger import logger
 
 from bot.helpers.generateImages.dataArray import getSettingNumberByModelName
-from bot.helpers.generateImages.process_image_block import process_image_block
 from bot.helpers.jobs.get_job_ID import get_job_ID
+from bot.settings import settings
+
+process_image_block = None
+
+
+def set_process_image_block(module):
+    global process_image_block
+    from bot.helpers.generateImages.process_image_block import (
+        process_image_block as pic,
+    )
+
+    process_image_block = pic
 
 
 # Функция для генерации изображений по объекту данных
@@ -21,12 +31,14 @@ async def generateImageBlock(
 ):
     # Прибавляем к постоянному промпту переменный промпт
     json = data["json"].copy()
-    json["input"]["prompt"] = variable_prompt.replace("\n", " ") + " " + json["input"]["prompt"]
+    json["input"]["prompt"] = (
+        variable_prompt.replace("\n", " ") + " " + json["input"]["prompt"]
+    )
 
     # Получаем имя настройки
     model_name = data["model_name"]
 
-    if not MOCK_MODE:
+    if not settings.MOCK_MODE:
         # Получаем номер настройки по имени модели
         setting_number = getSettingNumberByModelName(model_name)
 

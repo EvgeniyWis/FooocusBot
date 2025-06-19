@@ -1,10 +1,9 @@
-### Мок-ссылки
+import constants
 
-# Мок-ссылка для сохранения изображений
-MOCK_LINK_FOR_SAVE_IMAGE = "https://drive.google.com/file/d/1dSkG6TsDFK3Tp0LlMDkTqyWZpsvnvvg0/view?usp=drivesdk"
+from bot.settings import settings
 
-# Мок-ссылка для сохранения видео
-MOCK_LINK_FOR_SAVE_VIDEO = "https://drive.google.com/drive/folders/18V64itY-c07U43aZb09mdzgVU9UGa242"
-
-# Мок-ссылка для замены лица
-MOCK_FACEFUSION_PATH = "FocuuusBot/bot/assets/mocks/mock_image.jpg"
+MOCK_LINK_FOR_SAVE_IMAGE = settings.MOCK_LINK_FOR_SAVE_IMAGE
+MOCK_LINK_FOR_SAVE_VIDEO = settings.MOCK_LINK_FOR_SAVE_VIDEO
+MOCK_FACEFUSION_PATH = (
+    constants.BASE_DIR / "bot" / "assets" / "mocks" / "mock_image.jpg"
+)
