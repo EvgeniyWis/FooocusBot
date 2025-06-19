@@ -6,7 +6,7 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from bot.config import TEMP_IMAGE_FILES_DIR
+import bot.constants as constants
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
@@ -439,7 +439,7 @@ async def handle_prompt_for_videoGenerationFromImage(
             )
 
         file_path = file.file_path
-        temp_path = f"{TEMP_IMAGE_FILES_DIR}/{image_file_id}.jpg"
+        temp_path = f"{constants.TEMP_IMAGE_FILES_DIR}/{image_file_id}.jpg"
 
         try:
             await asyncio.wait_for(

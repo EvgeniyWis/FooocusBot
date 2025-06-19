@@ -4,9 +4,8 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from PIL import Image
 
-from bot.config import TEMP_FOLDER_PATH
+import bot.constants as constants
 from bot.helpers import text
-from bot.utils.images import image_to_base64
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
@@ -14,6 +13,7 @@ from bot.helpers.generateImages.dataArray import (
 )
 from bot.helpers.generateImages.upscale import upscale_image
 from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.images import image_to_base64
 
 
 async def process_upscale_image(
@@ -41,12 +41,14 @@ async def process_upscale_image(
     upscale_message = await editMessageOrAnswer(
         call,
         text.UPSCALE_IMAGE_PROGRESS_TEXT.format(
-            image_index, model_name, model_name_index
+            image_index,
+            model_name,
+            model_name_index,
         ),
     )
 
     # Получаем само изображение по пути
-    image_path = f"{TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
+    image_path = f"{constants.TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -56,7 +58,9 @@ async def process_upscale_image(
         await editMessageOrAnswer(
             call,
             text.IMAGE_NOT_FOUND_TEXT.format(
-                image_index, model_name, model_name_index
+                image_index,
+                model_name,
+                model_name_index,
             ),
         )
         return

@@ -1,23 +1,15 @@
-import os
 from datetime import timedelta
 
 from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.fsm.storage.redis import RedisStorage
-from dotenv import find_dotenv, load_dotenv
 
 from bot.factory.redis_factory import create_redis_client
+from bot.settings import settings
 
-load_dotenv(find_dotenv(), override=True)
-
-
-# if "BOT_API_TOKEN" in os.environ:  # fixme: нужно ли?
-#     del os.environ["BOT_API_TOKEN"]
-
-# Создаём бота
 bot = Bot(
-    token=os.getenv("BOT_API_TOKEN"),
+    token=settings.BOT_API_TOKEN,
     default=DefaultBotProperties(parse_mode="HTML"),
 )
 
@@ -32,8 +24,6 @@ storage = RedisStorage(
 dp = Dispatcher(storage=storage)
 router = Router()
 
-# Увеличиваем таймаут для запросов к Telegram API
 bot.session = AiohttpSession(timeout=60)
-
 
 dp.include_router(router)

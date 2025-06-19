@@ -4,7 +4,7 @@ import os
 
 from PIL import Image
 
-from bot.config import TEMP_FOLDER_PATH
+import bot.constants as constants
 from bot.logger import logger
 
 
@@ -64,7 +64,7 @@ async def base64_to_image(
         if is_test_generation:
             folder_name = "test"
 
-        save_dir = f"{TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
+        save_dir = f"{constants.TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index + 1}.jpg"
 
@@ -74,7 +74,7 @@ async def base64_to_image(
         image.close()  # Закрываем изображение после сохранения
 
         logger.info(
-            f"Изображение успешно загружено: {image} по пути {file_path}"
+            f"Изображение успешно загружено: {image} по пути {file_path}",
         )
 
         # Возвращаем изображение

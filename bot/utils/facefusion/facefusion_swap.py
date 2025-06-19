@@ -1,11 +1,11 @@
 import asyncio
-import os
 import uuid
 
 import aiofiles
 
-from bot.config import FACEFUSION_RESULTS_DIR
+import bot.constants as constants
 from bot.logger import logger
+from bot.settings import settings
 
 
 async def facefusion_swap(source_filename: str, target_filename: str) -> str:
@@ -17,16 +17,12 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     :return: абсолютный путь к выходному изображению
     """
     output_filename = f"{uuid.uuid4()}_output.jpg"
-    output_path = os.path.join(FACEFUSION_RESULTS_DIR, output_filename)
-    
-    FACEFUSION_CONTAINER_NAME = os.getenv("FACEFUSION_CONTAINER_NAME")
-
-    logger.info(f"FACEFUSION_CONTAINER_NAME: {FACEFUSION_CONTAINER_NAME}")
+    output_path = constants.FACEFUSION_RESULTS_DIR / output_filename
 
     docker_cmd = [
         "docker",
         "exec",
-        FACEFUSION_CONTAINER_NAME,
+        settings.FACEFUSION_CONTAINER_NAME,
         "python",
         "facefusion.py",
         "headless-run",

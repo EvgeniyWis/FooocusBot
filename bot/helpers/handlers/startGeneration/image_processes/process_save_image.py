@@ -14,7 +14,7 @@ from bot.helpers.generateImages.dataArray import (
 )
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
-from bot.settings import MOCK_MODE
+from bot.settings import settings
 from bot.utils.googleDrive.files import convertDriveLink
 from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
@@ -55,7 +55,7 @@ async def process_save_image(
 
     # Сохраняем изображение
     now = datetime.now().strftime("%Y-%m-%d")
-    if not MOCK_MODE:
+    if not settings.MOCK_MODE:
         link = await saveFile(
             result_path,
             user_id,
@@ -116,5 +116,5 @@ async def process_save_image(
     await saving_progress_message.delete()
 
     # Удаляем изображение с замененным лицом
-    if not MOCK_MODE:
+    if not settings.MOCK_MODE:
         os.remove(result_path)

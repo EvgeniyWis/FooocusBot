@@ -7,7 +7,6 @@ from storage import get_redis_storage
 from bot.assets.mocks.links import (
     MOCK_FACEFUSION_PATH,
 )
-from bot.config import PROCESS_IMAGE_TASK
 from bot.helpers.handlers.startGeneration.image_processes import (
     ProcessImageStep,
     get_current_process_image_step,
@@ -17,7 +16,7 @@ from bot.helpers.handlers.startGeneration.image_processes import (
     update_process_image_step,
 )
 from bot.logger import logger
-from bot.settings import FACEFUSION_MODE, MOCK_MODE, UPSCALE_MODE
+from bot.settings import settings
 
 
 async def process_image(
@@ -50,7 +49,7 @@ async def process_image(
         model_name=model_name,
         image_index=image_index,
     )
-    await redis_storage.add_task(PROCESS_IMAGE_TASK, task_dto)
+    await redis_storage.add_task(settings.PROCESS_IMAGE_TASK, task_dto)
 
     # Инициализируем результирующий путь
     result_path = None
@@ -62,9 +61,12 @@ async def process_image(
     )
 
     # Если не в режиме мока, то продолжаем генерацию
-    if not MOCK_MODE:
+    if not settings.MOCK_MODE:
         # Меняем текст на сообщении о начале upscale
-        if UPSCALE_MODE and process_image_step == ProcessImageStep.UPSCALE:
+        if (
+            settings.UPSCALE_MODE
+            and process_image_step == ProcessImageStep.UPSCALE
+        ):
             await process_upscale_image(
                 call,
                 state,
@@ -79,7 +81,7 @@ async def process_image(
                 ProcessImageStep.FACEFUSION,
             )
 
-        if FACEFUSION_MODE:
+        if settings.FACEFUSION_MODE:
             if process_image_step == ProcessImageStep.FACEFUSION:
                 result_path = await process_faceswap_image(
                     call,
@@ -113,7 +115,7 @@ async def process_image(
 
     redis_storage = get_redis_storage()
     await redis_storage.delete_task(
-        PROCESS_IMAGE_TASK,
+        settings.PROCESS_IMAGE_TASK,
         key_for_image(call.from_user.id, image_index, model_name),
     )
 
