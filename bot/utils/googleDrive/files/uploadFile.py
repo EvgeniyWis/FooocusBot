@@ -1,14 +1,22 @@
 from googleapiclient.http import MediaFileUpload
 from logger import logger
 
-from ..auth import service
+from bot.utils.googleDrive.auth import service
 
 
 # Функция для загрузки файла на Google Drive
-async def uploadFile(file_path: str, file_metadata: dict, name: str, folder_name: str):
+async def uploadFile(
+    file_path: str, file_metadata: dict, name: str, folder_name: str
+):
     media = MediaFileUpload(file_path, resumable=True)
     try:
-        file = service.files().create(body=file_metadata, media_body=media, fields="id, webViewLink").execute()
+        file = (
+            service.files()
+            .create(
+                body=file_metadata, media_body=media, fields="id, webViewLink"
+            )
+            .execute()
+        )
 
         # Добавление разрешения на публичный доступ
         permission = {
@@ -20,7 +28,9 @@ async def uploadFile(file_path: str, file_metadata: dict, name: str, folder_name
             body=permission,
         ).execute()
 
-        logger.info(f"Файл {name} успешно загружен {f'в папку {folder_name}' if folder_name else '!'}: {file['webViewLink']}")
+        logger.info(
+            f"Файл {name} успешно загружен {f'в папку {folder_name}' if folder_name else '!'}: {file['webViewLink']}"
+        )
         return file
     finally:
         media.stream().close()

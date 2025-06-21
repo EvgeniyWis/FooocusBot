@@ -1,20 +1,15 @@
 import os
+from datetime import timedelta
 
 from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.fsm.storage.redis import RedisStorage
+from dotenv import find_dotenv, load_dotenv
 
-from dotenv import load_dotenv
-from logger import logger
+from bot.factory.redis_factory import create_redis_client
 
-env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'FocuuusBot', '.env')
-logger.info(f"Путь к .env файлу: {env_path}")
-logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
-
-if 'BOT_API_TOKEN' in os.environ:
-    del os.environ['BOT_API_TOKEN']
-
-load_dotenv(env_path, override=True)
+load_dotenv(find_dotenv(), override=True)
 
 # Создаём бота
 bot = Bot(
@@ -22,7 +17,15 @@ bot = Bot(
     default=DefaultBotProperties(parse_mode="HTML"),
 )
 
-dp = Dispatcher()
+redis_client = create_redis_client()
+
+storage = RedisStorage(
+    redis=redis_client,
+    state_ttl=timedelta(days=15),
+    data_ttl=timedelta(days=3),
+)
+
+dp = Dispatcher(storage=storage)
 router = Router()
 
 # Увеличиваем таймаут для запросов к Telegram API

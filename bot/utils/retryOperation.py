@@ -1,7 +1,7 @@
 import asyncio
 import traceback
 
-from logger import logger
+from bot.logger import logger
 
 
 # Функция для повторной операции
