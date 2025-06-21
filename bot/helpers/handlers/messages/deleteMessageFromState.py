@@ -7,20 +7,20 @@ from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
 
 # Функция для удаления сообщения, полученного из стейта
 async def deleteMessageFromState(
-    state: FSMContext, key: str, model_name: str, chat_id: int
+    state: FSMContext, key: str, model_name: str, chat_id: int,
 ):
     # Получаем сообщение из стейта
     state_data = await state.get_data()
     messages_ids = state_data.get(key, [])
     logger.info(
-        f"Стейт сообщений для модели {model_name} по ключу {key}: {messages_ids}"
+        f"Стейт сообщений для модели {model_name} по ключу {key}: {messages_ids}",
     )
 
     data = await getDataInDictsArray(messages_ids, model_name)
 
     if data is None:
         logger.warning(
-            f"Не найдены сообщения для модели {model_name} по ключу {key}"
+            f"Не найдены сообщения для модели {model_name} по ключу {key} в стейте {state_data}",
         )
         return
 
@@ -33,7 +33,7 @@ async def deleteMessageFromState(
                         await bot.delete_message(chat_id, message_id)
                     except Exception as e:
                         logger.error(
-                            f"Ошибка при удалении сообщения {message_id}: {e}"
+                            f"Ошибка при удалении сообщения {message_id}: {e}",
                         )
         else:
             if isinstance(data, int):
@@ -51,6 +51,6 @@ async def deleteMessageFromState(
         if model_name not in ids_dict.keys()
     ]
     logger.info(
-        f"Стейт сообщений по ключу {key} для модели {model_name} после удаления: {messages_ids}"
+        f"Стейт сообщений по ключу {key} для модели {model_name} после удаления: {messages_ids}",
     )
     await state.update_data(**{key: messages_ids})
