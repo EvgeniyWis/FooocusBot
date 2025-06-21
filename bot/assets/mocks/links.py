@@ -7,4 +7,4 @@ MOCK_LINK_FOR_SAVE_IMAGE = "https://drive.google.com/file/d/1dSkG6TsDFK3Tp0LlMDk
 MOCK_LINK_FOR_SAVE_VIDEO = "https://drive.google.com/drive/folders/18V64itY-c07U43aZb09mdzgVU9UGa242"
 
 # Мок-ссылка для замены лица
-MOCK_FACEFUSION_PATH = "FocuuusBot/bot/assets/mocks/mock_image.jpg"
+MOCK_FACEFUSION_PATH = "bot/assets/mocks/mock_image.jpg"
