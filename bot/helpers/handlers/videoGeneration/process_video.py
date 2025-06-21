@@ -1,4 +1,5 @@
 import traceback
+from typing import Optional
 
 from adapters.redis_task_storage_repository import key_for_video
 from aiogram import types
@@ -19,9 +20,6 @@ from bot.utils import retryOperation
 from bot.utils.handlers import (
     appendDataToStateArray,
 )
-from bot.utils.handlers.messages import (
-    editMessageOrAnswer,
-)
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
@@ -29,12 +27,14 @@ from bot.utils.videos import generate_video
 
 
 async def process_video(
-    call: types.CallbackQuery,
     state: FSMContext,
     model_name: str,
     prompt: str,
     type_for_video_generation: str,
     image_url: str,
+    call: Optional[types.CallbackQuery] = None,
+    message: Optional[types.Message] = None,
+    is_quick_generation: bool = False,
 ):
     """
     Обработка видео после генерации в основной рабочей генерации.
@@ -48,12 +48,29 @@ async def process_video(
         type_for_video_generation: str - Тип генерации видео (Рабочий или Тестовый)
         image_url: str - Ссылка на изображение, из которого будет генерироваться видео
     """
+
+    if (call is None and message is None) or (call is not None and message is not None):
+        raise ValueError("Нужно передать либо call, либо message, но не оба и не ни одного.")
+
+    if call is not None:
+        user_id = call.from_user.id
+        chat_id = call.message.chat.id
+        message_id = call.message.message_id
+        callback_data = call.data
+        message = call.message
+    else:
+        user_id = message.from_user.id
+        chat_id = message.chat.id
+        message_id = message.message_id
+        callback_data = "generations_type|work"
+
+    # Добавляем задачу в Redis для дальнейшего восстановления при перезапуске бота
     redis_storage = get_redis_storage()
     task_dto = TaskProcessVideoDTO(
-        user_id=call.from_user.id,
-        chat_id=call.message.chat.id,
-        message_id=call.message.message_id,
-        callback_data=call.data,
+        user_id=user_id,
+        chat_id=chat_id,
+        message_id=message_id,
+        callback_data=callback_data,
         model_name=model_name,
         prompt=prompt,
         type_for_video_generation=type_for_video_generation,
@@ -65,8 +82,7 @@ async def process_video(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение про генерацию видео
-    video_progress_message = await editMessageOrAnswer(
-        call,
+    video_progress_message = await message.answer(
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
     )
 
@@ -86,8 +102,7 @@ async def process_video(
             # Отправляем сообщение об ошибке
             traceback.print_exc()
             logger.error(f"Произошла ошибка при генерации видео: {e}")
-            await editMessageOrAnswer(
-                call,
+            await message.answer(
                 text.GENERATE_VIDEO_ERROR_TEXT.format(
                     model_name,
                     model_name_index,
@@ -107,7 +122,7 @@ async def process_video(
                 model_name_index,
                 "Не удалось сгенерировать видео",
             ),
-            call,
+            message,
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
                 False,
@@ -123,7 +138,7 @@ async def process_video(
                     model_name_index,
                     video_path.get("error"),
                 ),
-                call,
+                message,
                 reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                     model_name,
                     False,
@@ -140,7 +155,7 @@ async def process_video(
     prefix = f"generate_video|{model_name}"
 
     if type_for_video_generation == "work":
-        method = call.message.answer_video(
+        method = message.answer_video(
             video=video,
             caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(
                 model_name,
@@ -148,11 +163,12 @@ async def process_video(
             ),
             reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
                 model_name,
+                is_quick_generation,
             ),
         )
         video_message = await bot(method)
     else:  # При тестовой просто отправляем юзеру результат генерации
-        method = call.message.answer_video(
+        method = message.answer_video(
             video=video,
             caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(
                 model_name,
@@ -181,7 +197,7 @@ async def process_video(
         PROCESS_VIDEO_TASK,
         key_for_video(
             type_for_video=type_for_video_generation,
-            user_id=call.from_user.id,
+            user_id=user_id,
             image_url=image_url,
             model_name=model_name,
         ),
