@@ -108,7 +108,7 @@ async def process_image(
     logger.info(f"Результат замены лица: {result_path}")
 
     # Сохраняем изображение
-    if process_image_step == ProcessImageStep.SAVE:
+    if process_image_step == ProcessImageStep.SAVE or not FACEFUSION_MODE:
         await process_save_image(call, state, model_name, result_path)
 
     redis_storage = get_redis_storage()

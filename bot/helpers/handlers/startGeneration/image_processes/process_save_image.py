@@ -6,7 +6,10 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from aiogram.methods import SendPhoto
 
-from bot.assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
+from bot.assets.mocks.links import (
+    MOCK_FACEFUSION_PATH,
+    MOCK_LINK_FOR_SAVE_IMAGE,
+)
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
@@ -116,5 +119,5 @@ async def process_save_image(
     await saving_progress_message.delete()
 
     # Удаляем изображение с замененным лицом
-    if not MOCK_MODE:
+    if not MOCK_MODE and result_path != MOCK_FACEFUSION_PATH:
         os.remove(result_path)
