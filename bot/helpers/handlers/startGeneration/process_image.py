@@ -34,6 +34,7 @@ async def process_image(
 
     Attributes:
         - call: types.CallbackQuery, объект вызова
+        - state: FSMContext, стейт
         - model_name: str, название модели
         - image_index: int, индекс выбранного изображения
 

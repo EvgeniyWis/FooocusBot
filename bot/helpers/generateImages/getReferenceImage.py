@@ -6,8 +6,6 @@ from bot.logger import logger
 
 from bot.helpers.generateImages.dataArray import getModelNameIndex
 
-from utils.generateImages.dataArray import getModelNameIndex
-
 
 # Функция для получения референсного изображения
 async def getReferenceImage(model_name: str) -> str:

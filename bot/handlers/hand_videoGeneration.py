@@ -16,6 +16,7 @@ from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
 )
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.videoGeneration import (
+    check_video_path,
     process_video,
     process_write_prompt,
     saveVideo,
@@ -24,7 +25,6 @@ from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
-from bot.utils import retryOperation
 from bot.utils.handlers import (
     getDataInDictsArray,
 )
@@ -34,7 +34,6 @@ from bot.utils.handlers.messages import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
-from bot.utils.videos import generate_video
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -298,6 +297,8 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
 
             raise e
 
+    await state.set_state(None)
+
 
 # Обработка нажатия на кнопки корректности видео
 async def handle_video_correctness_buttons(
@@ -404,7 +405,7 @@ async def handle_prompt_for_videoGenerationFromImage(
         return
 
     # Отправляем сообщение о прогрессе
-    await safe_send_message(
+    generate_video_from_image_progress_message = await safe_send_message(
         text.GENERATE_VIDEO_FROM_IMAGE_PROGRESS_TEXT,
         message,
     )
@@ -444,16 +445,10 @@ async def handle_prompt_for_videoGenerationFromImage(
             )
 
         # Генерируем видео
-        video_path = await retryOperation(
-            generate_video,
-            10,
-            1.5,
-            prompt,
-            None,
-            temp_path,
-        )
+        video_path = await check_video_path(prompt, message, None, temp_path)
+
         await state.update_data(
-            video_path_for_videoGenerationFromImage=video_path,
+            video_path=video_path,
         )
 
         video = types.FSInputFile(video_path)
@@ -471,6 +466,8 @@ async def handle_prompt_for_videoGenerationFromImage(
         await state.set_state(
             StartGenerationState.ask_for_model_name_for_video_generation_from_image,
         )
+
+        await generate_video_from_image_progress_message.delete()
 
         # Удаляем временное изображение
         os.remove(temp_path)
