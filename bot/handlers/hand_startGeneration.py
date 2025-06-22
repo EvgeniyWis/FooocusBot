@@ -76,6 +76,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "imageGeneration_mediagroup_messages_ids": [],
         "videoGeneration_messages_ids": [],
         "process_images_steps": [],
+        "upscale_progress_messages": [],
     }
 
     await state.update_data(**initial_state)

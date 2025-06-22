@@ -1,8 +1,7 @@
 import os
 
+from bot.config import VIDEOS_TEMP_DIR
 from bot.utils.httpx import httpx_get
-
-from bot.config import VIDEOS_TEMP_DIR  
 
 
 async def download_video(url: str) -> str:
@@ -32,7 +31,7 @@ async def download_video(url: str) -> str:
             return video_path
         else:
             raise Exception(
-                f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'}"
+                f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'}",
             )
     except Exception as e:
         raise Exception(f"Произошла ошибка при скачивании видео: {e}")

@@ -5,10 +5,10 @@ from bot.logger import logger
 
 # Функция для отправки GET-запросов с настройками таймаутов
 async def httpx_get(
-    url: str, headers: dict = None, timeout: int = 60, stream: bool = False
+    url: str, headers: dict = None, timeout: int = 60, stream: bool = False,
 ):
     async with httpx.AsyncClient(
-        timeout=httpx.Timeout(timeout), follow_redirects=True
+        timeout=httpx.Timeout(timeout), follow_redirects=True,
     ) as client:
         response = await client.get(url, headers=headers)
 

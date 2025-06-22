@@ -16,7 +16,7 @@ from bot.helpers.generateImages.dataArray import (
 from bot.utils.handlers import (
     appendDataToStateArray,
 )
-from bot.utils.handlers import (
+from bot.utils.handlers.messages import (
     safe_send_media_group,
 )
 

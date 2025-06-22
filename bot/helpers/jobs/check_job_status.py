@@ -107,7 +107,7 @@ async def check_job_status(
     await delete_job(job_id, state)
 
     # Если работа не завершена, то возвращаем False
-    if not response_json or response_json == CANCELLED_JOB_TEXT:
+    if not response_json or isinstance(response_json, str):
         return False
 
     # Проверяем наличие выходных данных

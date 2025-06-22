@@ -57,6 +57,9 @@ async def generateVideoFromImage(
         # Генерируем видео
         video_path = await check_video_path(prompt, message, None, temp_path)
 
+        if not video_path:
+            return
+
         # Сохраняем путь к видео в стейт
         if "video_paths" not in state_data:
             await state.update_data(video_paths=[video_path])

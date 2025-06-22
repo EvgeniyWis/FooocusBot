@@ -450,6 +450,11 @@ async def handle_prompt_for_videoGenerationFromImage(
         # Генерируем видео
         video_path = await check_video_path(prompt, message, None, temp_path)
 
+        await generate_video_from_image_progress_message.delete()
+
+        if not video_path:
+            return
+
         await state.update_data(
             video_path=video_path,
         )
@@ -469,8 +474,6 @@ async def handle_prompt_for_videoGenerationFromImage(
         await state.set_state(
             StartGenerationState.ask_for_model_name_for_video_generation_from_image,
         )
-
-        await generate_video_from_image_progress_message.delete()
 
         # Удаляем временное изображение
         os.remove(temp_path)
