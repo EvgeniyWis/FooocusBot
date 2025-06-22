@@ -119,7 +119,10 @@ async def process_save_image(
     await bot(method)
 
     # Удаляем сообщение о сохранении изображения
-    await saving_progress_message.delete()
+    try:
+        await saving_progress_message.delete()
+    except Exception as e:
+        logger.error(f"Произошла ошибка при удалении сообщения: {e}")
 
     # Удаляем изображение с замененным лицом
     if not MOCK_MODE and result_path != MOCK_FACEFUSION_PATH:
