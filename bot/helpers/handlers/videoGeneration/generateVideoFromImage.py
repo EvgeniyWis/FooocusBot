@@ -6,6 +6,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
+from bot.helpers.handlers.videoGeneration import check_video_path
 from bot.InstanceBot import bot
 from bot.keyboards.videoGeneration import (
     keyboards as video_generation_keyboards,
@@ -13,8 +14,6 @@ from bot.keyboards.videoGeneration import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
-from bot.utils.retryOperation import retryOperation
-from bot.utils.videos.generate_video import generate_video
 
 
 # Функция для генерации видео из изображения
@@ -56,14 +55,7 @@ async def generateVideoFromImage(
             )
 
         # Генерируем видео
-        video_path = await retryOperation(
-            generate_video,
-            10,
-            1.5,
-            prompt,
-            None,
-            temp_path,
-        )
+        video_path = await check_video_path(prompt, message, None, temp_path)
 
         # Сохраняем путь к видео в стейт
         if "video_paths" not in state_data:

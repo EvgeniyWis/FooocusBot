@@ -25,7 +25,7 @@ async def check_video_generation_status(request_id: str) -> str | None:
     while True:
         try:
             json = await httpx_get(
-                url_status_endpoint, headers=get_kling_headers()
+                url_status_endpoint, headers=get_kling_headers(),
             )
 
             logger.info(
@@ -36,12 +36,13 @@ async def check_video_generation_status(request_id: str) -> str | None:
             if json["status"] == "error":
                 # Обрабатываем ошибку промпта, непройденного модераций
                 PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT = "Параметры сформированы некорректно. Пожалуйста, убедитесь в правильности введенных данных и отсутствии неприемлемого контента в подсказках."
+                error_text = json["result"][0]
 
                 if (
-                    json["result"][0]
+                    error_text
                     == PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT
                 ):
-                    return {"error": PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT}
+                    return {"error": error_text}
 
                 logger.error(f"Ошибка при генерации видео: {json}")
                 raise Exception(json["result"][0])
