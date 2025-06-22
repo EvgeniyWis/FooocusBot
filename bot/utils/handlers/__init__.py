@@ -1,3 +1,3 @@
 from bot.utils.handlers.appendDataToStateArray import appendDataToStateArray
 from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
-from bot.utils.handlers.rate_limiter_for_send_media_group import safe_send_media_group
+from bot.utils.handlers.deleteDataFromStateArray import deleteDataFromStateArray
