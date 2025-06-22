@@ -12,11 +12,15 @@ from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.images.base64_to_image import base64_to_image
 
-# Lazy import to avoid circular dependency
 sendImageBlock = None
+
+
 def set_send_image_block(module):
     global sendImageBlock
-    from bot.helpers.handlers.startGeneration.sendImageBlock import sendImageBlock as sib
+    from bot.helpers.handlers.startGeneration.sendImageBlock import (
+        sendImageBlock as sib,
+    )
+
     sendImageBlock = sib
 
 

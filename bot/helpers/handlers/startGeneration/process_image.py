@@ -1,12 +1,9 @@
 from adapters.redis_task_storage_repository import key_for_image
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from domain.entities.task import TaskProcessImageDTO
-from storage import get_redis_storage
 
-from bot.assets.mocks.links import (
-    MOCK_FACEFUSION_PATH,
-)
+from bot.assets.mocks.links import MOCK_FACEFUSION_PATH
+from bot.domain.entities.task import TaskProcessImageDTO
 from bot.helpers.handlers.startGeneration.image_processes import (
     ProcessImageStep,
     get_current_process_image_step,
@@ -17,6 +14,7 @@ from bot.helpers.handlers.startGeneration.image_processes import (
 )
 from bot.logger import logger
 from bot.settings import settings
+from bot.storage import get_redis_storage
 
 
 async def process_image(
@@ -24,22 +22,7 @@ async def process_image(
     state: FSMContext,
     model_name: str,
     image_index: int,
-):
-    """
-    Обрабатывает изображение после выбора индекса среди сгенерированных изображений.
-    Последовательно производит над выбранным изображением операции upscale, faceswap
-    и сохраняет результат на Google Drive.
-    В стейте сохраняется каfждый текущий шаг обработки изображения для его возобновления в случае ошибки.
-
-    Attributes:
-        - call: types.CallbackQuery, объект вызова
-        - model_name: str, название модели
-        - image_index: int, индекс выбранного изображения
-
-    Returns:
-        - bool, True если изображение успешно обработано, False если нет
-    """
-
+) -> bool:
     redis_storage = get_redis_storage()
     task_dto = TaskProcessImageDTO(
         user_id=call.from_user.id,
@@ -51,66 +34,88 @@ async def process_image(
     )
     await redis_storage.add_task(settings.PROCESS_IMAGE_TASK, task_dto)
 
-    # Инициализируем результирующий путь
     result_path = None
 
-    # Получаем текущий этап обработки изображения для модели
     process_image_step = await get_current_process_image_step(
         state,
         model_name,
     )
 
-    # Если не в режиме мока, то продолжаем генерацию
     if not settings.MOCK_MODE:
-        # Меняем текст на сообщении о начале upscale
         if (
             settings.UPSCALE_MODE
             and process_image_step == ProcessImageStep.UPSCALE
         ):
-            await process_upscale_image(
-                call,
-                state,
-                image_index,
-                model_name,
-            )
+            logger.info("Запускаем upscale")
+            await process_upscale_image(call, state, image_index, model_name)
 
-            # Меняем шаг обработки изображения на faceswap
             process_image_step = await update_process_image_step(
                 state,
                 model_name,
                 ProcessImageStep.FACEFUSION,
             )
 
-        if settings.FACEFUSION_MODE:
-            if process_image_step == ProcessImageStep.FACEFUSION:
-                result_path = await process_faceswap_image(
-                    call,
-                    state,
-                    image_index,
-                    model_name,
-                )
+        if (
+            settings.FACEFUSION_MODE
+            and process_image_step == ProcessImageStep.FACEFUSION
+        ):
+            logger.info("Запускаем faceswap")
+            result_path = await process_faceswap_image(
+                call,
+                state,
+                image_index,
+                model_name,
+            )
 
-                # Меняем шаг обработки изображения на save
+            if result_path:
+                await state.update_data(
+                    {f"{model_name}_result_path": result_path},
+                )
                 process_image_step = await update_process_image_step(
                     state,
                     model_name,
                     ProcessImageStep.SAVE,
                 )
+            else:
+                logger.warning(
+                    "Faceswap не вернул result_path — не двигаем шаг",
+                )
+                return False
 
-        else:
-            result_path = MOCK_FACEFUSION_PATH
+        if process_image_step == ProcessImageStep.SAVE:
+            logger.info(
+                "Этап SAVE — восстанавливаем result_path из state",
+            )
+            state_data = await state.get_data()
+            result_path = state_data.get(f"{model_name}_result_path")
+
+            if not result_path:
+                logger.warning(
+                    "result_path пустой при SAVE — откат к FACEFUSION",
+                )
+                await update_process_image_step(
+                    state,
+                    model_name,
+                    ProcessImageStep.FACEFUSION,
+                )
+                return await process_image(
+                    call,
+                    state,
+                    model_name,
+                    image_index,
+                )
 
     else:
         result_path = MOCK_FACEFUSION_PATH
 
-    # Если результат замены лица не найден, то завершаем генерацию и уменьшаем кол-во ожидаемых изображений
     if not result_path:
+        logger.warning("result_path пустой — завершаем")
         return False
 
-    logger.info(f"Результат замены лица: {result_path}")
+    logger.info(f"Результат обработки: {result_path}")
 
-    # Сохраняем изображение
     if process_image_step == ProcessImageStep.SAVE:
+        logger.info("Сохраняем изображение")
         await process_save_image(call, state, model_name, result_path)
 
     redis_storage = get_redis_storage()

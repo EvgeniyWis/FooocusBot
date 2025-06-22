@@ -1,13 +1,26 @@
 services:
+  telegram_bot:
+    build:
+      context: .
+    container_name: telegram_bot_container
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../facefusion-docker/.assets:/app/.assets
+      - ./bot:/app/bot
+    env_file:
+      - .env
+    restart: unless-stopped
+    
+  
   redis:
     image: redis:7.2.4
     container_name: redis_container
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    ports:
-      - "6380:6379"
     volumes:
       - ./redisdata:/data
+    ports:
+      - "6379:6379"
     command: >
       sh -c '
         mkdir -p /usr/local/etc/redis &&
