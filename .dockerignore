@@ -1,0 +1,15 @@
+.venv/
+venv/
+**/__pycache__/
+**/*.pyc
+.git/
+.gitignore
+.env
+.idea/
+.vscode/
+*.log
+logs/
+.ruff_cache/
+.github/
+*.egg-info/
+redisdata/

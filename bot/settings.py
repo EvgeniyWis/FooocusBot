@@ -29,7 +29,7 @@ class Settings(BaseSettings):
 
     # Redis
     REDIS_PASSWORD: str
-    REDIS_HOST: str = "localhost"
+    REDIS_HOST: str
     REDIS_PORT: str = "6379"
     REDIS_DB: str = "0"
 

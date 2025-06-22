@@ -58,6 +58,7 @@ async def check_video_generation_status(request_id: str) -> str | None:
 
                 # Скачиваем видео локально
                 video_path = await download_video(result_url)
+                logger.info(f"Путь к скачанному видео: {video_path}")
                 if not video_path:
                     logger.error(
                         f"Не удалось скачать видео: {result_url}",
@@ -76,6 +77,7 @@ async def check_video_generation_status(request_id: str) -> str | None:
 
                     # Сохраняем по-новой
                     video_path = await download_video(result_url)
+                    logger.info(f"Путь к скачанному видео: {video_path}")
                     if not video_path:
                         logger.error(
                             f"Не удалось скачать видео: {result_url}",

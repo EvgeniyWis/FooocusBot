@@ -463,9 +463,7 @@ async def handle_prompt_for_videoGenerationFromImage(
             None,
             temp_path,
         )
-        await state.update_data(
-            video_path_for_videoGenerationFromImage=video_path,
-        )
+        await state.update_data(video_path=video_path)
 
         video = types.FSInputFile(video_path)
         await message.answer_video(
