@@ -6,6 +6,9 @@ from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 from InstanceBot import bot
 
 from bot.logger import logger
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
+)
 
 _edit_lock = asyncio.Lock()
 _last_edit_time = 0.0
@@ -14,7 +17,7 @@ MIN_DELAY = 1.5
 
 
 async def safe_edit_message(
-    call: types.CallbackQuery,
+    message: types.Message,
     safe_text: str,
     reply_markup: types.InlineKeyboardMarkup
     | types.ReplyKeyboardMarkup
@@ -29,11 +32,11 @@ async def safe_edit_message(
         if elapsed < MIN_DELAY:
             await asyncio.sleep(MIN_DELAY - elapsed)
             logger.warning(
-                f"Ожидаем {MIN_DELAY} секунд перед редактированием сообщения {call.message.message_id}...",
+                f"Ожидаем {MIN_DELAY} секунд перед редактированием сообщения {message.message_id}...",
             )
 
         try:
-            method = call.message.edit_text(
+            method = message.edit_text(
                 safe_text,
                 reply_markup=reply_markup,
                 parse_mode=parse_mode,
@@ -46,7 +49,7 @@ async def safe_edit_message(
             logger.warning(f"Telegram RetryAfter: {e.retry_after}s")
             await asyncio.sleep(e.retry_after)
             try:
-                method = call.message.edit_text(
+                method = message.edit_text(
                     safe_text,
                     reply_markup=reply_markup,
                     parse_mode=parse_mode,
@@ -59,6 +62,14 @@ async def safe_edit_message(
                 logger.exception("RetryAfter second attempt failed")
         except TelegramAPIError as e:
             logger.warning(f"Telegram API error: {e}")
+
+            # При ошибке, связанной с тем, что сообщение не найдено, то отправляем новое сообщение
+            if ("message to edit not found" in e.message.lower() or
+                "message is not modified" in e.message.lower()):
+                return await safe_send_message(
+                    safe_text,
+                    message,
+                )
         except Exception:
             logger.exception("Unexpected error in safe_edit_message")
 
