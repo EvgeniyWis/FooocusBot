@@ -202,4 +202,5 @@ temp/
 
 # redis
 redisdata/
-dump.rdb
+*.rdb
+*.aof
