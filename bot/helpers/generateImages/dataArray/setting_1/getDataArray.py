@@ -196,11 +196,12 @@ def setting1_getDataArray():
             "gia_prescott.xo",
             "1cgjXUHiiAh8fYbFgFYzx6JYnrTBYX0cm",
             "1RDFZrbYp0NWFlhI4AGrb74QXwnVb6N0G",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, thin lips, realistic green eyes, long voluminous ((brunette)) hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), ((big wide hips)), hourglass body.
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
 
-                Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard, ((((bright lightning face))))""",
+            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
+            """,
             [2, 1.70, -0.90, 1.40, 0.95, 1.00, 0.05, 0.80],
         ),
         setting1_generateData(
@@ -215,11 +216,12 @@ def setting1_getDataArray():
             "selinavoux",
             "1GMY2IoGDR402Qfb-XHBIYHlj3vAxFypw",
             "1i78rV8aQfsTiSZZijmwg52wsQG-LModz",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, thin lips, realistic green eyes, long voluminous black hair, (((extra-white skin tone))), natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), ((big wide hips)), hourglass body.
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long black hair, extra-white skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
 
-                Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard, ((((bright lightning face))))""",
+            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
+            """,
             [2, 2.65, -0.90, -0.25, 0.70, 1.00, 0.10, 0.75],
         ),
         setting1_generateData(
