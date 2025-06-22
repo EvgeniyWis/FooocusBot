@@ -2,3 +2,4 @@ from bot.utils.handlers.messages.editMessageOrAnswer import editMessageOrAnswer
 from bot.utils.handlers.messages.preserve_code_tags import preserve_code_tags
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import safe_edit_message
 from bot.utils.handlers.messages.rate_limiter_for_send_message import safe_send_message
+from bot.utils.handlers.messages.rate_limiter_for_send_media_group import safe_send_media_group
