@@ -54,7 +54,7 @@ async def check_video_path(
     image_url: str | None,
     temp_path: str | None,
     model_name: str = None,
-) -> str:
+) -> str | None:
     """
     Проверяет путь к видео на наличие ошибок и возвращает его в случае успеха.
     Если же ошибка, то отправляет сообщение об ошибке и возвращает None.
@@ -71,6 +71,7 @@ async def check_video_path(
     """
 
     # Генерируем видео
+    video_path = None
     if MOCK_MODE:
         video_path = "FocuuusBot/bot/assets/mocks/mock_video.mp4"
     else:
@@ -90,11 +91,11 @@ async def check_video_path(
             await send_error_message(message, model_name, e)
 
     if not video_path:
-        return await send_error_message(message, model_name, "Не удалось сгенерировать видео")
+        await send_error_message(message, model_name, "Не удалось сгенерировать видео")
 
     if isinstance(video_path, dict):
-        if video_path.get("error"):
-            return await send_error_message(message, model_name, video_path.get("error"))
-
+        error = video_path.get("error")
+        if error:
+            await send_error_message(message, model_name, error)
 
     return video_path

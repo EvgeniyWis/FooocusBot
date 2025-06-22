@@ -35,7 +35,7 @@ async def handle_randomizer_buttons(
     # Если была выбрана кнопка "💬 Одно сообщение"
     elif action == "one_message":
         await safe_edit_message(
-            call,
+            call.message,
             text.ONE_MESSAGE_FOR_RANDOMIZER_TEXT,
             parse_mode="HTML",
         )

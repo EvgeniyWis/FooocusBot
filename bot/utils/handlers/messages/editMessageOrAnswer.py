@@ -22,7 +22,7 @@ async def editMessageOrAnswer(
         safe_text = text
 
     message = await safe_edit_message(
-        call,
+        call.message,
         safe_text,
         reply_markup=reply_markup,
         parse_mode="HTML",
