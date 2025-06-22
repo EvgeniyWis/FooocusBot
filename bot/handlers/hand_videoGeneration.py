@@ -152,7 +152,10 @@ async def handle_video_example_buttons(
     state: FSMContext,
 ):
     # Удаляем текущее сообщение
-    await call.message.delete()
+    try:
+        await call.message.delete()
+    except Exception as e:
+        logger.error(f"Произошла ошибка при удалении сообщения: {e}")
 
     # Получаем индекс видео-примера и тип кнопки
     temp = call.data.split("|")

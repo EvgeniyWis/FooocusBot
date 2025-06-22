@@ -174,22 +174,24 @@ def setting1_getDataArray():
             "noavexen",
             "1J39NtE4ovUiklcTW_t8NMZHTidCoTZNJ",
             "1jpaYrZUUKeh2sL5e3W3Nx0UaJX5fk9BB",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, thin lips, realistic green eyes, long voluminous brown hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), ((big wide hips)), hourglass body.
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brown hair, tanned skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
 
-                Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard, ((((bright lightning face))))""",
+            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
+            """,
             [2, 1.60, -0.90, -1.70, 1.55, 1.00, 3.00, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
             "1ME0oexikdkzPqj1pJS-3z9NPY0ewAgVQ",
             "1y6qUi8iX5AMM1ns_B8B_j3HIIHH7reDC",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, thin lips, realistic green eyes, long voluminous ((brunette)) hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), ((big wide hips)), hourglass body.
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
 
-                Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard, ((((bright lightning face))))""",
+            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
+            """,
             [2, 1.70, -0.90, -0.95, 0.95, 1.00, 0.05, 0.40],
         ),
         setting1_generateData(
