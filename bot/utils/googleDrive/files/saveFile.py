@@ -1,6 +1,8 @@
 import asyncio
+import http.client
 import os
 import shutil
+import socket
 
 from bot.config import TEMP_FOLDER_PATH
 from bot.logger import logger
@@ -28,15 +30,19 @@ async def saveFile(
             raise ValueError("Некорректный initial_folder_id")
 
         # Проверяем есть ли папка с сегодняшней датой
-        results = (
-            service.files()
-            .list(
-                q=f"'{str(initial_folder_id)}' in parents and name = '{current_date}'",
-                fields="files(id, name)",
-                pageSize=1000,
+        try:
+            results = (
+                service.files()
+                .list(
+                    q=f"'{str(initial_folder_id)}' in parents and name = '{current_date}'",
+                    fields="files(id, name)",
+                    pageSize=1000,
+                )
+                .execute()
             )
-            .execute()
-        )
+        except (socket.gaierror, http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, OSError) as e:
+            logger.error(f"Сетевая ошибка при проверке папки с датой: {e}")
+            raise ValueError(f"Ошибка подключения к Google Drive: {e}")
 
         # Если папка с сегодняшней датой есть, то получаем её id
         if results.get("files", []):
@@ -52,15 +58,20 @@ async def saveFile(
             )
 
         # Получаем кол-во файлов в папке
-        results = (
-            service.files()
-            .list(
-                q=f"'{str(date_folder_id)}' in parents",
-                fields="files(id, name)",
-                pageSize=1000,
+        try:
+            results = (
+                service.files()
+                .list(
+                    q=f"'{str(date_folder_id)}' in parents",
+                    fields="files(id, name)",
+                    pageSize=1000,
+                )
+                .execute()
             )
-            .execute()
-        )
+        except (socket.gaierror, http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, OSError) as e:
+            logger.error(f"Сетевая ошибка при получении списка файлов: {e}")
+            raise Exception(f"Ошибка подключения к Google Drive: {e}")
+
         files_count = len(results.get("files", []))
 
         # Создаем имя для файла
@@ -98,4 +109,5 @@ async def saveFile(
         return file["webViewLink"]
 
     except Exception as e:
-        raise Exception(f"Произошла ошибка при сохранении файла: {e}")
+        logger.error(f"Произошла ошибка при сохранении файла: {e}")
+        raise RuntimeError(f"Произошла ошибка при сохранении файла: {e}")

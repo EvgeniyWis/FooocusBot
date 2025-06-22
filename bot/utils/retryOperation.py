@@ -1,4 +1,6 @@
 import asyncio
+import http.client
+import socket
 import traceback
 
 from bot.logger import logger
@@ -9,7 +11,7 @@ async def retryOperation(operation, max_attempts=3, delay=2, *args):
     for attempt in range(max_attempts):
         try:
             return await operation(*args)
-        except (ValueError, TypeError, RuntimeError) as e:
+        except (ValueError, TypeError, RuntimeError, socket.gaierror, http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, OSError) as e:
             traceback.print_exc()
             if attempt == max_attempts - 1:
                 raise e

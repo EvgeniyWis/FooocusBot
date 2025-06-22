@@ -15,6 +15,7 @@ from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
+from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.settings import MOCK_MODE
@@ -23,6 +24,7 @@ from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.retryOperation import retryOperation
 
 
 async def process_save_image(
@@ -59,7 +61,8 @@ async def process_save_image(
     # Сохраняем изображение
     now = datetime.now().strftime("%Y-%m-%d")
     if not MOCK_MODE:
-        link = await saveFile(
+        link = await retryOperation(
+            saveFile, 10, 2,
             result_path,
             user_id,
             model_name,
@@ -113,7 +116,7 @@ async def process_save_image(
     )
 
     # Отправляем фото с помощью бота
-    await call.bot(method)
+    await bot(method)
 
     # Удаляем сообщение о сохранении изображения
     await saving_progress_message.delete()

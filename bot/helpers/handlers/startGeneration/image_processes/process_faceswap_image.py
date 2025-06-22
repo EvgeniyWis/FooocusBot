@@ -4,10 +4,10 @@ from datetime import datetime
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.logger import logger
 from bot.helpers import text
-from bot.utils.facefusion import facefusion_swap
 from bot.helpers.generateImages.dataArray import getModelNameIndex
+from bot.logger import logger
+from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
 from bot.utils.retryOperation import retryOperation
@@ -69,11 +69,14 @@ async def process_faceswap_image(
     # Запускаем цикл, что пока очередь генераций не освободится, то ответ не будет выдан и генерацию не начинаем
     start_time = datetime.now()
     last_models_state = []
+    error_message = None
+
+    result_path = None
 
     while True:
         state_data = await state.get_data()
         faceswap_generated_models = state_data.get(
-            "faceswap_generated_models", []
+            "faceswap_generated_models", [],
         )
 
         # Проверяем, изменился ли список моделей
@@ -84,12 +87,12 @@ async def process_faceswap_image(
         # Проверяем таймаут
         current_time = datetime.now()
         elapsed_time = (current_time - start_time).total_seconds()
-        if elapsed_time > 1800:  # 30 минут = 1800 секунд
+        if elapsed_time > 1200:  # 20 минут = 1200 секунд
             error_message = f"Таймаут ожидания обновления списка faceswap_generated_models для модели {model_name}"
             logger.error(
                 error_message,
             )
-            raise Exception(error_message)
+            break
 
         logger.info(
             f"Список генераций для замены лица: {faceswap_generated_models}",
@@ -132,7 +135,7 @@ async def process_faceswap_image(
                         e,
                     ),
                 )
-                raise e
+                error_message = e
 
             break
 
@@ -149,5 +152,8 @@ async def process_faceswap_image(
     await state.update_data(
         faceswap_generated_models=faceswap_generated_models_without_current_model,
     )
+
+    if error_message:
+        raise Exception(error_message)
 
     return result_path
