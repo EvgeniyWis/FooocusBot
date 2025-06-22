@@ -6,6 +6,8 @@ from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 
 from bot.logger import logger
 
+from bot.InstanceBot import bot
+
 _send_lock = asyncio.Lock()
 _last_send_time = 0.0
 
@@ -35,7 +37,8 @@ async def safe_send_message(
             )
 
         try:
-            msg = await message.answer(text, reply_markup=reply_markup)
+            method = message.answer(text, reply_markup=reply_markup)
+            msg = await bot(method)
             _last_send_time = time.monotonic()
             return msg
         except TelegramRetryAfter as e:
