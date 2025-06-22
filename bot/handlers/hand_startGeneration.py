@@ -513,11 +513,12 @@ async def write_new_prompt_for_regenerate_image(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о перегенерации изображения
+    modified_prompt = prompt[:30] + "..." if len(prompt) > 30 else prompt
     regenerate_progress_message = await safe_send_message(
         text=text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(
             model_name,
             model_name_index,
-            prompt,
+            modified_prompt,
         ),
         message=message,
     )
