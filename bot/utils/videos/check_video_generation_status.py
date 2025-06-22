@@ -28,6 +28,12 @@ async def check_video_generation_status(request_id: str) -> str | None:
                 url_status_endpoint, headers=get_kling_headers(),
             )
 
+            if "status" not in json:
+                logger.error(
+                    f"Не удалось получить статус задания на генерацию видео с id {request_id}: {json}",
+                )
+                raise Exception("Не удалось получить статус задания на генерацию видео")
+
             logger.info(
                 f"Статус задания на генерацию видео с id {request_id}: "
                 f"{json['status']}",
