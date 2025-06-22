@@ -1,4 +1,3 @@
-import traceback
 from typing import Optional
 
 from adapters.redis_task_storage_repository import key_for_video
@@ -11,19 +10,15 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
 )
+from bot.helpers.handlers.videoGeneration.check_video_path import (
+    check_video_path,
+)
 from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
-from bot.settings import MOCK_MODE
 from bot.storage import get_redis_storage
-from bot.utils import retryOperation
 from bot.utils.handlers import (
     appendDataToStateArray,
 )
-from bot.utils.handlers.messages.rate_limiter_for_send_message import (
-    safe_send_message,
-)
-from bot.utils.videos import generate_video
 
 
 async def process_video(
@@ -82,69 +77,13 @@ async def process_video(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение про генерацию видео
-    video_progress_message = await message.answer(
+    method = message.answer(
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
     )
+    video_progress_message = await bot(method)
 
-    # Генерируем видео
-    if MOCK_MODE:
-        video_path = "FocuuusBot/bot/assets/mocks/mock_video.mp4"
-    else:
-        try:
-            video_path = await retryOperation(
-                generate_video,
-                10,
-                1.5,
-                prompt,
-                image_url,
-            )
-        except Exception as e:
-            # Отправляем сообщение об ошибке
-            traceback.print_exc()
-            logger.error(f"Произошла ошибка при генерации видео: {e}")
-            await message.answer(
-                text.GENERATE_VIDEO_ERROR_TEXT.format(
-                    model_name,
-                    model_name_index,
-                    e,
-                ),
-                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                    model_name,
-                    False,
-                ),
-            )
-            raise e
-
-    if not video_path:
-        await safe_send_message(
-            text.GENERATE_VIDEO_ERROR_TEXT.format(
-                model_name,
-                model_name_index,
-                "Не удалось сгенерировать видео",
-            ),
-            message,
-            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                model_name,
-                False,
-            ),
-        )
-        return
-
-    if isinstance(video_path, dict):
-        if video_path.get("error"):
-            await safe_send_message(
-                text.GENERATE_VIDEO_ERROR_TEXT.format(
-                    model_name,
-                    model_name_index,
-                    video_path.get("error"),
-                ),
-                message,
-                reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                    model_name,
-                    False,
-                ),
-            )
-            return
+    # Проверяем путь к видео
+    video_path = await check_video_path(prompt, message, image_url, None, model_name)
 
     # Добавляем путь к видео в стейт
     data_for_update = {f"{model_name}": video_path}
