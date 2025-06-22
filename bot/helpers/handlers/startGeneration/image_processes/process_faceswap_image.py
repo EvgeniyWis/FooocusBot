@@ -6,9 +6,10 @@ from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
+from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
 from bot.utils.facefusion import facefusion_swap
-from bot.utils.handlers import appendDataToStateArray
+from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
 from bot.utils.retryOperation import retryOperation
 
@@ -28,6 +29,9 @@ async def process_faceswap_image(
         state (FSMContext): контекст состояния
         image_index (int): индекс изображения
         model_name (str): название модели
+
+    Returns:
+        result_path (str): путь к результату замены лица
     """
 
     # Получаем айдишник пользователя
@@ -37,9 +41,13 @@ async def process_faceswap_image(
     model_name_index = getModelNameIndex(model_name)
 
     # Меняем текст на сообщении об очереди на замену лица
-    await editMessageOrAnswer(
-        call,
-        text.FACE_SWAP_WAIT_TEXT.format(model_name, model_name_index),
+    await send_progress_message(
+        state,
+        "faceswap_generation_wait_messages",
+        model_name,
+        call.message,
+        text.FACE_SWAP_WAIT_TEXT.format(image_index, model_name, model_name_index),
+        call.message.message_id,
     )
 
     # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
@@ -104,13 +112,22 @@ async def process_faceswap_image(
 
         # Если в списке генераций настала очередь этой модели, то запускаем генерацию
         if model_name == faceswap_generated_models[0]["model_name"]:
-            await editMessageOrAnswer(
-                call,
-                text.FACE_SWAP_PROGRESS_TEXT.format(
-                    image_index,
-                    model_name,
-                    model_name_index,
-                ),
+            # Меняем текст на сообщении об очереди на замену лица
+            await send_progress_message(
+                state,
+                "faceswap_generation_progress_messages",
+                model_name,
+                call.message,
+                text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index),
+                call.message.message_id,
+            )
+
+            # Удаляем из стейта данные о ожидании замены лица
+            await deleteDataFromStateArray(
+                state,
+                "faceswap_generation_wait_messages",
+                model_name,
+                "model_name",
             )
 
             try:
@@ -140,6 +157,14 @@ async def process_faceswap_image(
             break
 
         await asyncio.sleep(10)
+
+    # Удаляем из стейта данные о прогрессе faceswap
+    await deleteDataFromStateArray(
+        state,
+        "faceswap_generation_wait_messages",
+        model_name,
+        "model_name",
+    )
 
     # После генерации удаляем модель из стейта
     state_data = await state.get_data()
