@@ -10,14 +10,17 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
 )
+from bot.helpers.handlers.messages import send_progress_message
 from bot.helpers.handlers.videoGeneration.check_video_path import (
     check_video_path,
 )
 from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
+from bot.logger import logger
 from bot.storage import get_redis_storage
 from bot.utils.handlers import (
     appendDataToStateArray,
+    deleteDataFromStateArray,
 )
 
 
@@ -76,14 +79,37 @@ async def process_video(
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
-    # Отправляем сообщение про генерацию видео
-    method = message.answer(
+    video_progress_message_id = await send_progress_message(
+        state,
+        "video_generation_progress_messages",
+        model_name,
+        message,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
+        message.message_id,
     )
-    video_progress_message = await bot(method)
 
     # Проверяем путь к видео
     video_path = await check_video_path(prompt, message, image_url, None, model_name)
+
+    # Удаляем сообщение о генерации видео
+    try:
+        await bot.delete_message(
+            message.chat.id,
+            video_progress_message_id,
+        )
+    except Exception as e:
+        logger.error(f"Ошибка при удалении сообщения о генерации видео: {e}")
+
+    # Удаляем из стейта данные о прогрессе генерации видео
+    await deleteDataFromStateArray(
+        state,
+        "video_generation_progress_messages",
+        model_name,
+        "model_name",
+    )
+
+    if not video_path:
+        return
 
     # Добавляем путь к видео в стейт
     data_for_update = {f"{model_name}": video_path}
@@ -120,9 +146,6 @@ async def process_video(
         )
         video_message = await bot(method)
 
-    # Удаляем сообщение о генерации видео
-    await video_progress_message.delete()
-
     # Сохраняем сообщение в стейт для последующего удаления
     data_for_update = {f"{model_name}": video_message.message_id}
     await appendDataToStateArray(
@@ -141,3 +164,4 @@ async def process_video(
             model_name=model_name,
         ),
     )
+

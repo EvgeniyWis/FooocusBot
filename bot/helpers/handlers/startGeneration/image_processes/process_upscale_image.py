@@ -6,14 +6,18 @@ from PIL import Image
 
 from bot.config import TEMP_FOLDER_PATH
 from bot.helpers import text
-from bot.utils.images import image_to_base64
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
     getSettingNumberByModelName,
 )
 from bot.helpers.generateImages.upscale import upscale_image
+from bot.helpers.handlers.messages import send_progress_message
+from bot.utils.handlers import (
+    deleteDataFromStateArray,
+)
 from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.images import image_to_base64
 
 
 async def process_upscale_image(
@@ -38,11 +42,13 @@ async def process_upscale_image(
     model_name_index = getModelNameIndex(model_name)
 
     # Отправляем сообщение о начале upscale
-    upscale_message = await editMessageOrAnswer(
-        call,
-        text.UPSCALE_IMAGE_PROGRESS_TEXT.format(
-            image_index, model_name, model_name_index
-        ),
+    upscale_message_id = await send_progress_message(
+        state,
+        "upscale_progress_messages",
+        model_name,
+        call.message,
+        text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index),
+        call.message.message_id,
     )
 
     # Получаем само изображение по пути
@@ -56,7 +62,7 @@ async def process_upscale_image(
         await editMessageOrAnswer(
             call,
             text.IMAGE_NOT_FOUND_TEXT.format(
-                image_index, model_name, model_name_index
+                image_index, model_name, model_name_index,
             ),
         )
         return
@@ -79,7 +85,13 @@ async def process_upscale_image(
         user_id,
         model_name,
         image_index,
-        upscale_message.message_id,
+        upscale_message_id,
     )
 
-    return True
+    # Удаляем из стейта данные о начале upscale
+    await deleteDataFromStateArray(
+        state,
+        "upscale_progress_messages",
+        model_name,
+        "model_name",
+    )

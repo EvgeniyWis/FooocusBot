@@ -38,7 +38,6 @@ async def check_upscale_status(
         checkOtherJobs=False,
     )
 
-
     if not response_json:
         logger.error(f"Не удалось сделать upscale для изображения с ответом от сервера: {response_json}")
         raise Exception("Не удалось сделать upscale для изображения")
