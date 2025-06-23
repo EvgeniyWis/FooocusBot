@@ -28,7 +28,7 @@ def setting1_getDataArray():
                 real_beauty, igbaddie, 1girl, 20 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic blue eyes, long voluminous brown hair, natural skin texture, fine pores, detailed body, subtle highlights
 
                 Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-            [2, 2.6, -0.9, -1.5, 1.5, 1.0, 1.70, 1.0],
+            [2, 2.6, -0.9, -1.5, 1.5, 1.0, 1.40, 1.0],
         ),
         setting1_generateData(
             "chloemay",
