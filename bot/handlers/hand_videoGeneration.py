@@ -47,12 +47,6 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
-    # Удаляем сообщение
-    try:
-        await call.message.delete()
-    except Exception as e:
-        logger.error(f"Произошла ошибка при удалении сообщения: {e}")
-
     # Отправляем сообщение для выбора типа генерации видео
     if postfix == "default":
         await editMessageOrAnswer(
@@ -85,11 +79,6 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
     photo = call.message.photo[-1]
     file_id = photo.file_id
 
-    try:
-        await call.message.delete()
-    except Exception as e:
-        logger.error(f"Ошибка при удалении сообщения: {e}")
-
     state_data = await state.get_data()
 
     await state.update_data(
@@ -114,7 +103,6 @@ async def handle_video_generation_mode_buttons(
     # Получаем индекс модели
     temp = call.data.split("|")
     model_name = temp[1]
-    model_name_index = getModelNameIndex(model_name)
 
     # Получаем выбранный режим генерации видео
     mode = temp[2]

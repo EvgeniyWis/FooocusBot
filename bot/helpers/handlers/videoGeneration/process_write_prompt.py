@@ -5,7 +5,6 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
 from bot.states import StartGenerationState
 from bot.utils.handlers import appendDataToStateArray
-from bot.utils.handlers.messages import editMessageOrAnswer
 
 
 async def process_write_prompt(
@@ -30,15 +29,14 @@ async def process_write_prompt(
     model_name_index = getModelNameIndex(model_name)
 
     await state.update_data(model_name_for_video_generation=model_name)
-    write_prompt_message = await editMessageOrAnswer(
-        call,
-        text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(
+    await call.message.edit_caption(
+        caption=text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(
             model_name,
             model_name_index,
-        ),
-    )
+        ))
+
     # Сохраняем в стейт сообщение о написании промпта для последующего удаления
-    data_for_update = {f"{model_name}": write_prompt_message.message_id}
+    data_for_update = {f"{model_name}": call.message.message_id}
     await appendDataToStateArray(
         state,
         "write_prompt_messages_ids",
