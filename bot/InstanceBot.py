@@ -1,21 +1,23 @@
-import os
 from datetime import timedelta
 
 from aiogram import Bot, Dispatcher, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.fsm.storage.redis import RedisStorage
-from dotenv import find_dotenv, load_dotenv
-from logger import logger
 
+from bot.config import get_current_tokens
 from bot.factory.redis_factory import create_redis_client
 
-load_dotenv(find_dotenv(), override=True)
+# Получаем токен из config.py (где уже загружен .env файл)
+tokens = get_current_tokens()
+bot_token = tokens["BOT_API_TOKEN"]
+
+if not bot_token:
+    raise ValueError("BOT_API_TOKEN не найден в переменных окружения")
 
 # Создаём бота
-logger.info(f"BOT_API_TOKEN: {os.getenv('BOT_API_TOKEN')}")
 bot = Bot(
-    token=os.getenv("BOT_API_TOKEN"),
+    token=bot_token,
     default=DefaultBotProperties(parse_mode="HTML"),
 )
 
