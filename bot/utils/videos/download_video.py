@@ -1,4 +1,5 @@
 import os
+import aiofiles
 
 import bot.constants as constants
 from bot.utils.httpx import httpx_get
@@ -25,9 +26,9 @@ async def download_video(url: str) -> str:
         response = await httpx_get(url, timeout=180, stream=True)
 
         if response and response.status_code == 200:
-            with open(video_path, "wb") as f:
+            async with aiofiles.open(video_path, "wb") as f:
                 async for chunk in response.aiter_bytes():
-                    f.write(chunk)
+                    await f.write(chunk)
             return video_path
         else:
             raise Exception(

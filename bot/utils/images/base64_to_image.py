@@ -1,11 +1,27 @@
+import asyncio
 import base64
 import io
 import os
+from concurrent.futures import ProcessPoolExecutor
 
 from PIL import Image
 
 import bot.constants as constants
 from bot.logger import logger
+
+executor = ProcessPoolExecutor()
+
+def verify_and_reload_image(image_bytes):
+    image = Image.open(io.BytesIO(image_bytes))
+    image.verify()
+    image = Image.open(io.BytesIO(image_bytes))
+    return image
+
+
+def save_image_to_file(image_bytes, file_path):
+    img = Image.open(io.BytesIO(image_bytes))
+    img.save(file_path, format="PNG")
+    img.close()
 
 
 async def base64_to_image(
@@ -14,7 +30,7 @@ async def base64_to_image(
     index: int,
     user_id: int,
     is_test_generation: bool,
-) -> Image.Image:
+) -> str:
     """
     Преобразует изображение из base64 в PIL Image.
 
@@ -51,14 +67,12 @@ async def base64_to_image(
                 "Полученные данные не являются изображением PNG или JPEG",
             )
 
-        # Создаем изображение из бинарных данных
-        image = Image.open(io.BytesIO(image_bytes))
-
-        # Проверяем, что изображение было успешно загружено
-        image.verify()
-        image = Image.open(
-            io.BytesIO(image_bytes),
-        )  # Открываем заново после verify
+        loop = asyncio.get_event_loop()
+        image = await loop.run_in_executor(
+            executor,
+            verify_and_reload_image,
+            image_bytes,
+        )
 
         # Если папка не указана, то значит это тестовая генерация
         if is_test_generation:
@@ -68,16 +82,18 @@ async def base64_to_image(
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index + 1}.jpg"
 
-        # Используем контекстный менеджер для сохранения и закрытия файла
-        with open(file_path, "wb") as f:
-            image.save(f, format="PNG")
-        image.close()  # Закрываем изображение после сохранения
+        await loop.run_in_executor(
+            executor,
+            save_image_to_file,
+            image_bytes,
+            file_path,
+        )
 
         logger.info(
             f"Изображение успешно загружено: {image} по пути {file_path}",
         )
 
-        # Возвращаем изображение
+        # Возвращаем путь к сохраненному изображению
         return file_path
 
     except Exception as e:
