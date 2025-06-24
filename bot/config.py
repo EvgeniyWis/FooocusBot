@@ -14,6 +14,9 @@
 
 import os
 
+from dotenv import load_dotenv
+from logger import logger
+
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "idxmpy4kkpl9d1"
 SETTING_2_ENDPOINT_ID = "vmoqasbdvt7wl6"
@@ -22,7 +25,17 @@ SETTING_4_ENDPOINT_ID = "if2vaadpx2bo1u"
 
 # Константы для путей к директориям
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env_path = os.path.join(BASE_DIR, ".env")
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "FocuuusBot", ".env")
+logger.info(f"Путь к .env файлу: {env_path}")
+logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
+
+if "BOT_API_TOKEN" in os.environ:
+    del os.environ["BOT_API_TOKEN"]
+if "BOT_API_TOKEN" in os.environ:
+    del os.environ["BOT_API_TOKEN"]
+    del os.environ["KLING_API_KEY"]
+
+load_dotenv(env_path, override=True)
 
 TEMP_IMAGE_FILES_DIR = os.path.join(BASE_DIR, "bot", "temp", "images")
 
