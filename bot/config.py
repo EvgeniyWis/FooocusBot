@@ -29,13 +29,31 @@ env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.
 logger.info(f"Путь к .env файлу: {env_path}")
 logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
 
-if "BOT_API_TOKEN" in os.environ:
-    del os.environ["BOT_API_TOKEN"]
-if "BOT_API_TOKEN" in os.environ:
-    del os.environ["BOT_API_TOKEN"]
-    del os.environ["KLING_API_KEY"]
+# Очищаем переменные окружения, которые могут конфликтовать с .env файлом
+variables_to_clear = ["BOT_API_TOKEN", "RUNPOD_API_KEY", "KLING_API_KEY"]
+for var in variables_to_clear:
+    if var in os.environ:
+        logger.info(f"Удаляем переменную окружения: {var}")
+        del os.environ[var]
 
-load_dotenv(env_path, override=True)
+# Загружаем .env файл с принудительным переопределением
+if os.path.exists(env_path):
+    load_dotenv(env_path, override=True)
+    logger.info("✅ .env файл загружен с переопределением")
+
+    # Проверяем, что переменные загрузились
+    bot_token = os.getenv("BOT_API_TOKEN")
+    runpod_key = os.getenv("RUNPOD_API_KEY")
+    kling_key = os.getenv("KLING_API_KEY")
+
+    logger.info(f"BOT_API_TOKEN загружен: {'Да' if bot_token else 'Нет'}")
+    logger.info(f"RUNPOD_API_KEY загружен: {'Да' if runpod_key else 'Нет'}")
+    logger.info(f"KLING_API_KEY загружен: {'Да' if kling_key else 'Нет'}")
+
+    if bot_token:
+        logger.info(f"Токен бота: {bot_token[:10]}...{bot_token[-10:] if len(bot_token) > 20 else '***'}")
+else:
+    logger.warning(f"⚠️ .env файл не найден по пути: {env_path}")
 
 TEMP_IMAGE_FILES_DIR = os.path.join(BASE_DIR, "bot", "temp", "images")
 
@@ -78,6 +96,24 @@ def get_kling_headers() -> dict:
     return {
         "Accept": "application/json",
         "Authorization": f"Bearer {api_key}",
+    }
+
+
+def get_current_tokens():
+    """Получить текущие токены с отладочной информацией."""
+    bot_token = os.getenv("BOT_API_TOKEN")
+    runpod_key = os.getenv("RUNPOD_API_KEY")
+    kling_key = os.getenv("KLING_API_KEY")
+
+    logger.info("🔍 Текущие токены:")
+    logger.info(f"BOT_API_TOKEN: {bot_token[:10]}...{bot_token[-10:] if bot_token and len(bot_token) > 20 else 'Не найден'}")
+    logger.info(f"RUNPOD_API_KEY: {runpod_key[:10]}...{runpod_key[-10:] if runpod_key and len(runpod_key) > 20 else 'Не найден'}")
+    logger.info(f"KLING_API_KEY: {kling_key[:10]}...{kling_key[-10:] if kling_key and len(kling_key) > 20 else 'Не найден'}")
+
+    return {
+        "BOT_API_TOKEN": bot_token,
+        "RUNPOD_API_KEY": runpod_key,
+        "KLING_API_KEY": kling_key,
     }
 
 
