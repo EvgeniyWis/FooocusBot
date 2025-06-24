@@ -302,8 +302,6 @@ async def write_prompt_for_model(message: types.Message, state: FSMContext):
         )
         return
 
-    await message.answer()
-
     # Выводим в лог следующую модель
     logger.info(f"Следующая модель: {next_model}")
 

@@ -42,6 +42,12 @@ async def generateImagesInHandler(
 
     # Генерируем изображения
     try:
+        state_data = await state.get_data()
+        model_indexes_for_generation = state_data.get(
+            "model_indexes_for_generation",
+            [],
+        )
+
         if is_test_generation:
             if setting_number == "all":
                 # Заполнение параметра is_test_generation в вызове функции
@@ -74,11 +80,6 @@ async def generateImagesInHandler(
                     ),
                 ]
         else:
-            state_data = await state.get_data()
-            model_indexes_for_generation = state_data.get(
-                "model_indexes_for_generation",
-                [],
-            )
             logger.info(
                 f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}",
             )
