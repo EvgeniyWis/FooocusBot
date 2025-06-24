@@ -1,4 +1,5 @@
 import os
+import aiofiles
 
 import bot.constants as constants
 from bot.logger import logger
@@ -18,8 +19,8 @@ async def downloadFromGoogleDrive(url: str, file_id: str) -> str | None:
             file_path = os.path.join(
                 constants.FACEFUSION_RESULTS_DIR, f"{file_id}.jpg"
             )
-            with open(file_path, "wb") as f:
-                f.write(response.content)
+            async with aiofiles.open(file_path, "wb") as f:
+                await f.write(response.content)
             logger.info(f"Файл успешно сохранен по пути: {file_path}")
             return file_path
 

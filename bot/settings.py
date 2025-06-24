@@ -66,4 +66,4 @@ class Settings(BaseSettings):
     FACEFUSION_CONTAINER_NAME: str
 
 
-settings = Settings()
+settings = Settings()  # type: ignore
