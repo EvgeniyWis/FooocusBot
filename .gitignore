@@ -204,3 +204,4 @@ temp/
 redisdata/
 *.rdb
 *.aof
+redisdata
