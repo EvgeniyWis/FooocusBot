@@ -31,6 +31,10 @@ from bot.utils.handlers.messages import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+from bot.utils.handlers.messages.rate_limiter_for_send_photo import (
+    safe_send_photo,
+)
+
 from bot.utils.videos import generate_video
 
 
@@ -282,8 +286,9 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         f"URL изображения для генерации видео модели {model_name}: {image_url}",
     )
     try:
-        await message.answer_photo(
+        await safe_send_photo(
             photo=image_url,
+            message=message,
             caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(
                 model_name,
                 model_name_index,

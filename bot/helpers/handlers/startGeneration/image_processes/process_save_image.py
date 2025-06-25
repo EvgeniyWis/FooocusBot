@@ -4,7 +4,7 @@ from datetime import datetime
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from aiogram.methods import SendPhoto
+from utils.handlers.messages.rate_limiter_for_send_photo import safe_send_photo
 
 from bot.assets.mocks.links import MOCK_LINK_FOR_SAVE_IMAGE
 from bot.helpers import text
@@ -94,9 +94,9 @@ async def process_save_image(
         f"Отправляем сообщение о сохранении изображения: {direct_url}",
     )
 
-    method = SendPhoto(
-        chat_id=call.message.chat.id,
+    await safe_send_photo(
         photo=direct_url,
+        message=call,
         caption=text.SAVE_IMAGES_SUCCESS_TEXT.format(
             link,
             model_name,
@@ -106,11 +106,7 @@ async def process_save_image(
         reply_markup=video_generation_keyboards.generateVideoKeyboard(
             model_name,
         ),
-        parse_mode="HTML",
     )
-
-    # Отправляем фото с помощью бота
-    await call.bot(method)
 
     # Удаляем сообщение о сохранении изображения
     await saving_progress_message.delete()
