@@ -157,7 +157,7 @@ def setting2_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous black hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [1, 1, 0.90, 2.35, 0.50, -1.5],
+            [1, 1, 0.90, 2.5, 0.50, -1.5],
         ),
         setting2_generateData(
             "monikaroxley",
