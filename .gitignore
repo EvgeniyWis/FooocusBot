@@ -202,3 +202,12 @@ temp/
 
 # redis
 redisdata/
+
+# logs
+logs/
+
+# grafana 
+grafana_data/
+
+# nginx-basic-auth
+nginx/.htpasswd

@@ -13,3 +13,4 @@ logs/
 .github/
 *.egg-info/
 redisdata/
+grafana_data/
