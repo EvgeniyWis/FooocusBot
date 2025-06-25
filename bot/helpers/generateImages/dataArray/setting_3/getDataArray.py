@@ -18,12 +18,12 @@ def setting3_getDataArray():
         setting3_generateData("rubynoirelle", "1V3rrLYZk6Sim35-ze7Qbsu6GDXHe2pVU", "15tep7zPjvuQ3e5vBCfa_UZEbs8_qOj5x", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
             real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair, long hair, ponytail hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-        [-1.50, 1.30, 1.00, 0.40, 1.40, 0.80]),
+        [-1.50, 1.30, 1.00, 0.40, 1.40, 0.60]),
 
         setting3_generateData("heather_noelle.xo", "1x9y5BJTlbmy39K4J1lsO0CLPECfV1iq4", "1Iu5IZv6rbMkhbw3nyLe0i0I49wYSfDhs", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
             real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-        [-1.50, 1.30, 1.00, 0.03, 0.68, 2.2]),
+        [-1.50, 1.30, 1.00, 0.03, 0.68, 1.8]),
 
         setting3_generateData("sonyadolly.xo", "1ae8R8XjHv4VFFhxm-EBh5KkN1g3VAYJm", "12RwVYuTilpkgZMSR6hXuPDRlY-DFxUb2", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
