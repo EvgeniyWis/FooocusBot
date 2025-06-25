@@ -10,7 +10,15 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        bot: [1, 2, 3, 4]
+        include:
+          - server: 45.130.43.180
+            bot: 1
+          - server: 46.173.28.173
+            bot: 2
+          - server: 31.207.75.193
+            bot: 3
+          - server: 109.172.38.90
+            bot: 4
 
     steps:
       - name: Checkout code
@@ -26,11 +34,11 @@ jobs:
 
       - name: Test SSH connection
         run: |
-          ssh root@45.80.68.81 "echo 'SSH connection successful'"
+          ssh root@${{ matrix.server }} "echo 'SSH connection successful to server ${{ matrix.server }}'"
 
-      - name: Deploy to server ${{ matrix.bot }}
+      - name: Deploy to server ${{ matrix.server }} (bot ${{ matrix.bot }})
         run: |
-          ssh root@45.80.68.81 << 'EOF'
+          ssh root@${{ matrix.server }} << 'EOF'
           cd ..
           cd FocuuusBotFolder_${{ matrix.bot }}/FocuuusBot
           git pull origin master
