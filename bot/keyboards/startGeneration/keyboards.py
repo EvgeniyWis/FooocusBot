@@ -21,7 +21,7 @@ def generationsTypeKeyboard(
                     callback_data="generateVideoFromImage",
                 ),
             ],
-        ]
+        ],
     )
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 

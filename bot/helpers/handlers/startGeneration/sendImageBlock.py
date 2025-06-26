@@ -1,3 +1,4 @@
+import asyncio
 import shutil
 
 from aiogram.exceptions import TelegramRetryAfter
@@ -31,6 +32,14 @@ async def sendImageBlock(
     try:
         # Отправляем изображения с механизмом повторных попыток и глобальным rate limiter
         media_group_message = await safe_send_media_group(user_id, media_group)
+        logger.info(
+            f"Media group sent to user_id={user_id}, model_name={model_name}, images_count={len(media_group)}"
+        )
+
+        await asyncio.sleep(0.7)
+        logger.info(
+            f"Slept 0.7s before sending keyboard to user_id={user_id}, model_name={model_name}"
+        )
 
         # Сохраняем их в стейт
         data_for_update = {
@@ -97,6 +106,9 @@ async def sendImageBlock(
                 )
                 if state_data.get("setting_number", 1) != "all"
                 else None,
+            )
+            logger.info(
+                f"Keyboard sent to user_id={user_id}, model_name={model_name}"
             )
         except Exception as e:
             logger.error(f"Ошибка при отправке сообщения с клавиатурой: {e}")
