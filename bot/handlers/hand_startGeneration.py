@@ -498,7 +498,13 @@ async def write_new_prompt_for_regenerate_image(
         None,
     )
     if write_new_prompt_message_id:
-        await bot.delete_message(user_id, write_new_prompt_message_id)
+        try:
+            await bot.delete_message(user_id, write_new_prompt_message_id)
+        except Exception as e:
+            logger.error(
+                f"Не удалось удалить сообщение для перегенерации изображения по"
+                f"новому промпту {write_new_prompt_message_id} - {e}",
+            )
 
     # Записываем новый промпт в стейт для этой модели
     data_for_update = {f"{model_name}": prompt}
