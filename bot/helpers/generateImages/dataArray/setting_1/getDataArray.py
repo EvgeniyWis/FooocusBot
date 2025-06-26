@@ -182,7 +182,7 @@ def setting1_getDataArray():
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
-            [2, 1.60, -0.90, -1.70, 1.55, 2.65, 3.00, 1.00],
+            [2, 1.60, -0.90, -1.70, 1.55, 3, 3.00, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
@@ -225,7 +225,7 @@ def setting1_getDataArray():
             realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic, hourglass figure, very narrow waist, wide hips, medium breasts, thin legs, long black hair, extra-white skin, natural skin texture, thin lips, green eyes, slightly smiling, face well lit by bright sunlight, clothing color is considered.
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard""",
-            [2, 2.65, -0.90, -0.25, 0.70, 1.80, 0.10, 0.75],
+            [2, 2.65, -0.90, -0.25, 0.70, 2.10, 0.10, 0.75],
         ),
         setting1_generateData(
             "thaliavonn",
