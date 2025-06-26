@@ -158,7 +158,7 @@ def setting1_getDataArray():
 
             realbeauty, igbaddie, 1 girl, caucasian, 18 years old, athletic body with soft curves, medium teardrop-shaped breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face with plump lips and realistic blue eyes, ((long voluminous golden blonde hair)), ((bright golden hair color)), ((vibrant golden blonde hair)), tanned skin with natural texture and fine pores, subtle highlights, slight smile, well-lit face by bright sunlight, hourglass figure, clothing color considered.
 
-            Style: Instagram photo style, warm vibrant filter, high resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight creating warm highlights, outdoor courtyard lighting."""
+            Style: Instagram photo style, warm vibrant filter, high resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight creating warm highlights, outdoor courtyard lighting.""",
             [2, 2.60, -0.90, -0.60, 0.45, 0.8, 0.95, 1.00],
         ),
         setting1_generateData(
