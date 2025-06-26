@@ -95,8 +95,8 @@ def setting2_getDataArray():
             "rinazuri.xo",
             "16kfOvHl49oYtjQwWCti-6XQFbaFhmk4R",
             "1A9x1vWllbCV0RdkTIgaXH-tw5uYhtd3p",
-            """photorealistic portrait of an 18-year-old girl with ash-blonde long hair, slim figure, tan skin, bright blue eyes, slight smile, realistic photography style with soft natural light, high detail and quality.""",
-            [1, 1, 3.00, 0.30, -0.80, -1.50],
+            "photorealistic portrait of an 18-year-old girl with ash-blonde hair, slim figure, tan skin, blue eyes, slight smile, soft natural light, high detail.",
+            [1, 1, 3.10, 0.30, -0.80, -1.50],
         ),
         setting2_generateData(
             "mari_avellin",
