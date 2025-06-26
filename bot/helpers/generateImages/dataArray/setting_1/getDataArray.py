@@ -174,9 +174,9 @@ def setting1_getDataArray():
             "noavexen",
             "1J39NtE4ovUiklcTW_t8NMZHTidCoTZNJ",
             "1jpaYrZUUKeh2sL5e3W3Nx0UaJX5fk9BB",
-            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brown hair, tanned skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
+            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic body with soft curves, medium breasts, toned abdomen, narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brown hair, tanned skin with natural texture, fine pores, slightly smiling, face lit by bright sunlight, hourglass figure
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
@@ -186,9 +186,9 @@ def setting1_getDataArray():
             "lexalennix",
             "1ME0oexikdkzPqj1pJS-3z9NPY0ewAgVQ",
             "1y6qUi8iX5AMM1ns_B8B_j3HIIHH7reDC",
-            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
+            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic body with soft curves, medium breasts, toned abdomen, narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin with natural texture, fine pores, slightly smiling, face lit by bright sunlight, hourglass figure
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
@@ -198,9 +198,9 @@ def setting1_getDataArray():
             "gia_prescott.xo",
             "1cgjXUHiiAh8fYbFgFYzx6JYnrTBYX0cm",
             "1RDFZrbYp0NWFlhI4AGrb74QXwnVb6N0G",
-            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, toned abdomen, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
+            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic body with soft curves, toned abdomen, narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin with natural texture, fine pores, slightly smiling, face lit by bright sunlight, hourglass figure
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
@@ -218,12 +218,11 @@ def setting1_getDataArray():
             "selinavoux",
             "1GMY2IoGDR402Qfb-XHBIYHlj3vAxFypw",
             "1i78rV8aQfsTiSZZijmwg52wsQG-LModz",
-            """score_9, score_8_up, source_photo, source_real, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium breasts, very narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long black hair, extra-white skin, natural skin texture, fine pores, slightly smiling, face well lit by bright sunlight, hourglass figure
+            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic, hourglass figure, very narrow waist, wide hips, medium breasts, thin legs, long black hair, extra-white skin, natural skin texture, thin lips, green eyes, slightly smiling, face well lit by bright sunlight
 
-            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
-            """,
+            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard""",
             [2, 2.65, -0.90, -0.25, 0.70, 1.00, 0.10, 0.75],
         ),
         setting1_generateData(
