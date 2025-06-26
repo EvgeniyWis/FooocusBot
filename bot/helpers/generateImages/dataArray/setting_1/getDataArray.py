@@ -182,7 +182,7 @@ def setting1_getDataArray():
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
-            [2, 1.60, -0.90, -1.70, 1.55, 2.6, 3.00, 1.00],
+            [2, 1.60, -0.90, -1.70, 1.55, 2.65, 3.00, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
