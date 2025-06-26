@@ -1,5 +1,3 @@
-from typing import List
-
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
@@ -13,8 +11,8 @@ class Settings(BaseSettings):
 
     # user_id пользователей / администраторов
     ADMIN_ID: int
-    DEV_CHAT_IDS: List[int]
-    ALLOWED_USERS: List[int]
+    DEV_CHAT_IDS: list[int]
+    ALLOWED_USERS: list[int]
 
     # Режимы и флаги
     DEVELOPMENT_MODE: bool = False
