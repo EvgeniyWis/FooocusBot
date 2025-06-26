@@ -176,11 +176,11 @@ def setting1_getDataArray():
             "noavexen",
             "1J39NtE4ovUiklcTW_t8NMZHTidCoTZNJ",
             "1jpaYrZUUKeh2sL5e3W3Nx0UaJX5fk9BB",
-            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            realbeauty, igbaddie, 1 girl, caucasian, 18 years old, athletic body, medium breasts, narrow waist, wide hips, thin legs, beautiful face, green eyes, long brown voluminous hair, tanned skin, natural skin texture, fine pores, slight smile, face lit by bright sunlight, hourglass figure, clothing color considered
+            realbeauty, igbaddie, 1 girl, caucasian, 18, athletic body, medium breasts, narrow waist, wide hips, thin legs, beautiful face, green eyes, long voluminous brown hair, tanned skin, natural texture, fine pores, slight smile, face lit by bright sunlight, hourglass figure, clothing color considered
 
-            Style: Instagram photo, vibrant filter, high-res, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
+            Style: Instagram photo, vibrant filter, high-res, Canon DSLR look, shallow depth of field, soft natural daylight, bright sunlight, outdoor courtyard
             """,
             [2, 1.60, -0.90, -1.70, 1.55, 3, 3.00, 1.00],
         ),
@@ -225,7 +225,7 @@ def setting1_getDataArray():
             realbeauty, 1 girl, caucasian, 18 years old, athletic, hourglass figure, narrow waist, wide hips, medium breasts, thin legs, long black hair, very pale skin, natural skin texture, thin lips, green eyes, slight smile, face lit by bright sunlight
 
             Style: Instagram photo, vibrant filter, high-res, Canon DSLR look, shallow depth of field, soft daylight, bright sunlight, outdoor courtyard""",
-            [2, 2.65, -0.90, -0.25, 0.70, 2.10, 0.10, 0.75],
+            [2, 2.65, -0.90, -0.25, 0.70, 2.25, 0.10, 0.75],
         ),
         setting1_generateData(
             "thaliavonn",
