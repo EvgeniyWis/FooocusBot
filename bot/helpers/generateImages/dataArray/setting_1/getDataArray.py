@@ -170,7 +170,7 @@ def setting1_getDataArray():
                 real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, plump lips, realistic blue eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), ((big wide hips)), hourglass body, clothing color is considered.
 
                 Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard.""",
-            [2, 2.60, -0.90, -1.70, 1.50, 1.00, 1.50, 1.00],
+            [2, 2.60, -0.90, -1.70, 1.50, 1.20, 1.50, 1.00],
         ),
         setting1_generateData(
             "noavexen",
@@ -182,7 +182,7 @@ def setting1_getDataArray():
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
-            [2, 1.60, -0.90, -1.70, 1.55, 2.05, 3.00, 1.00],
+            [2, 1.60, -0.90, -1.70, 1.55, 2.3, 3.00, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
@@ -225,7 +225,7 @@ def setting1_getDataArray():
             realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic, hourglass figure, very narrow waist, wide hips, medium breasts, thin legs, long black hair, extra-white skin, natural skin texture, thin lips, green eyes, slightly smiling, face well lit by bright sunlight, clothing color is considered.
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard""",
-            [2, 2.65, -0.90, -0.25, 0.70, 1.40, 0.10, 0.75],
+            [2, 2.65, -0.90, -0.25, 0.70, 1.50, 0.10, 0.75],
         ),
         setting1_generateData(
             "thaliavonn",
@@ -258,7 +258,7 @@ def setting1_getDataArray():
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
-            [2, 0.65, -0.90, -1.70, 3.65, 1.10, 1.75, 1.00],
+            [2, 0.65, -0.90, -1.70, 3.65, 1.25, 1.75, 1.00],
         ),
         setting1_generateData(
             "miahazelton.xo",
