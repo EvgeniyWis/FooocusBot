@@ -182,7 +182,7 @@ def setting1_getDataArray():
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
-            [2, 1.60, -0.90, -1.70, 1.55, 4, 3.00, 1.00],
+            [2, 1.60, -0.90, -1.70, 1.55, 2, 3.00, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
@@ -220,12 +220,12 @@ def setting1_getDataArray():
             "selinavoux",
             "1GMY2IoGDR402Qfb-XHBIYHlj3vAxFypw",
             "1i78rV8aQfsTiSZZijmwg52wsQG-LModz",
-            """score9, score8up, sourcephoto, sourcereal, photorealistic, high quality, masterpiece, 8k, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            realbeauty, 1 girl, caucasian, 18, athletic, hourglass figure, narrow waist, wide hips, medium breasts, thin legs, long black hair, very pale skin, natural texture, thin lips, green eyes, slight smile, face lit by sunlight
+            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic, hourglass figure, very narrow waist, wide hips, medium breasts, thin legs, long black hair, extra-white skin, natural skin texture, thin lips, green eyes, slightly smiling, face well lit by bright sunlight, clothing color is considered.
 
-            Style: Instagram photo, vibrant filter, high-res, Canon DSLR, shallow depth, soft daylight, bright sunlight, outdoor courtyard""",
-            [2, 2.65, -0.90, -0.25, 0.70, 3, 0.10, 0.75],
+            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard""",
+            [2, 2.65, -0.90, -0.25, 0.70, 1.30, 0.10, 0.75],
         ),
         setting1_generateData(
             "thaliavonn",
