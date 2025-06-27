@@ -1,12 +1,23 @@
 import logging
 import os
+from datetime import datetime, timedelta
+
+
+class MoscowFormatter(logging.Formatter):
+    def formatTime(self, record, datefmt=None):
+        ct = datetime.fromtimestamp(record.created) + timedelta(hours=3)
+        if datefmt:
+            s = ct.strftime(datefmt)
+        else:
+            s = ct.strftime("%Y-%m-%d %H:%M:%S")
+        return s
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Создаем форматтер для логов
-formatter = logging.Formatter(
+# Используем наш кастомный форматтер
+formatter = MoscowFormatter(
     "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
 )
 
