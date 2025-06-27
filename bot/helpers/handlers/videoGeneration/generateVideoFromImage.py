@@ -43,7 +43,7 @@ async def generateVideoFromImage(
                 "Время ожидания получения файла Telegram истекло",
             )
         file_path = file.file_path
-        temp_path = f"FocuuusBot/temp/images/{image_file_id}.jpg"
+        temp_path = f"FooocusBot/temp/images/{image_file_id}.jpg"
         try:
             await asyncio.wait_for(
                 bot.download_file(file_path, temp_path),
