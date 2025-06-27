@@ -25,7 +25,7 @@ SETTING_4_ENDPOINT_ID = "if2vaadpx2bo1u"
 
 # Константы для путей к директориям
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "FocuuusBot", ".env")
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "FooocusBot", ".env")
 logger.info(f"Путь к .env файлу: {env_path}")
 logger.info(f"Файл .env существует: {os.path.exists(env_path)}")
 

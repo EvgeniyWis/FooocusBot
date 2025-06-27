@@ -73,7 +73,7 @@ async def check_video_path(
     # Генерируем видео
     video_path = None
     if MOCK_MODE:
-        video_path = "FocuuusBot/bot/assets/mocks/mock_video.mp4"
+        video_path = "FooocusBot/bot/assets/mocks/mock_video.mp4"
     else:
         try:
             video_path = await retryOperation(
