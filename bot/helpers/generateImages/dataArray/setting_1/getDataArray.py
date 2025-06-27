@@ -182,7 +182,7 @@ def setting1_getDataArray():
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
-            [2, 2.2, -0.90, -1.70, 2.1, 2.1, 3.00, 1.00],
+            [2, 2.4, -0.90, -1.70, 2.5, 2.3, 3.00, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
@@ -220,11 +220,11 @@ def setting1_getDataArray():
             "selinavoux",
             "1GMY2IoGDR402Qfb-XHBIYHlj3vAxFypw",
             "1i78rV8aQfsTiSZZijmwg52wsQG-LModz",
-            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, photorealistic, high quality, masterpiece, 8k detail, vibrant colors, bright lighting, skin detail, BREAK
 
-            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic, hourglass figure, very narrow waist, wide hips, medium breasts, thin legs, long black hair, extra-white skin, natural skin texture, thin lips, green eyes, slightly smiling, face well lit by bright sunlight, clothing color is considered.
+            realbeauty, 1 girl, caucasian, 18, athletic, hourglass figure, narrow waist, wide hips, medium breasts, thin legs, long black hair, very pale skin, natural texture, thin lips, green eyes, slight smile, face lit by sunlight
 
-            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard""",
+            Style: Instagram photo, vibrant filter, high-res, Canon DSLR, shallow depth, soft daylight, bright sunlight, outdoor courtyard""",
             [2, 3.2, -0.90, -0.25, 1.5, 1.50, 0.10, 0.75],
         ),
         setting1_generateData(
