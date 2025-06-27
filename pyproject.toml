@@ -15,8 +15,15 @@ exclude = [
 ]
 line-length = 79
 indent-width = 4
+
 [tool.ruff.lint]
-select = ["E", "W", "C", "F", "N", "COM", "I", "Q", "U", "N", "A", "M"]
+select = ["E", "W", "C", "F", "N", "COM", "I", "Q", "U", "N", "A", "RUF100"]
 ignore = ["F405"]
 fixable = ["ALL"]
 unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
