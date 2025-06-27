@@ -161,3 +161,5 @@ COMMON_NEGATIVE_PROMPT = (
     "preteen, infant, (((spread legs))), spread legs, open legs, legs apart, legs wide open, legs spread, "
     "no spread legs, no open legs, no legs apart, no legs wide open, no legs spread"
 )
+
+COMMON_UPSCALE_PROMPT = "high-resolution, ultra-detailed, photorealistic female model, perfect hand anatomy, anatomically correct fingers and nails, natural finger positioning, symmetrical hands, sharp skin texture, realistic skin pores, high-definition lighting, smooth shading, 8k skin detail, flawless complexion, crisp fabric edges, clean outlines, realistic lighting gradients, upscale to ultra quality, fine finger joints, soft shadows, cinematic render"
