@@ -65,7 +65,11 @@ async def choose_generations_type(
 
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
-    # Очищаем стейт
+    # Получаем текущие данные стейта для извлечения переменных рандомайзера
+    current_state_data = await state.get_data()
+    variable_names_for_randomizer = current_state_data.get("variable_names_for_randomizer", [])
+    
+    # Создаем базовый initial_state
     initial_state = {
         "generation_step": 1,
         "prompts_for_regenerated_models": [],
@@ -77,7 +81,13 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "videoGeneration_messages_ids": [],
         "process_images_steps": [],
         "upscale_progress_messages": [],
+        "variable_names_for_randomizer": [],
     }
+    
+    # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
+    for variable_name in variable_names_for_randomizer:
+        key = f"randomizer_{variable_name}_values"
+        initial_state[key] = []
 
     await state.update_data(**initial_state)
 
