@@ -423,9 +423,15 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     except Exception as e:
         traceback.print_exc()
+        model_name_index = getModelNameIndex(model_name)
+
         await editMessageOrAnswer(
             call,
-            text.GENERATE_IMAGE_ERROR_TEXT.format(model_name, e),
+            text.GENERATE_IMAGE_ERROR_TEXT.format(
+                model_name,
+                model_name_index,
+                e,
+            ),
         )
         raise e
 
