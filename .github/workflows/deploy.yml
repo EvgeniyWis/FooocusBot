@@ -27,7 +27,7 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets[format('SSH_PRIVATE_KEY_FOOOCUSBOT_{0}', matrix.bot)] }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
           ls -la ~/.ssh  # Проверка наличия ключа
