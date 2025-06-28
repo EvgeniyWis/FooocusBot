@@ -19,10 +19,10 @@ def setting3_getDataArray():
             real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 2.20, 1.60, -1.00]),
 
-        setting3_generateData("rubynoirelle", "1V3rrLYZk6Sim35-ze7Qbsu6GDXHe2pVU", "15tep7zPjvuQ3e5vBCfa_UZEbs8_qOj5x", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("rubynoirelle", "1V3rrLYZk6Sim35-ze7Qbsu6GDXHe2pVU", "15tep7zPjvuQ3e5vBCfa_UZEbs8_qOj5x", """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair, long hair, ponytail hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-        [-1.50, 1.30, 1.00, 0.40, 0.90, 0.30]),
+        realbeauty, igbaddie, 1 girl, 18, sorority girl, long black ponytail, huge breasts, slim waist, big hips, hourglass figure, toned legs, tan skin, thin lips, smirk, bright blue eyes, sharp cheekbones""",
+        [-1.50, 1.30, 1.00, 0.40, 0.90, 0.10]),
 
         setting3_generateData("heather_noelle.xo", "1x9y5BJTlbmy39K4J1lsO0CLPECfV1iq4", "1Iu5IZv6rbMkhbw3nyLe0i0I49wYSfDhs", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
