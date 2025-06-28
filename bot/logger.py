@@ -18,7 +18,7 @@ logger.setLevel(logging.INFO)
 
 # Используем наш кастомный форматтер
 formatter = MoscowFormatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
+    "%(name)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
 )
 
 # Создаем директорию для логов если её нет
