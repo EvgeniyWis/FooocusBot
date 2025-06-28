@@ -69,7 +69,12 @@ async def upscale_image(
         "image_index": image_index,
         "job_id": job_id,
     }
-    await appendDataToStateArray(state, "upscale_data", data_for_update)
+    await appendDataToStateArray(
+        state,
+        "upscale_data",
+        data_for_update,
+        unique_keys=("model_name", "image_index"),
+    )
 
     # Проверяем статус работы
     result = await check_upscale_status(

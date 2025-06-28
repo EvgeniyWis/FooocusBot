@@ -46,7 +46,8 @@ def videoWritePromptKeyboard(model_name: str):
 # Инлайн-клавиатура для выбора типа генерации видео
 def generatedVideoKeyboard(prefix: str, with_test_generation: bool = True):
     inline_keyboard = getGenerationsTypeButtons(
-        prefix, with_test_generation=with_test_generation
+        prefix,
+        with_test_generation=with_test_generation,
     )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)

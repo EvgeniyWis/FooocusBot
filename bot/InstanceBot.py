@@ -24,6 +24,6 @@ storage = RedisStorage(
 dp = Dispatcher(storage=storage)
 router = Router()
 
-bot.session = AiohttpSession(timeout=60)
+bot.session = AiohttpSession(timeout=180)
 
 dp.include_router(router)
