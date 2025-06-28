@@ -164,7 +164,7 @@ def setting2_getDataArray():
             "1qZhjbfxJOu2Ugrg6p6e4ALdKtbEsT2cO",
             "1lrvYzT3UJ2MSIhjMLZZrSxlGoRKFn3Q_",
             """photorealistic portrait of an 18-year-old sorority girl with voluminous long black hair, slim waist, medium saggy breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright blue eyes, sharp facial features and cheekbones, high quality and detail.""",
-            [1, 1, 0.90, 1.90, 0.50, -1.5],
+            [1, 1, 0.90, 1.85, 0.50, -1.5],
         ),
         setting2_generateData(
             "kiaravouxelle",
