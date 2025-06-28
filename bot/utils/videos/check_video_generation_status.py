@@ -1,9 +1,8 @@
 import asyncio
 import os
 
-from config import get_kling_headers
-
 from bot.logger import logger
+from bot.utils.get_api_headers import get_kling_headers
 from bot.utils.httpx import httpx_get
 from bot.utils.videos import download_video
 
@@ -25,7 +24,8 @@ async def check_video_generation_status(request_id: str) -> str | None:
     while True:
         try:
             json = await httpx_get(
-                url_status_endpoint, headers=get_kling_headers(),
+                url_status_endpoint,
+                headers=get_kling_headers(),
             )
 
             if "status" not in json:
@@ -65,6 +65,7 @@ async def check_video_generation_status(request_id: str) -> str | None:
 
                 # Скачиваем видео локально
                 video_path = await download_video(result_url)
+                logger.info(f"Путь к скачанному видео: {video_path}")
                 if not video_path:
                     logger.error(
                         f"Не удалось скачать видео: {result_url}",
@@ -83,6 +84,7 @@ async def check_video_generation_status(request_id: str) -> str | None:
 
                     # Сохраняем по-новой
                     video_path = await download_video(result_url)
+                    logger.info(f"Путь к скачанному видео: {video_path}")
                     if not video_path:
                         logger.error(
                             f"Не удалось скачать видео: {result_url}",

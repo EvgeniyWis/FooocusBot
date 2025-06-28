@@ -6,16 +6,15 @@ from typing import Callable, TypeVar
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
-from config import PROCESS_VIDEO_TASK
-from factory.redis_factory import create_redis_client
 
-from bot.config import PROCESS_IMAGE_BLOCK_TASK, PROCESS_IMAGE_TASK
 from bot.domain.entities.task import (
     TaskImageBlockDTO,
     TaskProcessImageDTO,
     TaskProcessVideoDTO,
 )
+from bot.factory.redis_factory import create_redis_client
 from bot.logger import logger
+from bot.settings import settings
 from bot.utils.task_storage.rebuild_callback_query_from_task import (
     rebuild_callback_query_from_task,
 )
@@ -24,11 +23,13 @@ T = TypeVar("T")
 
 
 def key_for_image_block(job_id: str) -> str:
-    return f"{PROCESS_IMAGE_BLOCK_TASK}:{job_id}"
+    return f"{settings.PROCESS_IMAGE_BLOCK_TASK}:{job_id}"
 
 
 def key_for_image(user_id: int, image_index: int, model_name: str) -> str:
-    return f"{PROCESS_IMAGE_TASK}:{user_id}:{image_index}:{model_name}"
+    return (
+        f"{settings.PROCESS_IMAGE_TASK}:{user_id}:{image_index}:{model_name}"
+    )
 
 
 def key_for_video(
@@ -37,7 +38,7 @@ def key_for_video(
     image_url: str,
     model_name: str,
 ) -> str:
-    return f"{PROCESS_VIDEO_TASK}:{type_for_video}:{user_id}:{image_url}:{model_name}"
+    return f"{settings.PROCESS_VIDEO_TASK}:{type_for_video}:{user_id}:{image_url}:{model_name}"
 
 
 class RedisTaskStorageRepository:
@@ -313,9 +314,9 @@ class RedisTaskStorageRepository:
         failed = 0
 
         prefixes = [
-            PROCESS_IMAGE_BLOCK_TASK,
-            PROCESS_IMAGE_TASK,
-            PROCESS_VIDEO_TASK,
+            settings.PROCESS_IMAGE_BLOCK_TASK,
+            settings.PROCESS_IMAGE_TASK,
+            settings.PROCESS_VIDEO_TASK,
         ]
 
         tasks = []
@@ -394,11 +395,11 @@ class RedisTaskStorageRepository:
         Exceptions:
             - ValueError: Если префикс ключа не соответствует ни одному известному типу
         """
-        if key.startswith(PROCESS_IMAGE_BLOCK_TASK):
+        if key.startswith(settings.PROCESS_IMAGE_BLOCK_TASK):
             return "process_image_block"
-        elif key.startswith(PROCESS_IMAGE_TASK):
+        elif key.startswith(settings.PROCESS_IMAGE_TASK):
             return "process_image"
-        elif key.startswith(PROCESS_VIDEO_TASK):
+        elif key.startswith(settings.PROCESS_VIDEO_TASK):
             return "process_video"
         else:
             error_msg = f"Неизвестный префикс ключа задачи: {key}"

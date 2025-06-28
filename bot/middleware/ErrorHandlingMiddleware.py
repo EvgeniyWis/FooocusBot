@@ -6,9 +6,9 @@ from typing import Any, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from bot.config import DEV_CHAT_IDS
 from bot.InstanceBot import bot
 from bot.logger import logger
+from bot.settings import settings
 
 
 class ErrorHandlingMiddleware(BaseMiddleware):
@@ -47,7 +47,7 @@ class ErrorHandlingMiddleware(BaseMiddleware):
 
             try:
                 # Отправляем сообщение об ошибке разработчикам
-                for DEV_CHAT_ID in DEV_CHAT_IDS:
+                for DEV_CHAT_ID in settings.DEV_CHAT_IDS:
                     await bot.send_message(DEV_CHAT_ID, error_message)
 
                 # Если ошибка произошла в чате с пользователем, отправляем ему сообщение

@@ -9,7 +9,7 @@ from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
-from bot.settings import MOCK_MODE
+from bot.settings import settings
 from bot.utils.googleDrive.files import saveFile
 from bot.utils.googleDrive.folders import getFolderDataByID
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
@@ -86,7 +86,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     )
 
     # Удаляем видео из папки temp
-    if not MOCK_MODE:
+    if not settings.MOCK_MODE:
         try:
             os.remove(video_path)
         except Exception as e:

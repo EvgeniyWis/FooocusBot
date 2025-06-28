@@ -1,4 +1,4 @@
-from bot.config import COMMON_NEGATIVE_PROMPT
+from bot.settings import settings
 
 
 # Глобальная функция для генерации данных для запроса
@@ -10,7 +10,7 @@ def generateData(
     loras: list[dict],
     base_config_model_name: str,
     image_number: int,
-    negative_prompt: str = COMMON_NEGATIVE_PROMPT,
+    negative_prompt: str = settings.COMMON_NEGATIVE_PROMPT,
     embeddings: list[str] | None = None,
 ):
     if embeddings is None:

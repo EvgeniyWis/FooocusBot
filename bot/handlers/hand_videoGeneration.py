@@ -6,7 +6,7 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-from bot.config import TEMP_IMAGE_FILES_DIR
+import bot.constants as constants
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
@@ -34,6 +34,11 @@ from bot.utils.handlers.messages import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+from bot.utils.handlers.messages.rate_limiter_for_send_photo import (
+    safe_send_photo,
+)
+
+from bot.utils.videos import generate_video
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -93,6 +98,30 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
         model_name,
         is_quick_generation=True,
     )
+
+
+async def handle_rewrite_prompt_button(
+    call: types.CallbackQuery,
+    state: FSMContext,
+):
+    _, model_name = call.data.split("|")
+    model_name_index = getModelNameIndex(model_name)
+
+    state_data = await state.get_data()
+    current_prompt = state_data.get("prompt_for_video", "")
+
+    # Обновляем сообщение
+    await editMessageOrAnswer(
+        call,
+        f"✏️ Текущий промпт: {current_prompt}\n\nВведите новый промпт для генерации видео:",
+        reply_markup=None,
+    )
+
+    # Сохраняем model_name, чтобы потом знать куда применить
+    await state.update_data(model_name_for_video_generation=model_name)
+
+    # Ставим стейт для обработки ввода
+    await state.set_state(StartGenerationState.write_prompt_for_video)
 
 
 # Обработка нажатия кнопок режима генерации видео
@@ -177,6 +206,7 @@ async def handle_video_example_buttons(
     # Получаем кастомный промпт, если он есть, а если нет, то берем промпт из видео-примера
     if "prompt_for_video" in state_data:
         custom_prompt = state_data.get("prompt_for_video", "")
+        await state.update_data(prompt_for_video=custom_prompt)
     else:
         custom_prompt = None
 
@@ -248,7 +278,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
 
     # Если выбрана быстрая генерация видео, то сразу генерируем видео
     if current_state == StartGenerationState.write_prompt_for_quick_video_generation:
-        await process_video(
+        return await process_video(
             state=state,
             model_name=model_name,
             prompt=prompt,
@@ -257,12 +287,12 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             message=message,
             is_quick_generation=True,
         )
-
-    # Если выбрана простая генерация видео, то сначала отправляем фото, а потом генерируем видео
-    else:
+    else: 
+        # Если выбрана простая генерация видео, то сначала отправляем фото, а потом генерируем видео
         try:
-            await message.answer_photo(
+            await safe_send_photo(
                 photo=image_url,
+                message=message,
                 caption=text.WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT.format(
                     model_name,
                     model_name_index,
@@ -285,7 +315,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
                     True,
                 ),
             )
-
+            
             raise e
 
     await state.set_state(None)
@@ -419,7 +449,7 @@ async def handle_prompt_for_videoGenerationFromImage(
             )
 
         file_path = file.file_path
-        temp_path = f"{TEMP_IMAGE_FILES_DIR}/{image_file_id}.jpg"
+        temp_path = f"{constants.TEMP_IMAGE_FILES_DIR}/{image_file_id}.jpg"
 
         try:
             await asyncio.wait_for(
@@ -497,7 +527,8 @@ async def handle_model_name_for_video_generation_from_image(
     # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
     if model_index > 100 or model_index < 1:
         await safe_send_message(
-            text.MODEL_NOT_FOUND_TEXT.format(model_index), message,
+            text.MODEL_NOT_FOUND_TEXT.format(model_index),
+            message,
         )
         return
 
@@ -560,7 +591,10 @@ def hand_add():
         handle_video_example_buttons,
         lambda call: call.data.startswith("generate_video"),
     )
-
+    router.callback_query.register(
+        handle_rewrite_prompt_button,
+        lambda call: call.data.startswith("rewrite_prompt|"),
+    )
     router.message.register(
         write_prompt_for_video,
         StateFilter(StartGenerationState.write_prompt_for_video,

@@ -413,13 +413,20 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         # Сохраняем название модели и id папки для видео
         await state.update_data(model_name=model_name)
 
-        # Обрабатываем изображение
-        await process_image(
-            call,
-            state,
-            model_name,
-            image_index,
-        )
+        try:
+            logger.info("Обрабатываем изображение")
+            await process_image(
+                call,
+                state,
+                model_name,
+                image_index,
+            )
+        except Exception as e:
+            logger.exception("Ошибка в process_image")
+            await editMessageOrAnswer(
+                call,
+                f"❌ Ошибка при обработке изображения: {e}",
+            )
 
     except Exception as e:
         traceback.print_exc()

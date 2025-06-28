@@ -4,7 +4,7 @@ import os
 import shutil
 import socket
 
-from bot.config import TEMP_FOLDER_PATH
+import bot.constants as constants
 from bot.logger import logger
 from bot.utils.googleDrive.auth import service
 from bot.utils.googleDrive.files.uploadFile import uploadFile
@@ -97,9 +97,11 @@ async def saveFile(
         if with_deleting_temp_folder:
             # Удаляем папку с файлами
             temp_path = (
-                os.path.join(TEMP_FOLDER_PATH, f"{folder_name}_{user_id}")
+                os.path.join(
+                    constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}"
+                )
                 if folder_name
-                else TEMP_FOLDER_PATH
+                else constants.TEMP_FOLDER_PATH
             )
             shutil.rmtree(temp_path)
 
