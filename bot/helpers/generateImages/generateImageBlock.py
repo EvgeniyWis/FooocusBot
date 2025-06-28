@@ -5,17 +5,6 @@ from bot.helpers.generateImages.dataArray import getSettingNumberByModelName
 from bot.helpers.jobs.get_job_ID import get_job_ID
 from bot.settings import settings
 
-process_image_block = None
-
-
-def set_process_image_block(module):
-    global process_image_block
-    from bot.helpers.generateImages.process_image_block import (
-        process_image_block as pic,
-    )
-
-    process_image_block = pic
-
 
 # Функция для генерации изображений по объекту данных
 async def generateImageBlock(
@@ -57,6 +46,10 @@ async def generateImageBlock(
         )
 
         # Обрабатываем работу
+        from helpers.generateImages.process_image_block import (
+            process_image_block,
+        )
+
         result = await process_image_block(
             job_id,
             model_name,
