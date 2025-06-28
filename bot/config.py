@@ -19,9 +19,9 @@ from logger import logger
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "gpp5vgbtpvphx8"
-SETTING_2_ENDPOINT_ID = "vmoqasbdvt7wl6"
-SETTING_3_ENDPOINT_ID = "e2u67i0khvang0"
-SETTING_4_ENDPOINT_ID = "if2vaadpx2bo1u"
+SETTING_2_ENDPOINT_ID = "dh4mjmjg7x55gq"
+SETTING_3_ENDPOINT_ID = "iudgj38f62cmal"
+SETTING_4_ENDPOINT_ID = "exauzymab4x1iz"
 
 # Константы для путей к директориям
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
