@@ -136,8 +136,13 @@ async def process_video(
             return
 
     # Добавляем путь к видео в стейт
-    data_for_update = {f"{model_name}": video_path}
-    await appendDataToStateArray(state, "video_paths", data_for_update)
+    data_for_update = {
+        "model_name": model_name,
+        "video_path": video_path,
+    }
+    await appendDataToStateArray(
+        state, "video_paths", data_for_update, unique_keys=("model_name",)
+    )
 
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
@@ -173,11 +178,15 @@ async def process_video(
     await video_progress_message.delete()
 
     # Сохраняем сообщение в стейт для последующего удаления
-    data_for_update = {f"{model_name}": video_message.message_id}
+    data_for_update = {
+        "model_name": model_name,
+        "message_id": video_message.message_id,
+    }
     await appendDataToStateArray(
         state,
         "videoGeneration_messages_ids",
         data_for_update,
+        unique_keys=("model_name",),
     )
 
     redis_storage = get_redis_storage()

@@ -1,13 +1,13 @@
+import asyncio
+import os
 import traceback
 
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
+from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
-from bot.helpers.generateImages import (
-    generateImageBlock,
-)
 from bot.helpers.generateImages.dataArray import (
     getAllDataArrays,
     getDataArrayBySettingNumber,
@@ -15,6 +15,7 @@ from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
     getNextModel,
 )
+from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     generateImagesInHandler,
@@ -47,6 +48,16 @@ async def choose_generations_type(
     generations_type = call.data.split("|")[1]
     await state.update_data(generations_type=generations_type)
 
+    if generations_type == "work":
+        await editMessageOrAnswer(
+            call,
+            "Выберите режим генерации:\n\n"
+            "🖼 Мультивыбор - можно выбрать несколько фотографий одновременно, присылается 10 на выбор\n"
+            "✅ Одиночный - можно выбрать только одну генерацию, присылается 4 на выбор",
+            reply_markup=start_generation_keyboards.generationModeKeyboard(),
+        )
+        return
+
     try:
         prompt_exist = bool(call.data.split("|")[2])
     except:
@@ -59,6 +70,22 @@ async def choose_generations_type(
         text.GET_GENERATIONS_SUCCESS_TEXT,
         reply_markup=start_generation_keyboards.selectSettingKeyboard(
             is_test_generation=generations_type == "test",
+        ),
+    )
+
+
+# Обработка выбора режима генерации
+async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
+    mode = call.data.split("|")[1]
+    if mode == "multi_select":
+        await state.update_data(multi_select_mode=True)
+    else:
+        await state.update_data(multi_select_mode=False)
+    await editMessageOrAnswer(
+        call,
+        "✅ Тип генерации успешно выбран! Теперь выбери какую настройку будешь использовать:",
+        reply_markup=start_generation_keyboards.selectSettingKeyboard(
+            is_test_generation=False,
         ),
     )
 
@@ -354,7 +381,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс работы и индекс изображения
     model_name = call.data.split("|")[1]
     setting_number = call.data.split("|")[2]
-    image_index = call.data.split("|")[3]
+    image_index = int(call.data.split("|")[3]) - 1
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -546,11 +573,144 @@ async def write_new_prompt_for_regenerate_image(
     await regenerate_progress_message.delete()
 
 
+async def select_multi_image(call: types.CallbackQuery, state: FSMContext):
+    _, model_name, setting_number, image_index = call.data.split("|")
+    image_index = int(image_index)
+    state_data = await state.get_data()
+    selected_indexes_raw = state_data.get("selected_indexes", {})
+    if isinstance(selected_indexes_raw, list):
+        selected_indexes_dict = {model_name: selected_indexes_raw}
+    else:
+        selected_indexes_dict = selected_indexes_raw
+    selected_indexes = selected_indexes_dict.get(model_name, [])
+    if image_index in selected_indexes:
+        selected_indexes.remove(image_index)
+    else:
+        if len(selected_indexes) < 10:
+            selected_indexes.append(image_index)
+    selected_indexes_dict[model_name] = selected_indexes
+    await state.update_data(selected_indexes=selected_indexes_dict)
+    from bot.keyboards.startGeneration.keyboards import (
+        selectMultiImageKeyboard,
+    )
+
+    kb = selectMultiImageKeyboard(
+        model_name,
+        setting_number,
+        10,
+        selected_indexes,
+    )
+    await call.message.edit_reply_markup(reply_markup=kb)
+    await call.answer()
+
+
+async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
+    state_data = await state.get_data()
+    model_name = call.data.split("|")[1]
+    selected_indexes_raw = state_data.get("selected_indexes", {})
+    if isinstance(selected_indexes_raw, list):
+        selected_indexes_dict = {model_name: selected_indexes_raw}
+    else:
+        selected_indexes_dict = selected_indexes_raw
+    selected_indexes = selected_indexes_dict.get(model_name, [])
+    if not selected_indexes:
+        await call.answer(
+            "Выберите хотя бы одно изображение!",
+            show_alert=True,
+        )
+        return
+
+    temp_dir = TEMP_FOLDER_PATH / f"{model_name}_{call.from_user.id}"
+    if os.path.exists(temp_dir):
+        files_in_dir = sorted(os.listdir(temp_dir))
+        logger.info(
+            f"[multi_image_done] Существующие файлы в {temp_dir}: {files_in_dir}",
+        )
+        # Фильтруем selected_indexes по реально существующим файлам
+        existing_indexes = set()
+        for fname in files_in_dir:
+            if fname.endswith(".jpg") and fname[:-4].isdigit():
+                existing_indexes.add(int(fname[:-4]))
+        filtered_selected_indexes = [
+            i for i in selected_indexes if i in existing_indexes
+        ]
+        skipped_indexes = [
+            i for i in selected_indexes if i not in existing_indexes
+        ]
+        if skipped_indexes:
+            logger.warning(
+                f"[multi_image_done] Эти индексы выбраны пользователем, но файлов нет: {skipped_indexes}",
+            )
+        selected_indexes = filtered_selected_indexes
+    else:
+        logger.warning(f"[multi_image_done] Директория {temp_dir} не найдена!")
+    logger.info(
+        f"[multi_image_done] RAW selected_indexes: {selected_indexes}",
+    )
+    selected_indexes_sorted = sorted(selected_indexes)
+    logger.info(
+        f"[multi_image_done] SORTED selected_indexes: {selected_indexes_sorted}",
+    )
+
+    await call.message.answer(
+        f"Вы выбрали изображения с номерами: {', '.join(str(i + 1) for i in selected_indexes_sorted)}.\nОбрабатываю выбор изображений...",
+    )
+
+    await deleteMessageFromState(
+        state,
+        "imageGeneration_mediagroup_messages_ids",
+        model_name,
+        call.message.chat.id,
+        delete_keyboard_message=True,
+    )
+
+    selected_indexes_copy = list(selected_indexes_sorted)
+
+    # Последовательная обработка изображений
+    for idx, image_index in enumerate(selected_indexes_copy, 1):
+        logger.info(
+            f"[multi_image_done] Обрабатываю image_index={image_index}",
+        )
+        status_message = await call.message.answer(
+            f"🔄 Работаю с изображением для модели {model_name} под номером {image_index}... (обработано {idx}/{len(selected_indexes_copy)})",
+        )
+
+        fake_call = types.CallbackQuery(
+            id=call.id,
+            from_user=call.from_user,
+            chat_instance=call.chat_instance,
+            message=status_message,
+            data=call.data,
+            inline_message_id=call.inline_message_id,
+        )
+
+        try:
+            await process_image(fake_call, state, model_name, image_index)
+            await asyncio.sleep(1)
+        except Exception as e:
+            logger.error(
+                f"Ошибка при обработке изображения {image_index}: {e}",
+            )
+            await status_message.edit_text(
+                f"❌ Ошибка при обработке изображения {image_index}: {str(e)}",
+            )
+            continue
+
+    await call.message.answer(
+        f"✅ Все выбранные изображения для модели {model_name} успешно обработаны!",
+    )
+
+
 # Добавление обработчиков
 def hand_add():
     router.callback_query.register(
         choose_generations_type,
         lambda call: call.data.startswith("generations_type"),
+    )
+
+    router.callback_query.register(
+        choose_generation_mode,
+        lambda call: call.data.startswith("generation_mode"),
     )
 
     router.callback_query.register(
@@ -600,4 +760,14 @@ def hand_add():
         StateFilter(
             StartGenerationState.write_new_prompt_for_regenerate_image,
         ),
+    )
+
+    router.callback_query.register(
+        select_multi_image,
+        lambda call: call.data.startswith("select_multi_image"),
+    )
+
+    router.callback_query.register(
+        multi_image_done,
+        lambda call: call.data.startswith("multi_image_done"),
     )

@@ -6,7 +6,6 @@ from aiogram.types import BotCommand
 
 import bot.constants as constants
 from bot import handlers
-from bot.helpers.generateImages.init_dependencies import init_dependencies
 from bot.helpers.generateImages.process_image_block import process_image_block
 from bot.helpers.handlers.startGeneration import process_image
 from bot.helpers.handlers.videoGeneration import process_video
@@ -15,8 +14,6 @@ from bot.logger import logger
 from bot.middleware import ErrorHandlingMiddleware
 from bot.settings import settings
 from bot.storage import get_redis_storage, init_redis_storage
-
-init_dependencies()
 
 
 async def clean_temp_dirs():

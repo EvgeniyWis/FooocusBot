@@ -1,13 +1,7 @@
-import asyncio
-import os
-import shutil
-
-import bot.constants as constants
 from bot.logger import logger
 from bot.utils.googleDrive.auth import service
 from bot.utils.googleDrive.files.uploadFile import uploadFile
 from bot.utils.googleDrive.folders.createFolder import createFolder
-from bot.utils.googleDrive.folders.deleteParentFolder import deleteParentFolder
 from bot.utils.retryOperation import retryOperation
 
 
@@ -83,19 +77,19 @@ async def saveFile(
             folder_name,
         )
 
-        if with_deleting_temp_folder:
-            # Удаляем папку с файлами
-            temp_path = (
-                os.path.join(
-                    constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}"
-                )
-                if folder_name
-                else constants.TEMP_FOLDER_PATH
-            )
-            shutil.rmtree(temp_path)
-
-            # Через 1 час удаляем и папку в более верхнем уровне
-            asyncio.create_task(deleteParentFolder(folder_name, user_id))
+        # if with_deleting_temp_folder:  # todo: при мультигенерации фоток у нас не должно сразу удаляться
+        # Удаляем папку с файлами
+        # temp_path = (
+        #     os.path.join(
+        #         constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}"
+        #     )
+        #     if folder_name
+        #     else constants.TEMP_FOLDER_PATH
+        # )
+        # shutil.rmtree(temp_path)
+        #
+        # # Через 1 час удаляем и папку в более верхнем уровне
+        # asyncio.create_task(deleteParentFolder(folder_name, user_id))
 
         return file["webViewLink"]
 

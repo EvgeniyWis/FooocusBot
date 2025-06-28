@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from PIL import Image
 
-import bot.constants as constants
+from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
@@ -12,6 +12,7 @@ from bot.helpers.generateImages.dataArray import (
     getSettingNumberByModelName,
 )
 from bot.helpers.generateImages.upscale import upscale_image
+from bot.logger import logger
 from bot.utils.handlers.messages import editMessageOrAnswer
 from bot.utils.images import image_to_base64
 
@@ -37,33 +38,48 @@ async def process_upscale_image(
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
 
+    image_path = (
+        TEMP_FOLDER_PATH / f"{model_name}_{user_id}" / f"{image_index}.jpg"
+    )
+    temp_user_dir = TEMP_FOLDER_PATH / f"{model_name}_{user_id}"
+    logger.info(
+        f"[upscale] START: {image_path} exists={os.path.exists(image_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+    )
+
     # Отправляем сообщение о начале upscale
     upscale_message = await editMessageOrAnswer(
         call,
         text.UPSCALE_IMAGE_PROGRESS_TEXT.format(
-            image_index,
+            int(image_index) + 1,
             model_name,
             model_name_index,
         ),
     )
 
-    # Получаем само изображение по пути
-    image_path = f"{constants.TEMP_FOLDER_PATH}/{model_name}_{user_id}/{image_index}.jpg"
+    if temp_user_dir.exists():
+        logger.info(
+            f"[process_upscale_image] Содержимое папки {temp_user_dir}: {os.listdir(temp_user_dir)}",
+        )
+    else:
+        logger.warning(
+            f"[process_upscale_image] Папка {temp_user_dir} не существует!",
+        )
 
-    # Получаем данные генерации по названию модели
+    logger.info(
+        f"[process_upscale_image] Проверка файла: {image_path} exists={os.path.exists(image_path)}",
+    )
+
     data = await getDataByModelName(model_name)
 
-    # Если изображение не найдено, то завершаем генерацию
     if not os.path.exists(image_path):
+        logger.error(
+            f"[process_upscale_image] Файл не найден для апскейла: {image_path} (model={model_name}, image_index={image_index}, user_id={user_id})",
+        )
         await editMessageOrAnswer(
             call,
-            text.IMAGE_NOT_FOUND_TEXT.format(
-                image_index,
-                model_name,
-                model_name_index,
-            ),
+            f"❌ Изображение для апскейла не найдено! (model={model_name}, image_index={image_index})",
         )
-        return
+        return None
 
     image = Image.open(image_path)
     image_base64 = image_to_base64(image)
@@ -84,6 +100,10 @@ async def process_upscale_image(
         model_name,
         image_index,
         upscale_message.message_id,
+    )
+
+    logger.info(
+        f"[upscale] END: {image_path} exists={os.path.exists(image_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
 
     return True

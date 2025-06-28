@@ -12,17 +12,6 @@ from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.images.base64_to_image import base64_to_image
 
-sendImageBlock = None
-
-
-def set_send_image_block(module):
-    global sendImageBlock
-    from bot.helpers.handlers.startGeneration.sendImageBlock import (
-        sendImageBlock as sib,
-    )
-
-    sendImageBlock = sib
-
 
 async def process_image_block(
     job_id: str,
@@ -128,6 +117,8 @@ async def process_image_block(
             )
 
         # Отправляем изображение
+        from helpers.handlers.startGeneration import sendImageBlock
+
         await sendImageBlock(
             state,
             media_group,

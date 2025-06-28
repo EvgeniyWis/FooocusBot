@@ -1,25 +1,35 @@
 from aiogram.fsm.context import FSMContext
-from bot.helpers.handlers.startGeneration.image_processes.process_image_steps import ProcessImageStep
+
+from bot.helpers.handlers.startGeneration.image_processes.process_image_steps import (
+    ProcessImageStep,
+)
+
 
 async def update_process_image_step(
-    state: FSMContext, 
-    model_name: str, 
-    new_step: ProcessImageStep
+    state: FSMContext,
+    model_name: str,
+    image_index: int,  # добавляем image_index
+    new_step: ProcessImageStep,
 ) -> None:
     """
-    Функция обновляет шаг обработки изображения для модели в массиве process_images_steps для state.
+    Функция обновляет шаг обработки изображения для конкретной пары (model_name, image_index)
+    в массиве process_images_steps для state.
     Всего есть 3 этапа обработки: upscale, faceswap, save.
 
     Attributes:
         - state: FSMContext, контекст состояния
         - model_name: str, название модели
+        - image_index: int, индекс изображения
         - new_step: ProcessImageStep, новый шаг обработки изображения (upscale, faceswap, save)
     """
 
     state_data = await state.get_data()
     process_images_steps = state_data.get("process_images_steps", [])
     for item in process_images_steps:
-        if item["model_name"] == model_name:
+        if (
+            item["model_name"] == model_name
+            and item["image_index"] == image_index
+        ):
             item["step"] = new_step
 
     await state.update_data(process_images_steps=process_images_steps)

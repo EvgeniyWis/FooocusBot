@@ -27,9 +27,9 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         "facefusion.py",
         "headless-run",
         "--source",
-        f"/facefusion/.assets/{source_filename}",
+        f"{source_filename}",
         "--target",
-        f"/facefusion/.assets/{target_filename}",
+        f"{target_filename}",
         "--output-path",
         f"/facefusion/.assets/images/results/{output_filename}",
     ]
