@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, ClassVar
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     SETTING_4_ENDPOINT_ID: str
 
     # Общий негатив-промпт
-    COMMON_NEGATIVE_PROMPT = (
+    COMMON_NEGATIVE_PROMPT: ClassVar[str] = (
         # Качество и технические проблемы
         "score_6, score_5, score_4, Negative_&_Positive_Embeddings_By_Stable_Yogi, negative_hand, pony, negativeXL_D, "
         "low quality, oversaturated, disfigured, poorly, bad, wrong, mutated, worst quality, normal quality, "
@@ -97,7 +97,7 @@ class Settings(BaseSettings):
     )
 
     # Промпт для upscale
-    COMMON_UPSCALE_PROMPT = "high-resolution, ultra-detailed, photorealistic female model, perfect hand anatomy, anatomically correct fingers and nails, natural finger positioning, symmetrical hands, sharp skin texture, realistic skin pores, high-definition lighting, smooth shading, 8k skin detail, flawless complexion, crisp fabric edges, clean outlines, realistic lighting gradients, upscale to ultra quality, fine finger joints, soft shadows, cinematic render"
+    COMMON_UPSCALE_PROMPT: ClassVar[str] = "high-resolution, ultra-detailed, photorealistic female model, perfect hand anatomy, anatomically correct fingers and nails, natural finger positioning, symmetrical hands, sharp skin texture, realistic skin pores, high-definition lighting, smooth shading, 8k skin detail, flawless complexion, crisp fabric edges, clean outlines, realistic lighting gradients, upscale to ultra quality, fine finger joints, soft shadows, cinematic render"
 
     # Мок-ссылки
     MOCK_LINK_FOR_SAVE_IMAGE: str
