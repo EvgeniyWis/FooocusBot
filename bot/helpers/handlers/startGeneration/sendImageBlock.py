@@ -1,3 +1,4 @@
+import asyncio
 import shutil
 
 from aiogram.exceptions import TelegramRetryAfter
@@ -31,20 +32,30 @@ async def sendImageBlock(
     user_id: int,
 ):
     try:
-        # Отправляем изображения с механизмом повторных попыток и глобальным rate limiter
+        # Ограничиваем media_group до 10 элементов (Telegram лимит)
+        media_group = media_group[:10]
         media_group_message = await safe_send_media_group(user_id, media_group)
-
-        # Сохраняем их в стейт
-        data_for_update = {
-            f"{model_name}": [
-                media.message_id for media in media_group_message
-            ],
-        }
-        await appendDataToStateArray(
-            state,
-            "imageGeneration_mediagroup_messages_ids",
-            data_for_update,
+        logger.info(
+            f"Media group sent to user_id={user_id}, model_name={model_name}, images_count={len(media_group)}",
         )
+
+        await asyncio.sleep(0.7)
+        logger.info(
+            f"Slept 0.7s before sending keyboard to user_id={user_id}, model_name={model_name}",
+        )
+
+        for idx, media in enumerate(media_group_message):
+            data_for_update = {
+                "model_name": model_name,
+                "image_index": idx,
+                "message_id": media.message_id,
+            }
+            await appendDataToStateArray(
+                state,
+                "imageGeneration_mediagroup_messages_ids",
+                data_for_update,
+                unique_keys=("model_name", "image_index"),
+            )
     except Exception as e:
         logger.error(f"Ошибка при отправке медиагруппы: {e}")
         try:
@@ -80,25 +91,52 @@ async def sendImageBlock(
 
         # Отправляем клавиатуру для выбора изображения
         try:
-            await bot.send_message(
-                chat_id=user_id,
-                text=text.SELECT_IMAGE_TEXT.format(
-                    model_name,
-                    model_name_index,
+            multi_select_mode = state_data.get("multi_select_mode", False)
+            selected_indexes = state_data.get("selected_indexes", [])
+            if multi_select_mode:
+                reply_markup = (
+                    start_generation_keyboards.selectMultiImageKeyboard(
+                        model_name,
+                        setting_number,
+                        10,
+                        selected_indexes,
+                    )
                 )
-                if not is_test_generation
-                else text.SELECT_TEST_IMAGE_TEXT.format(setting_number),
-                reply_markup=start_generation_keyboards.selectImageKeyboard(
+                select_message = await bot.send_message(
+                    chat_id=user_id,
+                    text=text.SELECT_SOME_IMAGES_TEXT.format(
+                        model_name,
+                        model_name_index,
+                    ),
+                    reply_markup=reply_markup,
+                )
+                await state.update_data(
+                    imageGeneration_select_message_id=select_message.message_id
+                )
+            else:
+                reply_markup = start_generation_keyboards.selectImageKeyboard(
                     model_name,
                     setting_number,
                     model_data["json"]["input"]["image_number"],
                 )
-                if not is_test_generation
-                else start_generation_keyboards.testGenerationImagesKeyboard(
-                    setting_number,
+                await bot.send_message(
+                    chat_id=user_id,
+                    text=text.SELECT_IMAGE_TEXT.format(
+                        model_name,
+                        model_name_index,
+                    )
+                    if not is_test_generation
+                    else text.SELECT_TEST_IMAGE_TEXT.format(setting_number),
+                    reply_markup=reply_markup
+                    if not is_test_generation
+                    else start_generation_keyboards.testGenerationImagesKeyboard(
+                        setting_number,
+                    )
+                    if state_data.get("setting_number", 1) != "all"
+                    else None,
                 )
-                if state_data.get("setting_number", 1) != "all"
-                else None,
+            logger.info(
+                f"Keyboard sent to user_id={user_id}, model_name={model_name}",
             )
         except Exception as e:
             logger.error(f"Ошибка при отправке сообщения с клавиатурой: {e}")

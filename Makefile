@@ -25,7 +25,7 @@ restart-bot:
 	docker-compose restart telegram_bot
 
 sh-bot:
-	docker-compose exec telegram_bot /bin/bash
+	docker-compose exec telegram_bot /bin/sh
 
 up-redis:
 	docker-compose up -d redis
@@ -40,7 +40,7 @@ restart-redis:
 	docker-compose restart redis
 
 sh-redis:
-	docker-compose exec redis_container /bin/bash
+	docker-compose exec redis_container /bin/sh
 
 up-loki:
 	docker-compose up -d loki
@@ -85,7 +85,7 @@ restart-grafana:
 	docker-compose restart grafana
 
 sh-grafana:
-	docker-compose exec grafana /bin/bash
+	docker-compose exec grafana /bin/sh
 
 up-nginx:
 	docker-compose up -d nginx

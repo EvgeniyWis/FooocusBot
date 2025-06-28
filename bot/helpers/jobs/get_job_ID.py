@@ -41,7 +41,10 @@ async def get_job_ID(
     }
     logger.info(f"Сохраняем id работы в стейт: {job_id}")
     await appendDataToStateArray(
-        state, "image_generation_jobs", data_for_update
+        state,
+        "image_generation_jobs",
+        data_for_update,
+        unique_keys=("job_id",),
     )
 
     return job_id

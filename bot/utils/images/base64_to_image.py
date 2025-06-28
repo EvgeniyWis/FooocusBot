@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import concurrent.futures
 import io
 import os
 from concurrent.futures import ProcessPoolExecutor
@@ -10,6 +11,7 @@ import bot.constants as constants
 from bot.logger import logger
 
 executor = ProcessPoolExecutor()
+
 
 def verify_and_reload_image(image_bytes):
     image = Image.open(io.BytesIO(image_bytes))
@@ -22,6 +24,17 @@ def save_image_to_file(image_bytes, file_path):
     img = Image.open(io.BytesIO(image_bytes))
     img.save(file_path, format="PNG")
     img.close()
+
+
+async def save_image_to_file_async(image_bytes, file_path):
+    loop = asyncio.get_running_loop()
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        await loop.run_in_executor(
+            pool,
+            save_image_to_file,
+            image_bytes,
+            file_path,
+        )
 
 
 async def base64_to_image(
@@ -80,21 +93,23 @@ async def base64_to_image(
 
         save_dir = f"{constants.TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
         os.makedirs(save_dir, exist_ok=True)
-        file_path = f"{save_dir}/{index + 1}.jpg"
-
-        await loop.run_in_executor(
-            executor,
-            save_image_to_file,
-            image_bytes,
-            file_path,
-        )
+        file_path = f"{save_dir}/{index}.jpg"
 
         logger.info(
-            f"Изображение успешно загружено: {image} по пути {file_path}",
+            f"[base64_to_image] Сохраняем файл: {file_path} | folder_name={folder_name}, index={index}, user_id={user_id}, is_test_generation={is_test_generation}"
+        )
+
+        # Используем асинхронное сохранение, чтобы не блокировать event loop
+        await save_image_to_file_async(image_bytes, file_path)
+        logger.info(
+            f"[base64_to_image] Изображение успешно загружено: {image} по пути {file_path}",
         )
 
         # Возвращаем путь к сохраненному изображению
         return file_path
 
     except Exception as e:
-        raise e
+        logger.error(
+            f"[base64_to_image] Ошибка при сохранении файла {file_path}: {e}"
+        )
+        raise

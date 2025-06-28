@@ -37,7 +37,6 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 from bot.utils.handlers.messages.rate_limiter_for_send_photo import (
     safe_send_photo,
 )
-
 from bot.utils.videos import generate_video
 
 
@@ -246,8 +245,11 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     await state.update_data(prompt_for_video=prompt)
     state_data = await state.get_data()
     model_name = state_data.get("model_name_for_video_generation", "")
+    image_index = state_data.get("image_index_for_video_generation", 0)
     saved_images_urls = state_data.get("saved_images_urls", [])
-    image_url = await getDataInDictsArray(saved_images_urls, model_name)
+    image_url = await getDataInDictsArray(
+        saved_images_urls, model_name, image_index
+    )
 
     if not image_url:
         await safe_send_message(
