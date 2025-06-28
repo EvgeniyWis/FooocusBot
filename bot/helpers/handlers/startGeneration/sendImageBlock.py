@@ -3,16 +3,16 @@ import shutil
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 
-from bot.config import TEMP_FOLDER_PATH
-from bot.settings import MOCK_MODE
-from bot.InstanceBot import bot
-from bot.keyboards import start_generation_keyboards
-from bot.logger import logger
+import bot.constants as constants
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
+from bot.InstanceBot import bot
+from bot.keyboards import start_generation_keyboards
+from bot.logger import logger
+from bot.settings import settings
 from bot.utils.handlers import (
     appendDataToStateArray,
 )
@@ -111,9 +111,9 @@ async def sendImageBlock(
                 pass
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-        if is_test_generation and not MOCK_MODE:
+        if is_test_generation and not settings.MOCK_MODE:
             try:
-                file_path = f"{TEMP_FOLDER_PATH}/test_{user_id}"
+                file_path = f"{constants.TEMP_FOLDER_PATH}/test_{user_id}"
                 shutil.rmtree(file_path)
             except Exception as e:
                 logger.error(f"Ошибка при удалении временных файлов: {e}")

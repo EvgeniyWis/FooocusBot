@@ -1,4 +1,4 @@
-from bot.settings import DEVELOPMENT_MODE
+from bot.settings import settings
 
 
 # Функция для получения примеров шаблонов для генерации видео с помощью kling
@@ -14,7 +14,7 @@ async def getVideoExamplesData() -> dict:
     ]
 
     # Формируем массив из file_id видео
-    if DEVELOPMENT_MODE:
+    if settings.DEVELOPMENT_MODE:
         video_ids = [
             "BAACAgIAAxkBAAK3nWgyCpXl79L5peVJ5dnsGnmozlvVAAINawACP6tQSZWtaZ9qiyFCNgQ",
             "BAACAgIAAxkBAAK3nmgyCpX48oVWcv9CR5478XLG2OXCAAIQawACP6tQSX0FEkOg-TfRNgQ",
@@ -35,7 +35,7 @@ async def getVideoExamplesData() -> dict:
     # Если длина массива промптов и длина массива видео не равны, то выводим ошибку
     if len(prompts) != len(video_ids):
         raise ValueError(
-            "Длина массива промптов и длина массива видео не равны"
+            "Длина массива промптов и длина массива видео не равны",
         )
 
     # Формируем объект с промптами и видео

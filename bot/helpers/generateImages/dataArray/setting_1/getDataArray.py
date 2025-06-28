@@ -1,7 +1,7 @@
 from bot.helpers.generateImages.dataArray.setting_1.generateData import (
     setting1_generateData,
 )
-from bot.settings import MOCK_MODE
+from bot.settings import settings
 
 
 # Функция для генерации массива данных для запроса для настройки 1
@@ -285,7 +285,7 @@ def setting1_getDataArray():
         ),
     ]
 
-    if MOCK_MODE:
+    if settings.MOCK_MODE:
         dataArray = dataArray[:1]
 
     return dataArray

@@ -5,13 +5,13 @@ from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
-from bot.config import ALLOWED_USERS
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
 from bot.InstanceBot import router
 from bot.keyboards import start_generation_keyboards
+from bot.settings import settings
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
@@ -21,7 +21,7 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 async def start(message: types.Message, state: FSMContext):
     await state.set_state(None)
 
-    if message.from_user.id not in ALLOWED_USERS:
+    if message.from_user.id not in settings.ALLOWED_USERS:
         await safe_send_message(text.ACCESS_DENIED_TEXT, message)
         return
 

@@ -4,13 +4,13 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
-from bot.helpers.generateImages import (
-    generateImageBlock,
-    generateImages,
-    generateImagesByAllSettings,
-)
 from bot.helpers.generateImages.dataArray import (
     getDataArrayBySettingNumber,
+)
+from bot.helpers.generateImages.generateImageBlock import generateImageBlock
+from bot.helpers.generateImages.generateImages import generateImages
+from bot.helpers.generateImages.generateImagesByAllSettings import (
+    generateImagesByAllSettings,
 )
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,

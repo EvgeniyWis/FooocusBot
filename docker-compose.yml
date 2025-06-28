@@ -1,13 +1,25 @@
 services:
+  telegram_bot:
+    build:
+      context: .
+    container_name: telegram_bot_container
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../facefusion-docker/.assets:/app/.assets
+      - ./bot:/app/bot
+    env_file:
+      - .env
+    restart: unless-stopped
+  
   redis:
     image: redis:7.2.4
     container_name: redis_container
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    ports:
-      - "6380:6379"
     volumes:
       - ./redisdata:/data
+    ports:
+      - "6379:6379"
     command: >
       sh -c '
         mkdir -p /usr/local/etc/redis &&
@@ -25,3 +37,56 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
+  
+  loki:
+    image: grafana/loki:2.9.4
+    container_name: loki
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://localhost:3100" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  promtail:
+    image: grafana/promtail:2.9.4
+    container_name: promtail
+    volumes:
+      - ./bot/logs:/var/log/
+      - ./promtail-config.yaml:/etc/promtail/promtail.yaml
+    command: -config.file=/etc/promtail/promtail.yaml
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://localhost:9080" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: grafana
+    restart: unless-stopped
+    depends_on:
+      - loki
+    volumes:
+      - ./grafana_data:/var/lib/grafana 
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/login" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost/grafana/
+
+  nginx:
+    image: nginx:1.25
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+    depends_on:
+      - promtail
+      - grafana

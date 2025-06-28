@@ -1,6 +1,7 @@
 import os
+import aiofiles
 
-from bot.config import FACEFUSION_RESULTS_DIR
+import bot.constants as constants
 from bot.logger import logger
 from bot.utils.httpx import httpx_get
 
@@ -14,15 +15,17 @@ async def downloadFromGoogleDrive(url: str, file_id: str) -> str | None:
         response = await httpx_get(url)
 
         if response:
-            os.makedirs(FACEFUSION_RESULTS_DIR, exist_ok=True)
-            file_path = os.path.join(FACEFUSION_RESULTS_DIR, f"{file_id}.jpg")
-            with open(file_path, "wb") as f:
-                f.write(response.content)
+            os.makedirs(constants.FACEFUSION_RESULTS_DIR, exist_ok=True)
+            file_path = os.path.join(
+                constants.FACEFUSION_RESULTS_DIR, f"{file_id}.jpg"
+            )
+            async with aiofiles.open(file_path, "wb") as f:
+                await f.write(response.content)
             logger.info(f"Файл успешно сохранен по пути: {file_path}")
             return file_path
 
         return None
     except Exception as e:
         raise Exception(
-            f"Произошла ошибка при скачивании файла из Google Drive: {e}"
+            f"Произошла ошибка при скачивании файла из Google Drive: {e}",
         )

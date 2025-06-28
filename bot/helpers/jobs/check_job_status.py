@@ -3,12 +3,13 @@ import asyncio
 import httpx
 from aiogram.fsm.context import FSMContext
 
-from bot.config import RUNPOD_HOST, get_runpod_headers
 from bot.helpers.jobs.delete_job import delete_job
 from bot.helpers.jobs.edit_job_message import edit_job_message
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
 from bot.logger import logger
+from bot.settings import settings
 from bot.utils import httpx_post
+from bot.utils.get_api_headers import get_runpod_headers
 
 CANCELLED_JOB_TEXT = "Работа была отменена"
 
@@ -52,7 +53,7 @@ async def check_job_status(
                 ENDPOINT_ID = await get_endpoint_ID(setting_number)
 
                 # Формируем URL для отправки запроса
-                url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
+                url = f"{settings.RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
                 response_json = await httpx_post(
                     url,
                     get_runpod_headers(),

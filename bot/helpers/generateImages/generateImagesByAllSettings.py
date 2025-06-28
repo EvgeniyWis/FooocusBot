@@ -12,7 +12,6 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
 )
-from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
@@ -27,6 +26,10 @@ async def generateImagesByAllSettings(
     variable_prompt: str,
     with_randomizer: bool = False,
 ):
+    from bot.helpers.generateImages.generateImageBlock import (
+        generateImageBlock,
+    )
+
     # Получаем все настройки
     dataArrays = getAllDataArrays()
     settings_numbers_success = []
