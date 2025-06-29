@@ -19,7 +19,7 @@ from logger import logger
 
 # ID эндпоинтов для генерации изображений (для каждой настройки своя)
 SETTING_1_ENDPOINT_ID = "gpp5vgbtpvphx8"
-SETTING_2_ENDPOINT_ID = "nzlqoq2c5i6vmy"
+SETTING_2_ENDPOINT_ID = "dh4mjmjg7x55gq"
 SETTING_3_ENDPOINT_ID = "iudgj38f62cmal"
 SETTING_4_ENDPOINT_ID = "exauzymab4x1iz"
 
