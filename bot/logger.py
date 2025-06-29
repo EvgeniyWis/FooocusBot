@@ -33,7 +33,7 @@ formatter = MoscowFormatter(
 
 def my_namer(default_name):
     dt = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    return str(backup_dir / f"Logs_{dt}.log")
+    return str(backup_dir / dt / "logs.log")
 
 
 def my_rotator(source, dest):
