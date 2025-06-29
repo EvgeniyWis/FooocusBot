@@ -153,7 +153,7 @@ def setting4_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
         real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, black hair, long volumnous hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
-            [2, 1.90, 0.10, 0.85, 2.00, 2.00, -0.70, 0.35],
+            [2, 1.90, -0.1, 0.85, 2.00, 2.00, -0.70, 0.35],
         ),
         setting4_generateData(
             "christine_morell.xo",
