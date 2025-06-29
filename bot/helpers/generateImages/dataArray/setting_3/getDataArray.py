@@ -41,7 +41,7 @@ def setting3_getDataArray():
 
         setting3_generateData("noellebriar.xo", "1dd-r3lUZlWcqkLJ5yaNMxBxCy79wiacH", "1BeeAxBI4xE3Kgy_4u94x9OIjnMF8QmOI", """score9, photorealistic, 8k, vibrant, bright light, skin detail, BREAK
 
-        realbeauty, 1 girl, 18, sorority, black hair with white curls, big breasts, slim waist, tan skin, smirk""",
+        realbeauty, 1 girl, 18, sorority, black hair, big breasts, slim waist, tan skin, smirk""",
         [-1.50, 1.30, 1.00, 2.05, 0.45, -0.70]),
 
         setting3_generateData("bianca_mirell", "1DQYyWFPBPs45Rra5tmcGSwMBzDLqUUB7", "1xcSZ5XeyVamQbeZhXfrd8OgMP9gxUVKe", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
