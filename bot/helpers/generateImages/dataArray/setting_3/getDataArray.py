@@ -34,14 +34,14 @@ def setting3_getDataArray():
             real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous  platinum-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
         [-1.50, 1.30, 1.00, 1.90, 0.23, -0.55]),
 
-        setting3_generateData("bridget_laurent.xo", "1rTSrckm7TERhmBbyvyw6VU3RJOI8fcYd", "1-OoXYC7u-DZhXFDH44PF-K__MoB8UFkG", """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("bridget_laurent.xo", "1rTSrckm7TERhmBbyvyw6VU3RJOI8fcYd", "1-OoXYC7u-DZhXFDH44PF-K__MoB8UFkG", """score9, high quality, photorealistic, 8k, vibrant colors, bright light, skin detail, BREAK
 
-        realbeauty, igbaddie, 1 girl, 18, sorority girl, long voluminous white-platinum hair, huge breasts, slim waist, big hips, hourglass figure, toned legs, tan skin, thin lips, smirk, bright green eyes, sharp cheekbones""",
+        realbeauty, 1 girl, 18, sorority, long white-platinum hair, big breasts, slim waist, big hips, hourglass, toned legs, tan skin, thin lips, smirk, bright green eyes, sharp cheekbones""",
         [-1.50, 1.30, 1.00, 2.50, 0.50, -0.45]),
 
-        setting3_generateData("noellebriar.xo", "1dd-r3lUZlWcqkLJ5yaNMxBxCy79wiacH", "1BeeAxBI4xE3Kgy_4u94x9OIjnMF8QmOI", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+        setting3_generateData("noellebriar.xo", "1dd-r3lUZlWcqkLJ5yaNMxBxCy79wiacH", "1BeeAxBI4xE3Kgy_4u94x9OIjnMF8QmOI", """score9, high quality, photorealistic, 8k, vibrant colors, bright light, skin detail, BREAK
 
-        real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous black hair with white curls, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, huge buttocks, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-green eyes, sharp facial features, sharp cheekbones.""",
+        realbeauty, 1 girl, 18, sorority, long voluminous black hair with white curls, big breasts, slim waist, big hips, hourglass, toned legs, tan skin, thin lips, smirk, bright green eyes, sharp cheekbones""",
         [-1.50, 1.30, 1.00, 2.05, 0.45, -0.70]),
 
         setting3_generateData("bianca_mirell", "1DQYyWFPBPs45Rra5tmcGSwMBzDLqUUB7", "1xcSZ5XeyVamQbeZhXfrd8OgMP9gxUVKe", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
