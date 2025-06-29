@@ -1,10 +1,9 @@
-import datetime
 import logging
 import os
-from datetime import datetime, timedelta
-from pathlib import Path
 import shutil
+from datetime import datetime, timedelta
 from logging.handlers import TimedRotatingFileHandler
+from pathlib import Path
 
 
 class MoscowFormatter(logging.Formatter):
@@ -15,7 +14,7 @@ class MoscowFormatter(logging.Formatter):
         else:
             s = ct.strftime("%Y-%m-%d %H:%M:%S")
         return s
-    
+
 
 log_dir = Path(__file__).resolve().parent / "logs"
 backup_dir = log_dir / "backups"
@@ -32,8 +31,8 @@ formatter = MoscowFormatter(
 )
 
 
-def my_namer():
-    dt = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H-%M-%S")
+def my_namer(default_name):
+    dt = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     return str(backup_dir / dt / "logs.log")
 
 

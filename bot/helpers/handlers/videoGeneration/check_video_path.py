@@ -5,7 +5,7 @@ from aiogram import types
 from bot.helpers.generateImages.dataArray import getModelNameIndex
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
-from bot.settings import MOCK_MODE
+from bot.settings import settings
 from bot.utils import retryOperation, text
 from bot.utils.handlers.messages import safe_send_message
 from bot.utils.videos.generate_video import generate_video
@@ -36,9 +36,9 @@ async def send_error_message(message: types.Message, model_name: str, e: str):
             message,
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
-                    False,
-                ),
-            )
+                False,
+            ),
+        )
     else:
         await safe_send_message(
             text.GENERATE_VIDEO_ERROR_TEXT_WITHOUT_MODEL.format(
@@ -72,7 +72,7 @@ async def check_video_path(
 
     # Генерируем видео
     video_path = None
-    if MOCK_MODE:
+    if settings.MOCK_MODE:
         video_path = "FooocusBot/bot/assets/mocks/mock_video.mp4"
     else:
         try:
@@ -91,7 +91,9 @@ async def check_video_path(
             await send_error_message(message, model_name, e)
 
     if not video_path:
-        await send_error_message(message, model_name, "Не удалось сгенерировать видео")
+        await send_error_message(
+            message, model_name, "Не удалось сгенерировать видео"
+        )
 
     if isinstance(video_path, dict):
         error = video_path.get("error")
