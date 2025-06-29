@@ -39,9 +39,9 @@ def setting3_getDataArray():
         realbeauty, 1 girl, 18, sorority, long white-platinum hair, big breasts, slim waist, big hips, hourglass, toned legs, tan skin, thin lips, smirk, bright green eyes, sharp cheekbones""",
         [-1.50, 1.30, 1.00, 2.50, 0.50, -0.45]),
 
-        setting3_generateData("noellebriar.xo", "1dd-r3lUZlWcqkLJ5yaNMxBxCy79wiacH", "1BeeAxBI4xE3Kgy_4u94x9OIjnMF8QmOI", """score9, high quality, photorealistic, 8k, vibrant colors, bright light, skin detail, BREAK
+        setting3_generateData("noellebriar.xo", "1dd-r3lUZlWcqkLJ5yaNMxBxCy79wiacH", "1BeeAxBI4xE3Kgy_4u94x9OIjnMF8QmOI", """score9, photorealistic, 8k, vibrant, bright light, skin detail, BREAK
 
-        realbeauty, 1 girl, 18, sorority, long voluminous black hair with white curls, big breasts, slim waist, big hips, hourglass, toned legs, tan skin, thin lips, smirk, bright green eyes, sharp cheekbones""",
+        realbeauty, 1 girl, 18, sorority, black hair with white curls, big breasts, slim waist, hourglass, tan skin, smirk, bright green eyes""",
         [-1.50, 1.30, 1.00, 2.05, 0.45, -0.70]),
 
         setting3_generateData("bianca_mirell", "1DQYyWFPBPs45Rra5tmcGSwMBzDLqUUB7", "1xcSZ5XeyVamQbeZhXfrd8OgMP9gxUVKe", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
@@ -84,9 +84,9 @@ def setting3_getDataArray():
         realbeauty, 1 girl, 18, sorority, long ash-platinum blonde hair, big breasts, slim waist, hourglass, toned legs, tan skin, big lips, smirk, bright blue eyes, sharp cheekbones""",
         [-1.50, 1.30, 1.00, 2.00, 0.30, -0.30]),
 
-        setting3_generateData("callieroux", "1oMwvePG5pSnbquF6wEr6yGWw45EjaeyO", "1u9fE_nQdDVSnbucs95u1kqcn0vwMGRFM", """score9, photorealistic, 8k, vibrant colors, bright light, skin detail, BREAK
+        setting3_generateData("callieroux", "1oMwvePG5pSnbquF6wEr6yGWw45EjaeyO", "1u9fE_nQdDVSnbucs95u1kqcn0vwMGRFM", """score9, photorealistic, 8k, vibrant, bright light, skin detail, BREAK
 
-        realbeauty, 1 girl, 18, sorority, long ash-blonde hair, big breasts, slim waist, big hips, hourglass, toned legs, tan skin, thin lips, smirk, bright blue eyes, sharp cheekbones""",
+        realbeauty, 1 girl, 18, sorority, ash-blonde hair, big breasts, slim waist, hourglass, tan skin, smirk""",
         [-1.50, 1.30, 1.00, 3.45, -0.20, 0.30]),
 
         setting3_generateData("aveline_lion", "1ryKfs0xEbcgWw3j35E1hBFsP_vSnuKiD", "1MxgVRtb9qxnZY__yeX1Cj-uEkZQX8Rda", """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
