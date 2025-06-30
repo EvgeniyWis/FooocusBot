@@ -25,10 +25,10 @@ def setting3_getDataArray():
         [-1.50, 1.30, 0.7, 1.90, 0.23, -0.55]),
 
         setting3_generateData("bridget_laurent.xo", "1rTSrckm7TERhmBbyvyw6VU3RJOI8fcYd", "1-OoXYC7u-DZhXFDH44PF-K__MoB8UFkG", "photorealistic portrait, 18 years old, platinum-blonde hair, big breasts, slim waist, big hips, tan skin, thin lips, smirk, green eyes, high quality.",
-        [-1.50, 1.30, 0.7, 2.70, 1.6, -0.45]),
+        [-1.50, 1.30, 0.7, 3, 1.6, -0.45]),
 
         setting3_generateData("noellebriar.xo", "1dd-r3lUZlWcqkLJ5yaNMxBxCy79wiacH", "1BeeAxBI4xE3Kgy_4u94x9OIjnMF8QmOI", "photorealistic portrait, 18 years old, black hair, big breasts, slim waist, tan skin, smirk, high quality.",
-        [-1.50, 1.30, 0.7, 2.25, 1.35, -0.70]),
+        [-1.50, 1.30, 0.7, 2.45, 1.35, -0.70]),
 
         setting3_generateData("bianca_mirell", "1DQYyWFPBPs45Rra5tmcGSwMBzDLqUUB7", "1xcSZ5XeyVamQbeZhXfrd8OgMP9gxUVKe", "photorealistic portrait, 18 years old, black hair with white curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
         [-1.50, 1.30, 0.7, 1.80, 0.3, 0]),
