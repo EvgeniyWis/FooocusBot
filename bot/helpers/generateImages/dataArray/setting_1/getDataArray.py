@@ -69,10 +69,10 @@ def setting1_getDataArray():
             "1gDi92Np8hE8hML2wq-nB6uXt2REmuMIg",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)), clothing color is considered.
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)).
 
             Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-            [2, 3.10, -0.90, -1.10, 1.75, 0.9, 0.65, 0.80],
+            [2, 3.10, -0.90, -1.10, 1.75, 0.8, 0.65, 0.80],
         ),
         setting1_generateData(
             "zoe_callahan",
@@ -82,7 +82,7 @@ def setting1_getDataArray():
             real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, small teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)), clothing color is considered.
 
             Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-            [2, 2.65, -0.90, -0.85, 1.40, 1.00, 1.00, 0.80],
+            [2, 2.65, -0.90, -0.85, 1.40, 0.9, 1.00, 0.80],
         ),
         setting1_generateData(
             "brookenixon.xo",
@@ -148,7 +148,7 @@ def setting1_getDataArray():
                 real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, plump lips, realistic blue eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), hips, hourglass body, clothing color is considered.
 
                 Style: Instagram photo style, vibrant and warm filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features))""",
-            [2, 4.15, -0.90, -1.50, 0.45, 1.00, 0.05, 0.80],
+            [2, 4.15, -0.90, -1.50, 0.45, 0.9, 0.05, 0.80],
         ),
         setting1_generateData(
             "zara_devaux",
@@ -176,11 +176,11 @@ def setting1_getDataArray():
             "noavexen",
             "1J39NtE4ovUiklcTW_t8NMZHTidCoTZNJ",
             "1jpaYrZUUKeh2sL5e3W3Nx0UaJX5fk9BB",
-            """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, sourcephoto, sourcereal, BREAK
 
-            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic body with soft curves, medium breasts, toned abdomen, narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brown hair, tanned skin with natural texture, fine pores, slightly smiling, face lit by bright sunlight, hourglass figure, clothing color is considered.
+            realbeauty, 1girl, caucasian, 18 years old, athletic, brown hair, green eyes, tanned skin, smiling.
 
-            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
+            Style: Instagram photo, high-res, bright sunlight, outdoor
             """,
             [2, 2.4, -0.90, -1.70, 2.5, 2.3, 3.00, 1.00],
         ),
@@ -190,7 +190,7 @@ def setting1_getDataArray():
             "1y6qUi8iX5AMM1ns_B8B_j3HIIHH7reDC",
             """score9, score8up, sourcephoto, sourcereal, hyper-realistic, photorealism, high quality, masterpiece, photography, 8k detail, detailed background, vibrant colors, bright lighting, skin detail, BREAK
 
-            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic body with soft curves, medium breasts, toned abdomen, narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin with natural texture, fine pores, slightly smiling, face lit by bright sunlight, hourglass figure, clothing color is considered.
+            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic body with soft curves, medium breasts, toned abdomen, narrow waist, wide hips, thin legs, beautiful face, thin lips, green eyes, long voluminous brunette hair, tanned skin with natural texture, fine pores, slightly smiling, face lit by bright sunlight, hourglass figure.
 
             Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, bright direct sunlight, outdoor courtyard
             """,
@@ -266,7 +266,7 @@ def setting1_getDataArray():
             "1RoBG69D7ZPkq2pgnSp6B7Rna63e_4sf2",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), ((extra-skinny girl with big boobs)), thin legs, beautiful face, plump lips, realistic green eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), big wide hips, hourglass body, clothing color is considered.
+                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), ((extra-skinny girl with big boobs)), thin legs, beautiful face, plump lips, realistic green eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), big wide hips, hourglass body.
 
                 Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard.""",
             [2, 3.10, -0.90, -1.70, 1.50, 1.00, 1.00, 0.40],
