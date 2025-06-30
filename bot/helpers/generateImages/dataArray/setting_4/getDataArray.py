@@ -68,9 +68,9 @@ def setting4_getDataArray():
             "tessadelynn",
             "1H80DQiU4QbO_v-CDzHC-xRix3Ekx1b4B",
             "1DwmXWp_rTObqbr1y3Cn_S2Q2rrCRm75t",
-            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+            """score_9, score_8_up, source_photo, source_real, BREAK 
 
-        real_beauty, igbaddie, solo, 1woman, milf, black hair, long hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
+        real_beauty, 1woman, black hair, green eyes, tan skin, skinny, cute.""",
             [2, 1.00, 0.55, 1.50, 2.00, 1.70, -0.70, 0.35],
         ),
         setting4_generateData(
@@ -86,9 +86,9 @@ def setting4_getDataArray():
             "evelynlaine.xo.xo",
             "1PQL0mx2vHnXpPnjAi0ekmwGkjFfvoJAw",
             "1rZpZdzxgHriK6_8knTYJNo7uqhu1FEWe",
-            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+            """score_9, score_8_up, source_photo, source_real, BREAK 
 
-        real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, platinum-blonde hair, long hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
+        real_beauty, 1girl, 18 years old, blonde hair, green eyes, tan skin, skinny, cute.""",
             [2, 3.00, -2.00, 1.50, 2.00, 1.70, -0.70, 0.35],
         ),
         setting4_generateData(
@@ -132,9 +132,9 @@ def setting4_getDataArray():
             "sherryknoxlyn",
             "1YCXo9G2Z1sNZv_eXWzrMl2Nrj3aXi_xu",
             "1jBBhpqXt92SNzf18Igtwv68rI-YBgE_r",
-            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+            """score_9, score_8_up, source_photo, source_real, BREAK 
 
-        real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, black hair, long volumnous hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
+        real_beauty, 1girl, 18 years old, black hair, green eyes, tan skin, skinny, cute.""",
             [2, 2.10, -0.40, 1.05, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generateData(
@@ -159,9 +159,9 @@ def setting4_getDataArray():
             "christine_morell.xo",
             "1TjPCYuqSH9Y-WzzZ2JI96_gQtonhNoVT",
             "1mg3DJX3WWMcxcCOvGA6rhuuE8zc2duCi",
-            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+            """score_9, score_8_up, source_photo, source_real, BREAK 
 
-        real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, ash-blonde hair, long volumnous hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist))""",
+        real_beauty, 1girl, 18 years old, blonde hair, blue eyes, tan skin, skinny, cute.""",
             [2, 0.15, -1.70, 4.00, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generateData(
@@ -242,9 +242,9 @@ def setting4_getDataArray():
             "ashleymoreaux.xo",
             "1RthZyPItvmRrnnEAW-doRBhA6aH5b3xb",
             "1sdttiJfPzyseSAMEI6dth-SE47rN3_Ma",
-            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+            """score_9, score_8_up, source_photo, source_real, BREAK 
 
-        real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, highlighted black hair, long straight hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, high height, ((extra-tan skin)), skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist)), slightly smiling, smirk""",
+        real_beauty, 1girl, 18 years old, black hair, blue eyes, tan skin, skinny, cute, smiling.""",
             [2, 2.70, -1.70, 1.95, 1.00, 1.70, -0.70, 0.35, 0, 1.25],
         ),
         setting4_generateData(
