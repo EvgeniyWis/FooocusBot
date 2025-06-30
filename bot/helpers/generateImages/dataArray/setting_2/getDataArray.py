@@ -138,9 +138,9 @@ def setting2_getDataArray():
             "ruthmonclaire",
             "1fZ2qgurQZxENOq_XTCQfOpHLKEMf15c_",
             "1tT8bXGlfK3s_rBtrwUg98uho_zhDfeRK",
-            """score9, score8up, score7up, sourcephoto, sourcereal, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-            realbeauty, igbaddie, 1girl, redhead girl, 18 years old, asian girl, sorority girl, voluminous natural red hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
+            real_beauty, igbaddie, 1girl, redhead girl, 18 years old, asian girl, sorority girl, voluminous saturated ginger-red hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
             [1, 0.7, 2.25, 1.10, -1.70, -1.5],
         ),
         setting2_generateData(
