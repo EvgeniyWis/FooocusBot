@@ -55,7 +55,7 @@ def setting2_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, arabian girl, 18 years old, sorority girl, voluminous black hair, long hair, huge breasts, slim waist, erect breasts, upright breasts, big bubble butt, huge ass toned legs, ((high tan skin)), skinny, cute, big plump lips, plump lips, smirk, bright-brown eyes.""",
-            [1, 0.7, 2.40, 0.75, -1.70, -1.5],
+            [1, 0.7, 2.40, 0.85, -1.70, -1.5],
         ),
         setting2_generateData(
             "ellamaddix.xo",

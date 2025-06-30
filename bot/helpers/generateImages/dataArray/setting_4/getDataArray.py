@@ -89,7 +89,7 @@ def setting4_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
             real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, platinum-blonde hair, long hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
-            [2, 3.00, -2.00, 1.80, 2.00, 1.70, -0.70, 0.45],
+            [2, 3.00, -2.00, 1.80, 2.00, 1.70, -0.70, 0.55],
         ),
         setting4_generateData(
             "melissaxlaine",
