@@ -48,27 +48,21 @@ class Settings(BaseSettings):
         "score_6, score_5, score_4, Negative_&_Positive_Embeddings_By_Stable_Yogi, negative_hand, pony, negativeXL_D, "
         "low quality, oversaturated, disfigured, poorly, bad, wrong, mutated, worst quality, normal quality, "
         "blurry, jpeg artifacts, overexposed, underexposed, low-quality shading, low res, "
-        
         # Проблемы с лицом и анатомией
         "ugly face, bad anatomy, unrealistic anatomy, deformed eyes, unnatural face, distorted face, "
         "barbie face, uncanny valley, big head, disproportionately large head, disproportionately long torso, "
         "extra limbs, distorted proportions, exaggerated curves, "
-        
         # Проблемы с руками
         "mutated hands, extra fingers, poorly drawn hands, fused fingers, too many fingers, bad hands, "
         "tiny hands, low quality hands, six fingers, long neck, "
-        
         # Проблемы с глазами и другими частями тела
         "blurry face, blurry eyes, tiny feet, multiple women, "
-        
         # Нежелательные элементы
         "text, signature, signature artist, multiple female, multiple male, "
         "hat, multicolored hair, pubic hair, asian, tan lines, makeup, lipstick, playing cards, black skin, "
         "steering wheel, man, "
-        
         # Стили и эффекты
         "cartoon, anime, 3d, cgi, illustration, doll-like, overly muscular, chubby, plastic skin, waxy texture, "
-        
         # Усиленная защита от обнаженности
         "naked nipples, naked breasts, topless, bare breasts, exposed breasts, uncovered breasts, "
         "nipples showing, nipples visible, breast exposure, chest exposure, "
@@ -76,19 +70,15 @@ class Settings(BaseSettings):
         "(((nipples showing))), (((nipples visible))), (((breast exposure))), (((chest exposure))), "
         "nude, nudity, naked, topless, bare chest, exposed chest, "
         "(((nude))), (((nudity))), (((naked))), (((topless))), (((bare chest))), (((exposed chest))), "
-        
         # Защита от несовершеннолетних
         "child, children, kid, toddler, baby, minor, teenager, young girl, young boy, childlike, underage, "
         "preteen, infant, low quality child, "
-        
         # Проблемы с ногами
         "spread legs, open legs, legs apart, legs wide open, legs spread, "
         "(((spread legs))), (((open legs))), (((legs apart))), (((legs wide open))), (((legs spread))), "
         "no spread legs, no open legs, no legs apart, no legs wide open, no legs spread, "
-        
         # Дополнительные негативные элементы
         "unnatural smile, ugly, "
-        
         # Усиленные негативные промпты для максимальной защиты
         "((((naked)))), ((((topless)))), ((((bare breasts)))), ((((exposed breasts)))), "
         "((((nipples)))), ((((nude)))), ((((nudity)))), ((((chest exposure)))), "
@@ -97,7 +87,9 @@ class Settings(BaseSettings):
     )
 
     # Промпт для upscale
-    COMMON_UPSCALE_PROMPT: ClassVar[str] = "high-resolution, ultra-detailed, photorealistic female model, perfect hand anatomy, anatomically correct fingers and nails, natural finger positioning, symmetrical hands, sharp skin texture, realistic skin pores, high-definition lighting, smooth shading, 8k skin detail, flawless complexion, crisp fabric edges, clean outlines, realistic lighting gradients, upscale to ultra quality, fine finger joints, soft shadows, cinematic render"
+    COMMON_UPSCALE_PROMPT: ClassVar[str] = (
+        "high-resolution, ultra-detailed, photorealistic female model, perfect hand anatomy, anatomically correct fingers and nails, natural finger positioning, symmetrical hands, sharp skin texture, realistic skin pores, high-definition lighting, smooth shading, 8k skin detail, flawless complexion, crisp fabric edges, clean outlines, realistic lighting gradients, upscale to ultra quality, fine finger joints, soft shadows, cinematic render"
+    )
 
     # Мок-ссылки
     MOCK_LINK_FOR_SAVE_IMAGE: str
@@ -105,6 +97,9 @@ class Settings(BaseSettings):
 
     # Параметры Facefusion
     FACEFUSION_CONTAINER_NAME: str
+
+    # Параметры ComfyUI
+    COMFYUI_API_URL: str
 
 
 settings = Settings()  # type: ignore

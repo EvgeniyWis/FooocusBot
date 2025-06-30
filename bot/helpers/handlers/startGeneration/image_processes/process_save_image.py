@@ -16,7 +16,6 @@ from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
-from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.settings import settings
@@ -25,7 +24,6 @@ from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.utils.retryOperation import retryOperation
 
 
 async def process_save_image(
@@ -49,7 +47,7 @@ async def process_save_image(
     user_id = call.from_user.id
     temp_user_dir = TEMP_FOLDER_PATH / f"{model_name}_{user_id}"
     logger.info(
-        f"[save] START: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}"
+        f"[save] START: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
 
     # Получаем индекс модели
@@ -128,6 +126,7 @@ async def process_save_image(
         ),
         reply_markup=video_generation_keyboards.generateVideoKeyboard(
             model_name,
+            image_index=image_index,
         ),
     )
 
@@ -142,5 +141,5 @@ async def process_save_image(
         os.remove(result_path)
 
     logger.info(
-        f"[save] END: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}"
+        f"[save] END: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
