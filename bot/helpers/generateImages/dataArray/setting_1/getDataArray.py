@@ -174,12 +174,9 @@ def setting1_getDataArray():
             "noavexen",
             "1J39NtE4ovUiklcTW_t8NMZHTidCoTZNJ",
             "1jpaYrZUUKeh2sL5e3W3Nx0UaJX5fk9BB",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score_9, score_8_up, source_photo, source_real, BREAK
 
-            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, ((very narrow waist)), ((wide hips)), thin legs, beautiful face, thin lips, realistic green eyes, long voluminous brown hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), ((big wide hips)), hourglass body.
-
-            Style: Instagram photo style, vibrant filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features)), sunlight from outdoor courtyard, ((((bright lightning face))))
-            """,
+        real_beauty, 1girl, 18 years old, brown hair, green eyes, tan skin, skinny, cute, smiling.""",
             [2, 2.4, -0.90, -1.70, 1.5, 1, 3, 1.00],
         ),
         setting1_generateData(
