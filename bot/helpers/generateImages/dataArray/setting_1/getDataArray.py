@@ -143,11 +143,11 @@ def setting1_getDataArray():
             "skylalure",
             "1R35YdfvQUTK1_wz1Wx9y7DRCkW4l2w10",
             "1K_eG4yHp1di75TR5OyeMNPzjyGX76Ua5",
-            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+            """score9, score8up, score7up, sourcephoto, sourcereal, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-                real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, plump lips, realistic blue eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), hips, hourglass body, clothing color is considered.
+            realbeauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, plump lips, realistic blue eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), hips, hourglass body, clothing color is considered.
 
-                Style: Instagram photo style, vibrant and warm filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features))""",
+            Style: Instagram photo style, vibrant and warm filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features))""",
             [2, 4.15, -0.90, -1.50, 0.45, 1.00, 0.05, 0.80],
         ),
         setting1_generateData(
