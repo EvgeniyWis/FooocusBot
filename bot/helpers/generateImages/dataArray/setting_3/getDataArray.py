@@ -25,16 +25,16 @@ def setting3_getDataArray():
         [-1.50, 1.30, 0.7, 1.90, 0.23, -0.55]),
 
         setting3_generateData("bridget_laurent.xo", "1rTSrckm7TERhmBbyvyw6VU3RJOI8fcYd", "1-OoXYC7u-DZhXFDH44PF-K__MoB8UFkG", "photorealistic portrait, 18 years old, platinum-blonde hair, big breasts, slim waist, big hips, tan skin, thin lips, smirk, green eyes, high quality.",
-        [-1.50, 1.30, 0.7, 2.50, 1.1, -0.45]),
+        [-1.50, 1.30, 0.7, 2.50, 1.4, -0.45]),
 
         setting3_generateData("noellebriar.xo", "1dd-r3lUZlWcqkLJ5yaNMxBxCy79wiacH", "1BeeAxBI4xE3Kgy_4u94x9OIjnMF8QmOI", "photorealistic portrait, 18 years old, black hair, big breasts, slim waist, tan skin, smirk, high quality.",
-        [-1.50, 1.30, 0.7, 2.05, 0.95, -0.70]),
+        [-1.50, 1.30, 0.7, 2.05, 1.15, -0.70]),
 
         setting3_generateData("bianca_mirell", "1DQYyWFPBPs45Rra5tmcGSwMBzDLqUUB7", "1xcSZ5XeyVamQbeZhXfrd8OgMP9gxUVKe", "photorealistic portrait, 18 years old, black hair with white curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
         [-1.50, 1.30, 0.7, 1.80, 0.3, 0]),
 
         setting3_generateData("dasharomanova.xo", "12CAwN2jbJ_0r4XBziyGTN_zV6cKLkkow", "1f0caQN1-4GIbgpKt47bhmALxrqjLRWTL", "photorealistic portrait, 18 years old, platinum-blonde hair with black curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
-        [-1.50, 1.30, 0.7, 2.40, 1.50, -0.85]),
+        [-1.50, 1.30, 0.7, 2.40, 1.60, -0.85]),
 
         setting3_generateData("sofiavogel.xo", "1GcwlpKTi8kaeDUbYmLRGD7tmzrKqWsWJ", "1Xfn1E_N9Cth3siyMMXw6-BXc_TPmmNCX", "photorealistic portrait, 18 years old, platinum-blonde hair with black curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
         [-1.50, 1.30, 0.7, 1.85, 0.70, -0.20]),
