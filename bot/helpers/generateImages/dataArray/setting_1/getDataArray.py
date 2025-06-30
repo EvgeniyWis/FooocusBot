@@ -72,7 +72,7 @@ def setting1_getDataArray():
             real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)).
 
             Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-            [2, 3.10, -0.90, -1.10, 1.75, 0.7, 0.65, 0.80],
+            [2, 3.10, -0.90, -1.10, 1.75, 0.6, 0.65, 0.80],
         ),
         setting1_generateData(
             "zoe_callahan",
@@ -82,7 +82,7 @@ def setting1_getDataArray():
             real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, small teardrop-shaped breasts, toned abdomen, beautiful face, natural light on face, plump lips, realistic brown eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by daylight)), clothing color is considered.
 
             Style: realistic photography, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright indirect light highlighting her features)).""",
-            [2, 2.65, -0.90, -0.85, 1.40, 0.8, 1.00, 0.80],
+            [2, 2.65, -0.90, -0.85, 1.40, 0.7, 1.00, 0.80],
         ),
         setting1_generateData(
             "brookenixon.xo",
