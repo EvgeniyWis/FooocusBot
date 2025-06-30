@@ -131,7 +131,7 @@ def setting2_getDataArray():
             "1m_wGBpS8G8QqZGYYEmPZnhvclT7ErTFr",
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
-        real_beauty, igbaddie, 1girl, 18 years old, asian girl, sorority girl, voluminous brown hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
+        real_beauty, igbaddie, 1girl, 18 years old, asian girl, sorority girl, voluminous brown hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass toned legs, ((high tan skin)), skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
             [1, 0.7, 3.20, 1.45, -0.30, -1.5],
         ),
         setting2_generateData(

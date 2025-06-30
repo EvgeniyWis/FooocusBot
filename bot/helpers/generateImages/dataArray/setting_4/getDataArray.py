@@ -86,10 +86,10 @@ def setting4_getDataArray():
             "evelynlaine.xo.xo",
             "1PQL0mx2vHnXpPnjAi0ekmwGkjFfvoJAw",
             "1rZpZdzxgHriK6_8knTYJNo7uqhu1FEWe",
-            """score_9, score_8_up, source_photo, source_real, BREAK 
+            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
-        real_beauty, 1girl, 18 years old, blonde hair, green eyes, tan skin, skinny, cute.""",
-            [2, 3.00, -2.00, 1.50, 2.00, 1.70, -0.70, 0.35],
+            real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, platinum-blonde hair, long hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
+            [2, 3.00, -2.00, 1.70, 2.00, 1.70, -0.70, 0.35],
         ),
         setting4_generateData(
             "melissaxlaine",
