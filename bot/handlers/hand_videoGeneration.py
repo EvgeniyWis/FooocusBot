@@ -5,6 +5,7 @@ import traceback
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from settings import settings
 
 import bot.constants as constants
 from bot.helpers import text
@@ -24,6 +25,7 @@ from bot.helpers.handlers.videoGeneration import (
 from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
+from bot.services.comfyui.video_service import ComfyUIVideoService
 from bot.states import StartGenerationState
 from bot.utils.handlers import (
     getDataInDictsArray,
@@ -37,7 +39,6 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 from bot.utils.handlers.messages.rate_limiter_for_send_photo import (
     safe_send_photo,
 )
-from bot.utils.videos import generate_video
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -248,7 +249,9 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     image_index = state_data.get("image_index_for_video_generation", 0)
     saved_images_urls = state_data.get("saved_images_urls", [])
     image_url = await getDataInDictsArray(
-        saved_images_urls, model_name, image_index
+        saved_images_urls,
+        model_name,
+        image_index,
     )
 
     if not image_url:
@@ -279,7 +282,10 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
 
     # Если выбрана быстрая генерация видео, то сразу генерируем видео
-    if current_state == StartGenerationState.write_prompt_for_quick_video_generation:
+    if (
+        current_state
+        == StartGenerationState.write_prompt_for_quick_video_generation
+    ):
         return await process_video(
             state=state,
             model_name=model_name,
@@ -289,7 +295,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             message=message,
             is_quick_generation=True,
         )
-    else: 
+    else:
         # Если выбрана простая генерация видео, то сначала отправляем фото, а потом генерируем видео
         try:
             await safe_send_photo(
@@ -317,7 +323,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
                     True,
                 ),
             )
-            
+
             raise e
 
     await state.set_state(None)
@@ -572,6 +578,129 @@ async def handle_model_name_for_video_generation_from_image(
     #     logger.error(f"Произошла ошибка при сохранении видео: {e}")
 
 
+# Обработка нажатия кнопки "Генерация NSFW видео"
+async def quick_generate_nsfw_video(
+    call: types.CallbackQuery,
+    state: FSMContext,
+):
+    model_name = call.data.split("|")[1]
+
+    if not call.message.photo:
+        logger.error(f"Для {model_name} не нашлось изображение в сообщении")
+        await call.answer("Ошибка: не найдено изображение в сообщении")
+        return
+
+    photo = call.message.photo[-1]
+    file_id = photo.file_id
+
+    state_data = await state.get_data()
+
+    await state.update_data(
+        model_name_for_nsfw_video_generation=model_name,
+        image_file_id_for_nsfw_videoGenerationFromImage=file_id,
+        saved_images_urls=state_data.get("saved_images_urls", []),
+    )
+
+    await process_write_prompt(
+        call,
+        state,
+        model_name,
+        is_nsfw_generation=True,
+    )
+
+
+# Новый обработчик для NSFW генерации через ComfyUI
+async def handle_prompt_for_nsfw_generation(
+    message: types.Message,
+    state: FSMContext,
+):
+    """
+    Обрабатывает ввод промпта для NSFW генерации через ComfyUI (чистая версия, через сервис).
+    1. Сохраняет промпт в state.
+    2. Скачивает изображение из Telegram.
+    3. Ставит задачу в ComfyUI и сообщает пользователю позицию в очереди и примерное время ожидания.
+    4. Ожидает завершения генерации и отправляет результат.
+    """
+    prompt = message.text
+    await state.update_data(prompt_for_nsfw_video=prompt)
+    state_data = await state.get_data()
+    file_id = state_data.get(
+        "image_file_id_for_nsfw_videoGenerationFromImage",
+        None,
+    )
+
+    if not file_id:
+        await safe_send_message(
+            "Ошибка: не найдено изображение для NSFW генерации.",
+            message,
+        )
+        return
+
+    temp_dir = constants.TEMP_IMAGE_FILES_DIR
+    os.makedirs(temp_dir, exist_ok=True)
+    temp_path = os.path.join(temp_dir, f"{file_id}.jpg")
+    try:
+        file = await asyncio.wait_for(bot.get_file(file_id), timeout=30)
+        file_path = file.file_path
+        await asyncio.wait_for(
+            bot.download_file(file_path, temp_path),
+            timeout=60,
+        )
+    except Exception as e:
+        await safe_send_message(f"Ошибка скачивания изображения: {e}", message)
+        return
+
+    progress_message = await safe_send_message(
+        "⏳ Генерация NSFW видео через ComfyUI...",
+        message,
+    )
+    try:
+        video_service = ComfyUIVideoService(
+            api_url=settings.COMFYUI_API_URL,
+            workflow_path=constants.COMFYUI_WORKFLOW_TEMPLATE_PATH,
+            avg_times_path=constants.COMFYUI_AVG_TIMES_METRICS_PATH,
+        )
+        # 1. Ставим задачу и получаем очередь и примерное время ожидания
+        result = await video_service.generate(prompt, temp_path)
+        queue = result["queue"]
+        approx_wait = result["approx_wait"]
+        if queue and queue.get("position"):
+            pos = queue["position"]
+            total = queue["queue_length"]
+            wait_min = int(approx_wait // 60) if approx_wait else None
+            wait_sec = int(approx_wait % 60) if approx_wait else None
+            msg = (
+                f"Вы в очереди: {pos} из {total}.\nПримерное время ожидания: "
+            )
+            if wait_min:
+                msg += f"{wait_min} мин. "
+            if wait_sec:
+                msg += f"{wait_sec} сек."
+            await message.answer(msg)
+        # 2. Ожидаем завершения генерации
+        result_final = await video_service.wait_for_result(result["prompt_id"])
+        await progress_message.delete()
+        if result_final.get("video_urls"):
+            gen_time = result_final.get("duration")
+            for url in result_final["video_urls"]:
+                msg = f"Видео готово: {url}"
+                if gen_time:
+                    msg += f"\nВремя генерации: {int(gen_time // 60)} мин. {int(gen_time % 60)} сек."
+                await message.answer(msg)
+        elif result_final.get("error"):
+            await message.answer(
+                f"Ошибка при генерации видео через ComfyUI: {result_final['error']}",
+            )
+        else:
+            await message.answer("Не удалось получить результат от ComfyUI.")
+    finally:
+        try:
+            os.remove(temp_path)
+        except Exception:
+            pass
+        await state.set_state(None)
+
+
 # Добавление обработчиков
 def hand_add():
     router.callback_query.register(
@@ -599,8 +728,10 @@ def hand_add():
     )
     router.message.register(
         write_prompt_for_video,
-        StateFilter(StartGenerationState.write_prompt_for_video,
-        StartGenerationState.write_prompt_for_quick_video_generation),
+        StateFilter(
+            StartGenerationState.write_prompt_for_video,
+            StartGenerationState.write_prompt_for_quick_video_generation,
+        ),
     )
 
     router.callback_query.register(
@@ -630,4 +761,13 @@ def hand_add():
         StateFilter(
             StartGenerationState.ask_for_model_name_for_video_generation_from_image,
         ),
+    )
+
+    router.callback_query.register(
+        quick_generate_nsfw_video,
+        lambda call: call.data.startswith("generate_comfyui_video"),
+    )
+    router.message.register(
+        handle_prompt_for_nsfw_generation,
+        StateFilter(StartGenerationState.write_prompt_for_nsfw_generation),
     )

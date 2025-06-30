@@ -4,7 +4,7 @@ from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
 # Инлайн-клавиатура для генерации видео
-def generateVideoKeyboard(model_name: str):
+def generateVideoKeyboard(model_name: str, image_index: int):
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -17,6 +17,12 @@ def generateVideoKeyboard(model_name: str):
                 InlineKeyboardButton(
                     text="⚡️Генерация видео с промптом",
                     callback_data=f"quick_video_generation|{model_name}",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🤖 Генерация NSFW видео",
+                    callback_data=f"generate_comfyui_video|{model_name}|{image_index}",
                 ),
             ],
         ],
@@ -77,7 +83,10 @@ def videoGenerationTypeKeyboard(
 
 
 # Инлайн-клавиатура для выбора корректности генерации видео
-def videoCorrectnessKeyboard(model_name: str, is_quick_generation: bool = False):
+def videoCorrectnessKeyboard(
+    model_name: str,
+    is_quick_generation: bool = False,
+):
     if is_quick_generation:
         postfix = "quick"
     else:

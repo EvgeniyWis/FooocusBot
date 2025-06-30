@@ -13,6 +13,7 @@ async def process_write_prompt(
     state: FSMContext,
     model_name: str,
     is_quick_generation: bool = False,
+    is_nsfw_generation: bool = False,
 ):
     """
     Обработчик для записи промпта для видео генерации: установка стейта, отправка сообщения.
@@ -31,9 +32,16 @@ async def process_write_prompt(
 
     await state.update_data(model_name_for_video_generation=model_name)
 
-    message_text = text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(
-        model_name,
-        model_name_index,
+    message_text = (
+        text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(
+            model_name,
+            model_name_index,
+        )
+        if not is_nsfw_generation
+        else text.WRITE_PROMPT_FOR_NSFW_VIDEO_TEXT.format(
+            model_name,
+            model_name_index,
+        )
     )
 
     if call.message.content_type == types.ContentType.PHOTO:
@@ -58,6 +66,10 @@ async def process_write_prompt(
     if is_quick_generation:
         await state.set_state(
             StartGenerationState.write_prompt_for_quick_video_generation,
+        )
+    elif is_nsfw_generation:
+        await state.set_state(
+            StartGenerationState.write_prompt_for_nsfw_generation,
         )
     else:
         await state.set_state(StartGenerationState.write_prompt_for_video)

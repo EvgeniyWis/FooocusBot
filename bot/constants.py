@@ -8,3 +8,14 @@ TEMP_FOLDER_PATH: Final[Path] = FACEFUSION_DIR / "images" / "temp"
 FACEFUSION_RESULTS_DIR: Final[Path] = FACEFUSION_DIR / "images" / "results"
 VIDEOS_TEMP_DIR: Final[Path] = BASE_DIR / "bot" / "temp" / "videos"
 TEMP_DIR: Final[Path] = BASE_DIR / "temp"
+COMFYUI_WORKFLOW_TEMPLATE_PATH: Final[Path] = (
+    BASE_DIR
+    / "bot"
+    / "assets"
+    / "comfyui"
+    / "comfyui_workflows"
+    / "wan2-3-2.json"
+)
+COMFYUI_AVG_TIMES_METRICS_PATH: Final[Path] = (
+    BASE_DIR / "bot" / "assets" / "comfyui" / "avg_times_metrics.json"
+)
