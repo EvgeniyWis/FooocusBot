@@ -23,7 +23,7 @@ def setting2_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, huge breasts, slim waist, sagging breasts, big bubble butt, huge ass toned legs, tan skin, skinny, cute, big lips, plump lips, smirk, blue eyes.""",
-            [1, 0.7, 1.50, -0.20, -0.95, -1.50],
+            [1, 0.7, 1.60, -0.20, -0.95, -1.50],
         ),
         setting2_generateData(
             "celinemyrren",
@@ -173,7 +173,7 @@ def setting2_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, sorority girl, voluminous ash-blonde hair, long hair, medium-large breasts, slim waist, saggy breasts, big bubble butt, huge ass, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [1, 0.7, 2.05, 1.35, -1.15, -1.5, 1.1],
+            [1, 0.7, 1.85, 1.35, -1.15, -1.5, 1.1],
         ),
         setting2_generateData(
             "lilith_rayne.xo",
