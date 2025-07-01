@@ -223,14 +223,13 @@ def generationModeKeyboard():
                 InlineKeyboardButton(
                     text="🖼 Мультивыбор",
                     callback_data="generation_mode|multi_select",
-                ),
-                InlineKeyboardButton(
+                )],
+                [InlineKeyboardButton(
                     text="1️⃣ Выбор одного фото",
                     callback_data="generation_mode|single_select",
-                ),
+                )],
             ],
-        ],
-    )
+        )
 
 
 # Инлайн-клавиатура для мультивыборной генерации изображений
