@@ -162,7 +162,7 @@ def setting4_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
 
             real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, ash-blonde hair, long volumnous hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist))""",
-            [2, 0.15, -1.70, 4.10, 1.00, 1.70, -0.70, 0.35],
+            [2, 0.15, -1.70, 4.40, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generateData(
             "rihannacorvelle",
