@@ -269,7 +269,7 @@ def setting1_getDataArray():
             """score_9, score_8_up, source_photo, source_real, BREAK
 
         real_beauty, 1girl, 18 years old, brown hair, blue eyes, tan skin, skinny, cute, smiling.""",
-            [2, 1.00, -0.90, -0.35, 2.80, 1.00, 1.60, 0.55, 1.95],
+            [2, 1.00, -0.90, -0.35, 2.81, 1.00, 1.60, 0.55, 1.95],
         ),
     ]
 
