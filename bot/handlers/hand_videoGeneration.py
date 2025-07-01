@@ -75,6 +75,7 @@ async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
 # Обработка нажатия кнопки "⚡️Генерация видео с промптом"
 async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
     model_name = call.data.split("|")[1]
+    image_index = call.data.split("|")[2]
 
     if not call.message.photo:
         await call.answer("Ошибка: не найдено изображение в сообщении")
@@ -88,6 +89,7 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(
         model_name_for_video_generation=model_name,
         image_file_id_for_videoGenerationFromImage=file_id,
+        image_index_for_video_generation=image_index,
         saved_images_urls=state_data.get("saved_images_urls", []),
     )
 
@@ -104,7 +106,6 @@ async def handle_rewrite_prompt_button(
     state: FSMContext,
 ):
     _, model_name = call.data.split("|")
-    model_name_index = getModelNameIndex(model_name)
 
     state_data = await state.get_data()
     current_prompt = state_data.get("prompt_for_video", "")
@@ -247,6 +248,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     model_name = state_data.get("model_name_for_video_generation", "")
     image_index = state_data.get("image_index_for_video_generation", 0)
     saved_images_urls = state_data.get("saved_images_urls", [])
+
     image_url = await getDataInDictsArray(
         saved_images_urls, model_name, image_index
     )

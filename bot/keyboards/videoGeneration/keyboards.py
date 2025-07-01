@@ -4,7 +4,7 @@ from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
 # Инлайн-клавиатура для генерации видео
-def generateVideoKeyboard(model_name: str):
+def generateVideoKeyboard(model_name: str, image_index: int):
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -16,7 +16,7 @@ def generateVideoKeyboard(model_name: str):
             [
                 InlineKeyboardButton(
                     text="⚡️Генерация видео с промптом",
-                    callback_data=f"quick_video_generation|{model_name}",
+                    callback_data=f"quick_video_generation|{model_name}|{image_index}",
                 ),
             ],
         ],
