@@ -128,6 +128,7 @@ async def process_save_image(
         ),
         reply_markup=video_generation_keyboards.generateVideoKeyboard(
             model_name,
+            image_index,
         ),
     )
 
