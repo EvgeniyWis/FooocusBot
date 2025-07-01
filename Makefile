@@ -19,7 +19,7 @@ down-bot:
 	docker-compose down telegram_bot
 
 logs-bot:
-	docker-compose logs telegram_bot | tail -700
+	docker-compose logs telegram_bot
 
 restart-bot:
 	docker-compose restart telegram_bot
@@ -34,7 +34,7 @@ down-redis:
 	docker-compose down redis
 
 logs-redis:
-	docker-compose logs redis | tail -700
+	docker-compose logs redis
 
 restart-redis:
 	docker-compose restart redis
