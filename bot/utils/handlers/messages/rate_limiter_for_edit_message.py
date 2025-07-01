@@ -2,7 +2,10 @@ import asyncio
 import time
 
 from aiogram import types
-from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
+from aiogram.exceptions import (
+    TelegramAPIError,
+    TelegramRetryAfter,
+)
 from InstanceBot import bot
 
 from bot.logger import logger
@@ -61,15 +64,18 @@ async def safe_edit_message(
             except Exception:
                 logger.exception("RetryAfter second attempt failed")
         except TelegramAPIError as e:
-            logger.warning(f"Telegram API error: {e}")
+            if "message is not modified" not in str(e):
+                logger.warning(f"Telegram API error: {e}")
 
-            # При ошибке, связанной с тем, что сообщение не найдено, то отправляем новое сообщение
-            if ("message to edit not found" in e.message.lower() or
-                "message is not modified" in e.message.lower()):
-                return await safe_send_message(
-                    safe_text,
-                    message,
-                )
+                # При ошибке, связанной с тем, что сообщение не найдено, то отправляем новое сообщение
+                if (
+                    "message to edit not found" in e.message.lower()
+                    or "message is not modified" in e.message.lower()
+                ):
+                    return await safe_send_message(
+                        safe_text,
+                        message,
+                    )
         except Exception:
             logger.exception("Unexpected error in safe_edit_message")
 

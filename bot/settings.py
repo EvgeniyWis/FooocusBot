@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     MOCK_MODE: bool = False
     UPSCALE_MODE: bool = True
     FACEFUSION_MODE: bool = True
+    RECOVERING_TASKS: bool = True
 
     # Ключи Redis для восстановления задач
     PROCESS_IMAGE_TASK: str = "process_image"

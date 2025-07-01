@@ -609,7 +609,6 @@ async def quick_generate_nsfw_video(
     )
 
 
-# Новый обработчик для NSFW генерации через ComfyUI
 async def handle_prompt_for_nsfw_generation(
     message: types.Message,
     state: FSMContext,
@@ -624,14 +623,11 @@ async def handle_prompt_for_nsfw_generation(
     prompt = message.text
     await state.update_data(prompt_for_nsfw_video=prompt)
     state_data = await state.get_data()
-    file_id = state_data.get(
-        "image_file_id_for_nsfw_videoGenerationFromImage",
-        None,
-    )
+    file_id = state_data.get("image_file_id_for_nsfw_videoGenerationFromImage")
 
     if not file_id:
         await safe_send_message(
-            "Ошибка: не найдено изображение для NSFW генерации.",
+            "❌ Не найдено изображение для NSFW генерации.",
             message,
         )
         return
@@ -639,11 +635,11 @@ async def handle_prompt_for_nsfw_generation(
     temp_dir = constants.TEMP_IMAGE_FILES_DIR
     os.makedirs(temp_dir, exist_ok=True)
     temp_path = os.path.join(temp_dir, f"{file_id}.jpg")
+
     try:
         file = await asyncio.wait_for(bot.get_file(file_id), timeout=30)
-        file_path = file.file_path
         await asyncio.wait_for(
-            bot.download_file(file_path, temp_path),
+            bot.download_file(file.file_path, temp_path),
             timeout=60,
         )
     except Exception as e:
@@ -654,45 +650,86 @@ async def handle_prompt_for_nsfw_generation(
         "⏳ Генерация NSFW видео через ComfyUI...",
         message,
     )
+
     try:
         video_service = ComfyUIVideoService(
             api_url=settings.COMFYUI_API_URL,
             workflow_path=constants.COMFYUI_WORKFLOW_TEMPLATE_PATH,
             avg_times_path=constants.COMFYUI_AVG_TIMES_METRICS_PATH,
         )
-        # 1. Ставим задачу и получаем очередь и примерное время ожидания
+
+        # 1. Генерация + инфо о позиции
         result = await video_service.generate(prompt, temp_path)
         queue = result["queue"]
         approx_wait = result["approx_wait"]
-        if queue and queue.get("position"):
+        status = queue.get("status")
+
+        wait_min = approx_wait // 60 if approx_wait else 0
+        # 2. Информируем пользователя о статусе
+        if status == "queued" and queue.get("position"):
             pos = queue["position"]
             total = queue["queue_length"]
-            wait_min = int(approx_wait // 60) if approx_wait else None
-            wait_sec = int(approx_wait % 60) if approx_wait else None
-            msg = (
-                f"Вы в очереди: {pos} из {total}.\nПримерное время ожидания: "
-            )
-            if wait_min:
-                msg += f"{wait_min} мин. "
-            if wait_sec:
-                msg += f"{wait_sec} сек."
+            if wait_min > 80:
+                msg = (
+                    f"🕒 Вы в очереди: {pos} из {total}.\nПримерное ожидание: {wait_min} мин."
+                    f"🚫Сейчас очередь очень длинная, пожалуйста, ожидайте, или запустите генерацию позднее."
+                )
+            elif wait_min > 100:
+                msg = (
+                    f"🕒 Вы в очереди: {pos} из {total}.\nПримерное ожидание: {wait_min} мин. "
+                    f"🚫Сейчас очередь очень длинная, возможно, результат придется ждать около 3х часов. Ожидайте, или запустите генерацию позднее."
+                )
+            else:
+                msg = f"🕒 Вы в очереди: {pos} из {total}.\nПримерное ожидание: {wait_min} мин."
             await message.answer(msg)
-        # 2. Ожидаем завершения генерации
-        result_final = await video_service.wait_for_result(result["prompt_id"])
+        elif status == "processing":
+            await message.answer(
+                f"⚙️ Ваша задача успешно начала обрабатываться. Примерное ожидание: {wait_min} мин.",
+            )
+
+        # 3. Ждём начала генерации (если в очереди)
+        if status == "queued":
+            try:
+                await video_service.wait_until_generation_starts(
+                    result["prompt_id"],
+                )
+                await message.answer(
+                    f"⚙️ Ваша задача успешно начала обрабатываться. Примерное ожидание: {wait_min} мин.",
+                )
+            except TimeoutError:
+                await message.answer(
+                    "⏱ Задача не начала выполняться за допустимое время. Попробуйте позже.",
+                )
+                return
+
+        # 4. Ждём готовности результата
+        try:
+            result_final = await video_service.wait_for_result(
+                result["prompt_id"],
+            )
+        except Exception as e:
+            await message.answer(
+                f"❌ Ошибка во время ожидания результата: {e}",
+            )
+            return
         await progress_message.delete()
+
         if result_final.get("video_urls"):
             gen_time = result_final.get("duration")
             for url in result_final["video_urls"]:
-                msg = f"Видео готово: {url}"
+                msg = f"✅ Видео готово: {url}"
                 if gen_time:
                     msg += f"\nВремя генерации: {int(gen_time // 60)} мин. {int(gen_time % 60)} сек."
                 await message.answer(msg)
         elif result_final.get("error"):
             await message.answer(
-                f"Ошибка при генерации видео через ComfyUI: {result_final['error']}",
+                f"❌ Ошибка генерации: {result_final['error']}",
             )
         else:
-            await message.answer("Не удалось получить результат от ComfyUI.")
+            await message.answer(
+                "❌ Не удалось получить результат от ComfyUI.",
+            )
+
     finally:
         try:
             os.remove(temp_path)

@@ -60,7 +60,8 @@ async def on_startup():
         settings.PROCESS_IMAGE_BLOCK_TASK,
     )
     repo.set_process_callback(process_video, settings.PROCESS_VIDEO_TASK)
-    asyncio.create_task(repo.recover_tasks(bot, storage))
+    if settings.RECOVERING_TASKS:
+        asyncio.create_task(repo.recover_tasks(bot, storage))
 
     handlers.hand_commands.hand_add()
     handlers.hand_startGeneration.hand_add()
@@ -84,5 +85,7 @@ async def on_startup():
             logger.error(f"Ошибка при отправке сообщения разработчику: {e}")
 
     await clean_temp_dirs()
+
+    # Запускаем задачу очистки временных файлов
 
     await dp.start_polling(bot, skip_updates=True)
