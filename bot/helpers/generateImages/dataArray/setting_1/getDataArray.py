@@ -177,7 +177,7 @@ def setting1_getDataArray():
             """score_9, score_8_up, source_photo, source_real, BREAK
 
         real_beauty, 1girl, 18 years old, brown hair, green eyes, tan skin, skinny, cute, smiling.""",
-            [2, 2.4, -0.90, -1.70, 1.7, 1, 3, 1.00],
+            [2, 2.4, -0.90, -1.60, 1.7, 1, 3, 1.00],
         ),
         setting1_generateData(
             "lexalennix",
@@ -269,7 +269,7 @@ def setting1_getDataArray():
             """score_9, score_8_up, source_photo, source_real, BREAK
 
         real_beauty, 1girl, 18 years old, brown hair, blue eyes, tan skin, skinny, cute, smiling.""",
-            [2, 1.00, -0.90, -0.35, 2.30, 1.00, 1.60, 0.55, 1.95],
+            [2, 1.00, -0.90, -0.35, 2.40, 1.00, 1.60, 0.55, 1.95],
         ),
     ]
 
