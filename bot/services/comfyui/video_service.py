@@ -10,6 +10,8 @@ from bot.services.comfyui.queue_inspector import ComfyUIQueueInspector
 from bot.services.comfyui.uploader import ComfyUIUploader
 from bot.services.comfyui.workflow_preparer import ComfyUIWorkflowPreparer
 
+# todo: сделать при перезапсуке бота пустую генерацию для компиляции комфика
+
 
 class ComfyUIVideoService:
     def __init__(self, api_url: str, workflow_path: str, avg_times_path: str):
@@ -67,41 +69,74 @@ class ComfyUIVideoService:
         for _ in range(timeout // 60):
             await asyncio.sleep(60)
             status = await self.executor.get_status(prompt_id)
-            urls = self._extract_outputs(status)
-            if urls:
+            video_paths = self._extract_outputs(status)
+            if video_paths:
                 duration = time.time() - start
                 await self.metrics.save(duration)
+                video_urls = self.get_video_urls(status)
                 self.cleanup_local_output()
 
-                return {"video_urls": urls, "duration": duration}
+                return {"video_urls": video_urls, "duration": duration}
         logger.error(
             f"Timeout получения результата генерации ComfyUI для промпта {prompt_id}",
         )
         return {"error": "Timeout"}
 
-    def _extract_outputs(self, status_json: dict) -> list:
-        results = []
-        for node in status_json.get("outputs", {}).values():
-            for gif in node.get("gifs", []):
-                url = f"{self.api.base_url}/viewvideo?filename={gif['filename']}&type=output"
-                subfolder = gif.get("subfolder")
-                if subfolder:
-                    url += f"&subfolder={subfolder}"
-                results.append(url)
+    def _extract_outputs(self, status_json: dict) -> list[str]:
+        if not status_json:
+            return []
 
-            for img in node.get("images", []):
-                url = f"{self.api.base_url}/view?filename={img['filename']}&type=output"
-                subfolder = img.get("subfolder")
-                if subfolder:
-                    url += f"&subfolder={subfolder}"
-                results.append(url)
+        # Промпт ID всегда один
+        prompt_id, prompt_data = next(iter(status_json.items()))
+        outputs = prompt_data.get("outputs", {})
 
-        logger.info(
-            f"Найдены результаты генерации: {results}",
-        ) if results else logger.info(
-            f"Результаты генерации не найдены для status_json: {status_json}",
+        urls = []
+
+        for node_output in outputs.values():
+            if isinstance(node_output, dict):
+                for output in node_output.get("gifs", []):
+                    path = output.get("fullpath")
+                    if path:
+                        urls.append(path)
+
+        return urls
+
+    def _build_url(self, endpoint: str, file_info: dict) -> str:
+        filename = file_info["filename"]
+        subfolder = file_info.get("subfolder")
+        base = (
+            f"{self.api.base_url}/{endpoint}?filename={filename}&type=output"
         )
-        return results
+        if subfolder:
+            base += f"&subfolder={subfolder}"
+        return base
+
+    def get_video_urls(self, status_json: dict) -> list[str]:
+        if not status_json:
+            return []
+
+        prompt_id, prompt_data = next(iter(status_json.items()))
+        outputs = prompt_data.get("outputs", {})
+
+        urls = []
+        for node_output in outputs.values():
+            if isinstance(node_output, dict):
+                for gif in node_output.get("gifs", []):
+                    fullpath = gif.get("fullpath")
+                    if fullpath:
+                        parts = fullpath.split("/ComfyUI/output/")[-1].split(
+                            "/",
+                        )
+                        if len(parts) >= 2:
+                            subfolder = "/".join(parts[:-1])
+                            filename = parts[-1]
+                            file_info = {
+                                "filename": filename,
+                                "subfolder": subfolder,
+                            }
+                            url = self._build_url("view", file_info)
+                            urls.append(url)
+        return urls
 
     def cleanup_local_output(self, folder="./ComfyUI/output"):
         for root, _, files in os.walk(folder):
@@ -110,7 +145,7 @@ class ComfyUIVideoService:
                     try:
                         os.remove(os.path.join(root, f))
                         logger.info(
-                            f"Очищена папка ComfyUI/output: {root}/{f}"
+                            f"Очищена папка ComfyUI/output: {root}/{f}",
                         )
                     except Exception as e:
                         logger.warning(f"Ошибка при удалении {f}: {e}")
