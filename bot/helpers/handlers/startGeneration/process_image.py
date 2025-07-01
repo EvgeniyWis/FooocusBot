@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from adapters.redis_task_storage_repository import key_for_image
 from aiogram import types
@@ -223,7 +224,7 @@ async def process_image(
     )
 
     try:
-        os.rmdir(TEMP_FOLDER_PATH / f"{model_name}_{call.from_user.id}")
+        shutil.rmtree(TEMP_FOLDER_PATH / f"{model_name}_{call.from_user.id}")
     except Exception as e:
         logger.error(
             f"Ошибка при удалении папки {TEMP_FOLDER_PATH / f"{model_name}_{call.from_user.id}"}: {e}",
