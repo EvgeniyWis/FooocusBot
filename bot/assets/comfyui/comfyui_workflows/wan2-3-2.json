@@ -86,7 +86,7 @@
         "pingpong": false,
         "save_output": true,
         "images": [
-          "243",
+          "241",
           0
         ]
       },
@@ -280,7 +280,7 @@
           0
         ],
         "image": [
-          "243",
+          "241",
           0
         ]
       },
@@ -311,7 +311,7 @@
         "pingpong": false,
         "save_output": true,
         "images": [
-          "244",
+          "242",
           0
         ]
       },
@@ -416,7 +416,7 @@
         "ensemble": true,
         "scale_factor": 1,
         "frames": [
-          "244",
+          "242",
           0
         ]
       },
@@ -644,30 +644,6 @@
       "class_type": "VAEDecodeTiled",
       "_meta": {
         "title": "VAE Decode (Tiled)"
-      }
-    },
-    "243": {
-      "inputs": {
-        "value": [
-          "241",
-          0
-        ]
-      },
-      "class_type": "UnloadAllModels",
-      "_meta": {
-        "title": "UnloadAllModels"
-      }
-    },
-    "244": {
-      "inputs": {
-        "value": [
-          "242",
-          0
-        ]
-      },
-      "class_type": "UnloadAllModels",
-      "_meta": {
-        "title": "UnloadAllModels"
       }
     },
     "255": {
