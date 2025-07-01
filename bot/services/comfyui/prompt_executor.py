@@ -5,7 +5,7 @@ from bot.services.comfyui.api_client import ComfyUIAPI
 class ComfyUIPromptExecutor:
     def __init__(self, api: ComfyUIAPI):
         self.api = api
-        logger.debug("Инициализирован исполнитель промптов ComfyUI")
+        logger.info("Инициализирован исполнитель промптов ComfyUI")
 
     async def submit_prompt(self, workflow: dict) -> str:
         logger.info("Отправка нового промпта в ComfyUI")
@@ -30,10 +30,10 @@ class ComfyUIPromptExecutor:
             raise
 
     async def get_status(self, prompt_id: str) -> dict:
-        logger.debug(f"Проверка статуса промпта: {prompt_id}")
+        logger.info(f"Проверка статуса промпта: {prompt_id}")
         try:
             status = await self.api.get(f"/api/history/{prompt_id}")
-            logger.debug(f"Статус промпта {prompt_id}: {status}")
+            logger.info(f"Статус промпта {prompt_id}: {status}")
             return status
         except Exception as e:
             logger.error(

@@ -5,10 +5,10 @@ from bot.services.comfyui.api_client import ComfyUIAPI
 class ComfyUIQueueInspector:
     def __init__(self, api: ComfyUIAPI):
         self.api = api
-        logger.debug("Инициализирован инспектор очереди ComfyUI")
+        logger.info("Инициализирован инспектор очереди ComfyUI")
 
     async def get_queue_position(self, prompt_id: str) -> dict:
-        logger.debug(f"Проверка позиции в очереди для промпта: {prompt_id}")
+        logger.info(f"Проверка позиции в очереди для промпта: {prompt_id}")
         try:
             data = await self.api.get("/queue")
             pending = data.get("queue_pending", [])
@@ -36,7 +36,7 @@ class ComfyUIQueueInspector:
                     logger.info(f"Промпт {prompt_id} сейчас обрабатывается")
                     return status
 
-            logger.debug(
+            logger.info(
                 f"Промпт {prompt_id} не найден в очереди. Длина очереди: {len(pending)}",
             )
             return {

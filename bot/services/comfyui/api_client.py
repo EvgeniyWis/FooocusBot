@@ -17,12 +17,12 @@ class ComfyUIAPI:
         files: dict = None,
     ) -> dict:
         url = f"{self.base_url}{path}"
-        logger.debug(f"Отправка POST запроса на {url}")
+        logger.info(f"Отправка POST запроса на {url}")
         async with httpx.AsyncClient() as client:
             resp = await client.post(url, json=json, files=files)
             try:
                 resp.raise_for_status()
-                logger.debug(f"Успешный POST запрос к {path}")
+                logger.info(f"Успешный POST запрос к {path}")
                 return resp.json()
             except httpx.HTTPError as e:
                 logger.error(
@@ -32,12 +32,12 @@ class ComfyUIAPI:
 
     async def get(self, path: str) -> dict:
         url = f"{self.base_url}{path}"
-        logger.debug(f"Отправка GET запроса на {url}")
+        logger.info(f"Отправка GET запроса на {url}")
         async with httpx.AsyncClient() as client:
             resp = await client.get(url)
             try:
                 resp.raise_for_status()
-                logger.debug(f"Успешный GET запрос к {path}")
+                logger.info(f"Успешный GET запрос к {path}")
                 return resp.json()
             except httpx.HTTPError as e:
                 logger.error(f"Ошибка HTTP при GET запросе к {path}: {str(e)}")

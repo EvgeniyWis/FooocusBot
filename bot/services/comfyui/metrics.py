@@ -10,12 +10,12 @@ class ComfyUIMetricsService:
     def __init__(self, path: str, avg_count: int = 10):
         self.path = path
         self.avg_count = avg_count
-        logger.debug(
+        logger.info(
             f"Инициализирован сервис метрик. Путь: {path}, усреднение по {avg_count} записям",
         )
 
     async def save(self, duration: float):
-        logger.debug(f"Сохранение нового времени генерации: {duration:.2f}с")
+        logger.info(f"Сохранение нового времени генерации: {duration:.2f}с")
         try:
             if os.path.exists(self.path):
                 async with aiofiles.open(self.path, "r") as f:
@@ -55,7 +55,7 @@ class ComfyUIMetricsService:
                 return 3600.0
 
             avg = sum(times) / len(times)
-            logger.debug(
+            logger.info(
                 f"Рассчитано среднее время генерации: {avg:.2f}с на основе {len(times)} записей",
             )
             return avg
