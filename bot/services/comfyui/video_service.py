@@ -10,9 +10,6 @@ from bot.services.comfyui.queue_inspector import ComfyUIQueueInspector
 from bot.services.comfyui.uploader import ComfyUIUploader
 from bot.services.comfyui.workflow_preparer import ComfyUIWorkflowPreparer
 
-# todo: добавить очистку файлов с комфика
-# не качается видос
-
 
 class ComfyUIVideoService:
     def __init__(self, api_url: str, workflow_path: str, avg_times_path: str):
@@ -53,7 +50,7 @@ class ComfyUIVideoService:
             queue_info = await self.inspector.get_queue_position(prompt_id)
             if queue_info["status"] == "processing":
                 return
-            await asyncio.sleep(30)
+            await asyncio.sleep(80)
         logger.error(
             f"Timeout ожидания начала генерации ComfyUI для промпта {prompt_id}",
         )
@@ -74,6 +71,8 @@ class ComfyUIVideoService:
             if urls:
                 duration = time.time() - start
                 await self.metrics.save(duration)
+                self.cleanup_local_output()
+
                 return {"video_urls": urls, "duration": duration}
         logger.error(
             f"Timeout получения результата генерации ComfyUI для промпта {prompt_id}",
@@ -84,21 +83,23 @@ class ComfyUIVideoService:
         results = []
         for node in status_json.get("outputs", {}).values():
             for gif in node.get("gifs", []):
-                results.append(
-                    f"{self.api.base_url}/api/viewvideo?filename={
-                    gif['filename']}&type=output&subfolder={
-                    gif.get('subfolder', '')}&format=video/h264-mp4",
-                )
+                url = f"{self.api.base_url}/viewvideo?filename={gif['filename']}&type=output"
+                subfolder = gif.get("subfolder")
+                if subfolder:
+                    url += f"&subfolder={subfolder}"
+                results.append(url)
+
             for img in node.get("images", []):
-                results.append(
-                    f"{self.api.base_url}/view?filename={
-                    img['filename']}&type=output&subfolder={
-                    img.get('subfolder', '')}",
-                )
+                url = f"{self.api.base_url}/view?filename={img['filename']}&type=output"
+                subfolder = img.get("subfolder")
+                if subfolder:
+                    url += f"&subfolder={subfolder}"
+                results.append(url)
+
         logger.info(
-            f"Найдены результаты генерации: {results}",
+            f"Найдены результаты генерации: {results}",
         ) if results else logger.info(
-            f"Результаты генерации не найдены для status_json: {status_json}",
+            f"Результаты генерации не найдены для status_json: {status_json}",
         )
         return results
 
@@ -108,5 +109,8 @@ class ComfyUIVideoService:
                 if f.endswith((".mp4", ".jpg", ".png")):
                     try:
                         os.remove(os.path.join(root, f))
-                    except Exception:
-                        pass
+                        logger.info(
+                            f"Очищена папка ComfyUI/output: {root}/{f}"
+                        )
+                    except Exception as e:
+                        logger.warning(f"Ошибка при удалении {f}: {e}")
