@@ -31,7 +31,7 @@ def setting3_getDataArray():
         [-1.50, 1.30, 0.7, 2.65, 1.55, -0.70]),
 
         setting3_generateData("bianca_mirell", "1DQYyWFPBPs45Rra5tmcGSwMBzDLqUUB7", "1xcSZ5XeyVamQbeZhXfrd8OgMP9gxUVKe", "photorealistic portrait, 18 years old, black hair with white curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
-        [-1.50, 1.30, 0.7, 1.80, 0.3, 0]),
+        [-1.50, 1.30, 0.7, 1.50, 0.3, 0]),
 
         setting3_generateData("dasharomanova.xo", "12CAwN2jbJ_0r4XBziyGTN_zV6cKLkkow", "1f0caQN1-4GIbgpKt47bhmALxrqjLRWTL", "photorealistic portrait, 18 years old, platinum-blonde hair with black curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
         [-1.50, 1.30, 0.7, 2.40, 1.60, -0.85]),
