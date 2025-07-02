@@ -11,6 +11,7 @@ from bot.services.comfyui.uploader import ComfyUIUploader
 from bot.services.comfyui.workflow_preparer import ComfyUIWorkflowPreparer
 
 # todo: сделать при перезапсуке бота пустую генерацию для компиляции комфика
+# таймауты
 
 
 class ComfyUIVideoService:

@@ -14,7 +14,7 @@ COMFYUI_WORKFLOW_TEMPLATE_PATH: Final[Path] = (
     / "assets"
     / "comfyui"
     / "comfyui_workflows"
-    / "wan2-3-2.json"
+    / "wan2-3-4.json"
 )
 COMFYUI_AVG_TIMES_METRICS_PATH: Final[Path] = (
     BASE_DIR / "bot" / "assets" / "comfyui" / "avg_times_metrics.json"
