@@ -109,6 +109,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "process_images_steps": [],
         "upscale_progress_messages": [],
         "variable_names_for_randomizer": [],
+        "generated_video_paths": [],
     }
     
     # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)

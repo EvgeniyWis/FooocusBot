@@ -9,9 +9,10 @@ from bot.settings import settings
 from bot.utils import retryOperation, text
 from bot.utils.handlers.messages import safe_send_message
 from bot.utils.videos.generate_video import generate_video
+from bot import constants
 
 
-async def send_error_message(message: types.Message, model_name: str, e: str):
+async def send_error_message(message: types.Message, image_index: int | None, model_name: str, e: str):
     """
     Отправляет сообщение об ошибке в зависимости от того, есть модель или нет
 
@@ -36,7 +37,9 @@ async def send_error_message(message: types.Message, model_name: str, e: str):
             message,
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
+                image_index,
                 False,
+                True
             ),
         )
     else:
@@ -51,6 +54,7 @@ async def send_error_message(message: types.Message, model_name: str, e: str):
 async def check_video_path(
     prompt: str,
     message: types.Message,
+    image_index: int | None,
     image_url: str | None,
     temp_path: str | None,
     model_name: str = None,
@@ -61,6 +65,7 @@ async def check_video_path(
 
     Args:
         prompt: str - промпт для генерации видео
+        image_index: int | None - индекс изображения в массиве изображений
         image_url: str - ссылка на изображение
         message: types.Message - сообщение с которым связан процесс генерации видео
         model_name: str - название модели
@@ -72,8 +77,8 @@ async def check_video_path(
 
     # Генерируем видео
     video_path = None
-    if settings.MOCK_MODE:
-        video_path = "FooocusBot/bot/assets/mocks/mock_video.mp4"
+    if settings.MOCK_VIDEO_MODE:
+        video_path = constants.MOCK_VIDEO_PATH
     else:
         try:
             video_path = await retryOperation(
@@ -88,16 +93,16 @@ async def check_video_path(
             # Отправляем сообщение об ошибке
             traceback.print_exc()
             logger.error(f"Произошла ошибка при генерации видео: {e}")
-            await send_error_message(message, model_name, e)
+            await send_error_message(message, image_index, model_name, e)
 
     if not video_path:
         await send_error_message(
-            message, model_name, "Не удалось сгенерировать видео"
+            message, image_index, model_name, "Не удалось сгенерировать видео"
         )
 
     if isinstance(video_path, dict):
         error = video_path.get("error")
         if error:
-            await send_error_message(message, model_name, error)
+            await send_error_message(message, image_index, model_name, error)
 
     return video_path
