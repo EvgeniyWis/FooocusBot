@@ -58,7 +58,7 @@ def setting3_getDataArray():
         [-1.50, 1.30, 0.7, 3.45, -0.20, 0.30]),
 
         setting3_generateData("aveline_lion", "1ryKfs0xEbcgWw3j35E1hBFsP_vSnuKiD", "1MxgVRtb9qxnZY__yeX1Cj-uEkZQX8Rda", "photorealistic portrait, 18 years old, black hair, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, blue eyes, high quality.",
-        [-1.50, 1.30, 0.7, 2.40, 0.65, -0.35]),
+        [-1.50, 1.30, 0.7, 2.20, 0.6, -0.35]),
 
         setting3_generateData("lolavexley", "1FK7RNJ2Ufje8BC1_9cIPqFUa2xNOAI3O", "18Bkca3KhxB2WVVqG5loz5Azzg0FLEPs5", "photorealistic portrait, 18 years old, brown hair, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, blue eyes, high quality.",
         [-1.50, 1.30, 0.7, 2.75, 1.95, -1.00]),
@@ -67,7 +67,7 @@ def setting3_getDataArray():
         [-1.50, 1.30, 0.7, 0.35, 0.45, 0.55]),
 
         setting3_generateData("leonaclaive", "1yZYVKNmeNNFxBPQOktYAfjxEZPIeJjxp", "1DQALIdm2l54ia_RAD_oG1LL27L0aVgB3", "photorealistic portrait, 18 years old, platinum-blonde hair, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
-        [-1.50, 1.30, 0.7, 0.75, 1.75, -0.25]),
+        [-1.50, 1.30, 0.7, 0.5, 1.7, -0.25]),
     ]
 
     return dataArray
