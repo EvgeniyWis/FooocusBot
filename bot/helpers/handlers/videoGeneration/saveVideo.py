@@ -86,7 +86,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     )
 
     # Удаляем видео из папки temp
-    if not settings.MOCK_MODE:
+    if not settings.MOCK_VIDEO_MODE:
         try:
             os.remove(video_path)
         except Exception as e:

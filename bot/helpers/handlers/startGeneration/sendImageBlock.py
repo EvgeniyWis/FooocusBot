@@ -20,6 +20,7 @@ from bot.utils.handlers import (
 from bot.utils.handlers.messages import (
     safe_send_media_group,
 )
+import traceback
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
@@ -57,6 +58,7 @@ async def sendImageBlock(
                 unique_keys=("model_name", "image_index"),
             )
     except Exception as e:
+        traceback.print_exc()
         logger.error(f"Ошибка при отправке медиагруппы: {e}")
         try:
             if isinstance(e, TelegramRetryAfter):
@@ -149,7 +151,7 @@ async def sendImageBlock(
                 pass
 
         # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-        if is_test_generation and not settings.MOCK_MODE:
+        if is_test_generation and not settings.MOCK_IMAGES_MODE:
             try:
                 file_path = f"{constants.TEMP_FOLDER_PATH}/test_{user_id}"
                 shutil.rmtree(file_path)

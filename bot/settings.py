@@ -18,7 +18,8 @@ class Settings(BaseSettings):
 
     # Режимы и флаги
     DEVELOPMENT_MODE: bool = False
-    MOCK_MODE: bool = False
+    MOCK_IMAGES_MODE: bool = False
+    MOCK_VIDEO_MODE: bool = False
     UPSCALE_MODE: bool = True
     FACEFUSION_MODE: bool = True
 
