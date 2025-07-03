@@ -66,7 +66,7 @@ async def process_save_image(
 
     # Сохраняем изображение
     now = datetime.now().strftime("%Y-%m-%d")
-    if not settings.MOCK_MODE:
+    if not settings.MOCK_IMAGES_MODE:
         link = await saveFile(
             result_path,
             user_id,
@@ -139,7 +139,7 @@ async def process_save_image(
         logger.error(f"Произошла ошибка при удалении сообщения: {e}")
 
     # Удаляем изображение с замененным лицом
-    if not settings.MOCK_MODE and result_path != MOCK_FACEFUSION_PATH:
+    if not settings.MOCK_IMAGES_MODE and result_path != MOCK_FACEFUSION_PATH:
         os.remove(result_path)
 
     logger.info(

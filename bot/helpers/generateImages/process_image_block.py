@@ -72,7 +72,7 @@ async def process_image_block(
 
     # Если работа завершена, то обрабатываем результаты
     try:
-        if not settings.MOCK_MODE:
+        if not settings.MOCK_IMAGES_MODE:
             images_output = response_json.get("output", [])
 
             if images_output == []:
@@ -90,7 +90,7 @@ async def process_image_block(
             )
 
         # Обрабатываем результаты
-        if not settings.MOCK_MODE:
+        if not settings.MOCK_IMAGES_MODE:
             for i, image_data in enumerate(images_output):
                 file_path = await base64_to_image(
                     image_data["base64"],
