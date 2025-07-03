@@ -144,7 +144,16 @@ GENERATE_TEST_VIDEO_SUCCESS_TEXT = (
 # Текст при нажатии на кнопку "✒️ Написать свой промпт"
 WRITE_PROMPT_FOR_VIDEO_TEXT = "✒️ Напишите свой промпт, по которому будет сгенерировано видео для модели {} под номером {}:"
 
-WRITE_PROMPT_FOR_NSFW_VIDEO_TEXT = "✒️ Напишите свой промпт, по которому будет сгенерировано NSFW видео для модели {} под номером {}:\nРекомендумый качественный промпт: A naked girl strokes her bare breasts with her hands, sensual movement, static camera, cinematic lighting, natural body physics, 4K detail, eye contact"
+WRITE_PROMPT_FOR_NSFW_VIDEO_TEXT = """
+⏳ Обращаем ваше внимание на то, что генерация NSFW видео может занять длительное время.
+
+✒️ Напишите свой промпт, по которому будет сгенерировано NSFW видео для модели {} под номером {}
+
+<b>Рекомендуемый качественный промпт:</b>
+<code>
+A naked girl strokes her bare breasts with her hands, sensual movement, static camera, cinematic lighting, natural body physics, 4K detail, eye contact
+</code>
+"""
 
 # Текст при написании кастомного промпта для видео
 WRITE_PROMPT_FOR_VIDEO_SUCCESS_TEXT = "✅ Промпт для модели {} под номером {} успешно получен! \nТеперь выберите тип генерации видео:"

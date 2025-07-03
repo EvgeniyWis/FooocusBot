@@ -23,9 +23,14 @@ class ComfyUIVideoService:
         self.inspector = ComfyUIQueueInspector(self.api)
         self.metrics = ComfyUIMetricsService(avg_times_path)
 
-    async def generate(self, prompt: str, image_path: str) -> dict:
+    async def generate(
+        self,
+        prompt: str,
+        image_path: str,
+        seconds: int,
+    ) -> dict:
         image_name = await self.uploader.upload_image(image_path)
-        workflow = self.preparer.prepare(prompt, image_name)
+        workflow = self.preparer.prepare(prompt, image_name, seconds)
         prompt_id = await self.executor.submit_prompt(workflow)
         queue = await self.inspector.get_queue_position(prompt_id)
         avg = await self.metrics.get_avg()
@@ -53,7 +58,7 @@ class ComfyUIVideoService:
             queue_info = await self.inspector.get_queue_position(prompt_id)
             if queue_info["status"] == "processing":
                 return
-            await asyncio.sleep(80)
+            await asyncio.sleep(160)
         logger.error(
             f"Timeout ожидания начала генерации ComfyUI для промпта {prompt_id}",
         )
@@ -68,7 +73,7 @@ class ComfyUIVideoService:
     ) -> dict:
         start = time.time()
         for _ in range(timeout // 60):
-            await asyncio.sleep(60)
+            await asyncio.sleep(160)
             status = await self.executor.get_status(prompt_id)
             video_paths = self._extract_outputs(status)
             if video_paths:

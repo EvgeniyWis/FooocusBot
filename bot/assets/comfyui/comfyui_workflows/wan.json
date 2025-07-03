@@ -27,8 +27,8 @@
         "126",
         3
       ],
-      "length": 69,
-      "batch_size": 2,
+      "length": 65,
+      "batch_size": 1,
       "positive": [
         "220",
         0
@@ -96,7 +96,7 @@
   },
   "60": {
     "inputs": {
-      "clip_name": "umt5-xxl-encoder-Q8_0.gguf",
+      "clip_name": "umt5-xxl-encoder-Q5_K_S.gguf",
       "type": "wan"
     },
     "class_type": "CLIPLoaderGGUF",
@@ -459,7 +459,7 @@
   "159": {
     "inputs": {
       "seed": 80085,
-      "steps": 15,
+      "steps": 10,
       "cfg": 2.5,
       "sampler_name": "uni_pc",
       "scheduler": "simple",
@@ -541,7 +541,7 @@
   },
   "215": {
     "inputs": {
-      "clip_name": "umt5-xxl-encoder-Q8_0.gguf",
+      "clip_name": "umt5-xxl-encoder-Q5_K_S.gguf",
       "type": "wan"
     },
     "class_type": "CLIPLoaderGGUF",
@@ -577,7 +577,7 @@
   },
   "220": {
     "inputs": {
-      "text": "A naked girl strokes her bare breasts with her hands, sensual movement, static camera, cinematic lighting, natural body physics, 4K detail, eye contact",
+      "text": "A naked girl strokes her bare breasts with her hands, sensual movement, static camera, cinematic lighting, natural body physics, 4K detail, eye contact ",
       "clip": [
         "67",
         1
@@ -679,7 +679,7 @@
   },
   "255": {
     "inputs": {
-      "unet_name": "wan2.1-i2v-14b-480p-Q8_0.gguf"
+      "unet_name": "wan2.1-i2v-14b-480p-Q5_K_S.gguf"
     },
     "class_type": "UnetLoaderGGUF",
     "_meta": {
