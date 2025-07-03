@@ -32,9 +32,6 @@ class ComfyUIWorkflowPreparer:
                 if "50" in workflow and "inputs" in workflow["50"]:
                     workflow["50"]["inputs"]["length"] = length
 
-            logger.debug(
-                f"Подготовлен воркфлоу с промптом: '{prompt}', изображением: {image_name}, длиной: {length}",
-            )
             return workflow
         except Exception as e:
             logger.error(f"Ошибка при подготовке воркфлоу: {str(e)}")
