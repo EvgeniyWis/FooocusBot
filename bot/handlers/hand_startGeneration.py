@@ -394,7 +394,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс работы и индекс изображения
     model_name = call.data.split("|")[1]
     setting_number = call.data.split("|")[2]
-    image_index = int(call.data.split("|")[3]) - 1
+    image_index = int(call.data.split("|")[3])
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
