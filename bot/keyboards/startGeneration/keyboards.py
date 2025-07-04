@@ -21,7 +21,7 @@ def generationsTypeKeyboard(
                     callback_data="generateVideoFromImage",
                 ),
             ],
-        ]
+        ],
     )
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
@@ -199,17 +199,71 @@ def onePromptGenerationChooseTypeKeyboard():
     return kb
 
 
-# Инлайн-клавиатура для перегенерации видео
-def regenerateVideoKeyboard(model_name: str):
-    kb = InlineKeyboardMarkup(
+# Клавиатура для выбора режима генерации
+def generationModeKeyboard():
+    return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="🔄 Перегенерировать видео",
-                    callback_data=f"start_generate_video|{model_name}",
-                ),
+                    text="🖼 Мультивыбор",
+                    callback_data="generation_mode|multi_select",
+                )],
+                [InlineKeyboardButton(
+                    text="1️⃣ Выбор одного фото",
+                    callback_data="generation_mode|single_select",
+                )],
             ],
+        )
+
+
+# Инлайн-клавиатура для мультивыборной генерации изображений
+def selectMultiImageKeyboard(
+    model_name: str,
+    setting_number: str,
+    image_number: int,
+    selected_indexes: list[int],
+):
+    # Первое изображение (index=0) - референсное, поэтому показываем кнопки с 1 по 9
+    inline_keyboard = []
+    for i in range(1, min(image_number, 10), 2):
+        row = []
+        for j in [i, i + 1]:
+            if j >= 10:
+                continue
+            idx = j
+            selected = idx in selected_indexes
+            text = f"{j} {'✅' if selected else ''}"
+            row.append(
+                InlineKeyboardButton(
+                    text=text,
+                    callback_data=f"select_multi_image|{model_name}|{setting_number}|{idx}",
+                ),
+            )
+        if row:
+            inline_keyboard.append(row)
+
+    inline_keyboard.append(
+        [
+            InlineKeyboardButton(
+                text="Готово",
+                callback_data=f"multi_image_done|{model_name}|{setting_number}",
+            ),
         ],
     )
-
-    return kb
+    inline_keyboard.append(
+        [
+            InlineKeyboardButton(
+                text="🔄 Перегенерировать",
+                callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
+            ),
+        ],
+    )
+    inline_keyboard.append(
+        [
+            InlineKeyboardButton(
+                text="🔄 Перегенерировать с новым промптом",
+                callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt",
+            ),
+        ],
+    )
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)

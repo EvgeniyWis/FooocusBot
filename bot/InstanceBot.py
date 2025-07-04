@@ -5,19 +5,11 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.fsm.storage.redis import RedisStorage
 
-from bot.config import get_current_tokens
 from bot.factory.redis_factory import create_redis_client
+from bot.settings import settings
 
-# Получаем токен из config.py (где уже загружен .env файл)
-tokens = get_current_tokens()
-bot_token = tokens["BOT_API_TOKEN"]
-
-if not bot_token:
-    raise ValueError("BOT_API_TOKEN не найден в переменных окружения")
-
-# Создаём бота
 bot = Bot(
-    token=bot_token,
+    token=settings.BOT_API_TOKEN,
     default=DefaultBotProperties(parse_mode="HTML"),
 )
 
@@ -32,8 +24,6 @@ storage = RedisStorage(
 dp = Dispatcher(storage=storage)
 router = Router()
 
-# Увеличиваем таймаут для запросов к Telegram API
-bot.session = AiohttpSession(timeout=60)
-
+bot.session = AiohttpSession(timeout=180)
 
 dp.include_router(router)

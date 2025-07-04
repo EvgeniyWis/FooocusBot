@@ -11,7 +11,6 @@ from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameByIndex,
 )
-from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 
 
 # Функция для генерации изображений с помощью API
@@ -25,6 +24,15 @@ async def generateImages(
     with_randomizer: bool = False,
     model_indexes_for_generation: list[int] = None,
 ):
+    from bot.helpers.generateImages.generateImageBlock import (
+        generateImageBlock,
+    )
+
+    state_data = await state.get_data()
+
+    image_number = 10 if state_data.get('multi_select_mode') else 4
+
+    # Формируем массив данных с нужным количеством изображений
     if not with_randomizer:
         # Если модели для индивидуальной генерации есть, то формируем из них массив
         if model_indexes_for_generation:
@@ -59,6 +67,9 @@ async def generateImages(
             logger.info(
                 f"Генерация изображения с изначальными данными: {data}",
             )
+
+            if 'json' in data and 'input' in data['json']:
+                data['json']['input']['image_number'] = image_number
 
             image = await generateImageBlock(
                 data,

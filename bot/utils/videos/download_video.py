@@ -1,6 +1,7 @@
 import os
+import aiofiles
 
-from bot.config import VIDEOS_TEMP_DIR
+import bot.constants as constants
 from bot.utils.httpx import httpx_get
 
 
@@ -16,22 +17,22 @@ async def download_video(url: str) -> str:
     """
     try:
         # Создаем временную директорию, если её нет
-        os.makedirs(VIDEOS_TEMP_DIR, exist_ok=True)
+        os.makedirs(constants.VIDEOS_TEMP_DIR, exist_ok=True)
 
         # Генерируем уникальное имя файла
-        video_path = f"{VIDEOS_TEMP_DIR}/{os.urandom(8).hex()}.mp4"
+        video_path = f"{constants.VIDEOS_TEMP_DIR}/{os.urandom(8).hex()}.mp4"
 
         # Скачиваем видео
         response = await httpx_get(url, timeout=180, stream=True)
 
         if response and response.status_code == 200:
-            with open(video_path, "wb") as f:
+            async with aiofiles.open(video_path, "wb") as f:
                 async for chunk in response.aiter_bytes():
-                    f.write(chunk)
+                    await f.write(chunk)
             return video_path
         else:
             raise Exception(
-                f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'}",
+                f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'} с текстом: {response.text if response else 'нет ответа'}",
             )
     except Exception as e:
         raise Exception(f"Произошла ошибка при скачивании видео: {e}")

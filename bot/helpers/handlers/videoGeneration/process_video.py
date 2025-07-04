@@ -4,7 +4,6 @@ from adapters.redis_task_storage_repository import key_for_video
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.config import PROCESS_VIDEO_TASK
 from bot.domain.entities.task import TaskProcessVideoDTO
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
@@ -17,6 +16,7 @@ from bot.helpers.handlers.videoGeneration.check_video_path import (
 from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
+from bot.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils.handlers import (
     appendDataToStateArray,
@@ -30,9 +30,9 @@ async def process_video(
     prompt: str,
     type_for_video_generation: str,
     image_url: str,
+    image_index: int,
     call: Optional[types.CallbackQuery] = None,
     message: Optional[types.Message] = None,
-    is_quick_generation: bool = False,
 ):
     """
     Обработка видео после генерации в основной рабочей генерации.
@@ -45,10 +45,17 @@ async def process_video(
         prompt: str - Промпт для генерации видео
         type_for_video_generation: str - Тип генерации видео (Рабочий или Тестовый)
         image_url: str - Ссылка на изображение, из которого будет генерироваться видео
+        image_index: int - Индекс изображения в массиве изображений
+        call: Optional[types.CallbackQuery] = None - CallbackQuery с сообщением о генерации видео
+        message: Optional[types.Message] = None - Message с сообщением о генерации видео
     """
 
-    if (call is None and message is None) or (call is not None and message is not None):
-        raise ValueError("Нужно передать либо call, либо message, но не оба и не ни одного.")
+    if (call is None and message is None) or (
+        call is not None and message is not None
+    ):
+        raise ValueError(
+            "Нужно передать либо call, либо message, но не оба и не ни одного."
+        )
 
     if call is not None:
         user_id = call.from_user.id
@@ -74,7 +81,7 @@ async def process_video(
         type_for_video_generation=type_for_video_generation,
         image_url=image_url,
     )
-    await redis_storage.add_task(PROCESS_VIDEO_TASK, task_dto)
+    await redis_storage.add_task(settings.PROCESS_VIDEO_TASK, task_dto)
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
@@ -85,11 +92,17 @@ async def process_video(
         model_name,
         message,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
-        message.message_id,
     )
 
     # Проверяем путь к видео
-    video_path = await check_video_path(prompt, message, image_url, None, model_name)
+    video_path = await check_video_path(
+        prompt=prompt,
+        message=message,
+        image_index=image_index,
+        image_url=image_url,
+        temp_path=None,
+        model_name=model_name,
+    )
 
     # Удаляем сообщение о генерации видео
     try:
@@ -112,12 +125,21 @@ async def process_video(
         return
 
     # Добавляем путь к видео в стейт
-    data_for_update = {f"{model_name}": video_path}
-    await appendDataToStateArray(state, "video_paths", data_for_update)
+    data_for_update = {
+        "image_index": image_index,
+        "model_name": model_name,
+        "direct_url": video_path,
+    }
+    await appendDataToStateArray(
+        state,
+        "generated_video_paths",
+        data_for_update,
+        unique_keys=("model_name", "image_index"),
+    )
 
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
-    prefix = f"generate_video|{model_name}"
+    prefix = f"generate_video|{model_name}|{image_index}"
 
     if type_for_video_generation == "work":
         method = message.answer_video(
@@ -128,7 +150,7 @@ async def process_video(
             ),
             reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
                 model_name,
-                is_quick_generation,
+                image_index,
             ),
         )
         video_message = await bot(method)
@@ -147,16 +169,21 @@ async def process_video(
         video_message = await bot(method)
 
     # Сохраняем сообщение в стейт для последующего удаления
-    data_for_update = {f"{model_name}": video_message.message_id}
+    data_for_update = {
+        "model_name": model_name,
+        "image_index": image_index,
+        "message_id": video_message.message_id,
+    }
     await appendDataToStateArray(
         state,
         "videoGeneration_messages_ids",
         data_for_update,
+        unique_keys=("model_name", "image_index"),
     )
 
     redis_storage = get_redis_storage()
     await redis_storage.delete_task(
-        PROCESS_VIDEO_TASK,
+        settings.PROCESS_VIDEO_TASK,
         key_for_video(
             type_for_video=type_for_video_generation,
             user_id=user_id,
@@ -164,4 +191,3 @@ async def process_video(
             model_name=model_name,
         ),
     )
-

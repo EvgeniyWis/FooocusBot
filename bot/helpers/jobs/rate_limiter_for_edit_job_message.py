@@ -48,7 +48,7 @@ async def safe_bot_edit_job_message(
             _last_texts[key] = safe_text
         except TelegramRetryAfter as e:
             logger.warning(
-                f"Флуд-контроль, ожидаем {e.retry_after} секунд <UNK> <UNK> <UNK> <UNK> {message_id}...",
+                f"Флуд-контроль, ожидаем {e.retry_after} секунд перед повторным редактированием сообщения {message_id}...",
             )
             await asyncio.sleep(e.retry_after)
             await bot.edit_message_text(

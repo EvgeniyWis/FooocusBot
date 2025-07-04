@@ -11,3 +11,8 @@ class StartGenerationState(StatesGroup):
     write_prompt_for_videoGenerationFromImage = State()
     ask_for_model_name_for_video_generation_from_image = State()
     write_new_prompt_for_regenerate_image = State()
+    write_prompt_for_nsfw_generation = State()
+    ask_video_length_input = (
+        State()
+    )  # Новый стейт для запроса длительности видео
+    choose_generated_video = State()  # Новый стейт для выбора видео из группы

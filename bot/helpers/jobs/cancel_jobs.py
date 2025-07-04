@@ -1,8 +1,8 @@
-from bot.config import get_runpod_headers, RUNPOD_HOST
-
-from bot.logger import logger
-from bot.utils import httpx_post
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
+from bot.logger import logger
+from bot.settings import settings
+from bot.utils import httpx_post
+from bot.utils.get_api_headers import get_runpod_headers
 
 
 # Функция для отмены всех работ
@@ -22,7 +22,7 @@ async def cancel_jobs(jobs_ids: list[dict]):
             ENDPOINT_ID = await get_endpoint_ID(setting_number)
 
             # Формируем URL для отправки запроса
-            url = f"{RUNPOD_HOST}/{ENDPOINT_ID}/cancel/{job_id}"
+            url = f"{settings.RUNPOD_HOST}/{ENDPOINT_ID}/cancel/{job_id}"
 
             # Отправляем запрос на отмену работы
             await httpx_post(url, get_runpod_headers())

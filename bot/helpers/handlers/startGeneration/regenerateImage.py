@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from logger import logger
 
 from bot.helpers import text
-from bot.helpers.generateImages import generateImageBlock
+from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
