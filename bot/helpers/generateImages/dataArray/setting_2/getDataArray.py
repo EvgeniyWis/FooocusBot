@@ -218,7 +218,7 @@ def setting2_getDataArray():
             """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
 
         real_beauty, igbaddie, 1girl, 18 years old, latina girl, sorority girl, volumnous black hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
-            [1, 0.7, 3.50, 0.05, -3.00, -1.50],
+            [1, 0.7, 3.80, 0.1, -3.00, -1.50],
         ),
     ]
 
