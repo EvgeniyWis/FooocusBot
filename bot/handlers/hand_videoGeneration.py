@@ -1,14 +1,23 @@
 import asyncio
 import os
-import tempfile
 import traceback
 
-import aiohttp
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from domain.entities.video_generation import (
+    ErrorStatus,
+    ProcessingStatus,
+    QueuedStatus,
+    StartGenerationStatus,
+    TimeoutStatus,
+)
 from settings import settings
 from utils import retryOperation
+from utils.videos.download_nsfw_video import (
+    download_nsfw_videos,
+)
+from utils.videos.generate_nsfw_video import generate_nsfw_video
 
 import bot.constants as constants
 from bot.helpers import text
@@ -618,157 +627,135 @@ async def generate_nsfw_video_and_send_result(
     temp_path: str,
     seconds: int = None,
 ):
+    def get_target_message(
+        message_or_call: types.CallbackQuery | types.Message,
+    ):
+        return (
+            message_or_call.message
+            if isinstance(message_or_call, types.CallbackQuery)
+            else message_or_call
+        )
+
     progress_message = await safe_send_message(
         "⏳ Генерация NSFW видео через ComfyUI...",
         message_or_call.message
         if isinstance(message_or_call, types.CallbackQuery)
         else message_or_call,
     )
-    try:
-        video_service = ComfyUIVideoService(
-            api_url=settings.COMFYUI_API_URL,
-            workflow_path=constants.COMFYUI_WORKFLOW_TEMPLATE_PATH,
-            avg_times_path=constants.COMFYUI_AVG_TIMES_METRICS_PATH,
-        )
-        result = await video_service.generate(
-            prompt,
-            temp_path,
-            seconds=seconds,
-        )
-        queue = result["queue"]
-        approx_wait = result["approx_wait"]
-        status = queue.get("status")
-        wait_min = approx_wait // 60 if approx_wait else 0
-        if status == "queued" and queue.get("position"):
-            pos = queue["position"]
-            total = queue["queue_length"]
-            if wait_min >= 80:
+
+    status = await generate_nsfw_video(prompt, temp_path, seconds)
+    match status:
+        case QueuedStatus(
+            position=pos,
+            queue_length=total,
+            wait_min=wait_min,
+            prompt_id=prompt_id,
+        ):
+            if wait_min >= 150:
                 msg = (
-                    f"🕒 Вы в очереди: {pos} из {total}.\nПримерное ожидание: {int(wait_min)} мин. (рассчитано на основе различных длин генераций) \n"
-                    f"🚫Сейчас очередь очень длинная, пожалуйста, ожидайте, или запустите генерацию позднее."
+                    f"🕒 Вы в очереди: {pos} из {total}.\n"
+                    f"Примерное ожидание: {int(wait_min)} мин.\n"
+                    f"🚫Очередь очень длинная, возможно, придётся ждать до 3 часов."
                 )
-            elif wait_min >= 150:
+            elif wait_min >= 80:
                 msg = (
-                    f"🕒 Вы в очереди: {pos} из {total}.\nПримерное ожидание: {int(wait_min)} мин. (рассчитано на основе различных длин генераций) \n"
-                    f"🚫Сейчас очередь очень длинная, возможно, результат придется ждать около 3х часов. Ожидайте, или запустите генерацию позднее."
+                    f"🕒 Вы в очереди: {pos} из {total}.\n"
+                    f"Примерное ожидание: {int(wait_min)} мин.\n"
+                    f"🚫Очередь длинная. Ожидайте или попробуйте позже."
                 )
             else:
-                msg = f"🕒 Вы в очереди: {pos} из {total}.\nПримерное ожидание: {int(wait_min)} мин. (рассчитано на основе различных длин генераций)"
+                msg = (
+                    f"🕒 Вы в очереди: {pos} из {total}.\n"
+                    f"Примерное ожидание: {int(wait_min)} мин."
+                )
+            await safe_send_message(msg, get_target_message(message_or_call))
+
+        case (
+            ProcessingStatus(wait_min=wait_min, prompt_id=prompt_id)
+            | StartGenerationStatus(wait_min=wait_min, prompt_id=prompt_id)
+        ):
             await safe_send_message(
-                msg,
-                message_or_call.message
-                if isinstance(message_or_call, types.CallbackQuery)
-                else message_or_call,
+                f"⚙️ Генерация началась. Примерное ожидание: {int(wait_min)} мин.",
+                get_target_message(message_or_call),
             )
-        elif status == "processing":
+
+        case TimeoutStatus():
             await safe_send_message(
-                f"⚙️ Ваша задача успешно начала обрабатываться. Примерное ожидание: {int(wait_min)} мин. (рассчитано на основе различных длин генераций)",
-                message_or_call.message
-                if isinstance(message_or_call, types.CallbackQuery)
-                else message_or_call,
+                "❌ Время ожидания начала генерации истекло. Попробуйте позже.",
+                get_target_message(message_or_call),
             )
-        if status == "queued":
-            try:
-                await video_service.wait_until_generation_starts(
-                    result["prompt_id"],
-                )
-                await safe_send_message(
-                    f"⚙️ Ваша задача успешно начала обрабатываться. Примерное ожидание: {int(wait_min)} мин. (рассчитано на основе различных длин генераций)",
-                    message_or_call.message
-                    if isinstance(message_or_call, types.CallbackQuery)
-                    else message_or_call,
-                )
-            except TimeoutError:
-                await safe_send_message(
-                    "⏱ Задача не начала выполняться за допустимое время. Попробуйте позже.",
-                    message_or_call.message
-                    if isinstance(message_or_call, types.CallbackQuery)
-                    else message_or_call,
-                )
-                return
+            return
+
+        case ErrorStatus():
+            await safe_send_message(
+                "❌ Произошла ошибка при генерации NSFW видео.",
+                get_target_message(message_or_call),
+            )
+            return
+
+        case _:
+            logger.error(f"Неизвестный статус генерации: {status}")
+
+    video_service = ComfyUIVideoService(
+        api_url=settings.COMFYUI_API_URL,
+        workflow_path=constants.COMFYUI_WORKFLOW_TEMPLATE_PATH,
+        avg_times_path=constants.COMFYUI_AVG_TIMES_METRICS_PATH,
+    )
+    try:
+        result_final = await video_service.wait_for_result(
+            prompt_id,
+        )
+    except Exception:
         try:
-            result_final = await video_service.wait_for_result(
-                result["prompt_id"],
+            await retryOperation(
+                video_service.wait_for_result,
+                5,
+                5,
+                prompt_id,
             )
-        except Exception:
-            try:
-                await retryOperation(
-                    video_service.wait_for_result,
-                    5,
-                    5,
-                    result["prompt_id"],
-                )
-            except Exception as e:
-                await safe_send_message(
-                    f"❌ Ошибка во время ожидания результата: {e}",
-                    message_or_call.message
-                    if isinstance(message_or_call, types.CallbackQuery)
-                    else message_or_call,
-                )
-                return
-        await progress_message.delete()
-        if result_final.get("video_urls"):
-            video_urls = result_final["video_urls"]
-            await state.update_data(generated_nsfw_video_urls=video_urls)
-            for idx, url in enumerate(video_urls, 1):
-                try:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(url) as resp:
-                            if resp.status == 200:
-                                with tempfile.NamedTemporaryFile(
-                                    delete=False,
-                                    suffix=".mp4",
-                                ) as tmpfile:
-                                    tmpfile.write(await resp.read())
-                                    tmpfile_path = tmpfile.name
-                                caption = f"Видео {idx}"
-                                video = types.FSInputFile(tmpfile_path)
-                                await (
-                                    message_or_call.message.answer_video
-                                    if isinstance(
-                                        message_or_call,
-                                        types.CallbackQuery,
-                                    )
-                                    else message_or_call.answer_video
-                                )(video=video, caption=caption)
-                                os.remove(tmpfile_path)
-                            else:
-                                await safe_send_message(
-                                    f"Не удалось скачать видео {idx} по ссылке: {url}",
-                                    message_or_call.message
-                                    if isinstance(
-                                        message_or_call,
-                                        types.CallbackQuery,
-                                    )
-                                    else message_or_call,
-                                )
-                except Exception as e:
-                    await safe_send_message(
-                        f"Ошибка при скачивании/отправке видео {idx}: {e}",
-                        message_or_call.message
-                        if isinstance(message_or_call, types.CallbackQuery)
-                        else message_or_call,
-                    )
-            await state.set_state(None)
-        elif result_final.get("error"):
+        except Exception as e:
             await safe_send_message(
-                f"❌ Ошибка генерации: {result_final['error']}",
-                message_or_call.message
-                if isinstance(message_or_call, types.CallbackQuery)
-                else message_or_call,
+                f"❌ Ошибка во время ожидания результата: {e}",
+                get_target_message(message_or_call),
             )
-        else:
-            await safe_send_message(
-                "❌ Не удалось получить результат от ComfyUI.",
-                message_or_call.message
-                if isinstance(message_or_call, types.CallbackQuery)
-                else message_or_call,
-            )
-    finally:
-        try:
-            os.remove(temp_path)
-        except Exception:
-            pass
+            return
+
+    await progress_message.delete()
+
+    if result_final.get("video_urls"):
+        video_urls = result_final["video_urls"]
+        await state.update_data(generated_nsfw_video_urls=video_urls)
+
+        async for v in download_nsfw_videos(video_urls):
+            if not v.path:
+                continue
+
+            video = types.FSInputFile(v.path)
+            await (
+                message_or_call.message.answer_video
+                if isinstance(
+                    message_or_call,
+                    types.CallbackQuery,
+                )
+                else message_or_call.answer_video
+            )(video=video, caption=v.caption)
+
+        await state.set_state(None)
+    elif result_final.get("error"):
+        await safe_send_message(
+            f"❌ Ошибка генерации: {result_final['error']}",
+            get_target_message(message_or_call),
+        )
+    else:
+        await safe_send_message(
+            "❌ Не удалось получить результат от ComfyUI.",
+            get_target_message(message_or_call),
+        )
+
+    try:
+        os.remove(temp_path)
+    except Exception:
+        pass
 
 
 async def handle_prompt_for_nsfw_generation(
