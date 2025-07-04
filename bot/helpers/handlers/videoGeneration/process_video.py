@@ -98,7 +98,12 @@ async def process_video(
 
     # Проверяем путь к видео
     video_path = await check_video_path(
-        prompt, message, image_url, None, model_name
+        prompt=prompt,
+        message=message,
+        image_index=image_index,
+        image_url=image_url,
+        temp_path=None,
+        model_name=model_name,
     )
 
     # Удаляем сообщение о генерации видео
@@ -129,9 +134,9 @@ async def process_video(
     }
     await appendDataToStateArray(
         state,
-        "video_paths",
+        "generated_video_paths",
         data_for_update,
-        unique_keys=("model_name",),
+        unique_keys=("model_name", "image_index"),
     )
 
     # Отправляем видео юзеру
@@ -169,13 +174,14 @@ async def process_video(
     # Сохраняем сообщение в стейт для последующего удаления
     data_for_update = {
         "model_name": model_name,
+        "image_index": image_index,
         "message_id": video_message.message_id,
     }
     await appendDataToStateArray(
         state,
         "videoGeneration_messages_ids",
         data_for_update,
-        unique_keys=("model_name",),
+        unique_keys=("model_name", "image_index"),
     )
 
     redis_storage = get_redis_storage()

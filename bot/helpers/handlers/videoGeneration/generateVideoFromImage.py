@@ -58,7 +58,7 @@ async def generateVideoFromImage(
             )
 
         # Генерируем видео
-        video_path = await check_video_path(prompt, None, message, None, temp_path)
+        video_path = await check_video_path(prompt=prompt, message=message, image_index=None, image_url=None, temp_path=temp_path, model_name=None)
 
         if not video_path:
             return
