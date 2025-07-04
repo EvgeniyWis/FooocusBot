@@ -23,10 +23,14 @@ async def uploadFile(
             "type": "anyone",
             "role": "reader",
         }
-        service.permissions().create(
-            fileId=file["id"],
-            body=permission,
-        ).execute()
+        
+        try:
+            service.permissions().create(
+                fileId=file["id"],
+                body=permission,
+            ).execute()
+        except Exception as e:
+            logger.error(f"Ошибка при установке публичного доступа: {e}")
 
         logger.info(
             f"Файл {name} успешно загружен {f'в папку {folder_name}' if folder_name else '!'}: {file['webViewLink']}"

@@ -1,16 +1,18 @@
 import asyncio
+import os
 from datetime import datetime
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+from PIL import Image
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
-from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
 from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.helpers.handlers.messages import send_progress_message
 from bot.utils.retryOperation import retryOperation
 
 
@@ -50,11 +52,24 @@ async def process_faceswap_image(
         call.message.message_id,
     )
 
-    # Заменяем лицо на исходном изображении, которое сгенерировалось, на лицо с изображения модели
-    faceswap_target_path = (
-        f"images/temp/{model_name}_{user_id}/{image_index}.jpg"
+    # Локальный путь для проверки существования файла
+    from bot.constants import TEMP_FOLDER_PATH
+
+    # TEMP_FOLDER_PATH - это pathlib.Path, приводим к str для os.path.join
+    temp_user_dir = TEMP_FOLDER_PATH / f"{model_name}_{user_id}"
+    local_faceswap_target_path = os.path.join(
+        str(TEMP_FOLDER_PATH),
+        f"{model_name}_{user_id}",
+        f"{image_index}.jpg",
     )
-    faceswap_source_path = f"images/faceswap/{model_name}.jpg"
+    logger.info(
+        f"[faceswap] START: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}"
+    )
+    # Путь для передачи в facefusion_swap (виден внутри facefusion-контейнера)
+    faceswap_target_path = f"/facefusion/.assets/images/temp/{model_name}_{user_id}/{image_index}.jpg"
+    faceswap_source_path = (
+        f"/facefusion/.assets/images/faceswap/{model_name}.jpg"
+    )
     logger.info(
         f"Путь к исходному изображению для замены лица: {faceswap_target_path}",
     )
@@ -84,7 +99,8 @@ async def process_faceswap_image(
     while True:
         state_data = await state.get_data()
         faceswap_generated_models = state_data.get(
-            "faceswap_generated_models", [],
+            "faceswap_generated_models",
+            [],
         )
 
         # Проверяем, изменился ли список моделей
@@ -131,6 +147,47 @@ async def process_faceswap_image(
             )
 
             try:
+                # Логируем содержимое папки temp для диагностики
+                if temp_user_dir.exists():
+                    logger.info(
+                        f"[process_faceswap_image] Содержимое папки {temp_user_dir}: {os.listdir(temp_user_dir)}",
+                    )
+                else:
+                    logger.warning(
+                        f"[process_faceswap_image] Папка {temp_user_dir} не существует!",
+                    )
+
+                # Проверяем, существует ли файл для faceswap до запуска
+                logger.info(
+                    f"[process_faceswap_image] Проверка файла: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)}",
+                )
+                if not os.path.exists(local_faceswap_target_path):
+                    logger.error(
+                        f"[process_faceswap_image] Файл не найден: {local_faceswap_target_path} (model={model_name}, image_index={image_index}, user_id={user_id})",
+                    )
+                    await editMessageOrAnswer(
+                        call,
+                        f"❌ Изображение для upscale и замены лица не найдено! (model={model_name}, image_index={image_index})",
+                    )
+                    return None
+
+                # PIL check: Проверяем валидность изображения
+                try:
+                    with Image.open(local_faceswap_target_path) as img:
+                        img.verify()  # Проверяет, что файл не поврежден
+                except Exception as pil_exc:
+                    logger.error(
+                        f"[process_faceswap_image] Файл невалиден или поврежден для faceswap: {local_faceswap_target_path} (model={model_name}, image_index={image_index}, user_id={user_id}) — {pil_exc}",
+                    )
+                    await editMessageOrAnswer(
+                        call,
+                        f"❌ Изображение повреждено или невалидно для замены лица! (model={model_name}, image_index={image_index})",
+                    )
+                    return None
+                logger.info(
+                    f"[process_faceswap_image] Путь для FaceFusion в контейнере: {faceswap_target_path}",
+                )
+                # Копирование больше не требуется, так как файл уже в нужном месте
                 result_path = await retryOperation(
                     facefusion_swap,
                     5,
@@ -138,7 +195,6 @@ async def process_faceswap_image(
                     faceswap_source_path,
                     faceswap_target_path,
                 )
-
             except Exception as e:
                 result_path = None
                 logger.error(
@@ -149,7 +205,7 @@ async def process_faceswap_image(
                     text.FACE_SWAP_ERROR_TEXT.format(
                         model_name,
                         model_name_index,
-                        e,
+                        str(e)[0:100],
                     ),
                 )
                 error_message = e
@@ -167,15 +223,22 @@ async def process_faceswap_image(
     )
 
     # После генерации удаляем модель из стейта
+    logger.info(
+        f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}"
+    )
+    # После генерации удаляем модель из стейта по model_name и image_index
     state_data = await state.get_data()
     faceswap_generated_models = state_data.get("faceswap_generated_models", [])
-    faceswap_generated_models_without_current_model = [
+    faceswap_generated_models_without_current = [
         model
         for model in faceswap_generated_models
-        if model["model_name"] != model_name
+        if not (
+            model["model_name"] == model_name
+            and model["image_index"] == image_index
+        )
     ]
     await state.update_data(
-        faceswap_generated_models=faceswap_generated_models_without_current_model,
+        faceswap_generated_models=faceswap_generated_models_without_current,
     )
 
     if error_message:

@@ -17,7 +17,8 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
 
     # Получаем переменные рандомайзера
     variable_names_for_randomizer = state_data.get(
-        "variable_names_for_randomizer", []
+        "variable_names_for_randomizer",
+        [],
     )
 
     # Получаем массив данных
@@ -26,11 +27,12 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     generators = {}
     for variable_name in variable_names_for_randomizer:
         variable_values = state_data.get(
-            f"randomizer_{variable_name}_values", []
+            f"randomizer_{variable_name}_values",
+            [],
         )
         if variable_values:
             generators[variable_name] = random_choice_variables_for_images(
-                variable_values
+                variable_values,
             )
         else:
             logger.warning(f"Нет значений для переменной '{variable_name}'")
@@ -49,17 +51,29 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
 
             model_randomizer_prompt += formated_prompt
 
-        # Прибавляем к постоянному промпту промпт рандомайзера      
-        data["json"]["input"]["prompt"] = model_randomizer_prompt.replace("\n", " ") + " " + data["json"]["input"]["prompt"]
+        data["json"]["input"]["prompt"] = (
+            model_randomizer_prompt.replace("\n", " ")
+            + " "
+            + data["json"]["input"]["prompt"]
+        )
 
-        # Сохраняем промпт в стейт для перегенерации
-        data_for_update = {f"{data['model_name']}": model_randomizer_prompt}
+        data_for_update = {
+            "model_name": data["model_name"],
+            "image_index": data.get(
+                "image_index",
+                0,
+            ),
+            "prompt": model_randomizer_prompt,
+        }
         await appendDataToStateArray(
-            state, "randomizer_prompts", data_for_update
+            state,
+            "randomizer_prompts",
+            data_for_update,
+            unique_keys=("model_name", "image_index"),
         )
 
     logger.info(
-        f"Массив данных после применения переменных рандомайзера: {dataArray}"
+        f"Массив данных после применения переменных рандомайзера: {dataArray}",
     )
     # Возвращаем массив данных
     return dataArray

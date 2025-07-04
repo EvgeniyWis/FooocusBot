@@ -5,8 +5,6 @@ from utils.handlers.appendDataToStateArray import appendDataToStateArray
 from bot.helpers.jobs.send_run_request import send_run_request
 from bot.utils.retryOperation import retryOperation
 
-# from utils.check_unfinished_tasks import check_unfinished_tasks
-
 
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы
 async def get_job_ID(
@@ -21,7 +19,11 @@ async def get_job_ID(
 
     # Получаем id работы
     response_json = await retryOperation(
-        send_run_request, 10, 2, dataJSON, setting_number
+        send_run_request,
+        10,
+        2,
+        dataJSON,
+        setting_number,
     )
 
     logger.info(f"Ответ на запрос: {response_json}")
@@ -38,8 +40,11 @@ async def get_job_ID(
         "job_type": job_type,
     }
     logger.info(f"Сохраняем id работы в стейт: {job_id}")
-    await appendDataToStateArray(state, "image_generation_jobs", data_for_update)
-
-    # await check_unfinished_tasks.append_new_task(data_for_update)
+    await appendDataToStateArray(
+        state,
+        "image_generation_jobs",
+        data_for_update,
+        unique_keys=("job_id",),
+    )
 
     return job_id

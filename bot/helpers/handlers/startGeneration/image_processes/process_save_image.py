@@ -4,7 +4,8 @@ from datetime import datetime
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from aiogram.methods import SendPhoto
+from constants import TEMP_FOLDER_PATH
+from utils.handlers.messages.rate_limiter_for_send_photo import safe_send_photo
 
 from bot.assets.mocks.links import (
     MOCK_FACEFUSION_PATH,
@@ -15,16 +16,14 @@ from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
-from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
-from bot.settings import MOCK_MODE
+from bot.settings import settings
 from bot.utils.googleDrive.files import convertDriveLink
 from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.utils.retryOperation import retryOperation
 
 
 async def process_save_image(
@@ -32,6 +31,7 @@ async def process_save_image(
     state: FSMContext,
     model_name: str,
     result_path: str,
+    image_index: int,
 ):
     """
     Обрабатывает сохранение изображения после этапа замены лица.
@@ -45,6 +45,10 @@ async def process_save_image(
 
     # Получаем данные пользователя
     user_id = call.from_user.id
+    temp_user_dir = TEMP_FOLDER_PATH / f"{model_name}_{user_id}"
+    logger.info(
+        f"[save] START: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+    )
 
     # Получаем индекс модели
     model_name_index = getModelNameIndex(model_name)
@@ -60,14 +64,17 @@ async def process_save_image(
 
     # Сохраняем изображение
     now = datetime.now().strftime("%Y-%m-%d")
-    if not MOCK_MODE:
-        link = await retryOperation(
-            saveFile, 10, 2,
+    if not settings.MOCK_IMAGES_MODE:
+        state_data = await state.get_data()
+        multi_select_mode = bool(state_data.get("multi_select_mode", False))
+
+        link = await saveFile(
             result_path,
             user_id,
             model_name,
             model_data["picture_folder_id"],
             now,
+            image_index if multi_select_mode else None,
         )
     else:
         link = MOCK_LINK_FOR_SAVE_IMAGE
@@ -75,8 +82,17 @@ async def process_save_image(
     # Конвертируем ссылку в прямую ссылку для скачивания
     direct_url = convertDriveLink(link)
 
-    data_for_update = {f"{model_name}": direct_url}
-    await appendDataToStateArray(state, "saved_images_urls", data_for_update)
+    data_for_update = {
+        "model_name": model_name,
+        "image_index": image_index,
+        "direct_url": direct_url,
+    }
+    await appendDataToStateArray(
+        state,
+        "saved_images_urls",
+        data_for_update,
+        unique_keys=("model_name", "image_index"),
+    )
 
     if not link:
         traceback.print_exc()
@@ -94,15 +110,18 @@ async def process_save_image(
     logger.info(
         f"Данные папки по id {model_data['picture_folder_id']}: {folder}",
     )
+    logger.info(
+        f"Сохранили ссылку для ({model_name}, {image_index}): {direct_url}",
+    )
 
     # Отправляем сообщение о сохранении изображения
     logger.info(
         f"Отправляем сообщение о сохранении изображения: {direct_url}",
     )
 
-    method = SendPhoto(
-        chat_id=call.message.chat.id,
+    await safe_send_photo(
         photo=direct_url,
+        message=call,
         caption=text.SAVE_IMAGES_SUCCESS_TEXT.format(
             link,
             model_name,
@@ -111,12 +130,9 @@ async def process_save_image(
         ),
         reply_markup=video_generation_keyboards.generateVideoKeyboard(
             model_name,
+            image_index=image_index,
         ),
-        parse_mode="HTML",
     )
-
-    # Отправляем фото с помощью бота
-    await bot(method)
 
     # Удаляем сообщение о сохранении изображения
     try:
@@ -125,5 +141,9 @@ async def process_save_image(
         logger.error(f"Произошла ошибка при удалении сообщения: {e}")
 
     # Удаляем изображение с замененным лицом
-    if not MOCK_MODE and result_path != MOCK_FACEFUSION_PATH:
+    if not settings.MOCK_IMAGES_MODE and result_path != MOCK_FACEFUSION_PATH:
         os.remove(result_path)
+
+    logger.info(
+        f"[save] END: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+    )
