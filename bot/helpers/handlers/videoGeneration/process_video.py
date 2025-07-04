@@ -52,8 +52,12 @@ async def process_video(
         is_quick_generation: bool = False - Флаг, указывающий, является ли генерация быстрой
     """
 
-    if (call is None and message is None) or (call is not None and message is not None):
-        raise ValueError("Нужно передать либо call, либо message, но не оба и не ни одного.")
+    if (call is None and message is None) or (
+        call is not None and message is not None
+    ):
+        raise ValueError(
+            "Нужно передать либо call, либо message, но не оба и не ни одного."
+        )
 
     if call is not None:
         user_id = call.from_user.id
@@ -93,7 +97,9 @@ async def process_video(
     )
 
     # Проверяем путь к видео
-    video_path = await check_video_path(prompt, image_index, message, image_url, None, model_name)
+    video_path = await check_video_path(
+        prompt, message, image_url, None, model_name
+    )
 
     # Удаляем сообщение о генерации видео
     try:
@@ -122,7 +128,10 @@ async def process_video(
         "direct_url": video_path,
     }
     await appendDataToStateArray(
-        state, "generated_video_paths", data_for_update, unique_keys=("model_name", "image_index")
+        state,
+        "video_paths",
+        data_for_update,
+        unique_keys=("model_name",),
     )
 
     # Отправляем видео юзеру
@@ -179,4 +188,3 @@ async def process_video(
             model_name=model_name,
         ),
     )
-

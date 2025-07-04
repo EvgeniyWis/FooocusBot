@@ -1,4 +1,5 @@
 import asyncio
+import os
 import uuid
 
 import aiofiles
@@ -6,8 +7,6 @@ import aiofiles
 import bot.constants as constants
 from bot.logger import logger
 from bot.settings import settings
-
-import os
 
 
 async def facefusion_swap(source_filename: str, target_filename: str) -> str:
@@ -19,7 +18,10 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
     :return: абсолютный путь к выходному изображению
     """
     output_filename = f"{uuid.uuid4()}_output.jpg"
-    output_path = os.path.join(constants.FACEFUSION_RESULTS_DIR, output_filename)
+    output_path = os.path.join(
+        constants.FACEFUSION_RESULTS_DIR,
+        output_filename,
+    )
 
     FACEFUSION_CONTAINER_NAME = os.getenv("FACEFUSION_CONTAINER_NAME")
 
@@ -56,6 +58,16 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
                 f"FaceFusion завершился с ошибкой: {stderr.decode().strip()}",
             )
             raise RuntimeError(f"FaceFusion failed: {stderr.decode().strip()}")
+        else:
+            stderr_decoded = stderr.decode().strip()
+            if stderr_decoded:
+                # Фильтруем строку, если это ошибка pthread_setaffinity_np, иначе - warning
+                if "pthread_setaffinity_np failed" in stderr_decoded:
+                    logger.debug(
+                        f"Suppressing known onnxruntime affinity error: {stderr_decoded}",
+                    )
+                else:
+                    logger.warning(f"FaceFusion stderr: {stderr_decoded}")
 
         async with aiofiles.open(output_path, mode="rb") as f:
             if not f.readable():
