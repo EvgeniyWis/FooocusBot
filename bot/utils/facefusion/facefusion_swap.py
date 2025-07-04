@@ -10,13 +10,6 @@ from bot.settings import settings
 
 
 async def facefusion_swap(source_filename: str, target_filename: str) -> str:
-    """
-    Выполняет подмену лица через FaceFusion внутри Docker-контейнера.
-
-    :param source_filename: путь к исходному изображению относительно папки .assets/ (с которого взять лицо)
-    :param target_filename: путь к целевому изображению относительно папки .assets/  (куда вставить лицо)
-    :return: абсолютный путь к выходному изображению
-    """
     output_filename = f"{uuid.uuid4()}_output.jpg"
     output_path = os.path.join(
         constants.FACEFUSION_RESULTS_DIR,
@@ -53,39 +46,52 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         )
         stdout, stderr = await process.communicate()
 
+        stderr_decoded = stderr.decode().strip()
+        stdout_decoded = stdout.decode().strip()
+
+        logger.info(f"FaceFusion stdout:\n{stdout_decoded}")
+        logger.info(f"FaceFusion stderr:\n{stderr_decoded}")
+
         if process.returncode != 0:
-            logger.error(
-                f"FaceFusion завершился с ошибкой: {stderr.decode().strip()}",
-            )
-            raise RuntimeError(f"FaceFusion failed: {stderr.decode().strip()}")
+            stderr_decoded = stderr.decode().strip()
+            stderr_lines = stderr_decoded.splitlines()
+            filtered_lines = [
+                line
+                for line in stderr_lines
+                if "pthread_setaffinity_np failed" not in line
+            ]
+            if filtered_lines:
+                logger.error(
+                    "FaceFusion завершился с ошибкой:\n"
+                    + "\n".join(filtered_lines),
+                )
+                raise RuntimeError(
+                    "FaceFusion failed:\n" + "\n".join(filtered_lines),
+                )
         else:
             stderr_decoded = stderr.decode().strip()
             if stderr_decoded:
-                stderr_lines = stderr_decoded.splitlines()
-
-                # Пропускаем все строки с affinity warning'ами
                 filtered_lines = [
                     line
-                    for line in stderr_lines
+                    for line in stderr_decoded.splitlines()
                     if "pthread_setaffinity_np failed" not in line
                 ]
-
                 if filtered_lines:
-                    logger.warning(
+                    logger.debug(
                         "FaceFusion stderr (non-affinity):\n"
                         + "\n".join(filtered_lines),
                     )
-                else:
-                    logger.debug(
-                        "Все сообщения stderr — это ожидаемые ворнинги onnxruntime, игнорируем",
-                    )
+
+        if not os.path.exists(output_path):
+            logger.error(f"Файл результата не найден по пути: {output_path}")
+            raise FileNotFoundError(
+                f"Файл результата не найден: {output_path}",
+            )
 
         async with aiofiles.open(output_path, mode="rb") as f:
-            if not f.readable():
-                logger.error(f"Файл {output_filename} не найден")
-                raise FileNotFoundError(
-                    f"Файл {output_filename} не найден. Скорее всего проблема произошла с путями",
-                )
+            data = await f.read()
+            if not data:
+                raise RuntimeError("Файл результата пустой")
 
         logger.info(f"FaceFusion успешно завершен, результат: {output_path}")
         return str(output_path)
