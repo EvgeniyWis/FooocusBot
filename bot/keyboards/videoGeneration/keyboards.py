@@ -19,6 +19,12 @@ def generateVideoKeyboard(model_name: str, image_index: int):
                     callback_data=f"quick_video_generation|{model_name}|{image_index}",
                 ),
             ],
+            [
+                InlineKeyboardButton(
+                    text="🤖 Генерация NSFW видео",
+                    callback_data=f"generate_comfyui_video|{model_name}|{image_index}",
+                ),
+            ],
         ],
     )
 
@@ -109,6 +115,24 @@ def videoCorrectnessKeyboard(
     )
 
     return kb
+
+
+def nsfw_video_generation_insert_length_video_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Оставить по умолчанию",
+                    callback_data="video_length_choice|default",
+                ),
+                InlineKeyboardButton(
+                    text="✒️ Ввести свою длительность",
+                    callback_data="video_length_choice|input",
+                ),
+            ],
+        ],
+    )
+    return keyboard
 
 
 # Инлайн-клавиатура для выбора режима генерации видео

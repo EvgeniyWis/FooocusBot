@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from adapters.redis_task_storage_repository import key_for_image
 from aiogram import types
@@ -78,12 +79,20 @@ async def process_image(
             settings.UPSCALE_MODE
             and process_image_step == ProcessImageStep.UPSCALE
         ):
-            logger.info(f"[process_image] UPSCALE START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}")
-            logger.info(f"[process_image] temp dir before UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}")
+            logger.info(
+                f"[process_image] UPSCALE START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}",
+            )
+            logger.info(
+                f"[process_image] temp dir before UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+            )
             logger.info(f"Запускаем upscale для ({model_name}, {image_index})")
             await process_upscale_image(call, state, image_index, model_name)
-            logger.info(f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}")
-            logger.info(f"[process_image] temp dir after UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}")
+            logger.info(
+                f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}",
+            )
+            logger.info(
+                f"[process_image] temp dir after UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+            )
             process_image_step = await update_process_image_step(
                 state,
                 model_name,
@@ -98,12 +107,16 @@ async def process_image(
             settings.FACEFUSION_MODE
             and process_image_step == ProcessImageStep.FACEFUSION
         ):
-            logger.info(f"[process_image] FACEFUSION START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}")
+            logger.info(
+                f"[process_image] FACEFUSION START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}",
+            )
             faceswap_target_path = temp_image_path
             logger.info(
                 f"[process_image] Проверка файла перед faceswap: {faceswap_target_path} exists={os.path.exists(faceswap_target_path)}",
             )
-            logger.info(f"[process_image] temp dir before FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}")
+            logger.info(
+                f"[process_image] temp dir before FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+            )
             if not os.path.exists(faceswap_target_path):
                 logger.warning(
                     f"[process_image] Файл не найден для faceswap: {faceswap_target_path}",
@@ -115,8 +128,12 @@ async def process_image(
                 image_index,
                 model_name,
             )
-            logger.info(f"[process_image] FACEFUSION END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(faceswap_target_path)}")
-            logger.info(f"[process_image] temp dir after FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}")
+            logger.info(
+                f"[process_image] FACEFUSION END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(faceswap_target_path)}",
+            )
+            logger.info(
+                f"[process_image] temp dir after FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+            )
             if result_path:
                 await state.update_data(
                     {f"{model_name}_{image_index}_result_path": result_path},
@@ -206,4 +223,10 @@ async def process_image(
         key_for_image(call.from_user.id, image_index, model_name),
     )
 
+    try:
+        shutil.rmtree(TEMP_FOLDER_PATH / f"{model_name}_{call.from_user.id}")
+    except Exception as e:
+        logger.error(
+            f"Ошибка при удалении папки {TEMP_FOLDER_PATH / f"{model_name}_{call.from_user.id}"}: {e}",
+        )
     return True
