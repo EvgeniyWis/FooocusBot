@@ -46,7 +46,6 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
         model_name,
         model_data["video_folder_id"],
         now,
-        False,
     )
 
     if not link:
