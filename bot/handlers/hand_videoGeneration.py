@@ -740,6 +740,13 @@ async def generate_nsfw_video_and_send_result(
                 else message_or_call.answer_video
             )(video=video, caption=v.caption)
 
+            try:
+                os.remove(v.path)
+            except Exception as e:
+                logger.error(
+                    f"Ошибка при удалении временного файла {v.path}: {e}",
+                )
+
         await state.set_state(None)
     elif result_final.get("error"):
         await safe_send_message(
