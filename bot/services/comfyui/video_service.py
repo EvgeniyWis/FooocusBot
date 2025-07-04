@@ -10,9 +10,6 @@ from bot.services.comfyui.queue_inspector import ComfyUIQueueInspector
 from bot.services.comfyui.uploader import ComfyUIUploader
 from bot.services.comfyui.workflow_preparer import ComfyUIWorkflowPreparer
 
-# todo: сделать при перезапсуке бота пустую генерацию для компиляции комфика
-# таймауты
-
 
 class ComfyUIVideoService:
     def __init__(self, api_url: str, workflow_path: str, avg_times_path: str):
