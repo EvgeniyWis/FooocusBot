@@ -11,6 +11,7 @@ from bot.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.images.base64_to_image import base64_to_image
+from bot.logger import logger
 
 
 async def process_image_block(
@@ -38,37 +39,39 @@ async def process_image_block(
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
         chat_id (int): id чата
     """
-    redis_storage = get_redis_storage()
-    task_dto = TaskImageBlockDTO(
-        job_id=job_id,
-        model_name=model_name,
-        setting_number=setting_number,
-        user_id=user_id,
-        message_id=message_id,
-        is_test_generation=is_test_generation,
-        check_other_jobs=checkOtherJobs,
-        chat_id=chat_id,
-    )
-    await redis_storage.add_task(settings.PROCESS_IMAGE_BLOCK_TASK, task_dto)
 
-    # Проверяем статус работы
-    response_json = await retryOperation(
-        check_job_status,
-        3,
-        2,
-        job_id,
-        setting_number,
-        user_id,
-        message_id,
-        state,
-        is_test_generation,
-        checkOtherJobs,
-        500,
-    )
+    if not settings.MOCK_IMAGES_MODE:
+        redis_storage = get_redis_storage()
+        task_dto = TaskImageBlockDTO(
+            job_id=job_id,
+            model_name=model_name,
+            setting_number=setting_number,
+            user_id=user_id,
+            message_id=message_id,
+            is_test_generation=is_test_generation,
+            check_other_jobs=checkOtherJobs,
+            chat_id=chat_id,
+        )
+        await redis_storage.add_task(settings.PROCESS_IMAGE_BLOCK_TASK, task_dto)
 
-    # Если работа не завершена, то возвращаем False
-    if not response_json or response_json == CANCELLED_JOB_TEXT:
-        return False
+        # Проверяем статус работы
+        response_json = await retryOperation(
+            check_job_status,
+            3,
+            2,
+            job_id,
+            setting_number,
+            user_id,
+            message_id,
+            state,
+            is_test_generation,
+            checkOtherJobs,
+            500,
+        )
+
+        # Если работа не завершена, то возвращаем False
+        if not response_json or response_json == CANCELLED_JOB_TEXT:
+            return False
 
     # Если работа завершена, то обрабатываем результаты
     try:
@@ -118,6 +121,10 @@ async def process_image_block(
 
         # Отправляем изображение
         from helpers.handlers.startGeneration import sendImageBlock
+
+        if not len(media_group):
+            logger.error(f"Медиагруппа изображений для отправки пользователю {user_id} для модели {model_name} пуста: {media_group}")
+            return False
 
         await sendImageBlock(
             state,
