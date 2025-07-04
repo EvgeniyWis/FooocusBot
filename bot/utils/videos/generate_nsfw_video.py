@@ -7,10 +7,8 @@ from domain.entities.video_generation import (
     TimeoutStatus,
 )
 
-import bot.constants as constants
+from bot.factory.comfyui_video_service import get_video_service
 from bot.logger import logger
-from bot.services.comfyui.video_service import ComfyUIVideoService
-from bot.settings import settings
 
 
 async def generate_nsfw_video(
@@ -18,11 +16,7 @@ async def generate_nsfw_video(
     temp_path: str,
     seconds: int,
 ) -> NSFWVideoStatus:
-    video_service = ComfyUIVideoService(
-        api_url=settings.COMFYUI_API_URL,
-        workflow_path=constants.COMFYUI_WORKFLOW_TEMPLATE_PATH,
-        avg_times_path=constants.COMFYUI_AVG_TIMES_METRICS_PATH,
-    )
+    video_service = get_video_service()
 
     try:
         result = await video_service.generate(

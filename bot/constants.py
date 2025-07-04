@@ -14,3 +14,6 @@ COMFYUI_WORKFLOW_TEMPLATE_PATH: Final[Path] = (
 COMFYUI_AVG_TIMES_METRICS_PATH: Final[Path] = (
     BASE_DIR / "bot" / "assets" / "comfyui" / "avg_times_metrics.json"
 )
+COMFYUI_HEATING_IMAGES_PATH: Final[Path] = (
+    BASE_DIR / "bot" / "assets" / "comfyui" / "heating" / "img"
+)

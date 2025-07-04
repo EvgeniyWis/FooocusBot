@@ -5,21 +5,16 @@ import traceback
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from domain.entities.video_generation import (
+
+import bot.constants as constants
+from bot.domain.entities.video_generation import (
     ErrorStatus,
     ProcessingStatus,
     QueuedStatus,
     StartGenerationStatus,
     TimeoutStatus,
 )
-from settings import settings
-from utils import retryOperation
-from utils.videos.download_nsfw_video import (
-    download_nsfw_videos,
-)
-from utils.videos.generate_nsfw_video import generate_nsfw_video
-
-import bot.constants as constants
+from bot.factory.comfyui_video_service import get_video_service
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getModelNameIndex,
@@ -37,8 +32,8 @@ from bot.helpers.handlers.videoGeneration import (
 from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
-from bot.services.comfyui.video_service import ComfyUIVideoService
 from bot.states import StartGenerationState
+from bot.utils import retryOperation
 from bot.utils.handlers import (
     getDataInDictsArray,
 )
@@ -51,6 +46,10 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 from bot.utils.handlers.messages.rate_limiter_for_send_photo import (
     safe_send_photo,
 )
+from bot.utils.videos.download_nsfw_video import (
+    download_nsfw_videos,
+)
+from bot.utils.videos.generate_nsfw_video import generate_nsfw_video
 
 
 # Обработка нажатия кнопки "📹 Сгенерировать видео"
@@ -696,11 +695,7 @@ async def generate_nsfw_video_and_send_result(
         case _:
             logger.error(f"Неизвестный статус генерации: {status}")
 
-    video_service = ComfyUIVideoService(
-        api_url=settings.COMFYUI_API_URL,
-        workflow_path=constants.COMFYUI_WORKFLOW_TEMPLATE_PATH,
-        avg_times_path=constants.COMFYUI_AVG_TIMES_METRICS_PATH,
-    )
+    video_service = get_video_service()
     try:
         result_final = await video_service.wait_for_result(
             prompt_id,
