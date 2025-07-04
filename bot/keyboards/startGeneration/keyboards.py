@@ -248,7 +248,7 @@ def selectMultiImageKeyboard(
                 continue
             idx = j - 1
             selected = idx in selected_indexes
-            text = f"{'✅' if selected else ''}{j}"
+            text = f"{j} {'✅' if selected else ''}"
             row.append(
                 InlineKeyboardButton(
                     text=text,
