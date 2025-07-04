@@ -145,8 +145,10 @@ def setting1_getDataArray():
             "1K_eG4yHp1di75TR5OyeMNPzjyGX76Ua5",
             """score_9, score_8_up, source_photo, source_real, BREAK
 
-        real_beauty, 1girl, 18 years old, blonde hair, blue eyes, tan skin, skinny, cute, smiling.""",
-            [2, 4.15, -0.90, -1.50, 0.25, 0.9, 0.05, 0.80],
+            real_beauty, igbaddie, 1girl, caucasian, 18 years old, athletic body, soft curves, medium teardrop-shaped breasts, toned abdomen, beautiful face, plump lips, realistic blue eyes, long voluminous blonde hair, tanned skin, natural skin texture, fine pores, detailed body, subtle highlights, slightly smiling, ((the face is well lit by bright sunlight)), hips, hourglass body.
+
+            Style: Instagram photo style, vibrant and warm filter, high-resolution, Canon DSLR simulation, shallow depth of field, soft natural daylight, ((bright, direct sunlight creating warm highlights and accentuating features))""",
+            [2, 4.15, -0.90, -1.50, 0.7, 0.9, 0.05, 0.80],
         ),
         setting1_generateData(
             "zara_devaux",
