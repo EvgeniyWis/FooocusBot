@@ -679,7 +679,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     )
 
     await call.message.answer(
-        f"Вы выбрали изображения с номерами: {', '.join(str(i + 1) for i in selected_indexes_sorted)}.\nОбрабатываю выбор изображений...",
+        f"Вы выбрали изображения с номерами: {', '.join(str(i) for i in selected_indexes_sorted)}.\nОбрабатываю выбор изображений...",
     )
 
     await deleteMessageFromState(
