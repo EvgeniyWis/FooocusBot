@@ -394,7 +394,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Получаем индекс работы и индекс изображения
     model_name = call.data.split("|")[1]
     setting_number = call.data.split("|")[2]
-    image_index = int(call.data.split("|")[3])
+    image_index = call.data.split("|")[3]
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -437,6 +437,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 write_new_prompt_message_id=write_new_prompt_for_regenerate_message.message_id,
             )
             return
+        
+        image_index = int(image_index)
 
         # Если данные не найдены, ищем во всех доступных массивах
         if data is None:
