@@ -98,7 +98,7 @@ async def process_image_block(
                 file_path = await base64_to_image(
                     image_data["base64"],
                     model_name,
-                    i,
+                    i + 1,
                     user_id,
                     is_test_generation,
                 )

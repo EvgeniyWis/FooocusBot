@@ -76,7 +76,7 @@ async def check_upscale_status(
     return await base64_to_image(
         image_data,
         model_name,
-        int(image_index) - 1,
+        image_index,
         user_id,
         False,
     )
