@@ -3,18 +3,8 @@ from typing import Literal, Optional
 
 
 @dataclass
-class BaseStatus:
-    status: Literal[
-        "queued",
-        "processing",
-        "start_generation",
-        "timeout",
-        "error",
-    ]
-
-
-@dataclass
-class QueuedStatus(BaseStatus):
+class QueuedStatus:
+    status: Literal["queued"]
     position: int
     queue_length: int
     wait_min: int
@@ -22,25 +12,27 @@ class QueuedStatus(BaseStatus):
 
 
 @dataclass
-class ProcessingStatus(BaseStatus):
+class ProcessingStatus:
+    status: Literal["processing"]
     wait_min: int
     prompt_id: str
 
 
 @dataclass
-class StartGenerationStatus(BaseStatus):
+class StartGenerationStatus:
+    status: Literal["start_generation"]
     wait_min: int
     prompt_id: str
 
 
 @dataclass
-class TimeoutStatus(BaseStatus):
-    pass
+class TimeoutStatus:
+    status: Literal["timeout"]
 
 
 @dataclass
-class ErrorStatus(BaseStatus):
-    pass
+class ErrorStatus:
+    status: Literal["error"]
 
 
 NSFWVideoStatus = (
