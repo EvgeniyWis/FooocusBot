@@ -1,4 +1,3 @@
-import os
 import tempfile
 from typing import AsyncGenerator
 
@@ -28,6 +27,9 @@ async def _download_single_video(
                 suffix=".mp4",
             ) as tmpfile:
                 tmpfile.write(await resp.read())
+                logger.info(
+                    f"Видео {idx} успешно скачано, сохранено в {tmpfile.name}"
+                )
                 return DownloadedVideo(
                     path=tmpfile.name,
                     caption=f"Видео {idx}",
@@ -58,13 +60,6 @@ async def download_nsfw_videos(
             try:
                 video = await _download_single_video(session, url, idx)
                 yield video
-                if video.path:
-                    try:
-                        os.remove(video.path)
-                    except Exception as e:
-                        logger.error(
-                            f"Ошибка при удалении временного файла {video.path}: {e}",
-                        )
             except Exception as e:
                 logger.error(f"Ошибка при обработке видео {idx}: {e}")
                 yield DownloadedVideo(path=None, caption=None)
