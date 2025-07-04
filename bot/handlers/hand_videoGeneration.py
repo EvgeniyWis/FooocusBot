@@ -94,7 +94,7 @@ async def handle_rewrite_prompt_button(
     await state.update_data(model_name_for_video_generation=model_name)
 
     # Ставим стейт для обработки ввода
-    await state.set_state(StartGenerationState.write_prompt_for_video)
+    await state.set_state(StartGenerationState.write_prompt_for_quick_video_generation)
 
 
 # Обработка нажатия кнопок режима генерации видео
