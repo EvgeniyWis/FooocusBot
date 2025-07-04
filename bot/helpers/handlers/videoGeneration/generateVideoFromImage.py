@@ -14,6 +14,9 @@ from bot.keyboards.videoGeneration import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+from bot.utils.handlers import (
+    appendDataToStateArray,
+)
 
 
 # Функция для генерации видео из изображения
@@ -55,18 +58,15 @@ async def generateVideoFromImage(
             )
 
         # Генерируем видео
-        video_path = await check_video_path(prompt, message, None, temp_path)
+        video_path = await check_video_path(prompt, None, message, None, temp_path)
 
         if not video_path:
             return
 
         # Сохраняем путь к видео в стейт
-        if "video_paths" not in state_data:
-            await state.update_data(video_paths=[video_path])
-        else:
-            video_paths = state_data.get("video_paths", [])
-            video_paths.append(video_path)
-            await state.update_data(video_paths=video_paths)
+        await appendDataToStateArray(
+            state, "generated_video_paths", video_path
+        )
 
         video = types.FSInputFile(video_path)
         await message.answer_video(
