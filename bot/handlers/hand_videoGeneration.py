@@ -197,7 +197,7 @@ async def handle_video_example_buttons(
     # Получаем название модели и url изображения
     state_data = await state.get_data()
     saved_images_urls = state_data.get("saved_images_urls", [])
-    image_url = await getDataInDictsArray(saved_images_urls, model_name)
+    image_url = await getDataInDictsArray(saved_images_urls, model_name, image_index)
 
     # Удаляем сообщение с выбором видео-примера
     # TODO: режим генерации видео с видео-примерами временно отключен
@@ -283,6 +283,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         "write_prompt_messages_ids",
         model_name,
         message.chat.id,
+        image_index=image_index,
     )
 
     # Получаем индекс модели
@@ -397,6 +398,7 @@ async def handle_video_correctness_buttons(
         "videoGeneration_messages_ids",
         model_name,
         call.message.chat.id,
+        image_index=image_index,
     )
 
 
@@ -509,10 +511,11 @@ async def handle_prompt_for_videoGenerationFromImage(
         # Генерируем видео
         video_path = await check_video_path(
             prompt,
-            None,
             message,
-            None,
-            temp_path,
+            image_index=None,
+            image_url=None,
+            temp_path=temp_path,
+            model_name=None,
         )
 
         await generate_video_from_image_progress_message.delete()
