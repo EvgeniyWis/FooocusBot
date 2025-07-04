@@ -246,7 +246,7 @@ def selectMultiImageKeyboard(
         for j in [i, i + 1]:
             if j >= 10:
                 continue
-            idx = j - 1
+            idx = j
             selected = idx in selected_indexes
             text = f"{j} {'✅' if selected else ''}"
             row.append(

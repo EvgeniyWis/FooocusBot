@@ -120,16 +120,15 @@ def videoCorrectnessKeyboard(
 def nsfw_video_generation_insert_length_video_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                InlineKeyboardButton(
+            [InlineKeyboardButton(
                     text="✅ Оставить по умолчанию",
                     callback_data="video_length_choice|default",
-                ),
+                )],
+                [
                 InlineKeyboardButton(
                     text="✒️ Ввести свою длительность",
                     callback_data="video_length_choice|input",
-                ),
-            ],
+                )],
         ],
     )
     return keyboard
