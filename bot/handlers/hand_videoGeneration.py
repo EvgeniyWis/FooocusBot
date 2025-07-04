@@ -547,10 +547,6 @@ async def handle_prompt_for_videoGenerationFromImage(
         os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
-        await safe_send_message(
-            text.GENERATE_VIDEO_FROM_IMAGE_ERROR_TEXT.format(e),
-            message,
-        )
         raise e
 
 
