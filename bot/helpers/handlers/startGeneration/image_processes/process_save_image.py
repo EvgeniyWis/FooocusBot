@@ -67,12 +67,16 @@ async def process_save_image(
     # Сохраняем изображение
     now = datetime.now().strftime("%Y-%m-%d")
     if not settings.MOCK_IMAGES_MODE:
+        state_data = await state.get_data()
+        multi_select_mode = bool(state_data.get("multi_select_mode", False))
+
         link = await saveFile(
             result_path,
             user_id,
             model_name,
             model_data["picture_folder_id"],
             now,
+            image_index if multi_select_mode else None,
         )
     else:
         link = MOCK_LINK_FOR_SAVE_IMAGE
