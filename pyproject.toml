@@ -1,5 +1,5 @@
 [project]
-name = "FocuusBot"
+name = "FooocusBot"
 version = "2.0"
 
 [tool.setuptools]

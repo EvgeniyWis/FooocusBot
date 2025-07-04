@@ -30,6 +30,7 @@ async def process_video(
     prompt: str,
     type_for_video_generation: str,
     image_url: str,
+    image_index: int,
     call: Optional[types.CallbackQuery] = None,
     message: Optional[types.Message] = None,
     is_quick_generation: bool = False,
@@ -45,6 +46,10 @@ async def process_video(
         prompt: str - Промпт для генерации видео
         type_for_video_generation: str - Тип генерации видео (Рабочий или Тестовый)
         image_url: str - Ссылка на изображение, из которого будет генерироваться видео
+        image_index: int - Индекс изображения в массиве изображений
+        call: Optional[types.CallbackQuery] = None - CallbackQuery с сообщением о генерации видео
+        message: Optional[types.Message] = None - Message с сообщением о генерации видео
+        is_quick_generation: bool = False - Флаг, указывающий, является ли генерация быстрой
     """
 
     if (call is None and message is None) or (
@@ -89,7 +94,6 @@ async def process_video(
         model_name,
         message,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
-        message.message_id,
     )
 
     # Проверяем путь к видео
@@ -119,8 +123,9 @@ async def process_video(
 
     # Добавляем путь к видео в стейт
     data_for_update = {
+        "image_index": image_index,
         "model_name": model_name,
-        "video_path": video_path,
+        "direct_url": video_path,
     }
     await appendDataToStateArray(
         state,
@@ -131,7 +136,7 @@ async def process_video(
 
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
-    prefix = f"generate_video|{model_name}"
+    prefix = f"generate_video|{model_name}|{image_index}"
 
     if type_for_video_generation == "work":
         method = message.answer_video(
@@ -142,6 +147,7 @@ async def process_video(
             ),
             reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
                 model_name,
+                image_index,
                 is_quick_generation,
             ),
         )

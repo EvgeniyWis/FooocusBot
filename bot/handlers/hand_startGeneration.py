@@ -38,6 +38,7 @@ from bot.utils.handlers.messages import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+import shutil
 
 
 # Обработка выбора количества генераций
@@ -109,6 +110,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "process_images_steps": [],
         "upscale_progress_messages": [],
         "variable_names_for_randomizer": [],
+        "generated_video_paths": [],
     }
     
     # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
@@ -723,6 +725,16 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer(
         f"✅ Все выбранные изображения для модели {model_name} успешно обработаны!",
     )
+
+    # Удаляем папку модели с оставшимися изображениями
+    try:
+        temp_path = os.path.join(
+            TEMP_FOLDER_PATH, f"{model_name}_{call.from_user.id}"
+        )
+        if os.path.exists(temp_path):
+            shutil.rmtree(temp_path)
+    except Exception as e:
+        logger.error(f"Ошибка при удалении папки модели {model_name}: {e}")
 
 
 # Добавление обработчиков

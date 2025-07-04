@@ -6,6 +6,9 @@ from bot.utils.googleDrive.auth import service
 from bot.utils.googleDrive.files.uploadFile import uploadFile
 from bot.utils.googleDrive.folders.createFolder import createFolder
 from bot.utils.retryOperation import retryOperation
+import os
+from bot import constants
+import shutil
 
 
 # Сохранение одного файла
@@ -15,7 +18,7 @@ async def saveFile(
     folder_name: str,
     initial_folder_id: int,
     current_date: str,
-    with_deleting_temp_folder: bool = True,
+    image_index: int | None = None,
 ):
     try:
         if not initial_folder_id:
@@ -89,19 +92,22 @@ async def saveFile(
             folder_name,
         )
 
-        # if with_deleting_temp_folder:  # todo: при мультигенерации фоток у нас не должно сразу удаляться
-        # Удаляем папку с файлами
-        # temp_path = (
-        #     os.path.join(
-        #         constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}"
-        #     )
-        #     if folder_name
-        #     else constants.TEMP_FOLDER_PATH
-        # )
-        # shutil.rmtree(temp_path)
-        #
-        # # Через 1 час удаляем и папку в более верхнем уровне
-        # asyncio.create_task(deleteParentFolder(folder_name, user_id))
+        if image_index is not None:
+            # Удаляем файл изображения
+            temp_path = os.path.join(
+                constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}", 
+                f"{image_index}.jpg"
+            )
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+        else:
+            # Удаляем папку с изображениями
+            temp_path = os.path.join(
+                constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}"
+            )
+            if os.path.exists(temp_path):
+                shutil.rmtree(temp_path)
 
         return file["webViewLink"]
 
