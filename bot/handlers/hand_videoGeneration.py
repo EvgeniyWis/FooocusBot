@@ -7,13 +7,6 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 import bot.constants as constants
-from bot.domain.entities.video_generation import (
-    ErrorStatus,
-    ProcessingStatus,
-    QueuedStatus,
-    StartGenerationStatus,
-    TimeoutStatus,
-)
 from bot.factory.comfyui_video_service import get_video_service
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
@@ -189,8 +182,6 @@ async def handle_video_example_buttons(
     # Получаем индекс видео-примера и тип кнопки
     temp = call.data.split("|")
 
-
-
     if len(temp) == 4:
         # TODO: режим генерации видео с видео-примерами временно отключен
         # index = int(temp[1])
@@ -266,7 +257,9 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     image_index = int(state_data.get("image_index_for_video_generation", 0))
     saved_images_urls = state_data.get("saved_images_urls", [])
 
-    logger.info(f"Произвожу поиск изображения по индексу {image_index} и имени модели {model_name} в массиве: {saved_images_urls}")
+    logger.info(
+        f"Произвожу поиск изображения по индексу {image_index} и имени модели {model_name} в массиве: {saved_images_urls}",
+    )
 
     image_url = await getDataInDictsArray(
         saved_images_urls,
@@ -370,8 +363,14 @@ async def handle_video_correctness_buttons(
 
     # Получаем путь к видео
     generated_video_paths = state_data.get("generated_video_paths", [])
-    logger.info(f"Получены пути к видео: {generated_video_paths} и попытка получить путь к видео по имени модели {model_name} и индексу изображения {image_index}")
-    video_path = await getDataInDictsArray(generated_video_paths, model_name, image_index)
+    logger.info(
+        f"Получены пути к видео: {generated_video_paths} и попытка получить путь к видео по имени модели {model_name} и индексу изображения {image_index}",
+    )
+    video_path = await getDataInDictsArray(
+        generated_video_paths,
+        model_name,
+        image_index,
+    )
 
     if not video_path:
         await safe_send_message(
@@ -508,7 +507,13 @@ async def handle_prompt_for_videoGenerationFromImage(
             )
 
         # Генерируем видео
-        video_path = await check_video_path(prompt, None, message, None, temp_path)
+        video_path = await check_video_path(
+            prompt,
+            None,
+            message,
+            None,
+            temp_path,
+        )
 
         await generate_video_from_image_progress_message.delete()
 
@@ -666,57 +671,69 @@ async def generate_nsfw_video_and_send_result(
     )
 
     status = await generate_nsfw_video(prompt, temp_path, seconds)
-    match status:
-        case QueuedStatus(
-            position=pos,
-            queue_length=total,
-            wait_min=wait_min,
-            prompt_id=prompt_id,
-        ):
-            if wait_min >= 150:
-                msg = (
-                    f"🕒 Вы в очереди: {pos} из {total}.\n"
-                    f"Примерное ожидание: {int(wait_min)} мин.\n"
-                    f"🚫Очередь очень длинная, возможно, придётся ждать до 3 часов."
-                )
-            elif wait_min >= 80:
-                msg = (
-                    f"🕒 Вы в очереди: {pos} из {total}.\n"
-                    f"Примерное ожидание: {int(wait_min)} мин.\n"
-                    f"🚫Очередь длинная. Ожидайте или попробуйте позже."
-                )
-            else:
-                msg = (
-                    f"🕒 Вы в очереди: {pos} из {total}.\n"
-                    f"Примерное ожидание: {int(wait_min)} мин."
-                )
-            await safe_send_message(msg, get_target_message(message_or_call))
+    prompt_id = None
 
-        case (
-            ProcessingStatus(wait_min=wait_min, prompt_id=prompt_id)
-            | StartGenerationStatus(wait_min=wait_min, prompt_id=prompt_id)
-        ):
-            await safe_send_message(
-                f"⚙️ Генерация началась. Примерное ожидание: {int(wait_min)} мин.",
-                get_target_message(message_or_call),
+    if status.status == "queued":
+        prompt_id = status.prompt_id
+        pos = status.position
+        total = status.queue_length
+        wait_min = status.wait_min
+
+        if wait_min >= 150:
+            msg = (
+                f"🕒 Вы в очереди: {pos} из {total}.\n"
+                f"Примерное ожидание: {int(wait_min)} мин.\n"
+                f"🚫Очередь очень длинная, возможно, придётся ждать до 3 часов."
             )
-
-        case TimeoutStatus():
-            await safe_send_message(
-                "❌ Время ожидания начала генерации истекло. Попробуйте позже.",
-                get_target_message(message_or_call),
+        elif wait_min >= 80:
+            msg = (
+                f"🕒 Вы в очереди: {pos} из {total}.\n"
+                f"Примерное ожидание: {int(wait_min)} мин.\n"
+                f"🚫Очередь длинная. Ожидайте или попробуйте позже."
             )
-            return
-
-        case ErrorStatus():
-            await safe_send_message(
-                "❌ Произошла ошибка при генерации NSFW видео.",
-                get_target_message(message_or_call),
+        else:
+            msg = (
+                f"🕒 Вы в очереди: {pos} из {total}.\n"
+                f"Примерное ожидание: {int(wait_min)} мин."
             )
-            return
+        await safe_send_message(msg, get_target_message(message_or_call))
 
-        case _:
-            logger.error(f"Неизвестный статус генерации: {status}")
+    elif status.status in ("start_generation", "processing"):
+        prompt_id = status.prompt_id
+        wait_min = status.wait_min
+        await safe_send_message(
+            f"⚙️ Генерация началась. Примерное ожидание: {int(wait_min)} мин.",
+            get_target_message(message_or_call),
+        )
+
+    elif status.status == "timeout":
+        await safe_send_message(
+            "❌ Время ожидания начала генерации истекло. Попробуйте позже.",
+            get_target_message(message_or_call),
+        )
+        await progress_message.delete()
+        return
+
+    elif status.status == "error":
+        await safe_send_message(
+            "❌ Произошла ошибка при генерации NSFW видео.",
+            get_target_message(message_or_call),
+        )
+        await progress_message.delete()
+        return
+
+    else:
+        logger.error(f"Неизвестный статус генерации: {status}")
+        await progress_message.delete()
+        return
+
+    if not prompt_id:
+        await safe_send_message(
+            "❌ Не удалось получить идентификатор задачи генерации.",
+            get_target_message(message_or_call),
+        )
+        await progress_message.delete()
+        return
 
     video_service = get_video_service()
     try:
@@ -736,6 +753,7 @@ async def generate_nsfw_video_and_send_result(
                 f"❌ Ошибка во время ожидания результата: {e}",
                 get_target_message(message_or_call),
             )
+            await progress_message.delete()
             return
 
     await progress_message.delete()
