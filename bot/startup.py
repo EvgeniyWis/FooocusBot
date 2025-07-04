@@ -6,12 +6,14 @@ from aiogram.types import BotCommand
 
 import bot.constants as constants
 from bot import handlers
+from bot.factory.comfyui_video_service import get_video_service
 from bot.helpers.generateImages.process_image_block import process_image_block
 from bot.helpers.handlers.startGeneration import process_image
 from bot.helpers.handlers.videoGeneration import process_video
 from bot.InstanceBot import bot, dp, redis_client, storage
 from bot.logger import logger
 from bot.middleware import ErrorHandlingMiddleware
+from bot.services.comfyui.heating_models import heating_comfyui_models
 from bot.settings import settings
 from bot.storage import get_redis_storage, init_redis_storage
 
@@ -62,6 +64,9 @@ async def on_startup():
     repo.set_process_callback(process_video, settings.PROCESS_VIDEO_TASK)
     if settings.RECOVERING_TASKS:
         asyncio.create_task(repo.recover_tasks(bot, storage))
+
+    if settings.HEATING_COMFYUI_MODELS:
+        asyncio.create_task(heating_comfyui_models(get_video_service()))
 
     handlers.hand_commands.hand_add()
     handlers.hand_startGeneration.hand_add()
