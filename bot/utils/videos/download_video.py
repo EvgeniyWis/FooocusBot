@@ -32,7 +32,7 @@ async def download_video(url: str) -> str:
             return video_path
         else:
             raise Exception(
-                f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'}",
+                f"Не удалось скачать видео, статус код: {response.status_code if response else 'нет ответа'} с текстом: {response.text if response else 'нет ответа'}",
             )
     except Exception as e:
         raise Exception(f"Произошла ошибка при скачивании видео: {e}")
