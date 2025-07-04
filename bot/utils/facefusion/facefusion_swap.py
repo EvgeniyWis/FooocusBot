@@ -61,13 +61,24 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         else:
             stderr_decoded = stderr.decode().strip()
             if stderr_decoded:
-                # Фильтруем строку, если это ошибка pthread_setaffinity_np, иначе - warning
-                if "pthread_setaffinity_np failed" in stderr_decoded:
-                    logger.debug(
-                        f"Suppressing known onnxruntime affinity error: {stderr_decoded}",
+                stderr_lines = stderr_decoded.splitlines()
+
+                # Пропускаем все строки с affinity warning'ами
+                filtered_lines = [
+                    line
+                    for line in stderr_lines
+                    if "pthread_setaffinity_np failed" not in line
+                ]
+
+                if filtered_lines:
+                    logger.warning(
+                        "FaceFusion stderr (non-affinity):\n"
+                        + "\n".join(filtered_lines),
                     )
                 else:
-                    logger.warning(f"FaceFusion stderr: {stderr_decoded}")
+                    logger.debug(
+                        "Все сообщения stderr — это ожидаемые ворнинги onnxruntime, игнорируем",
+                    )
 
         async with aiofiles.open(output_path, mode="rb") as f:
             if not f.readable():
