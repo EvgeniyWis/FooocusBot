@@ -33,7 +33,6 @@ async def process_video(
     image_index: int,
     call: Optional[types.CallbackQuery] = None,
     message: Optional[types.Message] = None,
-    is_quick_generation: bool = False,
 ):
     """
     Обработка видео после генерации в основной рабочей генерации.
@@ -49,7 +48,6 @@ async def process_video(
         image_index: int - Индекс изображения в массиве изображений
         call: Optional[types.CallbackQuery] = None - CallbackQuery с сообщением о генерации видео
         message: Optional[types.Message] = None - Message с сообщением о генерации видео
-        is_quick_generation: bool = False - Флаг, указывающий, является ли генерация быстрой
     """
 
     if (call is None and message is None) or (
@@ -153,7 +151,6 @@ async def process_video(
             reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
                 model_name,
                 image_index,
-                is_quick_generation,
             ),
         )
         video_message = await bot(method)
