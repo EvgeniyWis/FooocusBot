@@ -718,15 +718,18 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
 
     selected_indexes_copy = list(selected_indexes_sorted)
 
-    # Последовательная обработка изображений
-    for idx, image_index in enumerate(selected_indexes_copy, 1):
+    tasks = []
+
+    for idx, image_index in enumerate(selected_indexes_sorted, 1):
         logger.info(
             f"[multi_image_done] Обрабатываю image_index={image_index}",
         )
+
         status_message = await call.message.answer(
-            f"🔄 Работаю с изображением для модели {model_name} под номером {image_index}... (обработано {idx}/{len(selected_indexes_copy)})",
+            f"🔄 Работаю с изображением для модели {model_name} под номером {image_index}... (обработано {idx}/{len(selected_indexes_sorted)})",
         )
 
+        # Создаём фейковый call для каждой задачи
         fake_call = types.CallbackQuery(
             id=call.id,
             from_user=call.from_user,
@@ -736,17 +739,22 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
             inline_message_id=call.inline_message_id,
         )
 
-        try:
-            await process_image(fake_call, state, model_name, image_index)
-            await asyncio.sleep(1)
-        except Exception as e:
+        task = asyncio.create_task(
+            process_image(fake_call, state, model_name, image_index),
+        )
+        tasks.append(task)
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    for index, result in enumerate(results):
+        if isinstance(result, Exception):
+            image_index = selected_indexes_sorted[index]
             logger.error(
-                f"Ошибка при обработке изображения {image_index}: {e}",
+                f"Ошибка при обработке изображения {image_index}: {result}",
             )
-            await status_message.edit_text(
-                f"❌ Ошибка при обработке изображения {image_index}: {str(e)}",
+            await call.message.answer(
+                f"❌ Ошибка при обработке изображения {image_index}: {str(result)}",
             )
-            continue
 
     await call.message.answer(
         f"✅ Все выбранные изображения для модели {model_name} успешно обработаны!",
