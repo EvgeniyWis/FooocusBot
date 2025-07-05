@@ -9,13 +9,7 @@ def generateVideoKeyboard(model_name: str, image_index: int):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="📹 Сгенерировать видео",
-                    callback_data=f"start_generate_video|{model_name}|default",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="⚡️Генерация видео с промптом",
+                    text="⚡️Генерация обычного видео",
                     callback_data=f"quick_video_generation|{model_name}|{image_index}",
                 ),
             ],
@@ -27,24 +21,6 @@ def generateVideoKeyboard(model_name: str, image_index: int):
             ],
         ],
     )
-
-    return kb
-
-
-# Инлайн-клавиатура при отправки примера видео с промптом с выбором типа генерации и возможности написания кастомного промпта
-def videoWritePromptKeyboard(model_name: str):
-    prefix = f"generate_video_mode|{model_name}"
-
-    inline_keyboard = [
-        [
-            InlineKeyboardButton(
-                text="✒️ Написать свой промпт",
-                callback_data=f"{prefix}|write_prompt",
-            ),
-        ],
-    ]
-
-    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
 
@@ -90,13 +66,7 @@ def videoGenerationTypeKeyboard(
 def videoCorrectnessKeyboard(
     model_name: str,
     image_index: int,
-    is_quick_generation: bool = False,
 ):
-    if is_quick_generation:
-        postfix = "quick"
-    else:
-        postfix = "default"
-
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -108,7 +78,7 @@ def videoCorrectnessKeyboard(
             [
                 InlineKeyboardButton(
                     text="❌ Перегенерировать видео",
-                    callback_data=f"start_generate_video|{model_name}|{postfix}",
+                    callback_data=f"quick_video_generation|{model_name}|{image_index}",
                 ),
             ],
         ],
@@ -120,16 +90,15 @@ def videoCorrectnessKeyboard(
 def nsfw_video_generation_insert_length_video_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                InlineKeyboardButton(
+            [InlineKeyboardButton(
                     text="✅ Оставить по умолчанию",
                     callback_data="video_length_choice|default",
-                ),
+                )],
+                [
                 InlineKeyboardButton(
                     text="✒️ Ввести свою длительность",
                     callback_data="video_length_choice|input",
-                ),
-            ],
+                )],
         ],
     )
     return keyboard

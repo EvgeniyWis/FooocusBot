@@ -11,6 +11,7 @@ async def deleteMessageFromState(
     model_name: str,
     chat_id: int,
     delete_keyboard_message: bool = False,
+    image_index: int = None,
 ):
     """
     Удаляет все сообщения медиагруппы для model_name из state[key], поддерживает структуру с image_index.
@@ -22,12 +23,21 @@ async def deleteMessageFromState(
 
     state_data = await state.get_data()
     data_list = state_data.get(key, [])
+    
     # Собираем только message_id медиагруппы (type == 'media' или без type)
-    messages_to_delete = [
-        item["message_id"]
-        for item in data_list
-        if item.get("model_name") == model_name and (item.get("type") in (None, "media"))
-    ]
+    if image_index is None:
+        messages_to_delete = [
+            item["message_id"]
+            for item in data_list
+            if item.get("model_name") == model_name and (item.get("type") in (None, "media"))
+        ]
+    else:
+        messages_to_delete = [
+            item["message_id"]
+            for item in data_list
+            if item.get("model_name") == model_name and item.get("image_index") == image_index and (item.get("type") in (None, "media"))
+        ]
+
     logger.info(
         f"[deleteMessageFromState] Найдено сообщений для удаления: {messages_to_delete}",
     )

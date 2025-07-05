@@ -33,7 +33,6 @@ async def process_video(
     image_index: int,
     call: Optional[types.CallbackQuery] = None,
     message: Optional[types.Message] = None,
-    is_quick_generation: bool = False,
 ):
     """
     Обработка видео после генерации в основной рабочей генерации.
@@ -49,7 +48,6 @@ async def process_video(
         image_index: int - Индекс изображения в массиве изображений
         call: Optional[types.CallbackQuery] = None - CallbackQuery с сообщением о генерации видео
         message: Optional[types.Message] = None - Message с сообщением о генерации видео
-        is_quick_generation: bool = False - Флаг, указывающий, является ли генерация быстрой
     """
 
     if (call is None and message is None) or (
@@ -98,7 +96,12 @@ async def process_video(
 
     # Проверяем путь к видео
     video_path = await check_video_path(
-        prompt, message, image_url, None, model_name
+        prompt=prompt,
+        message=message,
+        image_index=image_index,
+        image_url=image_url,
+        temp_path=None,
+        model_name=model_name,
     )
 
     # Удаляем сообщение о генерации видео
@@ -129,9 +132,9 @@ async def process_video(
     }
     await appendDataToStateArray(
         state,
-        "video_paths",
+        "generated_video_paths",
         data_for_update,
-        unique_keys=("model_name",),
+        unique_keys=("model_name", "image_index"),
     )
 
     # Отправляем видео юзеру
@@ -148,7 +151,6 @@ async def process_video(
             reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
                 model_name,
                 image_index,
-                is_quick_generation,
             ),
         )
         video_message = await bot(method)
@@ -169,13 +171,14 @@ async def process_video(
     # Сохраняем сообщение в стейт для последующего удаления
     data_for_update = {
         "model_name": model_name,
+        "image_index": image_index,
         "message_id": video_message.message_id,
     }
     await appendDataToStateArray(
         state,
         "videoGeneration_messages_ids",
         data_for_update,
-        unique_keys=("model_name",),
+        unique_keys=("model_name", "image_index"),
     )
 
     redis_storage = get_redis_storage()

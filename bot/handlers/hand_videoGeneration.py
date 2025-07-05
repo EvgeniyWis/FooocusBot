@@ -45,38 +45,6 @@ from bot.utils.videos.download_nsfw_video import (
 from bot.utils.videos.generate_nsfw_video import generate_nsfw_video
 
 
-# Обработка нажатия кнопки "📹 Сгенерировать видео"
-async def start_generate_video(call: types.CallbackQuery, state: FSMContext):
-    # Получаем название модели
-    model_name = call.data.split("|")[1]
-
-    # Получаем постфикс
-    postfix = call.data.split("|")[2]
-
-    # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
-
-    # Отправляем сообщение для выбора типа генерации видео
-    if postfix == "default":
-        await editMessageOrAnswer(
-            call,
-            text.SELECT_VIDEO_TYPE_GENERATION_TEXT.format(
-                model_name,
-                model_name_index,
-            ),
-            reply_markup=video_generation_keyboards.videoWritePromptKeyboard(
-                model_name,
-            ),
-        )
-    else:
-        await process_write_prompt(
-            call,
-            state,
-            model_name,
-            is_quick_generation=True,
-        )
-
-
 # Обработка нажатия кнопки "⚡️Генерация видео с промптом"
 async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
     model_name = call.data.split("|")[1]
@@ -126,7 +94,7 @@ async def handle_rewrite_prompt_button(
     await state.update_data(model_name_for_video_generation=model_name)
 
     # Ставим стейт для обработки ввода
-    await state.set_state(StartGenerationState.write_prompt_for_video)
+    await state.set_state(StartGenerationState.write_prompt_for_quick_video_generation)
 
 
 # Обработка нажатия кнопок режима генерации видео
@@ -197,7 +165,7 @@ async def handle_video_example_buttons(
     # Получаем название модели и url изображения
     state_data = await state.get_data()
     saved_images_urls = state_data.get("saved_images_urls", [])
-    image_url = await getDataInDictsArray(saved_images_urls, model_name)
+    image_url = await getDataInDictsArray(saved_images_urls, model_name, image_index)
 
     # Удаляем сообщение с выбором видео-примера
     # TODO: режим генерации видео с видео-примерами временно отключен
@@ -283,6 +251,7 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         "write_prompt_messages_ids",
         model_name,
         message.chat.id,
+        image_index=image_index,
     )
 
     # Получаем индекс модели
@@ -307,7 +276,6 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             image_url=image_url,
             image_index=image_index,
             message=message,
-            is_quick_generation=True,
         )
     else:
         # Если выбрана простая генерация видео, то сначала отправляем фото, а потом генерируем видео
@@ -397,6 +365,7 @@ async def handle_video_correctness_buttons(
         "videoGeneration_messages_ids",
         model_name,
         call.message.chat.id,
+        image_index=image_index,
     )
 
 
@@ -509,10 +478,11 @@ async def handle_prompt_for_videoGenerationFromImage(
         # Генерируем видео
         video_path = await check_video_path(
             prompt,
-            None,
             message,
-            None,
-            temp_path,
+            image_index=None,
+            image_url=None,
+            temp_path=temp_path,
+            model_name=None,
         )
 
         await generate_video_from_image_progress_message.delete()
@@ -544,10 +514,6 @@ async def handle_prompt_for_videoGenerationFromImage(
         os.remove(temp_path)
     except Exception as e:
         traceback.print_exc()
-        await safe_send_message(
-            text.GENERATE_VIDEO_FROM_IMAGE_ERROR_TEXT.format(e),
-            message,
-        )
         raise e
 
 
@@ -892,11 +858,6 @@ async def handle_ask_video_length_input(
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
-        start_generate_video,
-        lambda call: call.data.startswith("start_generate_video"),
-    )
-
     router.callback_query.register(
         quick_generate_video,
         lambda call: call.data.startswith("quick_video_generation"),

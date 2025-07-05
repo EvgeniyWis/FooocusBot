@@ -205,7 +205,7 @@ async def process_faceswap_image(
                     text.FACE_SWAP_ERROR_TEXT.format(
                         model_name,
                         model_name_index,
-                        e[0:100],
+                        str(e)[0:100],
                     ),
                 )
                 error_message = e
