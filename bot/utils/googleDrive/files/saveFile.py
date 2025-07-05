@@ -1,14 +1,14 @@
 import http.client
+import os
+import shutil
 import socket
 
+from bot import constants
 from bot.logger import logger
 from bot.utils.googleDrive.auth import service
 from bot.utils.googleDrive.files.uploadFile import uploadFile
 from bot.utils.googleDrive.folders.createFolder import createFolder
 from bot.utils.retryOperation import retryOperation
-import os
-from bot import constants
-import shutil
 
 
 # Сохранение одного файла
@@ -38,7 +38,13 @@ async def saveFile(
                 )
                 .execute()
             )
-        except (socket.gaierror, http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, OSError) as e:
+        except (
+            socket.gaierror,
+            http.client.RemoteDisconnected,
+            http.client.HTTPException,
+            ConnectionError,
+            OSError,
+        ) as e:
             logger.error(f"Сетевая ошибка при проверке папки с датой: {e}")
             raise ValueError(f"Ошибка подключения к Google Drive: {e}")
 
@@ -66,7 +72,13 @@ async def saveFile(
                 )
                 .execute()
             )
-        except (socket.gaierror, http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, OSError) as e:
+        except (
+            socket.gaierror,
+            http.client.RemoteDisconnected,
+            http.client.HTTPException,
+            ConnectionError,
+            OSError,
+        ) as e:
             logger.error(f"Сетевая ошибка при получении списка файлов: {e}")
             raise Exception(f"Ошибка подключения к Google Drive: {e}")
 
@@ -95,8 +107,9 @@ async def saveFile(
         if image_index is not None:
             # Удаляем файл изображения
             temp_path = os.path.join(
-                constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}", 
-                f"{image_index}.jpg"
+                constants.TEMP_FOLDER_PATH,
+                f"{folder_name}_{user_id}",
+                f"{image_index}.jpg",
             )
             if os.path.exists(temp_path):
                 os.remove(temp_path)
@@ -104,7 +117,8 @@ async def saveFile(
         else:
             # Удаляем папку с изображениями
             temp_path = os.path.join(
-                constants.TEMP_FOLDER_PATH, f"{folder_name}_{user_id}"
+                constants.TEMP_FOLDER_PATH,
+                f"{folder_name}_{user_id}",
             )
             if os.path.exists(temp_path):
                 shutil.rmtree(temp_path)
