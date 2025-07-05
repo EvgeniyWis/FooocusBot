@@ -80,20 +80,14 @@ async def check_video_path(
     if settings.MOCK_VIDEO_MODE:
         video_path = constants.MOCK_VIDEO_PATH
     else:
-        try:
-            video_path = await retryOperation(
-                generate_video,
-                10,
-                1.5,
-                prompt,
-                image_url,
-                temp_path,
-            )
-        except Exception as e:
-            # Отправляем сообщение об ошибке
-            traceback.print_exc()
-            logger.error(f"Произошла ошибка при генерации видео: {e}")
-            await send_error_message(message, image_index, model_name, e)
+        video_path = await retryOperation(
+            generate_video,
+            10,
+            1.5,
+            prompt,
+            image_url,
+            temp_path,
+        )
 
     if not video_path:
         await send_error_message(
