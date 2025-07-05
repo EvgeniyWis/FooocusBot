@@ -1,5 +1,7 @@
 import asyncio
 import os
+import re
+import shutil
 import traceback
 
 from aiogram import types
@@ -38,7 +40,6 @@ from bot.utils.handlers.messages import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
-import shutil
 
 
 # Обработка выбора количества генераций
@@ -95,8 +96,11 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Получаем текущие данные стейта для извлечения переменных рандомайзера
     current_state_data = await state.get_data()
-    variable_names_for_randomizer = current_state_data.get("variable_names_for_randomizer", [])
-    
+    variable_names_for_randomizer = current_state_data.get(
+        "variable_names_for_randomizer",
+        [],
+    )
+
     # Создаем базовый initial_state
     initial_state = {
         "generation_step": 1,
@@ -112,7 +116,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "variable_names_for_randomizer": [],
         "generated_video_paths": [],
     }
-    
+
     # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
     for variable_name in variable_names_for_randomizer:
         key = f"randomizer_{variable_name}_values"
@@ -437,7 +441,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 write_new_prompt_message_id=write_new_prompt_for_regenerate_message.message_id,
             )
             return
-        
+
         image_index = int(image_index)
 
         # Если данные не найдены, ищем во всех доступных массивах
@@ -484,41 +488,60 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         raise e
 
 
-# Обработка ввода названия модели для генерации
+PROMPT_BY_INDEX_PATTERN = re.compile(r"[№#]?\s*(\d+)\s*[-–—]\s*(.+)")
+
+
 async def write_model_name_for_generation(
     message: types.Message,
     state: FSMContext,
 ):
-    # Если в сообщении есть запятые, то записываем массив моделей в стейт
-    model_indexes = message.text.split(",")
+    text_input = message.text.strip()
 
-    # Если запятых нет, то записываем одну модель в стейт
+    # 1. Новый формат: №1 - текст
+    matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
+
+    if matches:
+        model_prompts = {}
+        for index, prompt in matches:
+            if not index.isdigit():
+                continue
+            if not (1 <= int(index) <= 100):
+                await safe_send_message(
+                    text=text.MODEL_NOT_FOUND_TEXT.format(index),
+                    message=message,
+                )
+                return
+            model_prompts[index] = prompt.strip()
+
+        await state.clear()
+        await safe_send_message(
+            text="✅ Промпты по моделям получены, начинаю генерацию...",
+            message=message,
+        )
+
+        # await generate_with_individual_prompts(model_prompts, message, state)
+        return
+
+    # 2. Старый формат: одна модель или через запятую
+    model_indexes = message.text.split(",")
     if len(model_indexes) == 1:
         model_indexes = [message.text]
 
-    # Удаляем пробелы из названий моделей
+        # Удаляем пробелы из названий моделей
     model_indexes = [model_index.strip() for model_index in model_indexes]
 
-    # Проверяем, что это число
     for model_index in model_indexes:
-        if not model_index.isdigit():
+        if not model_index.isdigit() or not (1 <= int(model_index) <= 100):
             await safe_send_message(
                 text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
                 message=message,
             )
             return
 
-    # Проверяем, существует ли такие модели
-    for model_index in model_indexes:
-        # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
-        if int(model_index) > 100 or int(model_index) < 1:
-            await safe_send_message(
-                text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
-                message=message,
-            )
-            return
-
-    await state.update_data(model_indexes_for_generation=model_indexes)
+    # Всё валидно — идём по старой логике
+    await state.update_data(
+        model_indexes_for_generation=model_indexes,
+    )
 
     await state.set_state(None)
     await safe_send_message(
@@ -527,6 +550,7 @@ async def write_model_name_for_generation(
         else text.GET_MODEL_INDEXES_SUCCESS_TEXT,
         message=message,
     )
+
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
 
@@ -731,7 +755,8 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     # Удаляем папку модели с оставшимися изображениями
     try:
         temp_path = os.path.join(
-            TEMP_FOLDER_PATH, f"{model_name}_{call.from_user.id}"
+            TEMP_FOLDER_PATH,
+            f"{model_name}_{call.from_user.id}",
         )
         if os.path.exists(temp_path):
             shutil.rmtree(temp_path)
