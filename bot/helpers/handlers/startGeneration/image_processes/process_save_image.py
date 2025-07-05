@@ -8,7 +8,6 @@ from constants import TEMP_FOLDER_PATH
 from utils.handlers.messages.rate_limiter_for_send_photo import safe_send_photo
 
 from bot.assets.mocks.links import (
-    MOCK_FACEFUSION_PATH,
     MOCK_LINK_FOR_SAVE_IMAGE,
 )
 from bot.helpers import text
@@ -141,8 +140,8 @@ async def process_save_image(
         logger.error(f"Произошла ошибка при удалении сообщения: {e}")
 
     # Удаляем изображение с замененным лицом
-    if not settings.MOCK_IMAGES_MODE and result_path != MOCK_FACEFUSION_PATH:
-        os.remove(result_path)
+    # if not settings.MOCK_IMAGES_MODE and result_path != MOCK_FACEFUSION_PATH:
+    #     os.remove(result_path)
 
     logger.info(
         f"[save] END: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
