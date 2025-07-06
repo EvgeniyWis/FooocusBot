@@ -43,6 +43,7 @@ from bot.utils.videos.download_nsfw_video import (
     download_nsfw_videos,
 )
 from bot.utils.videos.generate_nsfw_video import generate_nsfw_video
+from bot.helpers.generateImages.dataArray.getAllDataArrays import getAllDataArrays
 
 
 # Обработка нажатия кнопки "⚡️Генерация видео с промптом"
@@ -537,8 +538,12 @@ async def handle_model_name_for_video_generation_from_image(
         )
         return
 
-    # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
-    if model_index > 100 or model_index < 1:
+    # Получаем данные всех моделей
+    all_data_arrays = getAllDataArrays()
+    all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
+
+    # Если индекс больше числа моделей или меньше 1, то просим ввести другой индекс
+    if model_index > all_data_arrays_length or model_index < 1:
         await safe_send_message(
             text.MODEL_NOT_FOUND_TEXT.format(model_index),
             message,

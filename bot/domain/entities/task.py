@@ -17,7 +17,7 @@ class TaskImageBlockDTO(BaseTaskDTO):
     user_id: int
     message_id: int
     model_name: str
-    setting_number: int
+    setting_number: int | str
     is_test_generation: bool
     check_other_jobs: bool
     chat_id: int

@@ -2,7 +2,7 @@ from bot.settings import settings
 
 
 # Глобальная функция для генерации данных для запроса
-def generateData(
+def generate_data(
     model_name: str,
     picture_folder_id: str,
     video_folder_id: str,
@@ -12,6 +12,7 @@ def generateData(
     image_number: int,
     negative_prompt: str = settings.COMMON_NEGATIVE_PROMPT,
     embeddings: list[str] | None = None,
+    guidance_scale: float = 3.5,
 ):
     if embeddings is None:
         embeddings = []
@@ -30,7 +31,7 @@ def generateData(
                 "negative_prompt": negative_prompt,
                 "base_model_name": base_config_model_name,
                 "style_selections": [],
-                "guidance_scale": 3.5,
+                "guidance_scale": guidance_scale,
                 "aspect_ratios_selection": "720*1280",
             },
         },
