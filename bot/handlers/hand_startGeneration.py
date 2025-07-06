@@ -540,11 +540,18 @@ async def write_new_prompt_for_regenerate_image(
     state: FSMContext,
 ):
     # Получаем данные
+    prompt = message.text
+    if not prompt:
+        await safe_send_message(
+            text=text.EMPTY_PROMPT_TEXT,
+            message=message,
+        )
+        return
+
     state_data = await state.get_data()
     is_test_generation = state_data.get("generations_type", "") == "test"
     model_name = state_data.get("model_name_for_regenerate_image", "")
     setting_number = state_data.get("setting_number_for_regenerate_image", 1)
-    prompt = message.text
     user_id = message.from_user.id
 
     # Удаляем сообщение пользователя
