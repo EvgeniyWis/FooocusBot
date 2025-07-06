@@ -1,6 +1,6 @@
 from bot.helpers.generateImages.dataArray.generate_data import generate_data
-from bot.helpers.generateImages.dataArray.setting_1.generate_loras import (
-    setting1_generate_loras,
+from bot.helpers.generateImages.dataArray.extra_setting.generate_loras import (
+    extra_setting_generate_loras,
 )
 from bot.settings import settings
 
@@ -15,7 +15,7 @@ def extra_setting_generate_data(
     image_number: int = 4,
     negative_prompt: str = settings.COMMON_NEGATIVE_PROMPT,
 ):
-    loras = setting1_generate_loras(loras_weights)
+    loras = extra_setting_generate_loras(loras_weights)
     base_config_model_name = "CyberRealistic_Pony.safetensors"
     data = generate_data(
         model_name,
