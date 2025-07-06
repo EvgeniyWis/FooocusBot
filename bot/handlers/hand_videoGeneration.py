@@ -233,12 +233,6 @@ async def start_generateVideoFromImage(
     await call.message.edit_text(text.SEND_IMAGE_FOR_VIDEO_GENERATION)
     await state.set_state(StartGenerationState.send_image_for_video_generation)
 
-    # Очищаем стейт от всех данных
-    # TODO: убрать и сделать так, чтобы можно было генерить одновременно несколько видео
-    # await state.update_data(image_file_ids_for_videoGenerationFromImage=[])
-    # await state.update_data(prompts_for_videoGenerationFromImage={})
-    # await state.update_data(generated_video_paths=[])
-
 
 # Обработка присылания изображения для генерации видео и запроса на присылания промпта
 async def write_prompt_for_videoGenerationFromImage(
@@ -416,31 +410,6 @@ async def handle_model_name_for_video_generation_from_image(
     # Сохраняем видео
     await state.set_state(None)
     await saveVideo(video_path, model_name, message)
-
-    # TODO: вернуть
-    # try:
-    #     # Очищаем все стейты от текущих данных
-    #     await state.update_data(current_file_id_index=None)
-
-    #     # Получаем file_id изображения, которое нужно удалить
-    #     image_file_id = state_data.get("image_file_ids_for_videoGenerationFromImage", [])[file_id_index]
-    #     # Удаляем видео из списка и обновляем state
-    #     updated_generated_video_paths = state_data.get("generated_video_paths", [])
-    #     updated_generated_video_paths.pop(file_id_index)
-    #     await state.update_data(generated_video_paths=updated_generated_video_paths)
-
-    #     # Удаляем file_id из списка и обновляем state
-    #     updated_image_file_ids = state_data.get("image_file_ids_for_videoGenerationFromImage", [])
-    #     updated_image_file_ids.pop(file_id_index)
-    #     await state.update_data(image_file_ids_for_videoGenerationFromImage=updated_image_file_ids)
-
-    #     # Удаляем промпт по file_id и обновляем state
-    #     updated_prompts = state_data.get("prompts_for_videoGenerationFromImage", {})
-    #     updated_prompts.pop(image_file_id)
-    #     await state.update_data(prompts_for_videoGenerationFromImage=updated_prompts)
-    #     logger.info(f"Удалены данные из массивов: {updated_generated_video_paths}, {updated_image_file_ids}, {updated_prompts}")
-    # except Exception as e:
-    #     logger.error(f"Произошла ошибка при сохранении видео: {e}")
 
 
 async def quick_generate_nsfw_video(
