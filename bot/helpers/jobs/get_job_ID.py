@@ -9,7 +9,7 @@ from bot.utils.retryOperation import retryOperation
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы
 async def get_job_ID(
     dataJSON: dict,
-    setting_number: int,
+    setting_number: int | str,
     state: FSMContext,
     user_id: int,
     job_type: str,
