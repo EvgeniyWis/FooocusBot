@@ -508,10 +508,14 @@ async def write_model_name_for_generation(
             )
             return
 
+    # Получаем данные всех моделей
+    all_data_arrays = getAllDataArrays()
+    all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
+
     # Проверяем, существует ли такие модели
     for model_index in model_indexes:
-        # Если индекс больше 100 или меньше 1, то просим ввести другой индекс
-        if int(model_index) > 100 or int(model_index) < 1:
+        # Если индекс больше числа моделей или меньше 1, то просим ввести другой индекс
+        if int(model_index) > all_data_arrays_length or int(model_index) < 1:
             await safe_send_message(
                 text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
                 message=message,
@@ -536,11 +540,18 @@ async def write_new_prompt_for_regenerate_image(
     state: FSMContext,
 ):
     # Получаем данные
+    prompt = message.text
+    if not prompt:
+        await safe_send_message(
+            text=text.EMPTY_PROMPT_TEXT,
+            message=message,
+        )
+        return
+
     state_data = await state.get_data()
     is_test_generation = state_data.get("generations_type", "") == "test"
     model_name = state_data.get("model_name_for_regenerate_image", "")
     setting_number = state_data.get("setting_number_for_regenerate_image", 1)
-    prompt = message.text
     user_id = message.from_user.id
 
     # Удаляем сообщение пользователя

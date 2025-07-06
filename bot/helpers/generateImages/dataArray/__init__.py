@@ -10,8 +10,8 @@ from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
 from bot.helpers.generateImages.dataArray.getDataByModelName import (
     getDataByModelName,
 )
-from bot.helpers.generateImages.dataArray.generateData import generateData
-from bot.helpers.generateImages.dataArray.generateLoras import generateLoras
+from bot.helpers.generateImages.dataArray.generate_data import generate_data
+from bot.helpers.generateImages.dataArray.generate_loras import generate_loras
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )

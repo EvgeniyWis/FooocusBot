@@ -17,7 +17,7 @@ from bot.logger import logger
 async def process_image_block(
     job_id: str,
     model_name: str,
-    setting_number: int,
+    setting_number: int | str,
     user_id: int,
     state: FSMContext,
     message_id: int,
