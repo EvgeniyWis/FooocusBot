@@ -9,7 +9,7 @@ def generateVideoKeyboard(model_name: str, image_index: int):
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="⚡️Генерация обычного видео",
+                    text="⚡️ Генерация обычного видео",
                     callback_data=f"quick_video_generation|{model_name}|{image_index}",
                 ),
             ],
@@ -41,8 +41,6 @@ def generatedVideoKeyboard(prefix: str, with_test_generation: bool = True):
 def videoGenerationTypeKeyboard(
     model_name: str,
     image_index: int | None = None,
-    with_test_generation: bool = False,
-    rewrite_prompt: bool = False,
 ):
     if image_index is None:
         prefix = f"generate_video|{model_name}"
@@ -53,8 +51,9 @@ def videoGenerationTypeKeyboard(
         inline_keyboard=[
             *getGenerationsTypeButtons(
                 prefix=prefix,
-                with_test_generation=with_test_generation,
-                rewrite_prompt=rewrite_prompt,
+                with_work_generation=False,
+                with_test_generation=False,
+                rewrite_prompt=True,
             ),
         ],
     )
@@ -116,8 +115,6 @@ def videoGenerationModeKeyboard(model_name: str):
                     callback_data=f"{prefix}|write_prompt",
                 ),
             ],
-            # TODO: режим генерации видео с видео-примерами временно отключен
-            # [InlineKeyboardButton(text='⚙️ Использовать заготовленные примеры', callback_data=f'{prefix}|use_examples')]
         ],
     )
 
