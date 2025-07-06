@@ -7,6 +7,8 @@ from bot.utils.httpx import httpx_get
 from bot.utils.videos import download_video
 
 
+PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT = "Входные данные не прошли модерацию. Пожалуйста, убедитесь в отсутствии NSFW во входных данных."
+
 async def check_video_generation_status(request_id: str) -> str | None:
     """
     Функция для проверки статуса задания на генерацию видео с помощью API kling
@@ -41,7 +43,6 @@ async def check_video_generation_status(request_id: str) -> str | None:
 
             if json["status"] == "error":
                 # Обрабатываем ошибку промпта, непройденного модераций
-                PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT = "Параметры сформированы некорректно. Пожалуйста, убедитесь в правильности введенных данных и отсутствии неприемлемого контента в подсказках."
                 error_text = json["result"][0]
 
                 if (
