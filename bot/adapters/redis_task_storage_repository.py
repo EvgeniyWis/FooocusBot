@@ -279,7 +279,6 @@ class RedisTaskStorageRepository:
                         call=call,
                         model_name=task.model_name,
                         prompt=task.prompt,
-                        type_for_video_generation=task.type_for_video_generation,
                         image_url=task.image_url,
                         state=state,
                     )
@@ -454,9 +453,9 @@ class RedisTaskStorageRepository:
                 )
             elif task_type == "process_video":
                 return key_for_video(
-                    dto.type_for_video_generation,
+                    "work",
                     dto.user_id,
-                    dto.image_url,
+                    dto.image_url if dto.image_url else dto.image_path,
                     dto.model_name,
                 )
             else:

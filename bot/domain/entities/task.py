@@ -41,5 +41,5 @@ class TaskProcessVideoDTO(BaseTaskDTO):
     callback_data: str
     model_name: str
     prompt: str
-    type_for_video_generation: str
     image_url: str
+    image_path: str
