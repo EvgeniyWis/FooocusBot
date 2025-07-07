@@ -1,8 +1,8 @@
-from bot.helpers.generateImages.dataArray.generateLoras import generateLoras
+from bot.helpers.generateImages.dataArray.generate_loras import generate_loras
 
 
 # Функция для генерации массива лор для настройки 4
-def setting4_generateLoras(weights: list[int]):
+def setting4_generate_loras(weights: list[int]):
     loras = [
         "Pony_Realism_Slider.safetensors",
         "Breast_Size_Slider.safetensors",
@@ -16,4 +16,4 @@ def setting4_generateLoras(weights: list[int]):
         "Big_Natural_Breasts.safetensors",
     ]
 
-    return generateLoras(weights, loras)
+    return generate_loras(weights, loras)

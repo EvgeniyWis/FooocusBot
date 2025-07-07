@@ -1,5 +1,5 @@
 # Глобальная функция для генерации массива лор
-def generateLoras(weights: list[int], loras_names: list[str]):
+def generate_loras(weights: list[int], loras_names: list[str]):
     loras = []
     for lora_name in loras_names:
         loras.append({"model_name": lora_name, "enabled": True})
