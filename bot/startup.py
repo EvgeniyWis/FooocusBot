@@ -68,10 +68,13 @@ async def on_startup():
     if settings.HEATING_COMFYUI_MODELS:
         asyncio.create_task(heating_comfyui_models(get_video_service()))
 
+    # Добавление обработчиков
     handlers.hand_commands.hand_add()
     handlers.hand_startGeneration.hand_add()
     handlers.hand_randomizer.hand_add()
     handlers.hand_videoGeneration.hand_add()
+    handlers.hand_multi_image.hand_add()
+    handlers.hand_img2video.hand_add()
 
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())
