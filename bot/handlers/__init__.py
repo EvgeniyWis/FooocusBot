@@ -5,4 +5,5 @@ from bot.handlers import (
     hand_commands,
     hand_multi_image,
     hand_img2video,
+    hand_nsfw_video,
 )
