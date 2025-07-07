@@ -75,6 +75,7 @@ async def on_startup():
     handlers.hand_videoGeneration.hand_add()
     handlers.hand_multi_image.hand_add()
     handlers.hand_img2video.hand_add()
+    handlers.hand_nsfw_video.hand_add()
 
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())
