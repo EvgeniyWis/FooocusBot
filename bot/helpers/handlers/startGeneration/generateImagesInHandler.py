@@ -23,7 +23,7 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 
 # Функция для генерации изображения в зависимости от настроек
 async def generateImagesInHandler(
-    prompt: str,
+    prompt: str | dict,
     message: types.Message,
     state: FSMContext,
     user_id: int,
@@ -31,41 +31,35 @@ async def generateImagesInHandler(
     setting_number: str,
     with_randomizer: bool = False,
 ):
-    # Отправляем сообщение об отмене предыдущих работ
     message_for_edit = await safe_send_message(
         text=text.CANCEL_PREVIOUS_JOBS_TEXT,
         message=message,
     )
 
-    # Отменяем все работы
     await cancelImageGenerationJobs(state)
 
-    # Генерируем изображения
     try:
         state_data = await state.get_data()
         model_indexes_for_generation = state_data.get(
-            "model_indexes_for_generation",
-            [],
+            "model_indexes_for_generation", []
+        )
+
+        logger.info(
+            f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}",
         )
 
         if is_test_generation:
             if setting_number == "all":
-                # Заполнение параметра is_test_generation в вызове функции
                 result = await generateImagesByAllSettings(
                     message_for_edit,
                     state,
                     user_id,
                     is_test_generation,
                     prompt,
-                )  # Отправляем сообщение о получении промпта
+                )
             else:
                 await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
-
-                # Получаем данные для генерации
-                dataArray = getDataArrayBySettingNumber(
-                    int(setting_number),
-                )
-
+                dataArray = getDataArrayBySettingNumber(int(setting_number))
                 data = dataArray[0]
                 result = [
                     await generateImageBlock(
@@ -74,39 +68,50 @@ async def generateImagesInHandler(
                         state,
                         user_id,
                         setting_number,
-                        prompt,
+                        prompt if isinstance(prompt, str) else "",  # fallback
                         is_test_generation,
                         chat_id=message.chat.id,
                     ),
                 ]
         else:
-            logger.info(
-                f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}",
-            )
-
             if setting_number == "all":
                 result = await generateImagesByAllSettings(
                     message_for_edit,
                     state,
                     user_id,
                     is_test_generation,
-                    prompt,
+                    prompt if isinstance(prompt, str) else "",
                     True,
                 )
             else:
                 await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
-
                 await message_for_edit.pin()
-                result = await generateImages(
-                    setting_number,
-                    prompt,
-                    message_for_edit,
-                    state,
-                    user_id,
-                    is_test_generation,
-                    with_randomizer,
-                    model_indexes_for_generation,
-                )
+
+                if isinstance(prompt, dict):
+                    result = await generateImages(
+                        setting_number="individual",
+                        prompt_for_current_model=prompt,
+                        message=message_for_edit,
+                        state=state,
+                        user_id=user_id,
+                        is_test_generation=is_test_generation,
+                        with_randomizer=False,
+                        model_indexes_for_generation=list(
+                            map(int, prompt.keys())
+                        ),
+                    )
+                else:
+                    result = await generateImages(
+                        setting_number=setting_number,
+                        prompt_for_current_model={},
+                        message=message_for_edit,
+                        state=state,
+                        user_id=user_id,
+                        is_test_generation=is_test_generation,
+                        with_randomizer=with_randomizer,
+                        model_indexes_for_generation=model_indexes_for_generation,
+                    )
+
                 await message_for_edit.unpin()
 
         if not result:
