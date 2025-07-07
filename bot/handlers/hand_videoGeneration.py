@@ -24,16 +24,23 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 
 # Обработка нажатия кнопки "⚡️Генерация видео с промптом"
 async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
-    model_name = call.data.split("|")[1]
-    image_index = call.data.split("|")[2]
-
+    temp = call.data.split("|")
+    model_name = temp[1]
     state_data = await state.get_data()
 
-    await state.update_data(
-        model_name_for_video_generation=model_name,
-        image_index_for_video_generation=image_index,
-        saved_images_urls=state_data.get("saved_images_urls", []),
-    )
+    if len(temp) == 3:
+        image_index = int(temp[2])
+
+        await state.update_data(
+            model_name_for_video_generation=model_name,
+            image_index_for_video_generation=image_index,
+            saved_images_urls=state_data.get("saved_images_urls", []),
+        )
+    else:
+        image_index = None
+        await state.update_data(
+            model_name_for_video_generation=model_name,
+        )
 
     await process_write_prompt(
         call,
@@ -94,55 +101,78 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     prompt = message.text
     await state.update_data(prompt_for_video=prompt)
     state_data = await state.get_data()
+
     model_name = state_data.get("model_name_for_video_generation", "")
-    image_index = int(state_data.get("image_index_for_video_generation", 0))
-    saved_images_urls = state_data.get("saved_images_urls", [])
+    image_index = state_data.get("image_index_for_video_generation", None)
 
-    logger.info(
-        f"Произвожу поиск изображения по индексу {image_index} и имени модели {model_name} в массиве: {saved_images_urls}",
-    )
+    if image_index:
+        image_index = int(image_index)
+        saved_images_urls = state_data.get("saved_images_urls", [])
 
-    image_url = await getDataInDictsArray(
-        saved_images_urls,
-        model_name,
-        image_index,
-    )
-
-    if not image_url:
-        await safe_send_message(
-            "Ошибка: не удалось найти URL изображения",
-            message,
+        logger.info(
+            f"Произвожу поиск изображения по индексу {image_index} и имени модели {model_name} в массиве: {saved_images_urls}",
         )
-        return
+
+        image_url = await getDataInDictsArray(
+            saved_images_urls,
+            model_name,
+            image_index,
+        )
+
+        if not image_url:
+            await safe_send_message(
+                "Ошибка: не удалось найти URL изображения",
+                message,
+            )
+            return
+        
+    else:
+        temp_path = state_data.get(
+            "temp_path_for_video_generation",
+        )
 
     # Удаляем сообщение пользователя
     await message.delete()
 
     # Удаляем сообщение о написании промпта
-    await deleteMessageFromState(
-        state,
-        "write_prompt_messages_ids",
-        model_name,
-        message.chat.id,
-        image_index=image_index,
-    )
-
-    logger.info(
-        f"URL изображения для генерации видео модели {model_name}: {image_url}",
-    )
+    if image_index:
+        await deleteMessageFromState(
+            state,
+            "write_prompt_messages_ids",
+            model_name,
+            message.chat.id,
+            image_index=image_index,
+        )
 
     await state.set_state(None)
 
-    # сразу генерируем видео
-    return await process_video(
-        state=state,
-        model_name=model_name,
-        prompt=prompt,
-        type_for_video_generation="work",
-        image_url=image_url,
-        image_index=image_index,
-        message=message,
-    )
+    if image_index:
+        logger.info(
+            f"URL изображения для генерации видео модели {model_name}: {image_url}",
+        )
+
+        # сразу генерируем видео
+        return await process_video(
+            state=state,
+            model_name=model_name,
+            prompt=prompt,
+            image_url=image_url,
+            image_index=image_index,
+            message=message,
+        )
+    else:
+        logger.info(
+            f"Путь изображения для генерации видео модели {model_name}: {temp_path}",
+        )
+
+        # сразу генерируем видео
+        return await process_video(
+            state=state,
+            model_name=model_name,
+            prompt=prompt,
+            image_path=temp_path,
+            message=message,
+        )
 
 
 # Обработка нажатия на кнопки корректности видео
@@ -153,7 +183,11 @@ async def handle_video_correctness_buttons(
     # Получаем тип кнопки
     temp = call.data.split("|")
     model_name = temp[2]
-    image_index = int(temp[3])
+
+    if len(temp) == 4:
+        image_index = int(temp[3])
+    else:
+        image_index = None
 
     # Убираем кнопки у сообщения
     await call.message.edit_reply_markup(None)
@@ -163,14 +197,24 @@ async def handle_video_correctness_buttons(
 
     # Получаем путь к видео
     generated_video_paths = state_data.get("generated_video_paths", [])
-    logger.info(
-        f"Получены пути к видео: {generated_video_paths} и попытка получить путь к видео по имени модели {model_name} и индексу изображения {image_index}",
-    )
-    video_path = await getDataInDictsArray(
-        generated_video_paths,
-        model_name,
-        image_index,
-    )
+
+    if image_index: 
+        logger.info(
+            f"Получены пути к видео: {generated_video_paths} и попытка получить путь к видео по имени модели {model_name} и индексу изображения {image_index}",
+        )
+        video_path = await getDataInDictsArray(
+            generated_video_paths,
+            model_name,
+            image_index,
+        )
+    else:
+        logger.info(
+            f"Получены пути к видео: {generated_video_paths} и попытка получить путь к видео по имени модели {model_name}",
+        )
+        video_path = await getDataInDictsArray(
+            generated_video_paths,
+            model_name,
+        )
 
     if not video_path:
         await safe_send_message(
@@ -181,24 +225,26 @@ async def handle_video_correctness_buttons(
 
     logger.info(f"Получен путь к видео для сохранения: {video_path}")
 
-    # Удаляем изображение из массива объектов saved_images_urls
-    saved_images_urls = state_data.get("saved_images_urls", [])
-    for item in saved_images_urls:
-        if model_name in item.keys():
-            saved_images_urls.remove(item)
-    await state.update_data(saved_images_urls=saved_images_urls)
+    if image_index:
+        # Удаляем изображение из массива объектов saved_images_urls
+        saved_images_urls = state_data.get("saved_images_urls", [])
+        for item in saved_images_urls:
+            if model_name in item.keys():
+                saved_images_urls.remove(item)
+        await state.update_data(saved_images_urls=saved_images_urls)
 
     # Сохраняем видео
     await saveVideo(video_path, model_name, call.message)
 
-    # Удаляем сообщение о генерации видео
-    await deleteMessageFromState(
-        state,
-        "videoGeneration_messages_ids",
-        model_name,
-        call.message.chat.id,
-        image_index=image_index,
-    )
+    if image_index:
+        # Удаляем сообщение о генерации видео
+        await deleteMessageFromState(
+            state,
+            "videoGeneration_messages_ids",
+            model_name,
+            call.message.chat.id,
+            image_index=image_index,
+        )
 
 
 # Добавление обработчиков

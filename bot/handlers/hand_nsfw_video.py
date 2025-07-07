@@ -42,7 +42,7 @@ async def quick_generate_nsfw_video(
 
     await state.update_data(
         model_name_for_nsfw_video_generation=model_name,
-        image_file_id_for_nsfw_videoGenerationFromImage=file_id,
+        image_file_id_for_nsfw_img2video=file_id,
         saved_images_urls=state_data.get("saved_images_urls", []),
     )
 
@@ -215,7 +215,7 @@ async def handle_prompt_for_nsfw_generation(
     prompt = message.text
     await state.update_data(prompt_for_nsfw_video=prompt)
     state_data = await state.get_data()
-    file_id = state_data.get("image_file_id_for_nsfw_videoGenerationFromImage")
+    file_id = state_data.get("image_file_id_for_nsfw_img2video")
 
     if not file_id:
         await safe_send_message(

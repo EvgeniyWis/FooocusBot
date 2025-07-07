@@ -64,20 +64,26 @@ def videoGenerationTypeKeyboard(
 # Инлайн-клавиатура для выбора корректности генерации видео
 def videoCorrectnessKeyboard(
     model_name: str,
-    image_index: int,
+    image_index: int | None = None,
 ):
+    
+    if image_index is None:
+        postfix = f"{model_name}"
+    else:
+        postfix = f"{model_name}|{image_index}"
+
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
                     text="✅ Сохранить видео",
-                    callback_data=f"video_correctness|correct|{model_name}|{image_index}",
+                    callback_data=f"video_correctness|correct|{postfix}",
                 ),
             ],
             [
                 InlineKeyboardButton(
                     text="❌ Перегенерировать видео",
-                    callback_data=f"quick_video_generation|{model_name}|{image_index}",
+                    callback_data=f"quick_video_generation|{postfix}",
                 ),
             ],
         ],
