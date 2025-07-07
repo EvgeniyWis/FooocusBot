@@ -484,7 +484,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         raise e
 
 
-PROMPT_BY_INDEX_PATTERN = re.compile(r"[№#]?\s*(\d+)\s*[-–—]\s*(.+)")
+PROMPT_BY_INDEX_PATTERN = re.compile(r"(\d+)\s*[-–—]\s*(.+)")
 
 
 async def write_model_name_for_generation(
@@ -493,7 +493,7 @@ async def write_model_name_for_generation(
 ):
     text_input = message.text.strip()
 
-    # 1. Новый формат: №1 - текст
+    # 1. Новый формат: 1 - текст
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
 
     if matches:
@@ -508,14 +508,21 @@ async def write_model_name_for_generation(
                 )
                 return
             model_prompts[index] = prompt.strip()
-
+        await state.update_data(model_prompts_for_generation=model_prompts)
         await state.clear()
         await safe_send_message(
             text="✅ Промпты по моделям получены, начинаю генерацию...",
             message=message,
         )
 
-        # await generate_with_individual_prompts(model_prompts, message, state)
+        await generateImagesInHandler(
+            prompt=model_prompts,
+            message=message,
+            state=state,
+            user_id=message.from_user.id,
+            is_test_generation=False,
+            setting_number="individual",
+        )
         return
 
     # 2. Старый формат: одна модель или через запятую
@@ -630,8 +637,6 @@ async def write_new_prompt_for_regenerate_image(
         chat_id=message.chat.id,
     )
     await regenerate_progress_message.delete()
-
-
 
 
 # Добавление обработчиков
