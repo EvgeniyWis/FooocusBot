@@ -1,21 +1,21 @@
-from bot.helpers.generateImages.dataArray.generateData import generateData
-from bot.helpers.generateImages.dataArray.setting_2.generateLoras import (
-    setting2_generateLoras,
+from bot.helpers.generateImages.dataArray.generate_data import generate_data
+from bot.helpers.generateImages.dataArray.setting_2.generate_loras import (
+    setting2_generate_loras,
 )
 
 
 # Функция для генерации данных для запроса настройки 2
-def setting2_generateData(
+def setting2_generate_data(
     model_name: str,
     picture_folder_id: str,
     video_folder_id: str,
     prompt: str,
-    lorasWeights: list[int],
+    loras_weights: list[int],
     image_number: int = 4,
 ):
-    loras = setting2_generateLoras(lorasWeights)
+    loras = setting2_generate_loras(loras_weights)
     base_config_model_name = "CyberIllustrious_CyberRealistic.safetensors"
-    data = generateData(
+    data = generate_data(
         model_name,
         picture_folder_id,
         video_folder_id,

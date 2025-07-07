@@ -16,7 +16,7 @@ CANCELLED_JOB_TEXT = "Работа была отменена"
 
 async def check_job_status(
     job_id: str,
-    setting_number: int,
+    setting_number: int | str,
     user_id: int,
     message_id: int,
     state: FSMContext = None,

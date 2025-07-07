@@ -37,9 +37,7 @@ async def send_error_message(message: types.Message, image_index: int | None, mo
             message,
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
-                image_index,
-                False,
-                True
+                image_index
             ),
         )
     else:
