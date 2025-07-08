@@ -82,7 +82,7 @@ def videoCorrectnessKeyboard(
             ],
             [
                 InlineKeyboardButton(
-                    text="❌ Перегенерировать видео",
+                    text="🔄 Перегенерировать с новым промптом",
                     callback_data=f"quick_video_generation|{postfix}",
                 ),
             ],
