@@ -236,8 +236,6 @@ async def choose_writePrompt_type(
 async def write_prompts_for_models(message: types.Message, state: FSMContext):
     text_input = message.text.strip()
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
-    logger.info("Raw input:", repr(text_input))
-    logger.info("Matches:", matches)
 
     if not matches:
         await safe_send_message(
@@ -250,6 +248,7 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
     valid_range = state_data.get("valid_model_indexes_range", (1, 100))
     start_index, end_index = valid_range
     user_id = message.from_user.id
+    expected_count = end_index - start_index + 1
     setting_number = state_data.get("setting_number", "1")
 
     model_prompts = {}
@@ -264,6 +263,13 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
             )
             return
         model_prompts[str(index)] = prompt.strip()
+
+    if len(model_prompts) != expected_count:
+        await safe_send_message(
+            f"⚠️ Нужно указать <b>ровно {expected_count}</b> промптов (а не {len(model_prompts)}).",
+            message,
+        )
+        return
 
     await state.clear()
 
@@ -462,8 +468,6 @@ async def write_model_name_for_generation(
 
     # 1. Новый формат: 1 - текст
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
-    logger.info("Raw input:", repr(text_input))
-    logger.info("Matches:", matches)
 
     if matches:
         model_prompts = {}
