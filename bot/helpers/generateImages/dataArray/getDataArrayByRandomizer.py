@@ -54,14 +54,14 @@ async def getDataArrayByRandomizer(
                 continue
             random_variable_value = next(gen)
 
-            formated_prompt = f"{variable_name}: {random_variable_value};"
+            formated_prompt = f"{variable_name}: {random_variable_value}; "
 
             model_randomizer_prompt += formated_prompt
 
+        # Добавляем к постонному промпту промпт рандомайзера
         data["json"]["input"]["prompt"] = (
-            model_randomizer_prompt.replace("\n", " ")
-            + " "
-            + data["json"]["input"]["prompt"]
+            model_randomizer_prompt.replace("\n", "")
+            + data["json"]["input"]["prompt"].lstrip(" ")
         )
 
         data_for_update = {
