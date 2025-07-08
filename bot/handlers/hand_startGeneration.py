@@ -8,10 +8,8 @@ from aiogram.fsm.context import FSMContext
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getAllDataArrays,
-    getDataArrayBySettingNumber,
     getDataByModelName,
     getModelNameIndex,
-    getNextModel,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
@@ -183,50 +181,109 @@ async def choose_writePrompt_type(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
-    # Получаем данные
-    writePrompt_type = call.data.split("|")[1]
-    await state.update_data(writePrompt_type=writePrompt_type)
+    # Получаем тип: one или multi
+    prompt_type = call.data.split("|")[1]
+    await state.update_data(writePrompt_type=prompt_type)
 
-    if writePrompt_type == "one":
+    if prompt_type == "one":
+        # Один промпт на все модели
         await editMessageOrAnswer(
             call,
             text.GET_ONE_PROMPT_GENERATION_SUCCESS_TEXT,
             reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard(),
         )
+        return
 
+    state_data = await state.get_data()
+    setting_number = state_data.get("setting_number", 1)
+
+    # Получаем допустимые индексы моделей
+    if setting_number == "all":
+        # Если выбрано all — берём все модели
+        all_data_arrays = getAllDataArrays()
+        start_index = 1
+        end_index = sum(len(setting) for setting in all_data_arrays)
     else:
-        # Получаем данные
-        state_data = await state.get_data()
-        setting_number = state_data.get("setting_number", 1)
+        # Берём только модели из выбранной настройки
+        all_data_arrays = getAllDataArrays()
+        logger.info([len(arr) for arr in all_data_arrays])
+        setting_index = int(setting_number) - 1
 
-        if setting_number == "all":
-            # Получаем все настройки
-            dataArrays = getAllDataArrays()
+        # Считаем смещение как сумму длин всех предыдущих сетов
+        offset = sum(len(arr) for arr in all_data_arrays[:setting_index])
 
-            # Инициализируем начальные данные
-            model_name = dataArrays[0][0]["model_name"]
-            await state.update_data(current_setting_number_for_unique_prompt=1)
-            await state.set_state(StartGenerationState.write_prompt_for_model)
-        else:
-            # Получаем данные по настройке
-            dataArray = getDataArrayBySettingNumber(int(setting_number))
-            model_name = dataArray[0]["model_name"]
-            await state.update_data(
-                current_setting_number_for_unique_prompt=int(setting_number),
-            )
+        # Длина текущего сета
+        setting_length = len(all_data_arrays[setting_index])
 
-        # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
+        start_index = offset + 1
+        end_index = offset + setting_length
 
-        await editMessageOrAnswer(
-            call,
-            text.WRITE_PROMPT_FOR_MODEL_START_TEXT.format(
-                model_name,
-                model_name_index,
-            ),
+    # Сохраняем диапазон индексов в стейт
+    await state.update_data(valid_model_indexes_range=(start_index, end_index))
+
+    await editMessageOrAnswer(
+        call,
+        text.WRITE_PROMPTS_FOR_MODELS_TEXT.format(start_index, end_index),
+    )
+    await state.set_state(StartGenerationState.write_multi_prompts_for_models)
+
+
+PROMPT_BY_INDEX_PATTERN = re.compile(r"(\d+)\s*[:\-–—]\s*(.+)")
+
+
+# Обработка списка "индекс: промпт" для текущей настройки
+async def write_prompts_for_models(message: types.Message, state: FSMContext):
+    text_input = message.text.strip()
+    matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
+
+    if not matches:
+        await safe_send_message(
+            text.EMPTY_MATCHES_WRITE_PROMPTS_TEXT,
+            message,
         )
-        await state.update_data(current_model_for_unique_prompt=model_name)
-        await state.set_state(StartGenerationState.write_prompt_for_model)
+        return
+
+    state_data = await state.get_data()
+    valid_range = state_data.get("valid_model_indexes_range", (1, 100))
+    start_index, end_index = valid_range
+    user_id = message.from_user.id
+    setting_number = state_data.get("setting_number", "1")
+
+    model_prompts = {}
+    for index_str, prompt in matches:
+        if not index_str.isdigit():
+            continue
+        index = int(index_str)
+        if not (start_index <= index <= end_index):
+            await safe_send_message(
+                text.MODEL_NOT_FOUND_TEXT.format(index),
+                message,
+            )
+            return
+        model_prompts[str(index)] = prompt.strip()
+
+    await state.clear()
+
+    await safe_send_message(
+        "✅ Промпты получены. Начинаю генерацию...",
+        message,
+    )
+
+    try:
+        await generateImagesInHandler(
+            prompt=model_prompts,
+            message=message,
+            state=state,
+            user_id=user_id,
+            is_test_generation=False,
+            setting_number=setting_number,
+            with_randomizer=False,
+        )
+    except Exception:
+        await safe_send_message("❌ Произошла ошибка при генерации", message)
+        return
+
+    await safe_send_message("✅ Генерация завершена", message)
 
 
 # Обработка выбора режима при генерации с одним промптом
@@ -293,94 +350,96 @@ async def write_prompt(message: types.Message, state: FSMContext):
         )
 
 
-# Обработка ввода промпта для конкретной модели
-async def write_prompt_for_model(message: types.Message, state: FSMContext):
-    # Получаем данные
-    state_data = await state.get_data()
-    prompt = message.text
-    model_name = state_data.get("current_model_for_unique_prompt", "")
-    setting_number = state_data.get("setting_number", 1)
-    user_id = message.from_user.id
+#
+# # Обработка ввода промпта для конкретной модели
+# async def write_prompt_for_model(message: types.Message, state: FSMContext):
+#     # Получаем данные
+#     state_data = await state.get_data()
+#     prompt = message.text
+#     model_name = state_data.get("current_model_for_unique_prompt", "")
+#     setting_number = state_data.get("setting_number", 1)
+#     user_id = message.from_user.id
+#
+#     # Получаем индекс модели
+#     model_name_index = getModelNameIndex(model_name)
+#
+#     # Отправляем сообщение о начале генерации
+#     message_for_edit = await safe_send_message(
+#         text=text.GENERATE_IMAGE_PROGRESS_TEXT.format(
+#             model_name,
+#             model_name_index,
+#         ),
+#         message=message,
+#     )
+#
+#     # Получаем данные генерации по названию модели
+#     data = await getDataByModelName(model_name)
+#
+#     # Генерируем изображения
+#     await generateImageBlock(
+#         data,
+#         message_for_edit,
+#         state,
+#         user_id,
+#         setting_number,
+#         prompt,
+#         False,
+#         False,
+#         chat_id=message.chat.id,
+#     )
+#
+#     # Получаем следующую модель
+#     next_model = await getNextModel(model_name, setting_number, state)
+#
+#     # Если следующая модель не найдена, то завершаем генерацию
+#     if not next_model:
+#         await safe_send_message(
+#             text=text.GENERATION_SUCCESS_TEXT,
+#             message=message,
+#         )
+#         return
+#
+#     # Выводим в лог следующую модель
+#     logger.info(f"Следующая модель: {next_model}")
+#
+#     # Получаем индекс следующей модели
+#     next_model_index = getModelNameIndex(next_model)
+#
+#     await state.set_state(None)
+#     # Просим пользователя отправить промпт для следующей модели
+#     await safe_send_message(
+#         text=text.WRITE_PROMPT_FOR_MODEL_TEXT.format(
+#             next_model,
+#             next_model_index,
+#         ),
+#         message=message,
+#         reply_markup=start_generation_keyboards.confirmWriteUniquePromptForNextModelKeyboard(),
+#     )
+#     await state.update_data(current_model_for_unique_prompt=next_model)
+#
 
-    # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
 
-    # Отправляем сообщение о начале генерации
-    message_for_edit = await safe_send_message(
-        text=text.GENERATE_IMAGE_PROGRESS_TEXT.format(
-            model_name,
-            model_name_index,
-        ),
-        message=message,
-    )
-
-    # Получаем данные генерации по названию модели
-    data = await getDataByModelName(model_name)
-
-    # Генерируем изображения
-    await generateImageBlock(
-        data,
-        message_for_edit,
-        state,
-        user_id,
-        setting_number,
-        prompt,
-        False,
-        False,
-        chat_id=message.chat.id,
-    )
-
-    # Получаем следующую модель
-    next_model = await getNextModel(model_name, setting_number, state)
-
-    # Если следующая модель не найдена, то завершаем генерацию
-    if not next_model:
-        await safe_send_message(
-            text=text.GENERATION_SUCCESS_TEXT,
-            message=message,
-        )
-        return
-
-    # Выводим в лог следующую модель
-    logger.info(f"Следующая модель: {next_model}")
-
-    # Получаем индекс следующей модели
-    next_model_index = getModelNameIndex(next_model)
-
-    await state.set_state(None)
-    # Просим пользователя отправить промпт для следующей модели
-    await safe_send_message(
-        text=text.WRITE_PROMPT_FOR_MODEL_TEXT.format(
-            next_model,
-            next_model_index,
-        ),
-        message=message,
-        reply_markup=start_generation_keyboards.confirmWriteUniquePromptForNextModelKeyboard(),
-    )
-    await state.update_data(current_model_for_unique_prompt=next_model)
-
-
-# Обработка нажатия кнопки "✅ Написать промпт" для подтверждения написания уникального промпта для следующей модели
-async def confirm_write_unique_prompt_for_next_model(
-    call: types.CallbackQuery,
-    state: FSMContext,
-):
-    # Получаем данные
-    state_data = await state.get_data()
-    next_model = state_data.get("current_model_for_unique_prompt", "")
-
-    # Получаем индекс следующей модели
-    next_model_index = getModelNameIndex(next_model)
-
-    # Отправляем сообщение для ввода промпта
-    await editMessageOrAnswer(
-        call,
-        text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(
-            next_model,
-            next_model_index,
-        ),
-    )
-    await state.set_state(StartGenerationState.write_prompt_for_model)
+# # Обработка нажатия кнопки "✅ Написать промпт" для подтверждения написания уникального промпта для следующей модели
+# async def confirm_write_unique_prompt_for_next_model(
+#     call: types.CallbackQuery,
+#     state: FSMContext,
+# ):
+#     # Получаем данные
+#     state_data = await state.get_data()
+#     next_model = state_data.get("current_model_for_unique_prompt", "")
+#
+#     # Получаем индекс следующей модели
+#     next_model_index = getModelNameIndex(next_model)
+#
+#     # Отправляем сообщение для ввода промпта
+#     await editMessageOrAnswer(
+#         call,
+#         text.WRITE_UNIQUE_PROMPT_FOR_MODEL_TEXT.format(
+#             next_model,
+#             next_model_index,
+#         ),
+#     )
+#     await state.set_state(StartGenerationState.write_prompt_for_model)
 
 
 # Обработка выбора изображения
@@ -671,18 +730,6 @@ def hand_add():
         StateFilter(StartGenerationState.write_prompt_for_images),
     )
 
-    router.message.register(
-        write_prompt_for_model,
-        StateFilter(StartGenerationState.write_prompt_for_model),
-    )
-
-    router.callback_query.register(
-        confirm_write_unique_prompt_for_next_model,
-        lambda call: call.data.startswith(
-            "confirm_write_unique_prompt_for_next_model",
-        ),
-    )
-
     router.callback_query.register(
         select_image,
         lambda call: call.data.startswith("select_image"),
@@ -698,4 +745,8 @@ def hand_add():
         StateFilter(
             StartGenerationState.write_new_prompt_for_regenerate_image,
         ),
+    )
+    router.message.register(
+        write_prompts_for_models,
+        StartGenerationState.write_multi_prompts_for_models,
     )
