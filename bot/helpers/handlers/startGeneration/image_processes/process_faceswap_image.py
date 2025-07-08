@@ -8,11 +8,11 @@ from PIL import Image
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
+from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
 from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.helpers.handlers.messages import send_progress_message
 from bot.utils.retryOperation import retryOperation
 
 
@@ -48,14 +48,15 @@ async def process_faceswap_image(
         "faceswap_generation_wait_messages",
         model_name,
         call.message,
-        text.FACE_SWAP_WAIT_TEXT.format(image_index, model_name, model_name_index),
+        text.FACE_SWAP_WAIT_TEXT.format(
+            image_index, model_name, model_name_index
+        ),
         call.message.message_id,
     )
 
     # Локальный путь для проверки существования файла
     from bot.constants import TEMP_FOLDER_PATH
 
-    # TEMP_FOLDER_PATH - это pathlib.Path, приводим к str для os.path.join
     temp_user_dir = TEMP_FOLDER_PATH / f"{model_name}_{user_id}"
     local_faceswap_target_path = os.path.join(
         str(TEMP_FOLDER_PATH),
@@ -63,7 +64,7 @@ async def process_faceswap_image(
         f"{image_index}.jpg",
     )
     logger.info(
-        f"[faceswap] START: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}"
+        f"[faceswap] START: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
     # Путь для передачи в facefusion_swap (виден внутри facefusion-контейнера)
     faceswap_target_path = f"/facefusion/.assets/images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -134,7 +135,9 @@ async def process_faceswap_image(
                 "faceswap_generation_progress_messages",
                 model_name,
                 call.message,
-                text.FACE_SWAP_PROGRESS_TEXT.format(image_index, model_name, model_name_index),
+                text.FACE_SWAP_PROGRESS_TEXT.format(
+                    image_index, model_name, model_name_index
+                ),
                 call.message.message_id,
             )
 
@@ -224,7 +227,7 @@ async def process_faceswap_image(
 
     # После генерации удаляем модель из стейта
     logger.info(
-        f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}"
+        f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
     # После генерации удаляем модель из стейта по model_name и image_index
     state_data = await state.get_data()
