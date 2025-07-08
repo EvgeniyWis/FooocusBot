@@ -26,8 +26,9 @@ async def generateImageBlock(
     json["input"]["prompt"] = (
         variable_prompt.replace("\n", " ") + " " + json["input"]["prompt"]
     )
+    json["input"]["prompt"] = json["input"]["prompt"].lstrip(" ")
 
-    # Получаем имя настройки
+    # Получаем имя модели
     model_name = data["model_name"]
 
     # Получаем номер настройки по имени модели

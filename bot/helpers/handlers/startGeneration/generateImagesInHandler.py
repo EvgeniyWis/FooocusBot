@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataArrayBySettingNumber,
+    getModelNameIndex,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.generateImages.generateImages import generateImages
@@ -59,7 +60,7 @@ async def generateImagesInHandler(
                 )
             else:
                 await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
-                dataArray = getDataArrayBySettingNumber(int(setting_number))
+                dataArray = getDataArrayBySettingNumber(setting_number)
                 data = dataArray[0]
                 result = [
                     await generateImageBlock(
@@ -101,9 +102,17 @@ async def generateImagesInHandler(
                         ),
                     )
                 else:
+                    # Формируем словарь model_name -> prompt
+                    dataArray = getDataArrayBySettingNumber(setting_number)
+
+                    prompt_for_current_model = {}
+                    for data in dataArray:
+                        model_index = getModelNameIndex(data["model_name"])
+                        prompt_for_current_model[model_index] = prompt
+
                     result = await generateImages(
                         setting_number=setting_number,
-                        prompt_for_current_model={},
+                        prompt_for_current_model=prompt_for_current_model,
                         message=message_for_edit,
                         state=state,
                         user_id=user_id,

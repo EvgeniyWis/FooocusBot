@@ -48,7 +48,7 @@ async def generateImages(
         dataArray = await getDataArrayByRandomizer(state, setting_number)
 
     logger.info(
-        f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}",
+        f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}. Переменный промпт: {prompt_for_current_model}",
     )
 
     await state.update_data(jobs={}, total_jobs_count=len(dataArray))
