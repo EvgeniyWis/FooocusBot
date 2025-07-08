@@ -43,7 +43,7 @@ async def generateImages(
                 for model_name in model_names_for_generation
             ]
         else:
-            dataArray = getDataArrayBySettingNumber(int(setting_number))
+            dataArray = getDataArrayBySettingNumber(setting_number)
     else:
         dataArray = await getDataArrayByRandomizer(state, setting_number)
 

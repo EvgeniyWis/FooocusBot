@@ -27,6 +27,10 @@ async def getDataArrayByRandomizer(
     # Получаем массив данных
     dataArray = getDataArrayBySettingNumber(setting_number)
 
+    logger.info(
+        f"Массив данных до применения переменных рандомайзера: {dataArray} для настройки {setting_number}",
+    )
+
     generators = {}
     for variable_name in variable_names_for_randomizer:
         variable_values = state_data.get(
