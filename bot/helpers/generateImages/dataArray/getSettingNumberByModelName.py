@@ -12,7 +12,12 @@ def getSettingNumberByModelName(model_name: str):
     for index, setting in enumerate(all_settings):
         for dataArray in setting:
             if dataArray["model_name"] == model_name:
-                return index + 1
+                result = index + 1
+
+                if result == 5:
+                    return "extra"
+                else:
+                    return result
 
     # Если модель не найдена, то возвращаем None
     return None

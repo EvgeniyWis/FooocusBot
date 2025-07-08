@@ -11,7 +11,10 @@ from bot.utils.handlers import appendDataToStateArray
 
 
 # Функция для применения переменных рандомайзера к промптам массива данных
-async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
+async def getDataArrayByRandomizer(
+    state: FSMContext,
+    setting_number: int | str,
+):
     # Получаем массив данных
     state_data = await state.get_data()
 
@@ -22,7 +25,7 @@ async def getDataArrayByRandomizer(state: FSMContext, setting_number: int):
     )
 
     # Получаем массив данных
-    dataArray = getDataArrayBySettingNumber(int(setting_number))
+    dataArray = getDataArrayBySettingNumber(setting_number)
 
     generators = {}
     for variable_name in variable_names_for_randomizer:

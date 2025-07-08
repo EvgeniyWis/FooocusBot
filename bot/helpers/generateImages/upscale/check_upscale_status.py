@@ -8,7 +8,7 @@ from bot.utils.images.base64_to_image import base64_to_image
 
 async def check_upscale_status(
     job_id: str,
-    setting_number: int,
+    setting_number: int | str,
     state: FSMContext,
     model_name: str,
     image_index: int,

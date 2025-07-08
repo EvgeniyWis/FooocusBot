@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     SETTING_2_ENDPOINT_ID: str
     SETTING_3_ENDPOINT_ID: str
     SETTING_4_ENDPOINT_ID: str
+    EXTRA_SETTING_ENDPOINT_ID: str
 
     # Общий негатив-промпт
     COMMON_NEGATIVE_PROMPT: ClassVar[str] = (

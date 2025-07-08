@@ -12,7 +12,7 @@ from bot.utils.handlers import appendDataToStateArray
 async def upscale_image(
     input_image: str,
     base_config_model_name: str,
-    setting_number: int,
+    setting_number: int | str,
     state: FSMContext,
     user_id: int,
     model_name: str,

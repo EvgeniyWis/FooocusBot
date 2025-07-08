@@ -5,7 +5,7 @@ from bot.utils.get_api_headers import get_runpod_headers
 
 
 # Функция для отправки запроса на генерацию
-async def send_run_request(dataJSON: dict, setting_number: int):
+async def send_run_request(dataJSON: dict, setting_number: int | str):
     # Получаем ID эндпоинта для генерации изображений
     ENDPOINT_ID = await get_endpoint_ID(setting_number)
 
