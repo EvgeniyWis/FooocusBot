@@ -36,6 +36,13 @@ class Settings(BaseSettings):
     REDIS_PORT: str = "6379"
     REDIS_DB: str = "0"
 
+    # Postgres
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: str = "5432"
+    POSTGRES_DB: str
+
     # Адрес Runpod
     RUNPOD_HOST: str
 

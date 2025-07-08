@@ -6,6 +6,7 @@ from aiogram.types import BotCommand
 
 import bot.constants as constants
 from bot import handlers
+from bot.database.init_schema import init_schema
 from bot.factory.comfyui_video_service import get_video_service
 from bot.helpers.generateImages.process_image_block import process_image_block
 from bot.helpers.handlers.startGeneration import process_image
@@ -46,12 +47,18 @@ async def register_commands():
             command="/stop",
             description="Остановить генерацию изображений",
         ),
+        BotCommand(
+            command="/admin",
+            description="Управление настройками",
+        ),
     ]
     await bot.set_my_commands(commands)
 
 
 async def on_startup():
     logger.info("Startup initiated")
+
+    await init_schema()
 
     await init_redis_storage(redis_client)
 
@@ -76,6 +83,8 @@ async def on_startup():
     handlers.hand_multi_image.hand_add()
     handlers.hand_img2video.hand_add()
     handlers.hand_nsfw_video.hand_add()
+    handlers.hand_users.hand_add()
+    handlers.hand_superadmin.hand_add()
 
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())

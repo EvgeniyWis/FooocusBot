@@ -207,13 +207,16 @@ def generationModeKeyboard():
                 InlineKeyboardButton(
                     text="🖼 Мультивыбор",
                     callback_data="generation_mode|multi_select",
-                )],
-                [InlineKeyboardButton(
+                ),
+            ],
+            [
+                InlineKeyboardButton(
                     text="1️⃣ Выбор одного фото",
                     callback_data="generation_mode|single_select",
-                )],
+                ),
             ],
-        )
+        ],
+    )
 
 
 # Инлайн-клавиатура для мультивыборной генерации изображений
@@ -267,3 +270,97 @@ def selectMultiImageKeyboard(
         ],
     )
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+
+def admin_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="👤 Профиль",
+                    callback_data="user|profile",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📊 Лоры",
+                    callback_data="user|lora_settings",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="👨‍💻 Промпты",
+                    callback_data="user|prompts",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📁 Веса для лор",
+                    callback_data="user|lor_weights",
+                ),
+            ],
+        ],
+    )
+
+
+def super_admin_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📊 Лоры",
+                    callback_data="super_admin|lora_settings",
+                ),
+            ],
+        ],
+    )
+
+
+def lora_admin_menu_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📋 Показать все LoRA",
+                    callback_data="super_admin|show_loras",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="➕ Добавить LoRA",
+                    callback_data="super_admin|add_lora",
+                ),
+            ],
+        ],
+    )
+
+
+def lora_list_keyboard(loras: list[str]):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=f"{i+1}. {title}",
+                    callback_data=f"super_admin|select_lora|{title}",
+                ),
+            ]
+            for i, title in enumerate(loras)
+        ],
+    )
+
+
+def selected_lora_action_keyboard(title: str):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✏️ Изменить",
+                    callback_data=f"super_admin|edit_lora|{title}",
+                ),
+                InlineKeyboardButton(
+                    text="🗑 Удалить",
+                    callback_data=f"super_admin|delete_lora|{title}",
+                ),
+            ],
+        ],
+    )

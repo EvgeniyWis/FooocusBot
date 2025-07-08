@@ -17,6 +17,26 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 )
 
 
+async def admin(message: types.Message):
+    await safe_send_message(
+        text.ADMIN_TEXT,
+        message,
+        reply_markup=start_generation_keyboards.admin_keyboard(),
+    )
+
+
+async def super_admin(message: types.Message):
+    if message.from_user.id != settings.ADMIN_ID:
+        await safe_send_message(text.ACCESS_DENIED_TEXT, message)
+        return
+
+    await safe_send_message(
+        text.SUPER_ADMIN_TEXT,
+        message,
+        reply_markup=start_generation_keyboards.super_admin_keyboard(),
+    )
+
+
 # Отправка стартового меню при вводе "/start"
 async def start(message: types.Message, state: FSMContext):
     await state.set_state(None)
@@ -70,6 +90,10 @@ def hand_add():
     router.message.register(stop_generation, Command("stop"))
 
     router.message.register(clear_state, Command("clear"))
+
+    router.message.register(admin, Command("admin"))
+
+    router.message.register(super_admin, Command("superadmin"))
 
     # DEV: получение file id видео
     # router.message.register(get_file_id)
