@@ -18,7 +18,8 @@ from bot.helpers.generateImages.dataArray.extra_setting.get_data_array import (
 def getDataArrayBySettingNumber(setting_number: str | int):
     # Если передана строка, преобразуем её в число
     if isinstance(setting_number, str):
-        setting_number = int(setting_number)
+        if setting_number.isdigit():
+            setting_number = int(setting_number)
 
     if setting_number == 1:
         return setting1_get_data_array()

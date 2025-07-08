@@ -44,7 +44,10 @@ async def process_write_prompt(
         )
     )
 
-    if call.message.content_type == types.ContentType.PHOTO:
+    if call.message.content_type in [
+        types.ContentType.PHOTO,
+        types.ContentType.VIDEO,
+    ]:
         await call.message.edit_caption(
             caption=message_text,
         )

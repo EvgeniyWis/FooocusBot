@@ -103,12 +103,13 @@ async def generateImagesInHandler(
                     )
                 else:
                     # Формируем словарь model_name -> prompt
-                    dataArray = getDataArrayBySettingNumber(setting_number)
-
                     prompt_for_current_model = {}
-                    for data in dataArray:
-                        model_index = getModelNameIndex(data["model_name"])
-                        prompt_for_current_model[model_index] = prompt
+                    if setting_number != "individual":
+                        dataArray = getDataArrayBySettingNumber(setting_number)
+
+                        for data in dataArray:
+                            model_index = getModelNameIndex(data["model_name"])
+                            prompt_for_current_model[model_index] = prompt
 
                     result = await generateImages(
                         setting_number=setting_number,

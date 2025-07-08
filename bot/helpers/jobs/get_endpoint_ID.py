@@ -5,7 +5,8 @@ from bot.settings import settings
 async def get_endpoint_ID(setting_number: str | int):
     # Если передана строка, преобразуем её в число
     if isinstance(setting_number, str):
-        setting_number = int(setting_number)
+        if setting_number.isdigit():
+            setting_number = int(setting_number)
 
     match setting_number:
         case 1:
