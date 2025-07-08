@@ -10,6 +10,7 @@ from bot.helpers.generateImages.dataArray import (
     getAllDataArrays,
     getDataByModelName,
     getModelNameIndex,
+    getModelNameByIndex
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
@@ -113,6 +114,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "upscale_progress_messages": [],
         "variable_names_for_randomizer": [],
         "generated_video_paths": [],
+        "model_prompts_for_generation": [],
     }
 
     # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
@@ -271,7 +273,16 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
         )
         return
 
-    await state.clear()
+    data_for_update = {
+        f"{getModelNameByIndex(str(index))}": prompt
+        for index, prompt in model_prompts.items()
+    }
+    await appendDataToStateArray(
+        state,
+        "model_prompts_for_generation",
+        data_for_update,
+        unique_keys=("model_name"),
+    )
 
     await safe_send_message(
         "✅ Промпты получены. Начинаю генерацию...",
@@ -480,9 +491,18 @@ async def write_model_name_for_generation(
                     message=message,
                 )
                 return
-            model_prompts[index] = prompt.strip()
-        await state.update_data(model_prompts_for_generation=model_prompts)
-        await state.clear()
+            model_prompts[str(index)] = prompt.strip()
+
+        data_for_update = {
+            f"{getModelNameByIndex(str(index))}": prompt
+            for index, prompt in model_prompts.items()
+        }
+        await appendDataToStateArray(
+            state,
+            "model_prompts_for_generation",
+            data_for_update,
+        )
+
         await safe_send_message(
             text="✅ Промпты по моделям получены, начинаю генерацию...",
             message=message,
