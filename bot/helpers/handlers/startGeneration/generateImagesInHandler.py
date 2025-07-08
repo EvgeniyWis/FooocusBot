@@ -141,5 +141,4 @@ async def generateImagesInHandler(
         logger.error(f"Ошибка при генерации изображения: {e}")
         traceback.print_exc()
         await safe_send_message(text.GENERATION_IMAGE_ERROR_TEXT, message)
-        await state.clear()
         raise e

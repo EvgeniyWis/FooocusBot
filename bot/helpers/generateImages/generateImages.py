@@ -29,7 +29,7 @@ async def generateImages(
     )
 
     state_data = await state.get_data()
-    image_number = 10 if state_data.get("multi_select_mode") else 4
+    image_number = 10 if state_data.get("multi_select_mode", False) else 4
 
     # Получаем массив данных для генерации
     if not with_randomizer:

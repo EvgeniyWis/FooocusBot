@@ -64,19 +64,17 @@ async def getDataArrayByRandomizer(
             + data["json"]["input"]["prompt"].lstrip(" ")
         )
 
-        data_for_update = {
-            "model_name": data["model_name"],
-            "image_index": data.get(
-                "image_index",
-                0,
-            ),
-            "prompt": model_randomizer_prompt,
-        }
+        data_for_update = {f"{data['model_name']}": model_randomizer_prompt}
+
+        logger.info(
+            f"Данные для обновления: {data_for_update} для настройки {setting_number}",
+        )
+
         await appendDataToStateArray(
             state,
             "randomizer_prompts",
             data_for_update,
-            unique_keys=("model_name", "image_index"),
+            unique_keys=("model_name"),
         )
 
     logger.info(
