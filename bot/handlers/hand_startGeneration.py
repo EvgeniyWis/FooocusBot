@@ -499,6 +499,15 @@ async def write_model_name_for_generation(
         return
 
     # 2. Старый формат: одна модель или через запятую
+
+    # Проверяем, что введённое значение является числом
+    if not message.text.isdigit():
+        await safe_send_message(
+            text=text.NOT_NUMBER_TEXT,
+            message=message,
+        )
+        return
+
     model_indexes = message.text.split(",")
     if len(model_indexes) == 1:
         model_indexes = [message.text]
