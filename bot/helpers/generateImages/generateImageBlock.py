@@ -21,6 +21,10 @@ async def generateImageBlock(
     if not variable_prompt:
         variable_prompt = " "
 
+    # Проверяем наличие json в данных модели
+    if not "json" in data:
+        raise ValueError(f"Не получилось обнаружить json в {data}")
+
     # Прибавляем к постоянному промпту переменный промпт
     json = data["json"].copy()
     json["input"]["prompt"] = (
