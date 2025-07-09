@@ -124,7 +124,10 @@ async def generateImagesInHandler(
 
                 await message_for_edit.unpin()
 
-        if not result:
+        state_data = await state.get_data()
+        stop_generation = state_data.get("stop_generation", False)
+
+        if not result and not stop_generation:
             raise Exception("Произошла ошибка при генерации изображения")
         else:
             state_data = await state.get_data()
