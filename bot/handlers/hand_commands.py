@@ -10,30 +10,32 @@ from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
 from bot.InstanceBot import router
-from bot.keyboards import start_generation_keyboards
+from bot.keyboards import start_generation_keyboards, users_keyboards
 from bot.settings import settings
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
 
 
-async def admin(message: types.Message):
+async def admin(message: types.Message, state: FSMContext):
+    await state.clear()
     await safe_send_message(
         text.ADMIN_TEXT,
         message,
-        reply_markup=start_generation_keyboards.admin_keyboard(),
+        reply_markup=users_keyboards.admin_keyboard(),
     )
 
 
-async def super_admin(message: types.Message):
+async def super_admin(message: types.Message, state: FSMContext):
     if message.from_user.id != settings.ADMIN_ID:
         await safe_send_message(text.ACCESS_DENIED_TEXT, message)
         return
 
+    await state.clear()
     await safe_send_message(
         text.SUPER_ADMIN_TEXT,
         message,
-        reply_markup=start_generation_keyboards.super_admin_keyboard(),
+        reply_markup=users_keyboards.super_admin_keyboard(),
     )
 
 

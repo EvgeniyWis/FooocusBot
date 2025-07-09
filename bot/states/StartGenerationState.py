@@ -15,3 +15,23 @@ class StartGenerationState(StatesGroup):
     ask_video_length_input = State()
     choose_generated_video = State()
     write_multi_prompts_for_models = State()
+
+
+class UserLoraEditStates(StatesGroup):
+    waiting_for_weight_input = State()
+    waiting_for_lora_to_add = State()
+    selected_setting_number = State()
+    selected_lora_title = State()
+
+
+class LoraEditStates(StatesGroup):
+    waiting_for_new_title = State()
+    waiting_for_add_title = State()
+    selected_setting_number = State()
+
+
+class ModelEditStates(StatesGroup):
+    waiting_for_model_name = State()
+    waiting_for_model_rename = State()
+    selected_setting_number = State()
+    old_model_name = State()
