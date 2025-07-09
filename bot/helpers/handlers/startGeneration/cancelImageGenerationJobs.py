@@ -12,17 +12,9 @@ async def cancelImageGenerationJobs(state: FSMContext):
     state_data = await state.get_data()
     image_generation_jobs = state_data.get("image_generation_jobs", [])
 
-    logger.info(f"Отменяем работы: {image_generation_jobs}")
+    logger.info(f"Отменяем работы: {image_generation_jobs} ({len(image_generation_jobs)})")
 
     if len(image_generation_jobs) > 0:
         await cancel_jobs(image_generation_jobs)
     else:
         return
-
-    # Проверяем через 10 секунд, что все работы остановлены, а если нет, то делаем повторно
-    await asyncio.sleep(10)
-    state_data = await state.get_data()
-    image_generation_jobs = state_data.get("image_generation_jobs", [])
-
-    if len(image_generation_jobs) > 0:
-        await cancel_jobs(image_generation_jobs)

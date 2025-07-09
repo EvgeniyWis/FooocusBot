@@ -89,7 +89,15 @@ async def generateImages(
             traceback.print_exc()
             raise Exception(f"Ошибка при генерации изображения: {e}")
 
-    tasks = [asyncio.create_task(process_image(data)) for data in dataArray]
+    tasks = []
+    for data in dataArray:
+        state_data = await state.get_data()
+        stop_generation = state_data.get("stop_generation", False)
+
+        if not stop_generation:
+            tasks.append(asyncio.create_task(process_image(data)))
+            await asyncio.sleep(0.1)  # Задержка в 0.1 секунду между созданием задач
+
     results = await asyncio.gather(*tasks)
     images = [result[0] for result in results]
     return images

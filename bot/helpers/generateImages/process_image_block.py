@@ -4,14 +4,14 @@ from aiogram.fsm.context import FSMContext
 from bot.domain.entities.task import TaskImageBlockDTO
 from bot.helpers.generateImages.getReferenceImage import getReferenceImage
 from bot.helpers.jobs.check_job_status import (
-    CANCELLED_JOB_TEXT,
     check_job_status,
 )
+from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
+from bot.logger import logger
 from bot.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.images.base64_to_image import base64_to_image
-from bot.logger import logger
 
 
 async def process_image_block(
