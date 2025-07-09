@@ -229,7 +229,7 @@ async def handle_video_correctness_buttons(
         # Удаляем изображение из массива объектов saved_images_urls
         saved_images_urls = state_data.get("saved_images_urls", [])
         for item in saved_images_urls:
-            if model_name in item.keys():
+            if model_name == item["model_name"] and image_index == item["image_index"]:
                 saved_images_urls.remove(item)
         await state.update_data(saved_images_urls=saved_images_urls)
 
