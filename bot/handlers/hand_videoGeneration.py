@@ -114,14 +114,13 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
     await message.delete()
 
     # Удаляем сообщение о написании промпта
-    if image_index:
-        await deleteMessageFromState(
-            state,
-            "write_prompt_messages_ids",
-            model_name,
-            message.chat.id,
-            image_index=image_index,
-        )
+    await deleteMessageFromState(
+        state,
+        "write_prompt_messages_ids",
+        model_name,
+        message.chat.id,
+        image_index=image_index,
+    )
 
     await state.set_state(None)
 
