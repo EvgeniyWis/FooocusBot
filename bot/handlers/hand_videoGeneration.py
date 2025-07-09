@@ -46,6 +46,7 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
         call,
         state,
         model_name,
+        image_index,
         is_quick_generation=True,
     )
 
@@ -71,28 +72,6 @@ async def handle_rewrite_prompt_button(
 
     # Ставим стейт для обработки ввода
     await state.set_state(StartGenerationState.write_prompt_for_quick_video_generation)
-
-
-# Обработка нажатия кнопок режима генерации видео
-async def handle_video_generation_mode_buttons(
-    call: types.CallbackQuery,
-    state: FSMContext,
-):
-    # Получаем индекс модели
-    temp = call.data.split("|")
-    model_name = temp[1]
-
-    # Получаем выбранный режим генерации видео
-    mode = temp[2]
-
-    # Если выбран режим "Написать свой промпт", то отправляем сообщение для ввода кастомного промпта
-    if mode == "write_prompt":
-        await process_write_prompt(
-            call,
-            state,
-            model_name,
-        )
-        return
 
 
 # Хедлер для обработки ввода кастомного промпта для видео
@@ -252,11 +231,6 @@ def hand_add():
     router.callback_query.register(
         quick_generate_video,
         lambda call: call.data.startswith("quick_video_generation"),
-    )
-
-    router.callback_query.register(
-        handle_video_generation_mode_buttons,
-        lambda call: call.data.startswith("generate_video_mode"),
     )
 
     router.callback_query.register(

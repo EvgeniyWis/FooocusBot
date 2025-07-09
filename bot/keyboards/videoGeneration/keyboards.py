@@ -107,21 +107,3 @@ def nsfw_video_generation_insert_length_video_keyboard():
         ],
     )
     return keyboard
-
-
-# Инлайн-клавиатура для выбора режима генерации видео
-def videoGenerationModeKeyboard(model_name: str):
-    prefix = f"generate_video_mode|{model_name}"
-
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="✒️ Написать свой промпт",
-                    callback_data=f"{prefix}|write_prompt",
-                ),
-            ],
-        ],
-    )
-
-    return kb
