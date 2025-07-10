@@ -450,7 +450,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 image_index,
             )
         except Exception as e:
-            logger.exception("Ошибка в process_image")
+            traceback.print_exc()
+            logger.exception(f"Ошибка в process_image: {e}")
             await editMessageOrAnswer(
                 call,
                 f"❌ Ошибка при обработке изображения: {e}",
