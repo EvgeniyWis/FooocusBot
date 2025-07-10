@@ -19,6 +19,7 @@
 - Интеграция с внешним FaceFusion контейнером через `docker exec`
 - Система логирования с бэкапами и просмотром логов через Grafana (Loki/Promtail)
 - Безопасный доступ к Grafana через nginx с Basic Auth
+- Хранение пользовательских настроек (LoRA, промпты и т.д.) в PostgreSQL
 
 ---
 
@@ -42,6 +43,9 @@ make logs-bot
 - `make logs-<service>` — посмотреть логи сервиса (например, `make logs-bot`)
 - `make restart-<service>` — перезапустить сервис
 - `make sh-<service>` — войти внутрь контейнера (bash/sh)
+- `make up-database` / `make down-database` — запустить/остановить PostgreSQL
+- `make logs-database` / `make restart-database` — логи и перезапуск базы
+- `make sh-database` — войти внутрь контейнера PostgreSQL
 
 ## Доступ к логам и Grafana
 

@@ -1,7 +1,7 @@
 export COMPOSE_DOCKER_CLI_BUILD=1
 export DOCKER_BUILDKIT=1
 
-all: down-all build up-all up-bot down-bot logs-bot restart-bot sh-bot up-redis down-redis logs-redis restart-redis sh-redis up-loki down-loki logs-loki restart-loki sh-loki up-promtail down-promtail logs-promtail restart-promtail sh-promtail up-grafana down-grafana logs-grafana restart-grafana sh-grafana up-nginx down-nginx logs-nginx restart-nginx sh-nginx
+all: down-all build up-all up-bot down-bot logs-bot restart-bot sh-bot up-redis down-redis logs-redis restart-redis sh-redis up-loki down-loki logs-loki restart-loki sh-loki up-promtail down-promtail logs-promtail restart-promtail sh-promtail up-grafana down-grafana logs-grafana restart-grafana sh-grafana up-nginx down-nginx logs-nginx restart-nginx sh-nginx up-database down-database logs-database restart-database sh-database
 
 build:
 	docker-compose build
@@ -101,3 +101,18 @@ restart-nginx:
 
 sh-nginx:
 	docker-compose exec nginx /bin/sh
+
+up-database:
+	docker-compose up -d database
+
+down-database:
+	docker-compose down database
+
+logs-database:
+	docker-compose logs database | tail -700
+
+restart-database:
+	docker-compose restart database
+
+sh-database:
+	docker-compose exec database /bin/sh
