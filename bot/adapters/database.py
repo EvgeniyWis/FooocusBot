@@ -139,15 +139,41 @@ class PostgresRepository:
         lora_id: int,
         model_id: int,
         setting_number: int,
-    ):
-        return await self.db.fetchval(
-            "SELECT weight FROM user_loras WHERE "
-            "user_id = $1 AND lora_id = $2 AND model_id = $3 AND setting_number = $4",
-            user_id,
-            lora_id,
-            model_id,
-            setting_number,
-        )
+    ) -> float | None:
+        async with self.db.acquire() as conn:
+            base_weight = await conn.fetchval(
+                """
+                SELECT weight FROM user_loras
+                WHERE user_id = $1 AND lora_id = $2
+                  AND model_id IS NULL AND setting_number = $3
+                  AND is_override = FALSE
+                """,
+                user_id,
+                lora_id,
+                setting_number,
+            )
+
+            if base_weight is None:
+                return None
+
+            delta_weight = await conn.fetchval(
+                """
+                SELECT weight FROM user_loras
+                WHERE user_id = $1 AND lora_id = $2
+                  AND model_id = $3 AND setting_number = $4
+                  AND is_override = TRUE
+                """,
+                user_id,
+                lora_id,
+                model_id,
+                setting_number,
+            )
+
+            return (
+                base_weight + delta_weight
+                if delta_weight is not None
+                else base_weight
+            )
 
     async def get_model_id(self, name: str, setting_number: int) -> int | None:
         row = await self.db.fetchrow(
@@ -199,8 +225,8 @@ class PostgresRepository:
                 """
                 SELECT ul.lora_id, ul.model_id, ul.weight, m.name AS model_name
                 FROM user_loras ul
-                         JOIN models m ON ul.model_id = m.id
-                WHERE ul.user_id = $1 AND m.setting_number = $2
+                LEFT JOIN models m ON ul.model_id = m.id AND m.setting_number = $2
+                WHERE ul.user_id = $1 AND ul.setting_number = $2
                 """,
                 user_id,
                 setting_number,
@@ -232,25 +258,105 @@ class PostgresRepository:
                 weight,
             )
 
-    async def user_delete_lora(
+    async def user_add_lora_to_setting(
+        self,
+        user_id: int,
+        lora_id: int,
+        setting_number: int,
+        weight: float,
+    ):
+        await self.db.execute(
+            """
+            INSERT INTO user_loras (user_id, lora_id, model_id, setting_number, weight, is_override)
+            VALUES ($1, $2, NULL, $3, $4, FALSE)
+            ON CONFLICT (user_id, lora_id, model_id, setting_number)
+                DO UPDATE SET weight = EXCLUDED.weight
+            """,
+            user_id,
+            lora_id,
+            setting_number,
+            weight,
+        )
+
+    async def user_override_lora_weight_for_model(
+        self,
+        user_id: int,
+        lora_id: int,
+        model_id: int,
+        setting_number: int,
+        delta_weight: float,
+    ):
+        await self.db.execute(
+            """
+            INSERT INTO user_loras (user_id, lora_id, model_id, setting_number, weight, is_override)
+            VALUES ($1, $2, $3, $4, $5, TRUE)
+            ON CONFLICT (user_id, lora_id, model_id, setting_number)
+                DO UPDATE SET weight = EXCLUDED.weight, is_override = TRUE
+            """,
+            user_id,
+            lora_id,
+            model_id,
+            setting_number,
+            delta_weight,
+        )
+
+    async def user_delete_override_lora_weight(
         self,
         user_id: int,
         lora_id: int,
         model_id: int,
         setting_number: int,
     ):
+        await self.db.execute(
+            """
+            DELETE FROM user_loras
+            WHERE user_id = $1 AND lora_id = $2 AND model_id = $3
+              AND setting_number = $4 AND is_override = TRUE
+            """,
+            user_id,
+            lora_id,
+            model_id,
+            setting_number,
+        )
+
+    async def get_lora_overrides(
+        self,
+        user_id: int,
+        lora_id: int,
+        setting_number: int,
+    ) -> list[dict]:
+        async with self.db.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT ul.model_id, m.name AS model_name, ul.weight
+                FROM user_loras ul
+                         LEFT JOIN models m ON ul.model_id = m.id
+                WHERE ul.user_id = $1 AND ul.lora_id = $2 AND ul.setting_number = $3 AND ul.is_override = TRUE
+                ORDER BY m.name
+                """,
+                user_id,
+                lora_id,
+                setting_number,
+            )
+            return [dict(row) for row in rows]
+
+    async def user_delete_lora(
+        self,
+        user_id: int,
+        lora_id: int,
+        setting_number: int,
+    ):
         async with self.db.acquire() as conn:
             logger.info(
-                f"Deleting LoRA {lora_id} from user {user_id} for model_id {model_id} for setting {setting_number}",
+                f"Deleting LoRA {lora_id} from user {user_id} for setting {setting_number}",
             )
             await conn.execute(
                 """
                 DELETE FROM user_loras
-                WHERE user_id = $1 AND lora_id = $2 AND model_id = $3 AND setting_number = $4
+                WHERE user_id = $1 AND lora_id = $2 AND setting_number = $3
                 """,
                 user_id,
                 lora_id,
-                model_id,
                 setting_number,
             )
 
@@ -258,7 +364,7 @@ class PostgresRepository:
         async with self.db.acquire() as conn:
             logger.info(f"Getting prompts for user {user_id}")
             return await conn.fetch(
-                "SELECT model_id, setting_number, prompt FROM user_prompts WHERE user_id = $1",
+                "SELECT model_id, setting_number, prompt, type FROM user_prompts WHERE user_id = $1",
                 user_id,
             )
 
@@ -315,44 +421,73 @@ class PostgresRepository:
         self,
         user_db_id: int,
         lora_id: int,
-        model_id: int,
+        model_id: int | None,
         setting_number: int,
         delta_weight: float,
-    ):
+    ) -> float:
         async with self.db.acquire() as conn:
-            # Получаем текущий вес
-            current_weight = await conn.fetchval(
-                """
-                SELECT weight FROM user_loras
-                WHERE user_id = $1 AND lora_id = $2 AND model_id = $3 AND setting_number = $4
-                """,
-                user_db_id,
-                lora_id,
-                model_id,
-                setting_number,
-            )
-
-            if current_weight is None:
-                # Если нет такой записи — можно либо вставить новую, либо вернуть ошибку
-                raise ValueError(
-                    "LoRA не найдена для данного пользователя и модели",
+            if model_id is None:
+                # глобальная настройка
+                current_weight = await conn.fetchval(
+                    """
+                    SELECT weight FROM user_loras
+                    WHERE user_id = $1 AND lora_id = $2 AND model_id IS NULL
+                      AND setting_number = $3 AND is_override = FALSE
+                    """,
+                    user_db_id,
+                    lora_id,
+                    setting_number,
                 )
 
-            new_weight = max(-10, current_weight + delta_weight)
+                if current_weight is None:
+                    raise ValueError("Глобальная LoRA не найдена.")
 
-            await conn.execute(
-                """
-                UPDATE user_loras
-                SET weight = $5
-                WHERE user_id = $1 AND lora_id = $2 AND model_id = $3 AND setting_number = $4
-                """,
-                user_db_id,
-                lora_id,
-                model_id,
-                setting_number,
-                new_weight,
-            )
-            return new_weight
+                new_weight = max(-10, min(10, current_weight + delta_weight))
+
+                await conn.execute(
+                    """
+                    UPDATE user_loras
+                    SET weight = $4
+                    WHERE user_id = $1 AND lora_id = $2 AND model_id IS NULL
+                      AND setting_number = $3 AND is_override = FALSE
+                    """,
+                    user_db_id,
+                    lora_id,
+                    setting_number,
+                    new_weight,
+                )
+                return new_weight
+            else:
+                # override — дельта
+                current_delta = await conn.fetchval(
+                    """
+                    SELECT weight FROM user_loras
+                    WHERE user_id = $1 AND lora_id = $2 AND model_id = $3
+                      AND setting_number = $4 AND is_override = TRUE
+                    """,
+                    user_db_id,
+                    lora_id,
+                    model_id,
+                    setting_number,
+                )
+
+                current_delta = current_delta or 0.0
+                new_delta = max(-10, min(10, current_delta + delta_weight))
+
+                await conn.execute(
+                    """
+                    INSERT INTO user_loras (user_id, lora_id, model_id, setting_number, weight, is_override)
+                    VALUES ($1, $2, $3, $4, $5, TRUE)
+                    ON CONFLICT (user_id, lora_id, model_id, setting_number)
+                        DO UPDATE SET weight = EXCLUDED.weight, is_override = TRUE
+                    """,
+                    user_db_id,
+                    lora_id,
+                    model_id,
+                    setting_number,
+                    new_delta,
+                )
+                return new_delta
 
     async def user_get_prompt(
         self,

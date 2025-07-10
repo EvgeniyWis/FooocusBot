@@ -96,21 +96,85 @@ def lora_admin_menu_keyboard():
     )
 
 
-def lora_user_menu_keyboard(setting_number: int):
+def lora_user_menu_keyboard(
+    setting_number: int,
+    model_id: int | None,
+) -> InlineKeyboardMarkup:
+    buttons = []
+
+    if model_id is None:
+        # Глобальная LoRA — можно изменить вес, добавить override, удалить глобально
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="✏️ Изменить глобальный вес",
+                    callback_data="user|edit_lora_weight",
+                ),
+            ],
+        )
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="📂 Override-веса по моделям",
+                    callback_data="user|show_model_overrides",
+                ),
+            ],
+        )
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="🗑️ Удалить LoRA из настройки",
+                    callback_data="user|delete_lora",
+                ),
+            ],
+        )
+    else:
+        # Override — можно изменить override или удалить только override
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="✏️ Изменить override-вес",
+                    callback_data="user|edit_lora_weight",
+                ),
+            ],
+        )
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="♻️ Сбросить override-вес",
+                    callback_data="user|delete_lora",
+                ),
+            ],
+        )
+
+    # Кнопка назад
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                text="🔙 Назад",
+                callback_data=f"user|select_setting|{setting_number}",
+            ),
+        ],
+    )
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def select_model_for_override_keyboard(
+    models: list[dict],
+    setting_number: int,
+) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="✏️ Изменить вес",
-                    callback_data="user|edit_lora_weight",
+                    text=model["name"],
+                    callback_data=f"user|select_model_for_lora|{model['id']}",
                 ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🗑️ Удалить LoRA",
-                    callback_data="user|delete_lora",
-                ),
-            ],
+            ]
+            for model in models
+        ]
+        + [
             [
                 InlineKeyboardButton(
                     text="🔙 Назад",
@@ -119,6 +183,48 @@ def lora_user_menu_keyboard(setting_number: int):
             ],
         ],
     )
+
+
+def lora_override_list_keyboard(
+    overrides: list[dict],
+    model_map: dict,
+    setting_number: int,
+    lora_id: int,
+) -> InlineKeyboardMarkup:
+    buttons = []
+
+    for override in overrides:
+        model_id = override["model_id"]
+        weight = override["weight"]
+        model_name = model_map.get(model_id, f"ID {model_id}")
+
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text=f"{model_name}: вес {weight}",
+                    callback_data=f"user|select_lora|{setting_number}|{lora_id}|{model_id}",
+                ),
+            ],
+        )
+
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                text="➕ Добавить кастомный вес",
+                callback_data="user|add_model_override",
+            ),
+        ],
+    )
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                text="🔙 Назад",
+                callback_data=f"user|select_setting|{setting_number}",
+            ),
+        ],
+    )
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
 def user_lora_list_keyboard(
@@ -194,8 +300,14 @@ def show_user_loras_keyboard(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text=f"LoRA ID {l['lora_id']} | Модель {model_map.get(l['model_id'], '❓')} | Вес {l['weight']}",
-                    callback_data=f"user|select_lora|{setting_number}|{l['lora_id']}|{l['model_id']}",
+                    text=f"LoRA ID {l['lora_id']} | "
+                    + (
+                        f"Модель {model_map.get(l['model_id'], '❓')}"
+                        if l["model_id"]
+                        else "🌐 Все модели"
+                    )
+                    + f" | Вес {l['weight']}",
+                    callback_data=f"user|select_lora|{setting_number}|{l['lora_id']}|{l['model_id'] or 'all'}",
                 ),
             ]
             for l in user_loras

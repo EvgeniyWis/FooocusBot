@@ -86,13 +86,23 @@ class UserSettingsService:
         self,
         user_id: int,
         lora_id: int,
-        model_id: int,
         setting_number: int,
     ):
         return await self.repo.user_delete_lora(
             user_id,
             lora_id,
-            model_id,
+            setting_number,
+        )
+
+    async def get_lora_overrides(
+        self,
+        user_id: int,
+        lora_id: int,
+        setting_number: int,
+    ) -> list[dict]:
+        return await self.repo.get_lora_overrides(
+            user_id,
+            lora_id,
             setting_number,
         )
 
@@ -162,4 +172,49 @@ class UserSettingsService:
             model_id,
             setting_number,
             prompt_type,
+        )
+
+    async def user_add_lora_to_setting(
+        self,
+        user_id,
+        lora_id,
+        setting_number,
+        weight,
+    ):
+        await self.ensure_user_exists(user_id)
+        return await self.repo.user_add_lora_to_setting(
+            user_id,
+            lora_id,
+            setting_number,
+            weight,
+        )
+
+    async def user_override_lora_weight_for_model(
+        self,
+        user_id,
+        lora_id,
+        model_id,
+        setting_number,
+        new_weight,
+    ):
+        return await self.repo.user_override_lora_weight_for_model(
+            user_id,
+            lora_id,
+            model_id,
+            setting_number,
+            new_weight,
+        )
+
+    async def user_delete_override_lora_weight(
+        self,
+        user_id,
+        lora_id,
+        model_id,
+        setting_number,
+    ):
+        return await self.repo.user_delete_override_lora_weight(
+            user_id,
+            lora_id,
+            model_id,
+            setting_number,
         )

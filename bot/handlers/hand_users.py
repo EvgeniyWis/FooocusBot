@@ -31,48 +31,59 @@ def is_registered(func):
     return wrapper
 
 
+@is_registered
 async def show_user_profile(callback: CallbackQuery):
     message = callback.message
     user_id = callback.from_user.id
     service = await get_user_settings_service()
 
     user_db_id = await service.repo.get_user_db_id(user_id)
-    if user_db_id is None:
-        await safe_edit_message(
-            callback.message,
-            "⚠️ У вас ещё не создан профиль.\n\nНажмите на кнопку ниже, чтобы создать его.",
-            reply_markup=users_keyboards.user_registration_keyboard(),
-        )
-        return
+    text_lines = [
+        "👤 *Ваш профиль*",
+        "",
+        "⚙️ *Настройки с вашими данными:*",
+        "",
+    ]
+    has_data = False
 
-    stats = {}
     for setting_number in range(1, 5):
-        user_loras = await service.user_get_loras_by_setting(
+        loras = await service.user_get_loras_by_setting(
             user_db_id,
             setting_number,
         )
-        # user_prompts = await service.user_get_prompts_by_setting(user_db_id, setting_number)
-        user_prompts = [1, 2, 3]
-        if user_loras or user_prompts:
-            stats[setting_number] = {
-                "loras": len(user_loras),
-                "prompts": len(user_prompts),
-            }
+        prompts = await service.repo.user_get_prompts(user_db_id)
 
-    if not stats:
-        text = "⚠️ У вас пока нет сохранённых LoRA и промтов."
-    else:
-        text = "👤 *Ваш профиль*\n\n⚙️ *Настройки с вашими данными:*\n\n"
-        for sn, counts in sorted(stats.items()):
-            text += f"• Настройка {sn}: {counts['loras']} LoRA, {counts['prompts']} промт{'ов' if counts['prompts'] != 1 else ''}\n"
+        positive_prompts = [
+            p
+            for p in prompts
+            if p["setting_number"] == setting_number
+            and p["type"] == "positive"
+        ]
+        negative_prompts = [
+            p
+            for p in prompts
+            if p["setting_number"] == setting_number
+            and p["type"] == "negative"
+        ]
 
-        text += "\nДля управления LoRA и промтами выберите настройку в меню «LoRA настройки»."
+        if loras or positive_prompts or negative_prompts:
+            has_data = True
+            text_lines.append(
+                f"• Настройка {setting_number}: "
+                f"{len(loras)} LoRA, "
+                f"{len(positive_prompts)} positive prompts 👍, "
+                f"{len(negative_prompts)} negative prompts 👎",
+            )
+
+    if not has_data:
+        text_lines = [
+            "⚠️ У вас пока нет сохранённых LoRA и промтов.",
+        ]
 
     await safe_edit_message(
         message,
-        text,
+        "\n".join(text_lines),
         parse_mode="Markdown",
-        reply_markup=users_keyboards.user_lora_setting_selector_keyboard(),
     )
 
 
@@ -121,10 +132,34 @@ async def show_user_loras_for_setting(
     }
 
     if user_loras:
-        text = f"📋 Ваши LoRA для настройки {setting_number}:\n"
-        for l in user_loras:
-            model_name = model_map.get(l["model_id"], "❓Unknown")
-            text += f"• LoRA ID: {l['lora_id']}, Модель: {model_name}, Вес: {l['weight']}\n"
+        if user_loras:
+            text = f"📋 Ваши LoRA для настройки {setting_number} (глобально и локально):\n"
+
+            for l in user_loras:
+                lora_id = l["lora_id"]
+                model_id = l["model_id"]
+                model_name = (
+                    model_map.get(model_id) if model_id else "🌐 Все модели"
+                )
+                weight = l["weight"]
+
+                if model_id is None:
+                    # Глобальный вес
+                    text += f"• LoRA ID {lora_id}, {model_name}, глобальный вес: {weight:.2f}\n"
+                else:
+                    # Это override, нужно получить базовый глобальный вес
+                    base_weight = next(
+                        (
+                            item["weight"]
+                            for item in user_loras
+                            if item["lora_id"] == lora_id
+                            and item["model_id"] is None
+                        ),
+                        0.0,
+                    )
+                    total = base_weight + weight
+                    text += f"• LoRA ID {lora_id}, {model_name}, override Δ {weight:+.2f} → итог: {total:.2f}\n"
+
     else:
         text = f"⚠️ У вас пока нет LoRA для настройки {setting_number}."
 
@@ -192,24 +227,22 @@ async def user_handle_add_lora_confirm(
         )
         return
 
-    await state.update_data(
-        selected_lora_id=lora_id,
-        setting_number=setting_number,
-        selected_lora_title=title,
-    )
+    user_id = callback.from_user.id
+    user_db_id = await service.repo.get_user_db_id(user_id)
 
-    models = await service.repo.superadmin_get_models_by_setting(
+    # Добавляем LoRA ко всей настройке (глобально)
+    await service.user_add_lora_to_setting(
+        user_db_id,
+        lora_id,
         setting_number,
+        weight=1.0,
     )
 
     await safe_edit_message(
         callback.message,
-        "📦 Выберите модель для этой LoRA:",
-        reply_markup=users_keyboards.select_model_for_lora_keyboard(
-            models,
-            setting_number,
-        ),
+        f"✅ LoRA успешно добавлена ко всей настройке {setting_number} с весом 1.0",
     )
+    await show_user_loras_for_setting(callback, state, setting_number)
 
 
 @is_registered
@@ -223,9 +256,9 @@ async def user_handle_select_model_for_lora(
     data = await state.get_data()
     lora_id = data["selected_lora_id"]
     setting_number = data["setting_number"]
+    user_id = callback.from_user.id
 
     service = await get_user_settings_service()
-    user_id = callback.from_user.id
     user_db_id = await service.repo.get_user_db_id(user_id)
 
     await service.user_add_lora(
@@ -233,12 +266,12 @@ async def user_handle_select_model_for_lora(
         lora_id,
         model_id,
         setting_number,
-        1.0,
+        weight=1.0,
     )
 
     await safe_edit_message(
         callback.message,
-        "✅ LoRA успешно добавлена к выбранной модели с стандартным весом = 1.0.",
+        f"✅ LoRA добавлена к модели ID {model_id} с весом 1.0.",
     )
     await show_user_loras_for_setting(callback, state, setting_number)
 
@@ -249,9 +282,12 @@ async def user_handle_select_lora(callback: CallbackQuery, state: FSMContext):
         _, _, setting_str, lora_id_str, model_id_str = callback.data.split("|")
         setting_number = int(setting_str)
         lora_id = int(lora_id_str)
-        model_id = int(model_id_str)
+        model_id = None if model_id_str == "all" else int(model_id_str)
     except Exception:
-        await callback.answer("❌ Ошибка: неверный формат callback_data.")
+        await safe_edit_message(
+            callback.message,
+            "❌ Ошибка: неверный формат callback_data.",
+        )
         return
 
     await state.update_data(
@@ -260,10 +296,16 @@ async def user_handle_select_lora(callback: CallbackQuery, state: FSMContext):
         selected_model_id=model_id,
     )
 
+    suffix = "(все модели)" if model_id is None else f"(Модель ID {model_id})"
+    keyboard = users_keyboards.lora_user_menu_keyboard(
+        setting_number,
+        model_id,
+    )
+
     await safe_edit_message(
         callback.message,
-        f"Настройки для LoRA ID {lora_id} (Модель ID {model_id}):",
-        reply_markup=users_keyboards.lora_user_menu_keyboard(setting_number),
+        f"Настройки для LoRA ID {lora_id} {suffix}:",
+        reply_markup=keyboard,
     )
 
 
@@ -290,34 +332,35 @@ async def user_handle_weight_input(message: types.Message, state: FSMContext):
     service = await get_user_settings_service()
     user_db_id = await service.repo.get_user_db_id(user_id)
 
-    # Получаем текущий вес
-    current_weight = await service.repo.user_get_lora_weight(
-        user_db_id,
-        lora_id,
-        model_id,
-        setting_number,
-    )
-
     try:
         delta_weight = float(message.text)
         if delta_weight < -10 or delta_weight > 10:
             raise ValueError()
     except ValueError:
-        await message.answer(
-            "❌ Некорректное значение веса. Введите число от -10 до 10.",
-        )
+        await safe_edit_message(message, "❌ Введите число от -10 до 10.")
         return
 
-    new_weight = await service.user_update_lora_weight_delta(
-        user_db_id,
-        lora_id,
-        model_id,
-        setting_number,
-        delta_weight,
-    )
+    try:
+        current_weight = await service.repo.user_get_lora_weight(
+            user_db_id,
+            lora_id,
+            model_id,
+            setting_number,
+        )
+        new_weight = await service.user_update_lora_weight_delta(
+            user_db_id,
+            lora_id,
+            model_id,
+            setting_number,
+            delta_weight,
+        )
+    except ValueError:
+        await safe_edit_message(message, "❌ Ошибка: {e}")
+        return
 
-    await message.answer(
-        f"✅ Вес LoRA обновлён: {current_weight:.2f} {'+' if delta_weight >= 0 else ''}{delta_weight:.2f} = {new_weight:.2f}",
+    await safe_edit_message(
+        message,
+        f"✅ Вес обновлён: {current_weight:.2f} {'+' if delta_weight >= 0 else ''}{delta_weight:.2f} = {new_weight:.2f}",
     )
     await state.clear()
 
@@ -333,15 +376,87 @@ async def user_handle_delete_lora(callback: CallbackQuery, state: FSMContext):
     service = await get_user_settings_service()
     user_db_id = await service.repo.get_user_db_id(user_id)
 
-    await service.user_delete_lora(
-        user_db_id,
-        lora_id,
-        model_id,
+    if model_id is None:
+        await service.user_delete_lora(
+            user_db_id,
+            lora_id,
+            setting_number,
+        )
+        msg = "✅ Глобальный вес LoRA удалён."
+    else:
+        await service.user_delete_override_lora_weight(
+            user_db_id,
+            lora_id,
+            model_id,
+            setting_number,
+        )
+        msg = f"✅ Override вес LoRA для модели ID {model_id} удалён."
+
+    await safe_edit_message(callback.message, msg)
+    await show_user_loras_for_setting(callback, state, setting_number)
+
+
+@is_registered
+async def user_handle_add_model_override(
+    callback: CallbackQuery,
+    state: FSMContext,
+):
+    data = await state.get_data()
+    setting_number = data.get("setting_number")
+
+    service = await get_user_settings_service()
+    models = await service.repo.superadmin_get_models_by_setting(
         setting_number,
     )
 
-    await safe_edit_message(callback.message, "✅ LoRA успешно удалена.")
-    await show_user_loras_for_setting(callback, state, setting_number)
+    keyboard = users_keyboards.select_model_for_override_keyboard(
+        models,
+        setting_number,
+    )
+    await safe_edit_message(
+        callback.message,
+        "Выберите модель, к которой хотите добавить кастомный вес:",
+        reply_markup=keyboard,
+    )
+
+
+@is_registered
+async def user_show_model_overrides(
+    callback: CallbackQuery,
+    state: FSMContext,
+):
+    data = await state.get_data()
+    lora_id = data.get("selected_lora_id")
+    setting_number = data.get("setting_number")
+
+    service = await get_user_settings_service()
+    user_id = callback.from_user.id
+    user_db_id = await service.repo.get_user_db_id(user_id)
+
+    overrides = await service.get_lora_overrides(
+        user_db_id,
+        lora_id,
+        setting_number,
+    )
+    model_map = {
+        model["id"]: model["name"]
+        for model in await service.repo.superadmin_get_models_by_setting(
+            setting_number,
+        )
+    }
+
+    keyboard = users_keyboards.lora_override_list_keyboard(
+        overrides,
+        model_map,
+        setting_number,
+        lora_id,
+    )
+
+    await safe_edit_message(
+        callback.message,
+        f"📋 Override-веса для LoRA ID {lora_id}:",
+        reply_markup=keyboard,
+    )
 
 
 @is_registered
@@ -461,7 +576,7 @@ async def user_handle_prompt_input(message: types.Message, state: FSMContext):
         prompt_type=prompt_type,
     )
 
-    await message.answer("✅ Промпт успешно сохранён.")
+    await safe_edit_message(message, "✅ Промпт успешно сохранён.")
     await state.clear()
 
 
@@ -574,7 +689,7 @@ def hand_add():
     )
     router.callback_query.register(
         user_handle_add_prompt,
-        lambda c: c.data == "user|prompts",
+        lambda c: c.data.startswith("user|prompts"),
     )
     router.callback_query.register(
         user_handle_select_settings_for_prompt,
@@ -586,11 +701,11 @@ def hand_add():
     )
     router.callback_query.register(
         user_handle_prompt_edit,
-        lambda c: c.data == "user|prompt|edit",
+        lambda c: c.data.startswith("user|prompt|edit"),
     )
     router.callback_query.register(
         user_handle_prompt_delete,
-        lambda c: c.data == "user|prompt|delete",
+        lambda c: c.data.startswith("user|prompt|delete"),
     )
     router.message.register(
         user_handle_prompt_input,
@@ -602,17 +717,25 @@ def hand_add():
     )
     router.callback_query.register(
         back_to_settings,
-        lambda c: c.data == "user|prompt|back_to_settings",
+        lambda c: c.data.startswith("user|prompt|back_to_settings"),
     )
     router.callback_query.register(
         back_to_settings,
-        lambda c: c.data == "user|prompt|back_to_settings",
+        lambda c: c.data.startswith("user|prompt|back_to_settings"),
     )
     router.callback_query.register(
         back_to_models,
-        lambda c: c.data == "user|prompt|back_to_models",
+        lambda c: c.data.startswith("user|prompt|back_to_models"),
     )
     router.callback_query.register(
         back_to_type,
-        lambda c: c.data == "user|prompt|back_to_type",
+        lambda c: c.data.startswith("user|prompt|back_to_type"),
+    )
+    router.callback_query.register(
+        user_handle_add_model_override,
+        lambda c: c.data.startswith("user|add_model_override"),
+    )
+    router.callback_query.register(
+        user_show_model_overrides,
+        lambda c: c.data.startswith("user|show_model_overrides"),
     )
