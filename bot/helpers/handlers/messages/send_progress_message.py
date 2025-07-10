@@ -6,7 +6,7 @@ from bot.utils.handlers.messages import safe_edit_message, safe_send_message
 
 
 async def send_progress_message(state: FSMContext, array_key: str, model_name: str,
-    message: types.Message, message_text: str, message_id_for_edit: int = None):
+    message: types.Message, message_text: str, image_index: int, message_id_for_edit: int = None):
     """
     Отправляет сообщение о прогрессе генерации видео (если ещё не отправлено)
 
@@ -16,6 +16,7 @@ async def send_progress_message(state: FSMContext, array_key: str, model_name: s
         model_name (str): имя модели
         message (types.Message): сообщение
         message_text (str): текст сообщения
+        image_index (int): индекс изображения
         message_id_for_edit (int): id сообщения для редактирования (при необходимости)
 
     Returns:
@@ -25,9 +26,9 @@ async def send_progress_message(state: FSMContext, array_key: str, model_name: s
     # Отправляем сообщение про генерацию видео (если ещё не отправлено)
     state_data = await state.get_data()
     messages = state_data.get(array_key, [])
-    model_names = [item["model_name"] for item in messages]
+    message_is_exist = any(item.get("model_name") == model_name and item.get("image_index") == image_index for item in messages)
 
-    if model_name not in model_names:
+    if not message_is_exist:
         if message_id_for_edit:
             message = await safe_edit_message(
                 message,
@@ -44,12 +45,13 @@ async def send_progress_message(state: FSMContext, array_key: str, model_name: s
         # Добавляем в массив с тем, для каких моделей отправлены сообщения о прогрессе
         data_for_update = {
             "model_name": model_name,
+            "image_index": image_index,
             "message_id": message_id,
         }
         await appendDataToStateArray(state, array_key, data_for_update)
 
     else: # Если сообщение о начале upscale уже отправлено, то получаем его id
-        message_id = await getDataInDictsArray(messages, model_name)
+        message_id = await getDataInDictsArray(messages, model_name, image_index)
 
     return message_id
 

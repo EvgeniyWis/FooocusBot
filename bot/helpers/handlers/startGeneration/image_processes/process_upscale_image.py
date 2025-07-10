@@ -13,10 +13,10 @@ from bot.helpers.generateImages.dataArray import (
 )
 from bot.helpers.generateImages.upscale import upscale_image
 from bot.helpers.handlers.messages import send_progress_message
+from bot.logger import logger
 from bot.utils.handlers import (
     deleteDataFromStateArray,
 )
-from bot.logger import logger
 from bot.utils.handlers.messages import editMessageOrAnswer
 from bot.utils.images import image_to_base64
 
@@ -57,6 +57,7 @@ async def process_upscale_image(
         model_name,
         call.message,
         text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index),
+        image_index,
         call.message.message_id,
     )
 

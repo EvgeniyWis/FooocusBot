@@ -92,6 +92,7 @@ async def process_video(
         model_name,
         message,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
+        image_index,
     )
 
     # Проверяем путь к видео
