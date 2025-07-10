@@ -176,7 +176,6 @@ def setting1_get_data_array():
             """photorealistic portrait of 18-year-old athletic redhead girl, hourglass figure, tanned skin, modest clothing.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
             [2, 2.60, -0.90, -1.70, 0.05, 1.00, 4.85, 1.00],
-            8,
         ),
         setting1_generate_data(
             "selinavoux",

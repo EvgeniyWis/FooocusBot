@@ -34,7 +34,7 @@ async def generateImageBlock(
 
     # Получаем данные из стейта для установки количества изображений
     state_data = await state.get_data()
-    json["input"]["image_number"] = 10 if state_data.get("multi_select_mode", False) else 4
+    json["input"]["image_number"] = 10 if state_data.get("multi_select_mode", False) else json["input"]["image_number"]
 
     # Получаем имя модели
     model_name = data["model_name"]
