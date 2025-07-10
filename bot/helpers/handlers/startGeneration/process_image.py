@@ -74,10 +74,7 @@ async def process_image(
             / f"{model_name}_{call.from_user.id}"
             / f"{image_index}.jpg"
         )
-        if (
-            settings.UPSCALE_MODE
-            and process_image_step == ProcessImageStep.UPSCALE
-        ):
+        if process_image_step == ProcessImageStep.UPSCALE:
             logger.info(
                 f"[process_image] UPSCALE START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}",
             )
@@ -85,7 +82,10 @@ async def process_image(
                 f"[process_image] temp dir before UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
             )
             logger.info(f"Запускаем upscale для ({model_name}, {image_index})")
-            await process_upscale_image(call, state, image_index, model_name)
+
+            if settings.UPSCALE_MODE:
+                await process_upscale_image(call, state, image_index, model_name)
+
             logger.info(
                 f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}",
             )
@@ -102,10 +102,7 @@ async def process_image(
                 f"[process_image] step updated to FACEFUSION for ({model_name}, {image_index})",
             )
 
-        if (
-            settings.FACEFUSION_MODE
-            and process_image_step == ProcessImageStep.FACEFUSION
-        ):
+        if process_image_step == ProcessImageStep.FACEFUSION:
             logger.info(
                 f"[process_image] FACEFUSION START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}",
             )
@@ -121,12 +118,17 @@ async def process_image(
                     f"[process_image] Файл не найден для faceswap: {faceswap_target_path}",
                 )
                 return False
-            result_path = await process_faceswap_image(
-                call,
-                state,
-                image_index,
-                model_name,
-            )
+
+            if settings.FACEFUSION_MODE:
+                result_path = await process_faceswap_image(
+                    call,
+                    state,
+                    image_index,
+                    model_name,
+                )
+            else:
+                result_path = MOCK_FACEFUSION_PATH
+
             logger.info(
                 f"[process_image] FACEFUSION END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(faceswap_target_path)}",
             )

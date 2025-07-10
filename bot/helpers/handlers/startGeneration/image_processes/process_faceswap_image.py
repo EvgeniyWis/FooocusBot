@@ -51,6 +51,7 @@ async def process_faceswap_image(
         text.FACE_SWAP_WAIT_TEXT.format(
             image_index, model_name, model_name_index
         ),
+        image_index,
         call.message.message_id,
     )
 
@@ -138,6 +139,7 @@ async def process_faceswap_image(
                 text.FACE_SWAP_PROGRESS_TEXT.format(
                     image_index, model_name, model_name_index
                 ),
+                image_index,
                 call.message.message_id,
             )
 
