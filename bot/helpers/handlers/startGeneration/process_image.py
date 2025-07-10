@@ -135,7 +135,7 @@ async def process_image(
             )
             if result_path:
                 await state.update_data(
-                    {f"{model_name}_{image_index}_result_path": result_path},
+                    {f"{model_name}_{image_index}_result_path": str(result_path)},
                 )
                 process_image_step = await update_process_image_step(
                     state,
