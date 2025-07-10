@@ -29,7 +29,6 @@ async def generateImages(
     )
 
     state_data = await state.get_data()
-    image_number = 10 if state_data.get("multi_select_mode", False) else 4
 
     # Получаем массив данных для генерации
     if not with_randomizer:
@@ -68,7 +67,9 @@ async def generateImages(
     async def process_image(data: dict):
         try:
             if "json" in data and "input" in data["json"]:
-                data["json"]["input"]["image_number"] = image_number
+                data["json"]["input"]["image_number"] = (
+                    10 if state_data.get("multi_select_mode", False) else data["json"]["input"]["image_number"]
+                )
 
             model_name = data.get("model_name")
             prompt_for_model = name_to_prompt.get(model_name)
