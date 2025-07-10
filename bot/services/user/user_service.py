@@ -46,7 +46,11 @@ class UserSettingsService:
         return await self.repo.user_get_loras(user_id)
 
     async def user_get_lora_weight(
-        self, user_id: int, lora_id: int, model_id: int, setting_number: int
+        self,
+        user_id: int,
+        lora_id: int,
+        model_id: int,
+        setting_number: int,
     ):
         return await self.repo.user_get_lora_weight
 
@@ -99,28 +103,32 @@ class UserSettingsService:
     async def user_add_prompt(
         self,
         user_id: int,
-        model_name: str,
+        model_id: int,
         setting_number: int,
         prompt: str,
+        prompt_type: str = "positive",  # 'positive' или 'negative'
     ):
         await self.ensure_user_exists(user_id)
         return await self.repo.user_add_prompt(
             user_id,
-            model_name,
+            model_id,
             setting_number,
             prompt,
+            prompt_type,
         )
 
     async def user_delete_prompt(
         self,
         user_id: int,
-        model_name: str,
+        model_id: int,
         setting_number: int,
+        prompt_type: str = "positive",
     ):
         return await self.repo.user_delete_prompt(
             user_id,
-            model_name,
+            model_id,
             setting_number,
+            prompt_type,
         )
 
     async def get_model_id(self, name: str, setting_number: int) -> int | None:
@@ -140,4 +148,18 @@ class UserSettingsService:
             model_id,
             setting_number,
             delta_weight,
+        )
+
+    async def user_get_prompt(
+        self,
+        user_id: int,
+        model_id: int,
+        setting_number: int,
+        prompt_type: str = "positive",
+    ):
+        return await self.repo.user_get_prompt(
+            user_id,
+            model_id,
+            setting_number,
+            prompt_type,
         )

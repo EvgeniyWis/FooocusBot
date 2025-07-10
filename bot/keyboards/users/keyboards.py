@@ -332,3 +332,102 @@ def model_list_keyboard(
     )
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def prompt_admin_setting_selector_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=f"Настройка {i}",
+                    callback_data=f"user|prompt|select_setting|{i}",
+                ),
+            ]
+            for i in range(1, 5)
+        ]
+        + [
+            [
+                InlineKeyboardButton(
+                    text="🔙 Назад",
+                    callback_data="user|prompt|back_to_type",
+                ),
+            ],
+        ],
+    )
+
+
+def select_model_for_prompt_keyboard(models: list[dict]):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=model["name"],
+                    callback_data=f"user|select_model_for_prompt|{model['id']}",
+                ),
+            ]
+            for model in models
+        ]
+        + [
+            [
+                InlineKeyboardButton(
+                    text="🔙 Назад",
+                    callback_data="user|prompt|back_to_settings",
+                ),
+            ],
+        ],
+    )
+
+
+def prompt_manage_keyboard(prompt_exists: bool):
+    if prompt_exists:
+        buttons = [
+            [
+                InlineKeyboardButton(
+                    text="✏️ Изменить",
+                    callback_data="user|prompt|edit",
+                ),
+                InlineKeyboardButton(
+                    text="❌ Удалить",
+                    callback_data="user|prompt|delete",
+                ),
+            ],
+        ]
+    else:
+        buttons = [
+            [
+                InlineKeyboardButton(
+                    text="➕ Добавить промпт",
+                    callback_data="user|prompt|edit",
+                ),
+            ],
+        ]
+
+    buttons.append(
+        [
+            InlineKeyboardButton(
+                text="🔙 Назад",
+                callback_data="user|prompt|back_to_models",
+            ),
+        ],
+    )
+
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def prompt_type_selector_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✨ Позитивный промпт",
+                    callback_data="user|prompt|type|positive",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🚫 Негативный промпт",
+                    callback_data="user|prompt|type|negative",
+                ),
+            ],
+        ],
+    )

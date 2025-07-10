@@ -35,3 +35,7 @@ class ModelEditStates(StatesGroup):
     waiting_for_model_rename = State()
     selected_setting_number = State()
     old_model_name = State()
+
+
+class UserPromptWrite(StatesGroup):
+    waiting_for_prompt_input = State()

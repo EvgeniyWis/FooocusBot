@@ -258,52 +258,57 @@ class PostgresRepository:
         async with self.db.acquire() as conn:
             logger.info(f"Getting prompts for user {user_id}")
             return await conn.fetch(
-                "SELECT model_name, setting_number, prompt FROM user_prompts WHERE user_id = $1",
+                "SELECT model_id, setting_number, prompt FROM user_prompts WHERE user_id = $1",
                 user_id,
             )
 
     async def user_add_prompt(
         self,
         user_id: int,
-        model_name: str,
+        model_id: int,
         setting_number: int,
         prompt: str,
+        prompt_type: str = "positive",  # 'positive' или 'negative'
     ):
         async with self.db.acquire() as conn:
             logger.info(
-                f"Adding prompt {prompt} to user {user_id} for model {model_name} and setting {setting_number}",
+                f"Adding {prompt_type} prompt {prompt} to user {user_id} "
+                f"for model {model_id} and setting {setting_number}",
             )
             await conn.execute(
                 """
-                INSERT INTO user_prompts (user_id, model_name, setting_number, prompt)
-                VALUES ($1, $2, $3, $4)
-                ON CONFLICT (user_id, model_name, setting_number)
-                DO UPDATE SET prompt = EXCLUDED.prompt
+                INSERT INTO user_prompts (user_id, model_id, setting_number, type, prompt)
+                VALUES ($1, $2, $3, $4, $5)
+                ON CONFLICT (user_id, model_id, setting_number, type)
+                    DO UPDATE SET prompt = EXCLUDED.prompt
                 """,
                 user_id,
-                model_name,
+                model_id,
                 setting_number,
+                prompt_type,
                 prompt,
             )
 
     async def user_delete_prompt(
         self,
         user_id: int,
-        model_name: str,
+        model_id: int,
         setting_number: int,
+        prompt_type: str = "positive",
     ):
         async with self.db.acquire() as conn:
             logger.info(
-                f"Deleting prompt from user {user_id} for model {model_name} and setting {setting_number}",
+                f"Deleting {prompt_type} prompt from user {user_id} for model {model_id} and setting {setting_number}",
             )
             await conn.execute(
                 """
                 DELETE FROM user_prompts
-                WHERE user_id = $1 AND model_name = $2 AND setting_number = $3
+                WHERE user_id = $1 AND model_id = $2 AND setting_number = $3 AND type = $4
                 """,
                 user_id,
-                model_name,
+                model_id,
                 setting_number,
+                prompt_type,
             )
 
     async def user_update_lora_weight_delta(
@@ -348,3 +353,23 @@ class PostgresRepository:
                 new_weight,
             )
             return new_weight
+
+    async def user_get_prompt(
+        self,
+        user_id: int,
+        model_id: int,
+        setting_number: int,
+        prompt_type: str = "positive",
+    ):
+        async with self.db.acquire() as conn:
+            logger.info(f"Getting {prompt_type} prompt for user {user_id}")
+            return await conn.fetchval(
+                """
+                SELECT prompt FROM user_prompts
+                WHERE user_id = $1 AND model_id = $2 AND setting_number = $3 AND type = $4
+                """,
+                user_id,
+                model_id,
+                setting_number,
+                prompt_type,
+            )

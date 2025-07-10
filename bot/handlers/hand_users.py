@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     CallbackQuery,
 )
-from states.StartGenerationState import UserLoraEditStates
+from states.StartGenerationState import UserLoraEditStates, UserPromptWrite
 from utils.handlers.messages import safe_edit_message
 
 from bot.factory.user_factory import get_user_settings_service
@@ -344,6 +344,186 @@ async def user_handle_delete_lora(callback: CallbackQuery, state: FSMContext):
     await show_user_loras_for_setting(callback, state, setting_number)
 
 
+@is_registered
+async def user_handle_add_prompt(callback: CallbackQuery):
+    await safe_edit_message(
+        callback.message,
+        "Выберите тип промпта:",
+        reply_markup=users_keyboards.prompt_type_selector_keyboard(),
+    )
+
+
+@is_registered
+async def user_handle_prompt_type_selection(
+    callback: CallbackQuery,
+    state: FSMContext,
+):
+    _, _, _, prompt_type = callback.data.split("|")
+
+    await state.update_data(prompt_type=prompt_type)
+
+    await safe_edit_message(
+        callback.message,
+        "⚙️ Выберите настройку:",
+        reply_markup=users_keyboards.prompt_admin_setting_selector_keyboard(),
+    )
+
+
+@is_registered
+async def user_handle_select_settings_for_prompt(
+    callback: CallbackQuery,
+    state: FSMContext,
+):
+    _, _, _, setting_str = callback.data.split("|")
+    setting_number = int(setting_str)
+
+    service = await get_user_settings_service()
+    models = await service.repo.superadmin_get_models_by_setting(
+        setting_number,
+    )
+
+    await state.update_data(setting_number=setting_number)
+
+    await safe_edit_message(
+        callback.message,
+        "📦 Выберите модель:",
+        reply_markup=users_keyboards.select_model_for_prompt_keyboard(
+            models,
+        ),
+    )
+
+
+@is_registered
+async def user_handle_select_model_for_prompt(
+    callback: CallbackQuery,
+    state: FSMContext,
+):
+    _, _, model_id_str = callback.data.split("|")
+    model_id = int(model_id_str)
+
+    data = await state.get_data()
+    setting_number = data["setting_number"]
+    prompt_type = data["prompt_type"]
+    user_id = callback.from_user.id
+
+    await state.update_data(selected_model_id=model_id)
+
+    service = await get_user_settings_service()
+    user_db_id = await service.repo.get_user_db_id(user_id)
+
+    prompt = await service.user_get_prompt(
+        user_db_id,
+        model_id,
+        setting_number,
+        prompt_type=prompt_type,
+    )
+
+    if prompt:
+        text = f"📄 *Ваш {prompt_type} промпт:*\n\n`{prompt}`"
+        keyboard = users_keyboards.prompt_manage_keyboard(prompt_exists=True)
+    else:
+        text = f"❌ {prompt_type.capitalize()} промпт пока не задан."
+        keyboard = users_keyboards.prompt_manage_keyboard(prompt_exists=False)
+
+    await safe_edit_message(
+        callback.message,
+        text,
+        reply_markup=keyboard,
+        parse_mode="Markdown",
+    )
+
+
+@is_registered
+async def user_handle_prompt_edit(callback: CallbackQuery, state: FSMContext):
+    await safe_edit_message(
+        callback.message,
+        "✏️ Введите текст промпта:",
+    )
+    await state.set_state(UserPromptWrite.waiting_for_prompt_input)
+
+
+async def user_handle_prompt_input(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    setting_number = data["setting_number"]
+    model_id = data["selected_model_id"]
+    prompt_type = data["prompt_type"]
+    user_id = message.from_user.id
+
+    service = await get_user_settings_service()
+    user_db_id = await service.repo.get_user_db_id(user_id)
+
+    prompt_text = message.text.strip()
+    await service.user_add_prompt(
+        user_db_id,
+        model_id,
+        setting_number,
+        prompt_text,
+        prompt_type=prompt_type,
+    )
+
+    await message.answer("✅ Промпт успешно сохранён.")
+    await state.clear()
+
+
+@is_registered
+async def user_handle_prompt_delete(
+    callback: CallbackQuery,
+    state: FSMContext,
+):
+    data = await state.get_data()
+    setting_number = data["setting_number"]
+    model_id = data["selected_model_id"]
+    prompt_type = data["prompt_type"]
+    user_id = callback.from_user.id
+
+    service = await get_user_settings_service()
+    user_db_id = await service.repo.get_user_db_id(user_id)
+
+    await service.user_delete_prompt(
+        user_db_id,
+        model_id,
+        setting_number,
+        prompt_type=prompt_type,
+    )
+
+    await safe_edit_message(
+        callback.message,
+        f"✅ {prompt_type.capitalize()} промпт удалён.",
+    )
+
+
+async def back_to_settings(callback: CallbackQuery):
+    await safe_edit_message(
+        callback.message,
+        "⚙️ Выберите настройку:",
+        reply_markup=users_keyboards.prompt_admin_setting_selector_keyboard(),
+    )
+
+
+async def back_to_models(callback: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    setting_number = data["setting_number"]
+
+    service = await get_user_settings_service()
+    models = await service.repo.superadmin_get_models_by_setting(
+        setting_number,
+    )
+
+    await safe_edit_message(
+        callback.message,
+        "📦 Выберите модель:",
+        reply_markup=users_keyboards.select_model_for_prompt_keyboard(models),
+    )
+
+
+async def back_to_type(callback: CallbackQuery):
+    await safe_edit_message(
+        callback.message,
+        "Выберите тип промпта:",
+        reply_markup=users_keyboards.prompt_type_selector_keyboard(),
+    )
+
+
 def hand_add():
     router.callback_query.register(
         show_user_profile,
@@ -391,4 +571,48 @@ def hand_add():
     router.callback_query.register(
         user_handle_edit_lora_weight,
         lambda c: c.data.startswith("user|edit_lora_weight"),
+    )
+    router.callback_query.register(
+        user_handle_add_prompt,
+        lambda c: c.data == "user|prompts",
+    )
+    router.callback_query.register(
+        user_handle_select_settings_for_prompt,
+        lambda c: c.data.startswith("user|prompt|select_setting|"),
+    )
+    router.callback_query.register(
+        user_handle_select_model_for_prompt,
+        lambda c: c.data.startswith("user|select_model_for_prompt|"),
+    )
+    router.callback_query.register(
+        user_handle_prompt_edit,
+        lambda c: c.data == "user|prompt|edit",
+    )
+    router.callback_query.register(
+        user_handle_prompt_delete,
+        lambda c: c.data == "user|prompt|delete",
+    )
+    router.message.register(
+        user_handle_prompt_input,
+        StateFilter(UserPromptWrite.waiting_for_prompt_input),
+    )
+    router.callback_query.register(
+        user_handle_prompt_type_selection,
+        lambda c: c.data.startswith("user|prompt|type|"),
+    )
+    router.callback_query.register(
+        back_to_settings,
+        lambda c: c.data == "user|prompt|back_to_settings",
+    )
+    router.callback_query.register(
+        back_to_settings,
+        lambda c: c.data == "user|prompt|back_to_settings",
+    )
+    router.callback_query.register(
+        back_to_models,
+        lambda c: c.data == "user|prompt|back_to_models",
+    )
+    router.callback_query.register(
+        back_to_type,
+        lambda c: c.data == "user|prompt|back_to_type",
     )

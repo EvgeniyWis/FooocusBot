@@ -20,12 +20,15 @@ CREATE TABLE IF NOT EXISTS user_loras (
     UNIQUE (user_id, lora_id, model_id)
 );
 
+DROP TABLE IF EXISTS user_prompts;
 CREATE TABLE IF NOT EXISTS user_prompts (
     id SERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    model_name TEXT NOT NULL,
+    model_id INT NOT NULL REFERENCES models(id) ON DELETE CASCADE,
     setting_number INT NOT NULL,
-    prompt TEXT NOT NULL
+    type TEXT NOT NULL CHECK (type IN ('positive', 'negative')),
+    prompt TEXT NOT NULL,
+    UNIQUE (user_id, model_id, setting_number, type)
 );
 
 CREATE TABLE IF NOT EXISTS models (
