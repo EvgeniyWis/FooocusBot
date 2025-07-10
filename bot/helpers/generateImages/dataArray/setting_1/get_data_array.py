@@ -10,8 +10,8 @@ def setting1_get_data_array():
     dataArray = [
         setting1_generate_data(
             "evanoir.xo",
-            "1PxnsiuuUARM4uvCFvxzMb1zluQ5iwWlo",
-            "1IsI6qcfCgNCt2qbeN3v430N8b8wQi4N9",
+            "1OpQA-j8qpCRMPXapHFS_NahR5Qtyp3zD",
+            "19fy9sapKT9xYy9J4RvImxmR3h6ytW3uW",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 20 years old, athletic body, brown hair, blue eyes, natural skin texture.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -19,8 +19,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "nika_saintclair",
-            "1KtYtc3JSswLPQ3hu_G4obACI9rYjUaS0",
-            "1yhljt9rN-dcSUbzzyd8OCLVn7xUI5xnp",
+            "1s2JaV4prvx3R32TpMTO5e1l6RPzIPAXd",
+            "1G7ilmTfifO7ZOnY59xbXRSs2bCgvKIl7",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 20 years old, athletic body, brown hair, blue eyes, natural skin texture.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -28,8 +28,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "chloemay",
-            "1tpcOhP-d1YZ33RY3gQLjcz5exenweOBY",
-            "1tKIrGKK17xPlCoXlkq0F6vvH_hyXjxXv",
+            "1_yk-qrLHB8Stvfjpw-VyDiqH4a7LkMDS",
+            "11U3qMtN04QY7rhvq8wBDii5l7EDtmGiN",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 20 years old, athletic body, brown hair, blue eyes, natural skin texture.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -37,8 +37,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "arialennix",
-            "19XZemaTjt0TKkLjdh0LzogdfyDxaxWzC",
-            "1JW-TTk1vlRGllaF_bVHMV6EOlqWpP-JN",
+            "1vq18dnOnkFDvXWQA-kS-xMypBkYOQ68T",
+            "113jcBoYOtoz3tNxVk-RDhU4vykfSZ_G2",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 20 years old, skinny body, black hair, brown eyes, natural skin texture.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -46,8 +46,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "miaroxelle",
-            "1eELjtIkSqwx64nLbih2hRUr-hDYxnSwh",
-            "1g0XQOlJUHsKt3TNRVzhKPdLV6PDqb6Qv",
+            "1-CyFgTMIGsnyxfbf9t5C6RSSYlJePrrT",
+            "1ioiwWbMY_TWRJ1P3elgUIqH_CAXRRRgL",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, asian, 18 years old, athletic body, blonde hair, brown eyes, white skin.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -55,8 +55,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "brittany_cross.xo",
-            "13hhG6B4dCPtb9CIPT56XykWf8KCopvD0",
-            "1gDi92Np8hE8hML2wq-nB6uXt2REmuMIg",
+            "1if43vWf6-t4Xo1gX3b9gK5EYLD2s1Kra",
+            "1PvoR138JjQoY7RwsdooMtmhqEFrA2DqB",
             """photorealistic, high quality, vibrant colors, bright lighting, skin detail, BREAK
             1girl, 18 years old, athletic, blonde hair, brown eyes, fair skin, slight smile.
             Style: realistic photo, Canon DSLR, soft daylight.""",
@@ -64,8 +64,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "zoe_callahan",
-            "1mwT7N1Ck5VdgJGS6eRYRQ97mczaLGi6b",
-            "1YJB-tQCJVARYdWx23KatB-I8zXTDjZDn",
+            "1fEc3xq3uHs7StP0LVcKGxhFfYzkXgS1f",
+            "1nqsbAtwM9Lk1qQKwdUiNzcIrHHSo1L71",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, brown eyes, tanned skin.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -73,8 +73,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "brookenixon.xo",
-            "1RlHfUuF_GrhgA5n985a8NqLkZgd5Y-kd",
-            "1M5SChxLnMZAmQT72J-M4U8VsgOMZqALC",
+            "16BnT8PeIXTieTL3Z2Um23vVo0x707Zxd",
+            "1rwpnpDUgN84I5qpmhJ7aGTK3bCOn3X8Y",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, brown eyes, tanned skin.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -82,8 +82,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "giablake.xo",
-            "1beGL9f2ulLm6uYrZl2lc5QUAqZ6RBuzs",
-            "1wW-J2e7WsXk7rTiCo6vGWwq3a2Gqqrf0",
+            "1CTkMuNaiM52_zRHTd9NNAzhM1A94RjXK",
+            "1-tn9AB5W2ulMF3Hp57KXEUUWvyuZm6W1",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, brown hair, blue eyes, pale skin.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -91,8 +91,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "sierravexley",
-            "1BpqfTJSNs8EbdyTTIBo0vvE5LgIsQvSH",
-            "1jP2yTDmgpxXxdnmStmBcSMfG89_60ZdL",
+            "1T2byQR3et9FEHRN85nkX5m1X_SBTkkVP",
+            "1fCDLaziC1UpsJYhSTSeDOMu7RicWUhCf",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, brown hair, blue eyes, tanned skin, ponytail.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -100,8 +100,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "roxie_foxx.xo",
-            "11bl0KX0dl5RjUSOrINaqgowHbVCdLc5I",
-            "1w1SPZZqKNL3-b0V4yqprqztePX7CvXo6",
+            "1kb8wfJUysJx12CUgU0cwBdiedVjgcqKy",
+            "1BveMTkDPebvNs_vkm6QTQDMsIWwkNsRo",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, brown eyes, tanned skin, hourglass figure.
             Style: realistic photography, Canon DSLR, natural daylight.""",
@@ -109,8 +109,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "auroravaux.xo",
-            "1Fp48pVc5EOf-UwK134eKlCRk7TGCnheR",
-            "1lGN7b8J-0gPLhNDlGSlFgQg_pnL8VxpM",
+            "18juy3lsPV8ryZi7WtkphHIZjS_nf30lA",
+            "16srzqmB72nlCa3rbXOksNRtcmkHDm9sH",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
@@ -118,17 +118,17 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "skylalure",
-            "1R35YdfvQUTK1_wz1Wx9y7DRCkW4l2w10",
-            "1K_eG4yHp1di75TR5OyeMNPzjyGX76Ua5",
+            "1iLxddP75xUE31JAeYBRycNqCnmWbzZNx",
+            "1_5p2Aqrt7ZsJpgcOC7_20orXAszWyacO",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
-            [2, 4.15, -0.90, -1.50, 0.7, 0.9, 0.05, 0.80],
+            [2, 4.15, -0.90, -1.50, 1, 0.9, 0.05, 0.80],
         ),
         setting1_generate_data(
             "zara_devaux",
-            "1G-cRYVvv0IRoKnOjvNuf10Dsa98RTXwG",
-            "1KLnE5981AWAzKKaNY6darPgxIjS6UI9p",
+            "1c0lOBl34CEXTUeUpaOX6nwJJEHRxqIdp",
+            "1HjA0oA0XefuZsVTDGTZx4foNXBGlFN-e",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, golden blonde hair, blue eyes, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
@@ -136,8 +136,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "alinaquinn.xo",
-            "1sTKaWqiH7nU0Jmwck-unGcCZkGID6a9a",
-            "1fB6RvnWcjcj9rNXgsR-HXBkGzcxseUHp",
+            "13AlKGaPWSk3CYzhOMAS1q7TpQH2MROeh",
+            "1lFB9Ac1mfu5Y3kqB5ZqgVaA6lPDZ0E3q",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
@@ -145,16 +145,16 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "noavexen",
-            "1J39NtE4ovUiklcTW_t8NMZHTidCoTZNJ",
-            "1jpaYrZUUKeh2sL5e3W3Nx0UaJX5fk9BB",
+            "12r5DCqoOt41dTv0yG663JtqeJxuUuZXY",
+            "1XJgQF8riA_bqiuYdfEE1K4AOAo1uVxaK",
             """photorealistic, high quality, BREAK
             1girl, 18 years old, brown hair, green eyes, tan skin, smiling.""",
             [2, 2.4, -0.90, -1.40, 1.8, 1, 3, 1.00],
         ),
         setting1_generate_data(
             "lexalennix",
-            "1ME0oexikdkzPqj1pJS-3z9NPY0ewAgVQ",
-            "1y6qUi8iX5AMM1ns_B8B_j3HIIHH7reDC",
+            "1QcoOohtVOmQBp7Hdb2rq79T8am3doM23",
+            "1Naq6qCmktUJMge5dTnmcRS2vHCgUa8tk",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, brunette hair, green eyes, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
@@ -162,8 +162,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "gia_prescott.xo",
-            "1cgjXUHiiAh8fYbFgFYzx6JYnrTBYX0cm",
-            "1RDFZrbYp0NWFlhI4AGrb74QXwnVb6N0G",
+            "1GR_m3RDjiz4NM9vBsJ5ANGnbDmbkjZ3-",
+            "1anmUX6jfL0dzNZ2UkWuTv_sR5D-oq04S",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic, brunette hair, green eyes, tanned skin, hourglass figure.
             Style: Instagram photo, Canon DSLR, bright sunlight""",
@@ -171,16 +171,16 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "daisyknoxen",
-            "1BfBUv1bUHaGsWmBg8Oxv4r_wniQu2_VO",
-            "1XReaJxJA2wRiJNbyjOZOdJC3lBNtpX5j",
+            "1NNdGwAwQrxRxfFZZK_e2XfRJYTkmHtlU",
+            "1EJ0-lQKet94RlOmAM_lEyl_Sro1mgYgs",
             """photorealistic portrait of 18-year-old athletic redhead girl, hourglass figure, tanned skin, modest clothing.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
             [2, 2.60, -0.90, -1.70, 0.05, 1.00, 4.85, 1.00],
         ),
         setting1_generate_data(
             "selinavoux",
-            "1GMY2IoGDR402Qfb-XHBIYHlj3vAxFypw",
-            "1i78rV8aQfsTiSZZijmwg52wsQG-LModz",
+            "1ZZ-HA0I_u-lX8GB4Gk01uAQZhTMRW-cn",
+            "1X42qMLmQdnXdnEpfCuoOoyZzmUfcCXI-",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18, athletic, black hair, green eyes, pale skin, hourglass figure.
             Style: Instagram photo, Canon DSLR, bright sunlight""",
@@ -188,8 +188,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "thaliavonn",
-            "1cQmMTefw1sWVRYooH3KmhHGyVb0njwpo",
-            "1cchKR9pKlnkPcf0lZ1sEGoaE-Kf2CHQD",
+            "1KmyC8nmu84aQP4oufWQmAk5SngiOBAqm",
+            "1l71dcMbImfv_Jue-IPBh52dV1XAELO_Z",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
@@ -197,8 +197,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "adelinedior",
-            "1daQxeVSJWQGAVeUicUrgLj0hTwiT6Ws-",
-            "1qwRI4JQ-1NzcH5Y0rwG0EyJzkeh8-T90",
+            "1lmFLKRK5Bi6ipBV1gjgwdn5Wi97SKuZw",
+            "175zu9Eq9qrGzp7UzhV2NvrUUiDhlgDt-",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
@@ -206,8 +206,8 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "naomiruelle",
-            "1EECavlAfyk-zA7iR0HAnDkH5H9qHMhbm",
-            "1FBfwLfIDCiNPDQ7gF-14l5znrS_X49Xw",
+            "1e8KTNNhXLvkMsR0QMv14K7jyTfuu8Cvm",
+            "1pL7PUrlI4Ll24iAYhApg7l1YtM1Xf21y",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic, blonde hair, green eyes, tanned skin, hourglass figure.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
@@ -215,16 +215,16 @@ def setting1_get_data_array():
         ),
         setting1_generate_data(
             "miahazelton.xo",
-            "1zHzqZi3BOprj7l7FiVs9riTHBUzI9Tat",
-            "1RoBG69D7ZPkq2pgnSp6B7Rna63e_4sf2",
+            "1WqKHKzeLSes0Jy6OtG8R1PNTUM5ipevj",
+            "1yoA-UCcsQelyybhwtqgE2eAtycOhgQZu",
             """photorealistic, high quality, BREAK
             1girl, 18 years old, blonde hair, green eyes, tan skin, smiling.""",
             [2, 3.10, -0.90, -1.70, 1.50, 0.9, 1.00, 0.40],
         ),
         setting1_generate_data(
             "sasharoxelle",
-            "1jMZnHt32aDHJZU7Ihr84b7eXlFi_M9mE",
-            "1R8zwFg_U52IZPR-546-HZdtSw3DzrUWK",
+            "1kThzEe4Aa8hDVPot0eXKQX8TYUlr-Hqg",
+            "1xszDVXq5BEl6EPSKPM8fhPc4ocEx4m0S",
             """photorealistic, high quality, BREAK
             1girl, 18 years old, brown hair, blue eyes, tan skin, smiling.""",
             [2, 1.00, -0.90, -0.35, 2.5, 1.00, 1.60, 0.55, 1.95],
