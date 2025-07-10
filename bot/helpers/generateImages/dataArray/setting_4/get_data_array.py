@@ -9,24 +9,24 @@ def setting4_get_data_array():
     dataArray = [
         setting4_generate_data(
             "tiffanygale.xo",
-            "1qdQ3UKYwab49XvfSntvUqkWYGvyeuWWK",
-            "1Nxoffflsfc7JJoFTgwfFllPZWvcDi8JS",
+            "19cCMta3vuJ96Qf-NvK8xlUEiRc8tDbVs",  # Updated picture folder_id
+            "1WxDZPUxNywzuXd0t0MGjT7yqT77GY07s",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, ash-blonde hair, medium-large natural breasts, big butt, tan skin, blue eyes""",
             [2, 4.20, -1.70, 0.50, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "rachelveneux",
-            "1XsRQ2OuGE-iZBjB7MdZlqaZndcgWjezF",
-            "1JGuLRWqJa5MBA11oY5NqDHZypLfpdUAP",
+            "1y8bWhpUIirpaHW24hqLJfvES01qEueo0",  # Updated picture folder_id
+            "1P5XTobI77nJxLQZ5cD59r5z97ZdJPacf",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, brown hair, medium-large natural breasts, big butt, tan skin, blue eyes""",
             [2, 3.70, -1.70, 1.50, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "karine_montclair",
-            "1jgBSpQ3B6d099UNijzTQK86j96DYIsHl",
-            "12T0xGW2S8DX3RClWiWawm9sy1nh3oyeJ",
+            "1zbBLdrjAIXzJbEt9PoUO1wexMF0JKVea",  # Updated picture folder_id
+            "1kBl_LxPdOcsUidiUYMrHSIxylrVJkOPw",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18, sorority girl, ash-blonde hair, medium-large natural breasts, tan skin, blue eyes""",
             [2, 1.40, 0.50, 1.00, 2.50, 1.70, -0.70, 0.35],
@@ -34,168 +34,168 @@ def setting4_get_data_array():
         ),
         setting4_generate_data(
             "oliviarouxlyn",
-            "15mKNSXqGNn57z6-Qte03949P8DbBWU0Q",
-            "13drlsZRCL7plrU5VNsHyfTedAQADQPcG",
+            "13sNmKM74AINonx3zoKDZClJDX850ynxl",  # Updated picture folder_id
+            "1uJ8MsCAJPkHgpI7HZTZlsKgaTM3hRvMf",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, ash-blonde hair, medium-large natural breasts, big butt, tan skin, blue eyes, hourglass figure""",
             [2, 1.05, -0.50, 2.00, 1.50, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "arianabubblekiss",
-            "1TDWJAX_cH9TETv8OHmcp-BNMnDKqRsgM",
-            "1683ZQuCn9sAPToCyjdC4yQSLPp3q5CZ2",
+            "1iGRk31NVv4M3HivKCtc68dmjUaXB0hRY",  # Updated picture folder_id
+            "1v-L9U8z-MTH-LDtPHFuey9h5CMlkXdm6",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 2.00, -0.30, 1.50, 2.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "britneymonroe.xo",
-            "1Odvb0tOj2Ou11E2UZZWZ4OmBx93K3DrF",
-            "16OYykgZXCsRqw4QX0zEEK5m9L3jqaxNT",
+            "1cD32Ya4PHREjl4QtyljtNI5UkFDY9BPL",  # Updated picture folder_id
+            "1RRJT7qT8ROwpVCNkNJQrqJdr-vdagvlz",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 2.65, -1.55, 2.25, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "tessadelynn",
-            "1H80DQiU4QbO_v-CDzHC-xRix3Ekx1b4B",
-            "1DwmXWp_rTObqbr1y3Cn_S2Q2rrCRm75t",
+            "1fbYQfti9wKtf0Tkv-GEwtNnw1siNvFDF",  # Updated picture folder_id
+            "1YvFoqciTMczIIG29U4vo0hGxLz2VMuok",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1woman, milf, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 1.00, 0.55, 1.50, 2.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "victoriadellor",
-            "1b4Ozs2vlAim6d5FEkxJ1IdluJ6wNIAO4",
-            "1A3PVoGX1nziDsOqDB5g8usVeIFJgAuU7",
+            "1PACT6aox2tCFVZ-hyvTnaGlO6ahSNp9l",  # Updated picture folder_id
+            "1xUdUGyKdQymqFlymMeqwsv51oKukK795",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1woman, milf, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 4.30, -1.70, 1.00, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "evelynlaine.xo.xo",
-            "1PQL0mx2vHnXpPnjAi0ekmwGkjFfvoJAw",
-            "1rZpZdzxgHriK6_8knTYJNo7uqhu1FEWe",
+            "1S27XabYn1XVSY8KooNoZnGfT_3XvqUAR",  # Updated picture folder_id
+            "1Vu45ZY-eTPbmueAwc11fUkJhM64hMFdW",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, platinum-blonde hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 3.00, -2.00, 1.80, 2.00, 1.70, -0.70, 0.75],
         ),
         setting4_generate_data(
             "melissaxlaine",
-            "1-emjLPMenbVaDkMlASydigtIU0fEQddh",
-            "1-5VWCZ9FPnx6SATqvFa2PvinmZ5HQMYZ",
+            "14zTS2FKFmtcL-ZCYYL76paE0ZjpAJCLR",  # Updated picture folder_id
+            "1Ni16IB-TyaeHNcVWdh9WALvWERYkOEsw",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18, sorority girl, black hair, bob haircut, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 1.65, -0.80, 1.75, 1.50, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "sophieharlow.xo",
-            "1J9i43r89Izk1I2Hmq9jox9AGFuTbyQeB",
-            "1zZuYTNRXNkNlNObqY-7IyWFRNN_NEKgX",
+            "14EFwwjasyZJMCwi_CQo16SIryZogIfBa",  # Updated picture folder_id
+            "1V7xQf5sdk2J1nnItHlyUPkluth9bfALE",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 1.20, -0.10, 1.30, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "abrilberries",
-            "1FZLMgMiCiFPCyDaIhy5bzkBBjnj0TvyL",
-            "13gRwwvA6cdc1-joRJVA_I25NxtRRmnmy",
+            "1_YDZfiVudqFCrF6Y81G0aRb8GtIeL_j9",  # Updated picture folder_id
+            "1dUwkMJxlMW_-hZ6N93DRjakEGeEr6fXl",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, short hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 1.90, -1.70, 3.90, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "carmenkiss.xo",
-            "1qR2F7APaSfezERPS0eoZjrra6rmVxvGA",
-            "1LMsJFOc9MU8TKzS4uRNbdUJCiieJ4c1Q",
+            "1wQnXTNVk2T1_kb_wcyu1dYiZq38YjnMq",  # Updated picture folder_id
+            "1sTznfWUei84dJA-8uG04934vWzJx-9Km",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 1.50, -0.10, 1.70, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "sherryknoxlyn",
-            "1YCXo9G2Z1sNZv_eXWzrMl2Nrj3aXi_xu",
-            "1jBBhpqXt92SNzf18Igtwv68rI-YBgE_r",
+            "1c8bqX_SBa91AB0agRYP9nCh6ISxd6AJT",  # Updated picture folder_id
+            "1fVbt-MX78Eh3bCR8uBfYNsdSJsVVGu0u",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 2.10, -0.40, 1.05, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "rafaellakissme",
-            "1xuMhd1EIeU5tkvVqU9LtkDrh_Fc7kEI-",
-            "1qoyCSWLAFw4cjQkibUTk0wSpL0wh4Gmm",
+            "1hWCMvbhCPMYOcgf3wVlTN9KcdqDbwjzE",  # Updated picture folder_id
+            "1fEv3RSRpD3BW8pp7XO786yjBoSkJ_5dh",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, ash-blonde hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 3.40, -2.50, 1.75, 2.50, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "marianalolita.xo",
-            "1VNfWmcP1mXrFjSRm7u6BzCYPKvU24d2g",
-            "1_ATphHHe_NLSn4wmaI6wz1lzl5GJso3A",
+            "1VuqfkBnAbjtuXAivwnIqrDHbPoAjQmyS",  # Updated picture folder_id
+            "1zyl-KF3Tps-Z6t6WYvg7_KiiwRnt0OCY",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, tan skin, green eyes, hourglass figure""",
             [2, 1.90, -0.1, 0.85, 2.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "christine_morell.xo",
-            "1TjPCYuqSH9Y-WzzZ2JI96_gQtonhNoVT",
-            "1mg3DJX3WWMcxcCOvGA6rhuuE8zc2duCi",
+            "1loT6oxg8t9Bl64ZHEciDo53Kt41Adndz",  # Updated picture folder_id
+            "1zanCEjFL7xnCP1u5Z_ghn6fS-Wqoartx",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, ash-blonde hair, medium-large natural breasts, big butt, tan skin, blue eyes, hourglass figure""",
             [2, 0.15, -1.70, 4.40, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "rihannacorvelle",
-            "1BMfDzT7l-GA9ac7yVm6k4LMxacxNpevP",
-            "179ZTUDbkCAmDHZOonuzNGVtvgzdhKPpl",
+            "138ndxSZy0OtyV-WUKCHDpGhjTDt6aLVx",  # Updated picture folder_id
+            "1z4Xj9ZNVOIbani_0CW52JSHt82j9n0Ut",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, white-black hair, medium-large natural breasts, big butt, tan skin, blue eyes, hourglass figure""",
             [2, 3.90, -2.50, 2.00, 1.52, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "beatricemeltie",
-            "1U5W81Z5i4RhCS1XNIcm3F65pBF3Gs_QP",
-            "1_FOQCrI5BCTh2i0MizPGfBb4APWP9u1n",
+            "1xqLbV5kVpHk9CPQFQMfEH0nqFrwwoOvL",  # Updated picture folder_id
+            "17zzhewFhX5t1LiqQLelWevm780u2MkPi",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, white-black hair, medium-large natural breasts, big butt, tan skin, blue eyes, hourglass figure""",
             [2, 0.70, -0.80, 3.05, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "edith_maelis.xo",
-            "1TGwWIHbpToj4oR4MtkC2Kt7mpdTzh0km",
-            "1wpKm8EQMDeLH01KylQwnfz9i6Dr9nS3N",
+            "1cJWhI8E7K5JpKKyJZAdFyccVYJEXmmF_",  # Updated picture folder_id
+            "1wnoxlxawaBirVSYtv4G6icojcBlEhLAF",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, mulat, 18, sorority girl, white hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure""",
             [2, 0.70, -0.80, 3.05, 1.00, 1.70, -0.70, 0.35, 0.95],
         ),
         setting4_generate_data(
             "isabella.flirt",
-            "1LSbpnLrlmjTKpOl-ACeD3g1fiRirDT-S",
-            "1l-CxPND7Vghe2v3I2uYSFhbErKra4gjq",
+            "14HkVljdW_W-ENVz-rRqX_8xNRQs3zIoM",  # Updated picture folder_id
+            "1kcjOqAa5krdXbEYYxPYz_8AEYKCA1_0S",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, mulat, 18, sorority girl, white hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure""",
             [2, 0.70, 0.15, 1.80, 1.00, 1.70, -0.70, 0.35, -1.00],
         ),
         setting4_generate_data(
             "estefaniabubbly.xo",
-            "1kQqYj3oqODYmLuW1NYqsfpiz0AZ7uJQR",
-            "1jTp-RkiShlSP6dQW65eMYkwUKL2_H9ws",
+            "14EbDTowC5j5FNTo0485BLE7AcIhSHDGM",  # Updated picture folder_id
+            "1FI2ZNBf2LiHh20iexdhDMbaC0WiVMPNm",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, white hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure""",
             [2, 1.00, -2.00, 3.00, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "avacreston",
-            "1UBq3lY6TWW-ijuLUE-nKFqQFRPsYWZ2v",
-            "1aVEPThPAB9XZSWrVd51JGiKddjXUkLPy",
+            "1RCHmR9avrfP4gmvuQqHYCD1g88bLFN0J",  # Updated picture folder_id
+            "1ksfxBBCcy41TTjy7jNAsIBpAVN66_Dd-",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure""",
             [2, 1.80, -1.70, 3.05, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "eleonora.lolly",
-            "1YkIcdaEJSuiiKt9EY9Xln09S5N4qUfEl",
-            "1gxTmTkAz9iy2oC8hIFz6-9JpKnEY4B1O",
+            "1RR_Stac_ufm1zkGLy9_yc3kW0LXlAUAk",  # Updated picture folder_id
+            "1Pt3BxCphAColThDMQnRHxWufykOSgnqf",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure""",
             [2, 1.20, -1.70, 2.50, 1.00, 1.70, -0.70, 0.35, 0, 1.75],
@@ -203,24 +203,24 @@ def setting4_get_data_array():
         ),
         setting4_generate_data(
             "wendy_rosemont",
-            "1IlV2guGzxX4QpLDAtvSs8yT2fS9_2tmM",
-            "1QOhmAjS1xpK0sgc3RR9QLdWgeUQe-XrZ",
+            "1dhtAJziIgO8F9rETE8G9nWWcAzkrPcQF",  # Updated picture folder_id
+            "15ipSjiwivPZYOHebF-8hjtGFTmw2SVVb",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure""",
             [2, 1.20, -1.70, 2.50, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
         ),
         setting4_generate_data(
             "ashleymoreaux.xo",
-            "1RthZyPItvmRrnnEAW-doRBhA6aH5b3xb",
-            "1sdttiJfPzyseSAMEI6dth-SE47rN3_Ma",
+            "1coYXT1EqQQaND7O9YawKF79k7htV63II",  # Updated picture folder_id
+            "1E-CuS-tIK6iR6IGptTWlHKojiXAs3RP4",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure, smirk""",
             [2, 2.70, -1.70, 1.95, 1.00, 1.70, -0.70, 0.35, 0, 1.25],
         ),
         setting4_generate_data(
             "jennifer_harrington.xo",
-            "1VD2OVcIVUxETnWSnj_jD99Mh3k0fSCZA",
-            "1otWK-FAjKelcAyzOsVv_nhzW3-lUl2rZ",
+            "1bsb7lzuY_S0lwBqsKW0jZb-OFPmw94Ui",  # Updated picture folder_id
+            "1OV6rF_O8yZiIu-vz-jICOZNW6-wA9A97",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure, smirk""",
             [2, 3.10, -1.70, 1.30, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
@@ -228,8 +228,8 @@ def setting4_get_data_array():
         ),
         setting4_generate_data(
             "jessie_valemont",
-            "1LjUo-u-Upk-Oj6i3wgZI4ONZ_MeAHko8",
-            "1X2AXr2tu3VNrfch73ad80dz9SfPCDnRm",
+            "1Kdka8Dku_xyzfiJrVkWCJnaeBEQcX77_",  # Updated picture folder_id
+            "1RD9r4e86H0DtDsIvGbR2rMLlLqO7fN6Z",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, platinum hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure, smirk""",
             [2, 3.10, -1.70, 1.55, 1.00, 1.70, -0.70, 0.35, 0, 0.15],
@@ -237,20 +237,19 @@ def setting4_get_data_array():
         ),
         setting4_generate_data(
             "jessieveroux",
-            "1PDLzpiU4PwkN94v_akJW8augzOiOkIpy",
-            "1x-YS5dpyrsNAnOKQY1KfTySEdiskwEog",
+            "1E-MA1eNwoedp5i3eL4p7vJtUTdhLyN1x",  # Updated picture folder_id
+            "1t9z6tskhN0-mlrBhRRiNudrytg2PXLFk",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure, smirk""",
             [2, 2.25, -0.80, 0.65, 1.00, 1.70, -0.70, 0.35, 0, 0.95],
         ),
         setting4_generate_data(
             "viviengloww",
-            "1fNsc4y0F6338SvYCNxiOQgez3XeLEu2m",
-            "1Z7K-gFAoIJCPctKrJO_9Q0V6jSf41n6x",
+            "1nFGIP8Nuwj5YA1iC_o7wkuLpFblJbg4B",  # Updated picture folder_id
+            "1YRGdqoNq1hdNwM0uAJS0a9VPo2ln0iME",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, hourglass figure, smirk""",
             [2, 1.75, -0.40, 1.45, 1.00, 1.70, -0.70, 0.35, 0, 0.75],
-            8
         ),
     ]
 
