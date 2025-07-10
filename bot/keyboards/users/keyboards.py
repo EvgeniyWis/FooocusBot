@@ -22,12 +22,6 @@ def admin_keyboard():
                     callback_data="user|prompts",
                 ),
             ],
-            [
-                InlineKeyboardButton(
-                    text="📁 Веса для лор",
-                    callback_data="user|lor_weights",
-                ),
-            ],
         ],
     )
 
