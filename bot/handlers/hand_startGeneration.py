@@ -670,6 +670,65 @@ async def write_model_name_for_generation(
         )
         return
 
+    # 2. Старый формат: одна модель или через запятую
+
+    # Проверяем, что введённое значение является числом
+    model_indexes = message.text.split(",")
+    if len(model_indexes) == 1:
+        if not message.text.isdigit():
+            await safe_send_message(
+                text=text.NOT_NUMBER_TEXT,
+                message=message,
+            )
+            return
+        model_indexes = [message.text]
+
+    # Получаем данные всех моделей
+    all_data_arrays = getAllDataArrays()
+    all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
+
+    # Проверяем, существует ли такие модели
+    for model_index in model_indexes:
+        model_index = model_index.strip()
+
+        if not model_index.isdigit():
+            await safe_send_message(
+                text=text.NOT_NUMBER_TEXT,
+                message=message,
+            )
+            return
+
+        # Если индекс больше числа моделей или меньше 1, то просим ввести другой индекс
+        if int(model_index) > all_data_arrays_length or int(model_index) < 1:
+            await safe_send_message(
+                text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
+                message=message,
+            )
+            return
+
+    await state.update_data(model_indexes_for_generation=model_indexes)
+    # Всё валидно — идём по старой логике
+    await state.update_data(
+        model_indexes_for_generation=model_indexes,
+    )
+
+    await state.set_state(None)
+
+    if len(model_indexes) == 1:
+        await safe_send_message(
+            text=text.GET_MODEL_INDEX_SUCCESS_TEXT,
+            message=message,
+        )
+
+        await state.set_state(StartGenerationState.write_prompt_for_images)
+
+    else:
+        await safe_send_message(
+            text=text.GET_MODELS_INDEXES_AND_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
+            message=message,
+            reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard(),
+        )
+
 
 # Обработка ввода нового промпта для перегенерации изображения
 async def write_new_prompt_for_regenerate_image(
