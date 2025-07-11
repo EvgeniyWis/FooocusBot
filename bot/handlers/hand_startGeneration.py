@@ -9,8 +9,8 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getAllDataArrays,
     getDataByModelName,
+    getModelNameByIndex,
     getModelNameIndex,
-    getModelNameByIndex
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
@@ -115,6 +115,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "variable_names_for_randomizer": [],
         "generated_video_paths": [],
         "model_prompts_for_generation": [],
+        "randomizer_prompts": [],
+        "prompt_for_images": "",
     }
 
     # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
@@ -522,15 +524,14 @@ async def write_model_name_for_generation(
     # 2. Старый формат: одна модель или через запятую
 
     # Проверяем, что введённое значение является числом
-    if not message.text.isdigit():
-        await safe_send_message(
-            text=text.NOT_NUMBER_TEXT,
-            message=message,
-        )
-        return
-
     model_indexes = message.text.split(",")
     if len(model_indexes) == 1:
+        if not message.text.isdigit():
+            await safe_send_message(
+                text=text.NOT_NUMBER_TEXT,
+                message=message,
+            )
+            return
         model_indexes = [message.text]
 
     # Получаем данные всех моделей
@@ -539,6 +540,15 @@ async def write_model_name_for_generation(
 
     # Проверяем, существует ли такие модели
     for model_index in model_indexes:
+        model_index = model_index.strip()
+
+        if not model_index.isdigit():
+            await safe_send_message(
+                text=text.NOT_NUMBER_TEXT,
+                message=message,
+            )
+            return
+
         # Если индекс больше числа моделей или меньше 1, то просим ввести другой индекс
         if int(model_index) > all_data_arrays_length or int(model_index) < 1:
             await safe_send_message(
@@ -554,14 +564,21 @@ async def write_model_name_for_generation(
     )
 
     await state.set_state(None)
-    await safe_send_message(
-        text=text.GET_MODEL_INDEX_SUCCESS_TEXT
-        if len(model_indexes) == 1
-        else text.GET_MODEL_INDEXES_SUCCESS_TEXT,
-        message=message,
-    )
 
-    await state.set_state(StartGenerationState.write_prompt_for_images)
+    if len(model_indexes) == 1:
+        await safe_send_message(
+            text=text.GET_MODEL_INDEX_SUCCESS_TEXT,
+            message=message,
+        )
+
+        await state.set_state(StartGenerationState.write_prompt_for_images)
+
+    else:
+        await safe_send_message(
+            text=text.GET_MODELS_INDEXES_AND_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
+            message=message,
+            reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard(),
+        )
 
 
 # Обработка ввода нового промпта для перегенерации изображения

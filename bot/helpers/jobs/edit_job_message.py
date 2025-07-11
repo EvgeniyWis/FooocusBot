@@ -67,11 +67,17 @@ async def edit_job_message(
         await state.update_data(total_images_count=total_images_count)
 
         try:
+            message_text = (
+                text.GENERATE_IMAGES_PROCESS_TEXT
+                if total_jobs_count == 1
+                else text.GENERATE_IMAGES_PROCESS_TEXT_FOR_MANY_MODELS
+            )
+
             await safe_bot_edit_job_message(
                 bot,
                 chat_id=user_id,
                 message_id=message_id,
-                safe_text=text.GENERATE_IMAGES_PROCESS_TEXT.format(
+                safe_text=message_text.format(
                     success_images_count,
                     error_images_count,
                     cancelled_images_count,
