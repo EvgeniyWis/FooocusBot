@@ -3,6 +3,13 @@ CREATE TABLE IF NOT EXISTS users (
     user_id BIGINT UNIQUE NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS models (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    setting_number INT NOT NULL,
+    UNIQUE (name, setting_number)
+);
+
 CREATE TABLE IF NOT EXISTS loras (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
@@ -21,7 +28,6 @@ CREATE TABLE IF NOT EXISTS user_loras (
     UNIQUE (user_id, lora_id, model_id, setting_number)
 );
 
-
 CREATE TABLE IF NOT EXISTS user_prompts (
     id SERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -30,11 +36,4 @@ CREATE TABLE IF NOT EXISTS user_prompts (
     type TEXT NOT NULL CHECK (type IN ('positive', 'negative')),
     prompt TEXT NOT NULL,
     UNIQUE (user_id, model_id, setting_number, type)
-);
-
-CREATE TABLE IF NOT EXISTS models (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    setting_number INT NOT NULL,
-    UNIQUE (name, setting_number)
 );
