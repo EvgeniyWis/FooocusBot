@@ -290,13 +290,13 @@ def select_type_specific_generation():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="1️⃣ 1 промпт для всех моделей",
+                    text="1️⃣ Обычная генерация",
                     callback_data="specific_generation|one_prompt",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="🔢 Уникальный промпт для каждой модели",
+                    text="🔢 Генерация с уникальным промптом",
                     callback_data="specific_generation|more_prompts",
                 ),
             ],

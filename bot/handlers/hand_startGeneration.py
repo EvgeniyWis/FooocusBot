@@ -139,8 +139,6 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
             reply_markup=start_generation_keyboards.select_type_specific_generation(),
         )
         await state.update_data(specific_model=True)
-        # Очищаем стейт
-        await state.set_state(StartGenerationState.write_prompt_for_images)
 
         return
 
@@ -612,12 +610,20 @@ async def write_models_for_specific_generation(
 
     await state.update_data(model_indexes_for_generation=model_indexes)
 
-    await safe_send_message(
-        text=text.GET_MODEL_INDEX_SUCCESS_TEXT
-        if len(model_indexes) == 1
-        else text.GET_MODEL_INDEXES_SUCCESS_TEXT,
-        message=message,
-    )
+    if len(model_indexes) == 1:
+        await safe_send_message(
+            text=text.GET_MODEL_INDEX_SUCCESS_TEXT,
+            message=message,
+        )
+
+        await state.set_state(StartGenerationState.write_prompt_for_images)
+
+    else:
+        await safe_send_message(
+            text=text.GET_MODELS_INDEXES_AND_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
+            message=message,
+            reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard(),
+        )
 
     await state.set_state(StartGenerationState.write_prompt_for_images)
 
@@ -847,7 +853,7 @@ def hand_add():
 
     router.message.register(
         write_model_name_for_generation,
-        StateFilter(StartGenerationState.write_prompt_for_images),
+        StateFilter(StartGenerationState.write_model_name_for_generation),
     )
 
     router.message.register(
