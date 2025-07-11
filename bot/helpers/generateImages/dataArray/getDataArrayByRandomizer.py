@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
@@ -7,6 +9,9 @@ from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
 from bot.helpers.generateImages.dataArray.random_choice_variables_for_images import (
     random_choice_variables_for_images,
 )
+from bot.helpers.generateImages.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
+)
 from bot.utils.handlers import appendDataToStateArray
 
 
@@ -14,6 +19,7 @@ from bot.utils.handlers import appendDataToStateArray
 async def getDataArrayByRandomizer(
     state: FSMContext,
     setting_number: int | str,
+    model_indexes_for_generation: list[int] = None,
 ):
     # Получаем массив данных
     state_data = await state.get_data()
@@ -25,7 +31,10 @@ async def getDataArrayByRandomizer(
     )
 
     # Получаем массив данных
-    dataArray = getDataArrayBySettingNumber(setting_number)
+    if not model_indexes_for_generation:
+        dataArray = getDataArrayBySettingNumber(setting_number)
+    else:
+        dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
 
     logger.info(
         f"Массив данных до применения переменных рандомайзера: {dataArray} для настройки {setting_number}",
@@ -45,6 +54,7 @@ async def getDataArrayByRandomizer(
             logger.warning(f"Нет значений для переменной '{variable_name}'")
 
     # Проходимся по всем промптам для каждой переменной рандомайзера и формируем промпт
+    randomizer_prompts = []
     for data in dataArray:
         model_randomizer_prompt = ""
 
@@ -67,15 +77,12 @@ async def getDataArrayByRandomizer(
         data_for_update = {f"{data['model_name']}": model_randomizer_prompt}
 
         logger.info(
-            f"Данные для обновления: {data_for_update} для настройки {setting_number}",
+            f"Данные для обновления: {data_for_update} для модели {data['model_name']}",
         )
 
-        await appendDataToStateArray(
-            state,
-            "randomizer_prompts",
-            data_for_update,
-            unique_keys=("model_name"),
-        )
+        randomizer_prompts.append(data_for_update)
+
+    await state.update_data(randomizer_prompts=randomizer_prompts)
 
     logger.info(
         f"Массив данных после применения переменных рандомайзера: {dataArray}",

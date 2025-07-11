@@ -6,11 +6,17 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from bot.helpers.generateImages.dataArray import (
+from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
+)
+from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
     getDataArrayBySettingNumber,
-    getDataByModelName,
+)
+from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
     getModelNameByIndex,
+)
+from bot.helpers.generateImages.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
 )
 
 
@@ -33,18 +39,11 @@ async def generateImages(
     # Получаем массив данных для генерации
     if not with_randomizer:
         if model_indexes_for_generation:
-            model_names_for_generation = [
-                getModelNameByIndex(model_index)
-                for model_index in model_indexes_for_generation
-            ]
-            dataArray = [
-                await getDataByModelName(model_name)
-                for model_name in model_names_for_generation
-            ]
+            dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
         else:
             dataArray = getDataArrayBySettingNumber(setting_number)
     else:
-        dataArray = await getDataArrayByRandomizer(state, setting_number)
+        dataArray = await getDataArrayByRandomizer(state, setting_number, model_indexes_for_generation)
 
     logger.info(
         f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}. Переменный промпт: {prompt_for_current_model}",
