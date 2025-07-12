@@ -62,6 +62,6 @@ async def safe_bot_edit_job_message(
             )
             _last_texts[key] = safe_text
         except Exception as e:
-            logger.warning(
-                f"Ошибка при редактировании сообщения {message_id}: {e}",
+            logger.error(
+                f"❌ Ошибка при редактировании сообщения {message_id}: {e}, отправляем новое сообщение...",
             )

@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from keyboards.randomizer.keyboards import done_typing_keyboard_for_prompts
 
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration import generateImagesInHandler
@@ -34,12 +35,7 @@ async def handle_randomizer_buttons(
 
     # Если была выбрана кнопка "💬 Одно сообщение"
     elif action == "one_message":
-        await safe_edit_message(
-            call.message,
-            text.ONE_MESSAGE_FOR_RANDOMIZER_TEXT,
-            parse_mode="HTML",
-        )
-        await state.set_state(RandomizerState.write_one_message_for_randomizer)
+        await start_multi_prompt_input_mode(call, state)
 
     # Если была выбрана кнопка "⚡️ Начать генерацию"
     elif action == "start_generation":
@@ -309,6 +305,67 @@ async def write_value_for_variable_for_randomizer(
     await state.set_state(
         RandomizerState.write_value_for_variable_for_randomizer,
     )
+
+
+async def start_multi_prompt_input_mode(
+    call: types.CallbackQuery,
+    state: FSMContext,
+):
+    await state.set_state(
+        RandomizerState.write_multi_messages_for_prompt_for_randomizer,
+    )
+    await state.update_data(
+        prompt_chunks=[],
+    )
+
+    await safe_send_message(
+        text.ONE_MESSAGE_FOR_RANDOMIZER_TEXT,
+        call.message,
+        reply_markup=done_typing_keyboard_for_prompts(),
+    )
+
+
+@router.message(RandomizerState.write_multi_messages_for_prompt_for_randomizer)
+async def handle_chunk_input(message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    chunks = data.get("prompt_chunks", [])
+
+    chunks.extend(
+        line.strip() for line in message.text.split("\n") if line.strip()
+    )
+    await state.update_data(
+        prompt_chunks=chunks,
+        last_user_id=message.from_user.id,
+        last_chat_id=message.chat.id,
+        last_message_id=message.message_id,
+    )
+
+
+@router.callback_query(lambda c: c.data == "done_typing_randomize_prompts")
+async def finish_prompt_input(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+):
+    data = await state.get_data()
+    full_text = "\n".join(data.get("prompt_chunks", []))
+
+    user_id = data.get("last_user_id")
+    chat_id = data.get("last_chat_id")
+
+    await safe_edit_message(
+        callback.message,
+        "🧠 Обрабатываю длинный промпт...",
+    )
+
+    fake_message = types.Message(
+        message_id=callback.message.message_id,
+        date=callback.message.date,
+        chat=types.Chat(id=chat_id, type="private"),
+        from_user=callback.from_user,
+        text=full_text,
+    )
+
+    await write_one_message_for_randomizer(fake_message, state)
 
 
 # Обработка ввода одного сообщения для рандомайзера
