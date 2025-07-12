@@ -46,8 +46,8 @@ async def stop_generation(message: types.Message, state: FSMContext):
     await cancelImageGenerationJobs(state)
 
     # Завершаем отмену
+    await asyncio.sleep(15)
     await safe_send_message(text.STOP_GENERATION_TEXT, message)
-    await asyncio.sleep(5)
     await state.update_data(stop_generation=False)
 
 

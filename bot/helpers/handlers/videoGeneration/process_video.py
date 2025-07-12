@@ -28,9 +28,9 @@ async def process_video(
     state: FSMContext,
     model_name: str,
     prompt: str,
-    type_for_video_generation: str,
-    image_url: str,
-    image_index: int,
+    image_url: str | None = None,
+    image_path: str | None = None,
+    image_index: int | None = None,
     call: Optional[types.CallbackQuery] = None,
     message: Optional[types.Message] = None,
 ):
@@ -43,9 +43,9 @@ async def process_video(
         state: FSMContext - Контекст состояния
         model_name: str - Название модели для генерации видео
         prompt: str - Промпт для генерации видео
-        type_for_video_generation: str - Тип генерации видео (Рабочий или Тестовый)
         image_url: str - Ссылка на изображение, из которого будет генерироваться видео
-        image_index: int - Индекс изображения в массиве изображений
+        image_path: str | None - Путь к изображению, из которого будет генерироваться видео
+        image_index: int | None - Индекс изображения в массиве изображений
         call: Optional[types.CallbackQuery] = None - CallbackQuery с сообщением о генерации видео
         message: Optional[types.Message] = None - Message с сообщением о генерации видео
     """
@@ -78,8 +78,8 @@ async def process_video(
         callback_data=callback_data,
         model_name=model_name,
         prompt=prompt,
-        type_for_video_generation=type_for_video_generation,
         image_url=image_url,
+        image_path=image_path,
     )
     await redis_storage.add_task(settings.PROCESS_VIDEO_TASK, task_dto)
 
@@ -92,6 +92,7 @@ async def process_video(
         model_name,
         message,
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_name_index),
+        image_index,
     )
 
     # Проверяем путь к видео
@@ -100,7 +101,7 @@ async def process_video(
         message=message,
         image_index=image_index,
         image_url=image_url,
-        temp_path=None,
+        temp_path=image_path,
         model_name=model_name,
     )
 
@@ -125,69 +126,63 @@ async def process_video(
         return
 
     # Добавляем путь к видео в стейт
-    data_for_update = {
-        "image_index": image_index,
-        "model_name": model_name,
-        "direct_url": video_path,
-    }
-    await appendDataToStateArray(
-        state,
-        "generated_video_paths",
-        data_for_update,
-        unique_keys=("model_name", "image_index"),
-    )
+    if image_index:
+        data_for_update = {
+            "image_index": image_index,
+            "model_name": model_name,
+            "direct_url": video_path,
+        }
+        await appendDataToStateArray(
+            state,
+            "generated_video_paths",
+            data_for_update,
+            unique_keys=("model_name", "image_index"),
+        )
+    else:
+        data_for_update = {f"{model_name}": video_path}
+        await appendDataToStateArray(
+            state,
+            "generated_video_paths",
+            data_for_update,
+        )
 
     # Отправляем видео юзеру
     video = types.FSInputFile(video_path)
-    prefix = f"generate_video|{model_name}|{image_index}"
 
-    if type_for_video_generation == "work":
-        method = message.answer_video(
-            video=video,
-            caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(
-                model_name,
-                model_name_index,
-            ),
-            reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
-                model_name,
-                image_index,
-            ),
-        )
-        video_message = await bot(method)
-    else:  # При тестовой просто отправляем юзеру результат генерации
-        method = message.answer_video(
-            video=video,
-            caption=text.GENERATE_TEST_VIDEO_SUCCESS_TEXT.format(
-                model_name,
-                model_name_index,
-            ),
-            reply_markup=video_generation_keyboards.generatedVideoKeyboard(
-                prefix,
-                False,
-            ),
-        )
-        video_message = await bot(method)
+    method = message.answer_video(
+        video=video,
+        caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(
+            model_name,
+            model_name_index,
+        ),
+        reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
+            model_name,
+            image_index,
+        ),
+    )
+    video_message = await bot(method)
 
     # Сохраняем сообщение в стейт для последующего удаления
-    data_for_update = {
-        "model_name": model_name,
-        "image_index": image_index,
-        "message_id": video_message.message_id,
-    }
-    await appendDataToStateArray(
-        state,
-        "videoGeneration_messages_ids",
-        data_for_update,
-        unique_keys=("model_name", "image_index"),
-    )
+    if image_index:
+        data_for_update = {
+            "model_name": model_name,
+            "image_index": image_index,
+            "message_id": video_message.message_id,
+        }
+        await appendDataToStateArray(
+            state,
+            "videoGeneration_messages_ids",
+            data_for_update,
+            unique_keys=("model_name", "image_index"),
+        )
 
     redis_storage = get_redis_storage()
     await redis_storage.delete_task(
         settings.PROCESS_VIDEO_TASK,
         key_for_video(
-            type_for_video=type_for_video_generation,
+            "work",
             user_id=user_id,
-            image_url=image_url,
+            image_url=image_url if image_url else image_path,
             model_name=model_name,
         ),
     )

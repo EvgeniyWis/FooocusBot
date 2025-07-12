@@ -16,6 +16,11 @@ from bot.helpers.generateImages.dataArray.extra_setting.get_data_array import (
 
 
 def getDataArrayBySettingNumber(setting_number: str | int):
+    # Если передана строка, преобразуем её в число
+    if isinstance(setting_number, str):
+        if setting_number.isdigit():
+            setting_number = int(setting_number)
+
     if setting_number == 1:
         return setting1_get_data_array()
     elif setting_number == 2:
@@ -26,3 +31,5 @@ def getDataArrayBySettingNumber(setting_number: str | int):
         return setting4_get_data_array()
     elif setting_number == "extra":
         return extra_setting_get_data_array()
+
+    raise ValueError(f"Неизвестный номер настройки: {setting_number}")

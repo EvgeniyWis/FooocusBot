@@ -1,15 +1,17 @@
-import traceback
 
 from aiogram import types
 
+from bot import constants
 from bot.helpers.generateImages.dataArray import getModelNameIndex
 from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
 from bot.settings import settings
 from bot.utils import retryOperation, text
 from bot.utils.handlers.messages import safe_send_message
+from bot.utils.videos.errors_texts import (
+    NOT_ENOUGH_MONEY_ERROR_TEXT,
+    PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT,
+)
 from bot.utils.videos.generate_video import generate_video
-from bot import constants
 
 
 async def send_error_message(message: types.Message, image_index: int | None, model_name: str, e: str):
@@ -37,9 +39,7 @@ async def send_error_message(message: types.Message, image_index: int | None, mo
             message,
             reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
                 model_name,
-                image_index,
-                False,
-                True
+                image_index
             ),
         )
     else:
@@ -80,14 +80,24 @@ async def check_video_path(
     if settings.MOCK_VIDEO_MODE:
         video_path = constants.MOCK_VIDEO_PATH
     else:
-        video_path = await retryOperation(
-            generate_video,
-            10,
-            1.5,
-            prompt,
-            image_url,
-            temp_path,
-        )
+        try:
+            video_path = await retryOperation(
+                generate_video,
+                10,
+                1.5,
+                prompt,
+                image_url,
+                temp_path,
+            )
+        except Exception as e:
+            await send_error_message(
+                message, image_index, model_name, e
+            )
+
+            if str(e) in [NOT_ENOUGH_MONEY_ERROR_TEXT, PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT]:
+                return
+            else:
+                raise e
 
     if not video_path:
         await send_error_message(

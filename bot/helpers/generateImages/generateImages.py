@@ -1,22 +1,28 @@
 import asyncio
 import traceback
+from typing import Any
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from bot.helpers.generateImages.dataArray import (
+from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
+)
+from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
     getDataArrayBySettingNumber,
-    getDataByModelName,
+)
+from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
     getModelNameByIndex,
+)
+from bot.helpers.generateImages.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
 )
 
 
-# Функция для генерации изображений с помощью API
 async def generateImages(
     setting_number: int | str,
-    prompt: str,
+    prompt_for_current_model: dict[str, Any],
     message: types.Message,
     state: FSMContext,
     user_id: int,
@@ -30,46 +36,42 @@ async def generateImages(
 
     state_data = await state.get_data()
 
-    image_number = 10 if state_data.get('multi_select_mode') else 4
-
-    # Формируем массив данных с нужным количеством изображений
+    # Получаем массив данных для генерации
     if not with_randomizer:
-        # Если модели для индивидуальной генерации есть, то формируем из них массив
         if model_indexes_for_generation:
-            # Получаем имена моделей по их номерам
-            model_names_for_generation = [
-                getModelNameByIndex(model_index)
-                for model_index in model_indexes_for_generation
-            ]
-            dataArray = [
-                await getDataByModelName(model_name)
-                for model_name in model_names_for_generation
-            ]
+            dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
         else:
-            dataArray = getDataArrayBySettingNumber(int(setting_number))
+            dataArray = getDataArrayBySettingNumber(setting_number)
     else:
-        dataArray = await getDataArrayByRandomizer(state, setting_number)
+        dataArray = await getDataArrayByRandomizer(state, setting_number, model_indexes_for_generation)
 
     logger.info(
-        f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}",
+        f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(dataArray)}. Переменный промпт: {prompt_for_current_model}",
     )
 
-    # Обновляем стейт
-    jobs = {}
-    await state.update_data(jobs=jobs)
-    await state.update_data(total_jobs_count=len(dataArray))
-
-    # Инициализируем папку для хранения изображений
+    await state.update_data(jobs={}, total_jobs_count=len(dataArray))
     images = []
 
-    async def process_image(data: tuple[dict, str, str]):
-        try:
-            logger.info(
-                f"Генерация изображения с изначальными данными: {data}",
-            )
+    # Создаем карту model_name -> prompt из prompt_for_current_model
+    name_to_prompt = {}
+    if prompt_for_current_model:
+        for index_str, prompt in prompt_for_current_model.items():
+            try:
+                model_name = getModelNameByIndex(int(index_str))
+                if model_name:
+                    name_to_prompt[model_name] = prompt
+            except Exception:
+                continue
 
-            if 'json' in data and 'input' in data['json']:
-                data['json']['input']['image_number'] = image_number
+    async def process_image(data: dict):
+        try:
+            if "json" in data and "input" in data["json"]:
+                data["json"]["input"]["image_number"] = (
+                    10 if state_data.get("multi_select_mode", False) else data["json"]["input"]["image_number"]
+                )
+
+            model_name = data.get("model_name")
+            prompt_for_model = name_to_prompt.get(model_name)
 
             image = await generateImageBlock(
                 data,
@@ -77,7 +79,7 @@ async def generateImages(
                 state,
                 user_id,
                 setting_number,
-                prompt,
+                prompt_for_model,
                 is_test_generation,
                 chat_id=message.chat.id,
             )
@@ -85,15 +87,17 @@ async def generateImages(
             return image, None
         except Exception as e:
             traceback.print_exc()
-            raise Exception(
-                f"Произошла ошибка при генерации изображения во внутренней функции: {e}",
-            )
+            raise Exception(f"Ошибка при генерации изображения: {e}")
 
-    # Создаем список задач, выполняющихся параллельно
-    tasks = [asyncio.create_task(process_image(data)) for data in dataArray]
+    tasks = []
+    for data in dataArray:
+        state_data = await state.get_data()
+        stop_generation = state_data.get("stop_generation", False)
 
-    # Ждем выполнения всех задач
+        if not stop_generation:
+            tasks.append(asyncio.create_task(process_image(data)))
+            await asyncio.sleep(0.1)  # Задержка в 0.1 секунду между созданием задач
+
     results = await asyncio.gather(*tasks)
     images = [result[0] for result in results]
-
     return images
