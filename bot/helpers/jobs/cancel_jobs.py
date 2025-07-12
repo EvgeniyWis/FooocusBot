@@ -13,6 +13,8 @@ async def cancel_jobs(jobs_ids: list[dict]):
 
     # Отменяем все работы
     for job_dict in jobs_ids:
+        logger.info(f"Отменяем работу по id: {job_dict["job_id"]}")
+
         try:
             # Получаем id работы и номер настройки
             setting_number = job_dict["setting_number"]

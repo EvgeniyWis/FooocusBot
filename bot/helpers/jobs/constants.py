@@ -1,0 +1,1 @@
+CANCELLED_JOB_TEXT = "Работа была отменена"

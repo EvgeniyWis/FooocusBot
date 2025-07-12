@@ -3,6 +3,7 @@ import asyncio
 import httpx
 from aiogram.fsm.context import FSMContext
 
+from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
 from bot.helpers.jobs.delete_job import delete_job
 from bot.helpers.jobs.edit_job_message import edit_job_message
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
@@ -10,8 +11,6 @@ from bot.logger import logger
 from bot.settings import settings
 from bot.utils import httpx_post
 from bot.utils.get_api_headers import get_runpod_headers
-
-CANCELLED_JOB_TEXT = "Работа была отменена"
 
 
 async def check_job_status(
@@ -83,12 +82,23 @@ async def check_job_status(
             if response_json["status"] == "COMPLETED":
                 break
 
-            elif response_json["status"] in ["FAILED", "CANCELLED"]:
+            state_data = await state.get_data()
+            stop_generation = state_data.get("stop_generation", False)
+
+            if response_json["status"] in ["FAILED", "CANCELLED"] or stop_generation:
                 if response_json["status"] == "FAILED":
                     response_json = response_json["error"]
 
-                elif response_json["status"] == "CANCELLED":
+                elif response_json["status"] == "CANCELLED" or stop_generation:
                     response_json = CANCELLED_JOB_TEXT
+
+                    await edit_job_message(
+                        job_id,
+                        message_id,
+                        state,
+                        response_json,
+                        user_id,
+                    )
 
                 break
 

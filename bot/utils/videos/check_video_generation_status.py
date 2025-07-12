@@ -5,9 +5,10 @@ from bot.logger import logger
 from bot.utils.get_api_headers import get_kling_headers
 from bot.utils.httpx import httpx_get
 from bot.utils.videos import download_video
+from bot.utils.videos.errors_texts import (
+    PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT,
+)
 
-
-PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT = "Входные данные не прошли модерацию. Пожалуйста, убедитесь в отсутствии NSFW во входных данных."
 
 async def check_video_generation_status(request_id: str) -> str | None:
     """

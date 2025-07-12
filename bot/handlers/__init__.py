@@ -3,4 +3,7 @@ from bot.handlers import (
     hand_startGeneration,
     hand_videoGeneration,
     hand_commands,
+    hand_multi_image,
+    hand_img2video,
+    hand_nsfw_video,
 )
