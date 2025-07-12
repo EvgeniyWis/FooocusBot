@@ -55,8 +55,17 @@ async def handle_randomizer_buttons(
 
             # Отправляем сообщение о генерации
             user_id = call.from_user.id
-            setting_number = state_data.get("setting_number", 1)
-            is_test_generation = setting_number == "test"
+            model_indexes_for_generation = state_data.get(
+                "model_indexes_for_generation", []
+            )
+            if len(model_indexes_for_generation) == 0:
+                setting_number = state_data.get("setting_number", 1)
+            else:
+                setting_number = "individual"
+
+            generations_type = state_data.get("generations_type", "")
+            is_test_generation = generations_type == "test"
+
             await generateImagesInHandler(
                 "",
                 call.message,

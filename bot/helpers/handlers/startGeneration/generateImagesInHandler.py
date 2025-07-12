@@ -14,6 +14,9 @@ from bot.helpers.generateImages.generateImages import generateImages
 from bot.helpers.generateImages.generateImagesByAllSettings import (
     generateImagesByAllSettings,
 )
+from bot.helpers.generateImages.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
+)
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
@@ -109,12 +112,15 @@ async def generateImagesInHandler(
                 else:
                     # Формируем словарь model_name -> prompt
                     prompt_for_current_model = {}
+
                     if setting_number != "individual":
                         dataArray = getDataArrayBySettingNumber(setting_number)
+                    else:
+                        dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
 
-                        for data in dataArray:
-                            model_index = getModelNameIndex(data["model_name"])
-                            prompt_for_current_model[model_index] = prompt
+                    for data in dataArray:
+                        model_index = getModelNameIndex(data["model_name"])
+                        prompt_for_current_model[model_index] = prompt
 
                     result = await generateImages(
                         setting_number=setting_number,
