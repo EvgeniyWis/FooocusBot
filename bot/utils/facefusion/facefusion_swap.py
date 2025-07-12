@@ -45,10 +45,4 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
 
     logger.info(f"FaceFusion успешно завершен, результат: {output_path}")
 
-    # Проверка на существование файла
-    if not os.path.exists(output_path):
-        raise FileNotFoundError(
-            f"Отсуствует результат замены лица для изображения с source: {source_filename} и target: {target_filename}. Путь к файлу: {output_path}",
-        )
-
     return str(output_path)
