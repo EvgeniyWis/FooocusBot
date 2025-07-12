@@ -13,7 +13,6 @@ from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameByIndex,
     getModelNameIndex,
-    getModelNameByIndex
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
@@ -626,8 +625,9 @@ async def write_models_for_specific_generation(
 async def write_model_name_for_generation(
     message: types.Message,
     state: FSMContext,
+    text_input: str = None,
 ):
-    text_input = message.text.strip()
+    text_input = text_input or message.text.strip()
 
     # 1. Новый формат: 1 - текст
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
