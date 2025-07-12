@@ -36,7 +36,7 @@ def setting2_get_data_array():
             "1oeewOsL40XQ9DrW4eUj_H5zHbpSRocDA",
             "17cPchVSb1T_Blz91QD0gSH0Mne-VGo67",
             """photorealistic portrait of an 18-year-old sorority girl with voluminous long blonde hair, slim waist, huge breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright green eyes, high quality and detail.""",
-            [1, 0.7, 2.05, 0.05, -0.85, -1.5],
+            [1, 0.7, 1.9, 0.05, -0.85, -1.5],
         ),
         setting2_generate_data(
             "valeriagomez.xo",
