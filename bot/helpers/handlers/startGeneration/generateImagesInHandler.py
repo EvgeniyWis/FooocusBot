@@ -2,6 +2,7 @@ import traceback
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+from utils.handlers.messages import safe_edit_message
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
@@ -42,7 +43,8 @@ async def generateImagesInHandler(
     try:
         state_data = await state.get_data()
         model_indexes_for_generation = state_data.get(
-            "model_indexes_for_generation", []
+            "model_indexes_for_generation",
+            [],
         )
 
         logger.info(
@@ -59,7 +61,10 @@ async def generateImagesInHandler(
                     prompt,
                 )
             else:
-                await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
+                await safe_edit_message(
+                    message_for_edit,
+                    text.GET_PROMPT_SUCCESS_TEXT,
+                )
                 dataArray = getDataArrayBySettingNumber(setting_number)
                 data = dataArray[0]
                 result = [
@@ -98,7 +103,7 @@ async def generateImagesInHandler(
                         is_test_generation=is_test_generation,
                         with_randomizer=False,
                         model_indexes_for_generation=list(
-                            map(int, prompt.keys())
+                            map(int, prompt.keys()),
                         ),
                     )
                 else:
@@ -133,7 +138,10 @@ async def generateImagesInHandler(
             state_data = await state.get_data()
             stop_generation = state_data.get("stop_generation", False)
 
-            if not stop_generation and (len(model_indexes_for_generation) > 1 or len(model_indexes_for_generation) == 0):
+            if not stop_generation and (
+                len(model_indexes_for_generation) > 1
+                or len(model_indexes_for_generation) == 0
+            ):
                 await safe_send_message(text.GENERATION_SUCCESS_TEXT, message)
 
     except Exception as e:

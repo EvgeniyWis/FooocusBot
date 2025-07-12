@@ -1,5 +1,4 @@
 import asyncio
-import os
 import traceback
 
 from aiogram import types
@@ -85,7 +84,7 @@ async def write_prompt_for_img2video(
         raise TimeoutError(
             "Время ожидания скачивания файла Telegram истекло.",
         )
-    
+
     # Сохраняем путь в стейт
     await state.update_data(temp_path_for_video_generation=temp_path)
 

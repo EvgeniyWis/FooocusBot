@@ -207,13 +207,16 @@ def generationModeKeyboard():
                 InlineKeyboardButton(
                     text="🖼 Мультивыбор",
                     callback_data="generation_mode|multi_select",
-                )],
-                [InlineKeyboardButton(
+                ),
+            ],
+            [
+                InlineKeyboardButton(
                     text="1️⃣ Выбор одного фото",
                     callback_data="generation_mode|single_select",
-                )],
+                ),
             ],
-        )
+        ],
+    )
 
 
 # Инлайн-клавиатура для мультивыборной генерации изображений
@@ -267,3 +270,35 @@ def selectMultiImageKeyboard(
         ],
     )
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+
+def done_typing_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Готово",
+                    callback_data="done_typing",
+                ),
+            ],
+        ],
+    )
+
+
+def select_type_specific_generation():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Генерация с 1 промптом",
+                    callback_data="specific_generation|one_prompt",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="Каждая модель с промптом",
+                    callback_data="specific_generation|more_prompts",
+                ),
+            ],
+        ],
+    )
