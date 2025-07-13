@@ -103,7 +103,7 @@ def setting1_get_data_array():
             "1kb8wfJUysJx12CUgU0cwBdiedVjgcqKy",
             "1BveMTkDPebvNs_vkm6QTQDMsIWwkNsRo",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, blonde hair, brown eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, blonde hair, brown eyes, tanned skin.
             Style: realistic photography, Canon DSLR, natural daylight.""",
             [2, 1.60, -0.90, -1.70, 1.75, 1.00, 0.00, 0.80],
         ),
@@ -112,7 +112,7 @@ def setting1_get_data_array():
             "18juy3lsPV8ryZi7WtkphHIZjS_nf30lA",
             "16srzqmB72nlCa3rbXOksNRtcmkHDm9sH",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, blonde hair, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, blonde hair, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
             [2, 0.00, -0.90, -1.70, 3.00, 1.00, 1.80, 0.80],
         ),
@@ -121,7 +121,7 @@ def setting1_get_data_array():
             "1iLxddP75xUE31JAeYBRycNqCnmWbzZNx",
             "1_5p2Aqrt7ZsJpgcOC7_20orXAszWyacO",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
             [2, 4.15, -0.90, -1.50, 1, 0.9, 0.05, 0.80],
         ),
@@ -130,7 +130,7 @@ def setting1_get_data_array():
             "1c0lOBl34CEXTUeUpaOX6nwJJEHRxqIdp",
             "1HjA0oA0XefuZsVTDGTZx4foNXBGlFN-e",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, golden blonde hair, blue eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, golden blonde hair, blue eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
             [2, 2.60, -0.90, -0.60, 0.45, 0.8, 0.95, 1.00],
         ),
@@ -139,7 +139,7 @@ def setting1_get_data_array():
             "13AlKGaPWSk3CYzhOMAS1q7TpQH2MROeh",
             "1lFB9Ac1mfu5Y3kqB5ZqgVaA6lPDZ0E3q",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
             [2, 2.60, -0.90, -1.70, 1.50, 1.20, 1.50, 1.00],
         ),
@@ -156,7 +156,7 @@ def setting1_get_data_array():
             "1QcoOohtVOmQBp7Hdb2rq79T8am3doM23",
             "1Naq6qCmktUJMge5dTnmcRS2vHCgUa8tk",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, brunette hair, green eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, brunette hair, green eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
             [2, 1.70, -0.90, -0.95, 0.95, 1.00, 0.05, 0.40],
         ),
@@ -165,7 +165,7 @@ def setting1_get_data_array():
             "1GR_m3RDjiz4NM9vBsJ5ANGnbDmbkjZ3-",
             "1anmUX6jfL0dzNZ2UkWuTv_sR5D-oq04S",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic, brunette hair, green eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic, brunette hair, green eyes, tanned skin.
             Style: Instagram photo, Canon DSLR, bright sunlight""",
             [2, 1.70, -0.90, 1.40, 0.95, 1.00, 0.05, 0.80],
         ),
@@ -173,7 +173,7 @@ def setting1_get_data_array():
             "daisyknoxen",
             "1NNdGwAwQrxRxfFZZK_e2XfRJYTkmHtlU",
             "1EJ0-lQKet94RlOmAM_lEyl_Sro1mgYgs",
-            """photorealistic portrait of 18-year-old athletic redhead girl, hourglass figure, tanned skin, modest clothing.
+            """photorealistic portrait of 18-year-old athletic redhead girl, tanned skin, modest clothing.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
             [2, 2.60, -0.90, -1.70, 0.05, 1.00, 4.85, 1.00],
         ),
@@ -182,7 +182,7 @@ def setting1_get_data_array():
             "1ZZ-HA0I_u-lX8GB4Gk01uAQZhTMRW-cn",
             "1X42qMLmQdnXdnEpfCuoOoyZzmUfcCXI-",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18, athletic, black hair, green eyes, pale skin, hourglass figure.
+            1girl, 18, athletic, black hair, green eyes, pale skin.
             Style: Instagram photo, Canon DSLR, bright sunlight""",
             [2, 3.2, -0.90, -0.25, 1.5, 1.50, 0.10, 0.75],
         ),
@@ -191,7 +191,7 @@ def setting1_get_data_array():
             "1KmyC8nmu84aQP4oufWQmAk5SngiOBAqm",
             "1l71dcMbImfv_Jue-IPBh52dV1XAELO_Z",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
             [2, 1.10, -0.90, 0.35, 2.10, 1.00, 0.95, 1.00],
         ),
@@ -200,7 +200,7 @@ def setting1_get_data_array():
             "1lmFLKRK5Bi6ipBV1gjgwdn5Wi97SKuZw",
             "175zu9Eq9qrGzp7UzhV2NvrUUiDhlgDt-",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight.""",
             [2, 1.75, -0.90, -1.70, 0.10, 1.00, 0.10, 1.00],
         ),
@@ -209,7 +209,7 @@ def setting1_get_data_array():
             "1e8KTNNhXLvkMsR0QMv14K7jyTfuu8Cvm",
             "1pL7PUrlI4Ll24iAYhApg7l1YtM1Xf21y",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic, blonde hair, green eyes, tanned skin, hourglass figure.
+            1girl, 18 years old, athletic, blonde hair, green eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
             [2, 0.65, -0.90, -1.70, 4, 1.25, 1.75, 1.00],
         ),
