@@ -174,7 +174,7 @@ def setting2_get_data_array():
             "1LXoGdm0aXZmSrasZKEsDCU2CserqBEzA",
             "1SCeL6HxRp-taF7ZyNft69fkesHMvnz5f",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, hourglass figure, tan skin, thin lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 2.30, 1.20, -2.35, -1.50],
         ),
         setting2_generate_data(
@@ -182,7 +182,7 @@ def setting2_get_data_array():
             "1y-ZvB2v0wFM_GtBfmwlq1_NbXph3vJV7",
             "1xqj4WKi1-BGW-iy4KQmRU9NE6BnQxd7l",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, hourglass figure, tan skin, thin lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 3.45, 0.05, -1.70, -1.5],
         ),
         setting2_generate_data(
@@ -190,7 +190,7 @@ def setting2_get_data_array():
             "17ocspnKJciStoBD95IenCv5JEZCbEa15",
             "1hyg6ft5FszXlzYZjYs15BO9FSRICQgEY",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Latina, 18 years old, brown hair, huge breasts, slim waist, big butt, hourglass figure, tan skin, thin lips, smirk, blue eyes""",
+            1girl, Latina, 18 years old, brown hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 1.10, 0.05, -1.70, -1.5],
         ),
         setting2_generate_data(
@@ -198,7 +198,7 @@ def setting2_get_data_array():
             "1HI2o_fXxKZHpuF2hXVQlNx3z8A1xlBnO",
             "1AdfM-qUOqUhKli4jzOJ9e-7UJV-YGhHH",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Latina, 18 years old, black hair, huge breasts, slim waist, big butt, hourglass figure, tan skin, thin lips, smirk, blue eyes""",
+            1girl, Latina, 18 years old, black hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 3.80, 0.1, -3.00, -1.50],
         ),
     ]
