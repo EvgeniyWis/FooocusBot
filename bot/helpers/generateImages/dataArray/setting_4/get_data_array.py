@@ -199,7 +199,6 @@ def setting4_get_data_array():
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes""",
             [2, 1.20, -1.70, 2.50, 1.00, 1.70, -0.70, 0.35, 0, 1.75],
-            8
         ),
         setting4_generate_data(
             "wendy_rosemont",
@@ -224,7 +223,6 @@ def setting4_get_data_array():
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, smirk""",
             [2, 3.10, -1.70, 1.30, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
-            8
         ),
         setting4_generate_data(
             "jessie_valemont",
@@ -233,7 +231,6 @@ def setting4_get_data_array():
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, platinum hair, medium-large natural breasts, big butt, extra tan skin, blue eyes, smirk""",
             [2, 3.10, -1.70, 1.55, 1.00, 1.70, -0.70, 0.35, 0, 0.15],
-            8
         ),
         setting4_generate_data(
             "jessieveroux",
