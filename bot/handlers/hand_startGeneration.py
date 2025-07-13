@@ -625,8 +625,6 @@ async def write_models_for_specific_generation(
             reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard(),
         )
 
-    await state.set_state(StartGenerationState.write_prompt_for_images)
-
 
 async def write_model_name_for_generation(
     message: types.Message,
