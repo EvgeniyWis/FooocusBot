@@ -211,7 +211,7 @@ def setting1_get_data_array():
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic, blonde hair, green eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
-            [2, 0.65, -0.90, -1.70, 4, 1.25, 1.75, 1.00],
+            [2, 0.65, -0.90, -1.70, 3.7, 1.25, 1.75, 1.00],
         ),
         setting1_generate_data(
             "miahazelton.xo",
