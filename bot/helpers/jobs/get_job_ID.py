@@ -17,6 +17,11 @@ async def get_job_ID(
     # Делаем запрос на генерацию
     logger.info("Отправка запроса на генерацию...")
 
+    # Обновляем данные о числе изображений, в зависимости от того, есть ли мультигенерация
+    state_data = await state.get_data()
+    if state_data.get("multi_select_mode", False):
+        dataJSON["input"]["image_number"] = 10
+
     # Получаем id работы
     response_json = await retryOperation(
         send_run_request,

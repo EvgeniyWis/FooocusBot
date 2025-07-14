@@ -9,7 +9,7 @@ def generate_data(
     prompt: str,
     loras: list[dict],
     base_config_model_name: str,
-    image_number: int,
+    image_number: int = 4,
     negative_prompt: str = settings.COMMON_NEGATIVE_PROMPT,
     embeddings: list[str] | None = None,
     guidance_scale: float = 3.5,
