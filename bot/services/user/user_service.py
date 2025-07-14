@@ -10,7 +10,7 @@ class UserSettingsService:
         if user_db_id is None:
             await self.repo.add_user(user_id)
 
-    # --- Superadmin (глобальные LoRA) ---
+    # --- Superadmin ---
 
     async def superadmin_get_all_loras(self, setting_number: int):
         return await self.repo.superadmin_get_all_loras(setting_number)
@@ -39,7 +39,7 @@ class UserSettingsService:
     async def get_all_setting_numbers(self) -> list[int]:
         return await self.repo.get_all_setting_numbers()
 
-    # --- User (пользовательские LoRA и промпты) ---
+    # --- User ---
 
     async def user_get_loras(self, user_id: int):
         await self.ensure_user_exists(user_id)
@@ -109,6 +109,22 @@ class UserSettingsService:
     async def user_get_prompts(self, user_id: int):
         await self.ensure_user_exists(user_id)
         return await self.repo.user_get_prompts(user_id)
+
+    async def user_edit_prompt(
+        self,
+        user_id,
+        model_id,
+        setting_number,
+        prompt,
+        prompt_type,
+    ):
+        return await self.repo.user_edit_prompt(
+            user_id,
+            model_id,
+            setting_number,
+            prompt,
+            prompt_type,
+        )
 
     async def user_add_prompt(
         self,

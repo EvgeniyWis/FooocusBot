@@ -7,7 +7,7 @@ class PostgresRepository:
     def __init__(self, db: Pool):
         self.db = db
 
-    # --- Superadmin LoRA ---
+    # --- Superadmin ---
 
     async def superadmin_add_lora(self, title: str, setting_number: int):
         async with self.db.acquire() as conn:
@@ -368,11 +368,40 @@ class PostgresRepository:
                 user_id,
             )
 
+    async def user_edit_prompt(
+        self,
+        user_id: int,
+        model_id: int | None,
+        setting_number: int | None,
+        prompt: str,
+        prompt_type: str = "positive",
+    ):
+        async with self.db.acquire() as conn:
+            logger.info(
+                f"Editing {prompt_type} prompt {prompt} for user {user_id} "
+                f"for model {model_id} and setting {setting_number}",
+            )
+            await conn.execute(
+                """
+                UPDATE user_prompts
+                SET prompt = $1
+                WHERE user_id = $2
+                  AND model_id IS NOT DISTINCT FROM $3
+                  AND setting_number IS NOT DISTINCT FROM $4
+                  AND type = $5
+                """,
+                prompt,
+                user_id,
+                model_id,
+                setting_number,
+                prompt_type,
+            )
+
     async def user_add_prompt(
         self,
         user_id: int,
-        model_id: int,
-        setting_number: int,
+        model_id: int | None,
+        setting_number: int | None,
         prompt: str,
         prompt_type: str = "positive",  # 'positive' или 'negative'
     ):
@@ -398,8 +427,8 @@ class PostgresRepository:
     async def user_delete_prompt(
         self,
         user_id: int,
-        model_id: int,
-        setting_number: int,
+        model_id: int | None,
+        setting_number: int | None,
         prompt_type: str = "positive",
     ):
         async with self.db.acquire() as conn:
@@ -409,7 +438,10 @@ class PostgresRepository:
             await conn.execute(
                 """
                 DELETE FROM user_prompts
-                WHERE user_id = $1 AND model_id = $2 AND setting_number = $3 AND type = $4
+                WHERE user_id = $1
+                  AND model_id IS NOT DISTINCT FROM $2
+                  AND setting_number IS NOT DISTINCT FROM $3
+                  AND type = $4
                 """,
                 user_id,
                 model_id,
@@ -492,16 +524,21 @@ class PostgresRepository:
     async def user_get_prompt(
         self,
         user_id: int,
-        model_id: int,
-        setting_number: int,
+        model_id: int | None,
+        setting_number: int | None,
         prompt_type: str = "positive",
     ):
         async with self.db.acquire() as conn:
-            logger.info(f"Getting {prompt_type} prompt for user {user_id}")
+            logger.info(
+                f"Getting {prompt_type} prompt for user {user_id} for model {model_id} and setting {setting_number}",
+            )
             return await conn.fetchval(
                 """
                 SELECT prompt FROM user_prompts
-                WHERE user_id = $1 AND model_id = $2 AND setting_number = $3 AND type = $4
+                WHERE user_id = $1
+                  AND model_id IS NOT DISTINCT FROM $2
+                  AND setting_number IS NOT DISTINCT FROM $3
+                  AND type = $4
                 """,
                 user_id,
                 model_id,

@@ -484,7 +484,11 @@ def select_model_for_prompt_keyboard(models: list[dict]):
     )
 
 
-def prompt_manage_keyboard(prompt_exists: bool):
+def prompt_manage_keyboard(
+    prompt_exists: bool,
+    negative_prompt_type: bool = False,
+    edit_mode: bool = False,
+):
     if prompt_exists:
         buttons = [
             [
@@ -507,15 +511,24 @@ def prompt_manage_keyboard(prompt_exists: bool):
                 ),
             ],
         ]
-
-    buttons.append(
-        [
-            InlineKeyboardButton(
-                text="🔙 Назад",
-                callback_data="user|prompt|back_to_models",
-            ),
-        ],
-    )
+    if negative_prompt_type:
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="🔙 Назад",
+                    callback_data="user|prompt|back_to_type",
+                ),
+            ],
+        )
+    else:
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text="🔙 Назад",
+                    callback_data="user|prompt|back_to_models",
+                ),
+            ],
+        )
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 

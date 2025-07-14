@@ -477,6 +477,10 @@ async def user_handle_prompt_type_selection(
 
     await state.update_data(prompt_type=prompt_type)
 
+    if prompt_type == "negative":
+        await user_handle_select_model_for_prompt(callback, state)
+        return
+
     await safe_edit_message(
         callback.message,
         "⚙️ Выберите настройку:",
@@ -513,15 +517,20 @@ async def user_handle_select_model_for_prompt(
     callback: CallbackQuery,
     state: FSMContext,
 ):
-    _, _, model_id_str = callback.data.split("|")
-    model_id = int(model_id_str)
+    try:
+        _, _, model_id_str = callback.data.split("|")
+        model_id = int(model_id_str)
+    except ValueError:
+        model_id = None
+        pass
+    await state.update_data(selected_model_id=model_id)
 
     data = await state.get_data()
-    setting_number = data["setting_number"]
+    setting_number = (
+        data["setting_number"] if "setting_number" in data else None
+    )
     prompt_type = data["prompt_type"]
     user_id = callback.from_user.id
-
-    await state.update_data(selected_model_id=model_id)
 
     service = await get_user_settings_service()
     user_db_id = await service.repo.get_user_db_id(user_id)
@@ -538,7 +547,10 @@ async def user_handle_select_model_for_prompt(
         keyboard = users_keyboards.prompt_manage_keyboard(prompt_exists=True)
     else:
         text = f"❌ {prompt_type.capitalize()} промпт пока не задан."
-        keyboard = users_keyboards.prompt_manage_keyboard(prompt_exists=False)
+        keyboard = users_keyboards.prompt_manage_keyboard(
+            prompt_exists=False,
+            negative_prompt_type=True,
+        )
 
     await safe_edit_message(
         callback.message,
@@ -559,7 +571,9 @@ async def user_handle_prompt_edit(callback: CallbackQuery, state: FSMContext):
 
 async def user_handle_prompt_input(message: types.Message, state: FSMContext):
     data = await state.get_data()
-    setting_number = data["setting_number"]
+    setting_number = (
+        data["setting_number"] if "setting_number" in data else None
+    )
     model_id = data["selected_model_id"]
     prompt_type = data["prompt_type"]
     user_id = message.from_user.id
@@ -568,13 +582,28 @@ async def user_handle_prompt_input(message: types.Message, state: FSMContext):
     user_db_id = await service.repo.get_user_db_id(user_id)
 
     prompt_text = message.text.strip()
-    await service.user_add_prompt(
+    user_prompt = await service.user_get_prompt(
         user_db_id,
         model_id,
         setting_number,
-        prompt_text,
         prompt_type=prompt_type,
     )
+    if user_prompt:
+        await service.user_edit_prompt(
+            user_db_id,
+            model_id,
+            setting_number,
+            prompt_text,
+            prompt_type=prompt_type,
+        )
+    else:
+        await service.user_add_prompt(
+            user_db_id,
+            model_id,
+            setting_number,
+            prompt_text,
+            prompt_type=prompt_type,
+        )
 
     await safe_edit_message(message, "✅ Промпт успешно сохранён.")
     await state.clear()
@@ -586,7 +615,9 @@ async def user_handle_prompt_delete(
     state: FSMContext,
 ):
     data = await state.get_data()
-    setting_number = data["setting_number"]
+    setting_number = (
+        data["setting_number"] if "setting_number" in data else None
+    )
     model_id = data["selected_model_id"]
     prompt_type = data["prompt_type"]
     user_id = callback.from_user.id

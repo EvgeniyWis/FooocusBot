@@ -71,6 +71,7 @@ async def safe_edit_message(
                 if (
                     "message to edit not found" in e.message.lower()
                     or "message is not modified" in e.message.lower()
+                    or "message can't be edited" in e.message.lower()
                 ):
                     return await safe_send_message(
                         safe_text,
