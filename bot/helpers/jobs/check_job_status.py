@@ -127,4 +127,14 @@ async def check_job_status(
     if images_output == []:  # Если их нет, то кидаем ошибку
         raise Exception("Не удалось сгенерировать изображения")
 
+    # Обновляем сообщение для актуальных данных
+    if state:
+        await edit_job_message(
+            job_id,
+            message_id,
+            state,
+            response_json,
+            user_id,
+        )
+
     return response_json
