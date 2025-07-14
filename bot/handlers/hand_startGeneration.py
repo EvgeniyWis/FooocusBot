@@ -90,7 +90,7 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(multi_select_mode=False)
     await editMessageOrAnswer(
         call,
-        "✅ Тип генерации успешно выбран! Теперь выбери какую настройку будешь использовать:",
+        text.GET_GENERATIONS_SUCCESS_TEXT,
         reply_markup=start_generation_keyboards.selectSettingKeyboard(
             is_test_generation=False,
         ),
@@ -99,8 +99,19 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
 
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
+    # Получаем данные из стейта
+    state_data = await state.get_data()
+
     # Очищаем стейт
     await state.clear()
+
+    # Обновляем только важные значения в стейте после очистки
+    initial_state = {
+        "multi_select_mode": state_data.get("multi_select_mode", False),
+        "prompt_exist": state_data.get("prompt_exist", False),
+        "generations_type": state_data.get("generations_type", ""),
+    }
+    await state.update_data(**initial_state)
 
     # Если выбрана конкретная модель, то просим ввести название модели
     if call.data == "select_setting|specific_model":
@@ -116,9 +127,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Если выбрана другая настройка, то продолжаем генерацию
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
-    state_data = await state.get_data()
-    generations_type = state_data.get("generations_type", "")
     prompt_exist = state_data.get("prompt_exist", False)
+    generations_type = state_data.get("generations_type", "")
     await state.update_data(specific_model=False)
 
     # Если выбрана настройка для теста, то продолжаем генерацию в тестовом режиме
