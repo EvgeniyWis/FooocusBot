@@ -51,6 +51,10 @@ async def register_commands():
             command="/admin",
             description="Управление настройками",
         ),
+        BotCommand(
+            command="/clear",
+            description="Полная очистка стейта",
+        ),
     ]
     await bot.set_my_commands(commands)
 

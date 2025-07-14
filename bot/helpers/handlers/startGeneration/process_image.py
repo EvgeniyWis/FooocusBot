@@ -18,6 +18,7 @@ from bot.helpers.handlers.startGeneration.image_processes import (
 from bot.logger import logger
 from bot.settings import settings
 from bot.storage import get_redis_storage
+from bot.utils import retryOperation
 
 
 async def process_image(
@@ -84,7 +85,15 @@ async def process_image(
             logger.info(f"Запускаем upscale для ({model_name}, {image_index})")
 
             if settings.UPSCALE_MODE:
-                await process_upscale_image(call, state, image_index, model_name)
+                await retryOperation(
+                    process_upscale_image,
+                    3,
+                    2,
+                    call,
+                    state,
+                    image_index,
+                    model_name,
+                )
 
             logger.info(
                 f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}",

@@ -5,6 +5,7 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from keyboards.startGeneration.keyboards import done_typing_keyboard
+from pydantic import ValidationError
 from utils.handlers.messages import safe_edit_message
 
 from bot.helpers import text
@@ -122,6 +123,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "model_prompts_for_generation": [],
         "randomizer_prompts": [],
         "prompt_for_images": "",
+        "jobs": {},
+        "total_jobs_count": 0,
     }
 
     # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
@@ -224,7 +227,6 @@ async def start_write_prompts_for_models_multiline_input(
     else:
         # Берём только модели из выбранной настройки
         all_data_arrays = getAllDataArrays()
-        logger.info([len(arr) for arr in all_data_arrays])
         setting_index = int(setting_number) - 1
 
         # Считаем смещение как сумму длин всех предыдущих сетов
@@ -493,7 +495,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
 
 async def start_multi_prompt_input_mode(
-    message: types.Message,
+    callback: types.CallbackQuery,
     state: FSMContext,
 ):
     await state.set_state(MultiPromptInputState.collecting_prompt_parts)
@@ -501,9 +503,9 @@ async def start_multi_prompt_input_mode(
         prompt_chunks=[],
     )
 
-    await safe_send_message(
+    await safe_edit_message(
         text.WRITE_MULTI_PROMPTS_FOR_SPECIFIC_GENERATION,
-        message,
+        callback.message,
         reply_markup=done_typing_keyboard(),
     )
 
@@ -519,6 +521,7 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
         last_chat_id=message.chat.id,
         last_message_id=message.message_id,
     )
+    await safe_send_message("✅ Сообщение успешно обработано", message)
 
 
 @router.callback_query(lambda c: c.data == "done_typing")
@@ -528,23 +531,38 @@ async def finish_prompt_input(
 ):
     data = await state.get_data()
     full_text = "\n".join(data.get("prompt_chunks", []))
+    prompt_chunks = data.get("prompt_chunks", [])
+    if not prompt_chunks:
+        await safe_edit_message(
+            callback.message,
+            "❗️Вы не ввели ни одного промпта.",
+        )
+        return
 
-    user_id = data.get("last_user_id")
-    chat_id = data.get("last_chat_id")
+    user_id = data.get("last_user_id") or callback.from_user.id
+    chat_id = data.get("last_chat_id") or callback.message.chat.id
 
     await safe_edit_message(
         callback.message,
         "🧠 Обрабатываю длинный промпт...",
     )
-
-    # Создаём фейковое сообщение
-    fake_message = types.Message(
-        message_id=callback.message.message_id,
-        date=callback.message.date,
-        chat=types.Chat(id=chat_id, type="private"),
-        from_user=callback.from_user,
-        text=full_text,
-    )
+    try:
+        fake_message = types.Message(
+            message_id=callback.message.message_id,
+            date=callback.message.date,
+            chat=types.Chat(id=chat_id, type="private"),
+            from_user=callback.from_user,
+            text=full_text,
+        )
+    except ValidationError:
+        logger.exception(
+            f"Не удалось собрать сообщение finish_prompt_input для user_id={user_id}, chat_id={chat_id}",
+        )
+        await safe_edit_message(
+            callback.message,
+            "❗️Произошла ошибка при обработке промпта.",
+        )
+        return
 
     current_state = await state.get_state()
 
@@ -570,7 +588,7 @@ async def send_message_with_info_for_write_prompts_for_models(
     callback: types.CallbackQuery,
     state: FSMContext,
 ):
-    await safe_send_message(
+    await safe_edit_message(
         text=text.WRITE_MODELS_NAME_TEXT,
         message=callback.message,
     )
@@ -859,7 +877,9 @@ def hand_add():
     )
     router.message.register(
         write_prompts_for_models,
-        StartGenerationState.write_multi_prompts_for_models,
+        StateFilter(
+            StartGenerationState.write_multi_prompts_for_models,
+        ),
     )
     router.callback_query.register(
         send_message_with_info_for_write_prompts_for_models,
@@ -872,11 +892,13 @@ def hand_add():
 
     router.message.register(
         handle_chunk_input,
-        MultiPromptInputState.collecting_model_prompts_for_settings,
-        MultiPromptInputState.collecting_prompt_parts
+        StateFilter(
+            MultiPromptInputState.collecting_model_prompts_for_settings,
+            MultiPromptInputState.collecting_prompt_parts,
+        ),
     )
 
     router.message.register(
         write_models_for_specific_generation,
-        StartGenerationState.write_models_for_specific_generation
+        StateFilter(StartGenerationState.write_models_for_specific_generation),
     )

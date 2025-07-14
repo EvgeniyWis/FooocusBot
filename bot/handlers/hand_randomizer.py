@@ -2,6 +2,8 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from keyboards.randomizer.keyboards import done_typing_keyboard_for_prompts
+from logger import logger
+from pydantic import ValidationError
 
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration import generateImagesInHandler
@@ -56,7 +58,8 @@ async def handle_randomizer_buttons(
             # Отправляем сообщение о генерации
             user_id = call.from_user.id
             model_indexes_for_generation = state_data.get(
-                "model_indexes_for_generation", []
+                "model_indexes_for_generation",
+                [],
             )
             if len(model_indexes_for_generation) == 0:
                 setting_number = state_data.get("setting_number", 1)
@@ -347,6 +350,7 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
         last_chat_id=message.chat.id,
         last_message_id=message.message_id,
     )
+    await safe_send_message("✅ Сообщение успешно обработано", message)
 
 
 @router.callback_query(lambda c: c.data == "done_typing_randomize_prompts")
@@ -356,22 +360,38 @@ async def finish_prompt_input(
 ):
     data = await state.get_data()
     full_text = "\n".join(data.get("prompt_chunks", []))
+    prompt_chunks = data.get("prompt_chunks", [])
+    if not prompt_chunks:
+        await safe_edit_message(
+            callback.message,
+            "❗️Вы не ввели ни одного промпта.",
+        )
+        return
 
-    user_id = data.get("last_user_id")
-    chat_id = data.get("last_chat_id")
+    user_id = data.get("last_user_id") or callback.from_user.id
+    chat_id = data.get("last_chat_id") or callback.message.chat.id
 
     await safe_edit_message(
         callback.message,
         "🧠 Обрабатываю длинный промпт...",
     )
-
-    fake_message = types.Message(
-        message_id=callback.message.message_id,
-        date=callback.message.date,
-        chat=types.Chat(id=chat_id, type="private"),
-        from_user=callback.from_user,
-        text=full_text,
-    )
+    try:
+        fake_message = types.Message(
+            message_id=callback.message.message_id,
+            date=callback.message.date,
+            chat=types.Chat(id=chat_id, type="private"),
+            from_user=callback.from_user,
+            text=full_text,
+        )
+    except ValidationError:
+        logger.exception(
+            f"Не удалось собрать сообщение finish_prompt_input для user_id={user_id}, chat_id={chat_id}",
+        )
+        await safe_edit_message(
+            callback.message,
+            "❗️Произошла ошибка при обработке промпта.",
+        )
+        return
 
     await write_one_message_for_randomizer(fake_message, state)
 
@@ -493,5 +513,7 @@ def hand_add():
 
     router.message.register(
         handle_chunk_input,
-        StateFilter(RandomizerState.write_multi_messages_for_prompt_for_randomizer),
+        StateFilter(
+            RandomizerState.write_multi_messages_for_prompt_for_randomizer,
+        ),
     )
