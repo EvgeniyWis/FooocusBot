@@ -27,7 +27,7 @@ logger.propagate = False
 
 # Используем наш кастомный форматтер
 formatter = MoscowFormatter(
-    "%(name)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
+    "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
 )
 
 
