@@ -122,6 +122,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         "model_prompts_for_generation": [],
         "randomizer_prompts": [],
         "prompt_for_images": "",
+        "jobs": {},
+        "total_jobs_count": 0,
     }
 
     # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
