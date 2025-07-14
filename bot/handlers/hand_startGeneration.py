@@ -508,8 +508,6 @@ async def start_multi_prompt_input_mode(
     )
 
 
-@router.message(MultiPromptInputState.collecting_model_prompts_for_settings)
-@router.message(MultiPromptInputState.collecting_prompt_parts)
 async def handle_chunk_input(message: types.Message, state: FSMContext):
     data = await state.get_data()
     chunks = data.get("prompt_chunks", [])
@@ -581,7 +579,6 @@ async def send_message_with_info_for_write_prompts_for_models(
     )
 
 
-@router.message(StartGenerationState.write_models_for_specific_generation)
 async def write_models_for_specific_generation(
     message: types.Message,
     state: FSMContext,
@@ -871,4 +868,15 @@ def hand_add():
     router.callback_query.register(
         start_multi_prompt_input_mode,
         lambda call: call.data.startswith("specific_generation|more_prompts"),
+    )
+
+    router.message.register(
+        handle_chunk_input,
+        MultiPromptInputState.collecting_model_prompts_for_settings,
+        MultiPromptInputState.collecting_prompt_parts
+    )
+
+    router.message.register(
+        write_models_for_specific_generation,
+        StartGenerationState.write_models_for_specific_generation
     )

@@ -334,7 +334,6 @@ async def start_multi_prompt_input_mode(
     )
 
 
-@router.message(RandomizerState.write_multi_messages_for_prompt_for_randomizer)
 async def handle_chunk_input(message: types.Message, state: FSMContext):
     data = await state.get_data()
     chunks = data.get("prompt_chunks", [])
@@ -490,4 +489,9 @@ def hand_add():
     router.message.register(
         write_one_message_for_randomizer,
         StateFilter(RandomizerState.write_one_message_for_randomizer),
+    )
+
+    router.message.register(
+        handle_chunk_input,
+        StateFilter(RandomizerState.write_multi_messages_for_prompt_for_randomizer),
     )
