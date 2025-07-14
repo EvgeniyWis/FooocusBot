@@ -40,6 +40,15 @@ def my_rotator(source, dest):
     os.makedirs(Path(dest).parent, exist_ok=True)
     shutil.copy2(source, dest)
     open(source, "w").close()
+    cleanup_old_backups()
+
+
+def cleanup_old_backups(max_backups=7):
+    backups = sorted(backup_dir.iterdir(), key=os.path.getmtime)
+    if len(backups) > max_backups:
+        for old in backups[:-max_backups]:
+            logger.info(f"Removing old backup: {old}")
+            shutil.rmtree(old)
 
 
 if not logger.handlers:
