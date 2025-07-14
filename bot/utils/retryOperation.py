@@ -7,7 +7,7 @@ from bot.logger import logger
 
 
 # Функция для повторной операции
-async def retryOperation(operation, max_attempts=3, delay=2, *args):
+async def retryOperation(operation, max_attempts, delay, *args):
     for attempt in range(max_attempts):
         try:
             return await operation(*args)
