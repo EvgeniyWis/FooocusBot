@@ -29,6 +29,7 @@ async def quick_generate_nsfw_video(
     state: FSMContext,
 ):
     model_name = call.data.split("|")[1]
+    image_index = int(call.data.split("|")[2])
 
     if not call.message.photo:
         logger.error(f"Для {model_name} не нашлось изображение в сообщении")
@@ -38,18 +39,16 @@ async def quick_generate_nsfw_video(
     photo = call.message.photo[-1]
     file_id = photo.file_id
 
-    state_data = await state.get_data()
-
     await state.update_data(
         model_name_for_nsfw_video_generation=model_name,
         image_file_id_for_nsfw_img2video=file_id,
-        saved_images_urls=state_data.get("saved_images_urls", []),
     )
 
     await process_write_prompt(
         call,
         state,
         model_name,
+        image_index,
         is_nsfw_generation=True,
     )
 

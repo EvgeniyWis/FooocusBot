@@ -10,6 +10,7 @@ from bot.utils.googleDrive.files import (
     getGoogleDriveFileID,
 )
 from bot.utils.httpx import httpx_post
+from bot.utils.videos.errors_texts import NOT_ENOUGH_MONEY_ERROR_TEXT
 
 
 async def start_generate_video(
@@ -89,8 +90,6 @@ async def start_generate_video(
             )
 
         # Обрабатываем ошибку недостаточного баланса
-        NOT_ENOUGH_MONEY_ERROR_TEXT = "У Вас недостаточно средств на балансе. Подтвердите свой номер телефона и мы начислим Вам стартовый баланс."
-
         if json["error"] == NOT_ENOUGH_MONEY_ERROR_TEXT:
             try:
                 await bot.send_message(
@@ -98,7 +97,7 @@ async def start_generate_video(
                     text.KLING_INSUFFICIENT_BALANCE_TEXT,
                 )
             finally:
-                raise Exception(text.KLING_INSUFFICIENT_BALANCE_TEXT)
+                raise SystemError(text.KLING_INSUFFICIENT_BALANCE_TEXT)
 
         raise Exception(json["error"])
 

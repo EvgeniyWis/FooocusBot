@@ -270,3 +270,35 @@ def selectMultiImageKeyboard(
         ],
     )
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+
+
+def done_typing_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Готово",
+                    callback_data="done_typing",
+                ),
+            ],
+        ],
+    )
+
+
+def select_type_specific_generation():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="1️⃣ Обычная генерация",
+                    callback_data="specific_generation|one_prompt",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔢 Генерация с уникальным промптом",
+                    callback_data="specific_generation|more_prompts",
+                ),
+            ],
+        ],
+    )

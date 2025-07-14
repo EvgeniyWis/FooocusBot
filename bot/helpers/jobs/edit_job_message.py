@@ -1,5 +1,6 @@
 from aiogram.fsm.context import FSMContext
 
+from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
 from bot.InstanceBot import bot
 from bot.helpers import text
 from bot.helpers.jobs.rate_limiter_for_edit_job_message import safe_bot_edit_job_message
@@ -28,7 +29,12 @@ async def edit_job_message(
     if "jobs" in state_data:
         jobs = state_data.get("jobs", {})
         total_jobs_count = state_data.get("total_jobs_count", 0)
-        jobs[job_id] = response_json["status"]
+
+        if response_json == CANCELLED_JOB_TEXT:
+            jobs[job_id] = "CANCELLED"
+        else:
+            jobs[job_id] = response_json["status"]
+
         await state.update_data(jobs=jobs)
 
         # Получаем стейт и изменяем сообщение
@@ -61,11 +67,17 @@ async def edit_job_message(
         await state.update_data(total_images_count=total_images_count)
 
         try:
+            message_text = (
+                text.GENERATE_IMAGES_PROCESS_TEXT
+                if total_jobs_count == 1
+                else text.GENERATE_IMAGES_PROCESS_TEXT_FOR_MANY_MODELS
+            )
+
             await safe_bot_edit_job_message(
                 bot,
                 chat_id=user_id,
                 message_id=message_id,
-                safe_text=text.GENERATE_IMAGES_PROCESS_TEXT.format(
+                safe_text=message_text.format(
                     success_images_count,
                     error_images_count,
                     cancelled_images_count,

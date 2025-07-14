@@ -15,6 +15,12 @@ class StartGenerationState(StatesGroup):
     ask_video_length_input = State()
     choose_generated_video = State()
     write_multi_prompts_for_models = State()
+    write_models_for_specific_generation = State()
+
+
+class MultiPromptInputState(StatesGroup):
+    collecting_prompt_parts = State()
+    collecting_model_prompts_for_settings = State()
 
 
 class UserLoraEditStates(StatesGroup):
