@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict
 
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
+from zoneinfo import ZoneInfo
 
 from bot.InstanceBot import bot
 from bot.logger import logger
@@ -25,7 +26,8 @@ class ErrorHandlingMiddleware(BaseMiddleware):
             error_message = "❌ Произошла ошибка:\n\n"
             error_message += f"🔴 Тип ошибки: {type(e).__name__}\n"
             error_message += f"📝 Описание: {str(e)}\n\n"
-            error_message += f"🕒 Время ошибки: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+            moscow_time = datetime.now(ZoneInfo("Europe/Moscow")).strftime('%Y-%m-%d %H:%M:%S')
+            error_message += f"🕒 Время ошибки: {moscow_time}\n\n"
 
             # Добавляем информацию о пользователе, если доступна
             if hasattr(event, "from_user"):
