@@ -46,6 +46,10 @@ async def register_commands():
             command="/stop",
             description="Остановить генерацию изображений",
         ),
+        BotCommand(
+            command="/clear",
+            description="Очистить стейт",
+        ),
     ]
     await bot.set_my_commands(commands)
 
