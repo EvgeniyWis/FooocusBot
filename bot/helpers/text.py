@@ -413,7 +413,7 @@ time: morning/afternoon/evening;
 """
 
 # Сообщение об успешном вводе одного сообщения для рандомайзера
-ONE_MESSAGE_FOR_RANDOMIZER_SUCCESS_TEXT = "✅ Сообщение успешно обработано!"
+ONE_MESSAGE_FOR_RANDOMIZER_SUCCESS_TEXT = "✅ Обработка переменных завершилась"
 
 # Текст при ошибке ввода одного сообщения для рандомайзера
 ONE_MESSAGE_FOR_RANDOMIZER_ERROR_TEXT = "Произошла ошибка при обработке сообщения. Пожалуйста, проверьте формат и попробуйте снова."

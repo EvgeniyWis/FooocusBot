@@ -1,13 +1,13 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from bot.logger import logger
 
 from bot.helpers import text
-from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
 )
+from bot.helpers.generateImages.generateImageBlock import generateImageBlock
+from bot.logger import logger
 from bot.utils.handlers import getDataInDictsArray
 from bot.utils.handlers.messages.editMessageOrAnswer import editMessageOrAnswer
 
@@ -39,7 +39,7 @@ async def regenerateImage(
         randomizer_prompts, model_name
     )
 
-    prompt_for_images = state_data.get("prompt_for_images", "")
+    prompt_for_images = state_data.get("prompt_for_images", None)
 
     prompts_for_regenerated_models = state_data.get(
         "prompts_for_regenerated_models", []
