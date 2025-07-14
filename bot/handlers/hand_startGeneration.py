@@ -495,7 +495,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
 
 async def start_multi_prompt_input_mode(
-    callback: types.CallbackQuery,
+    message: types.Message,
     state: FSMContext,
 ):
     await state.set_state(MultiPromptInputState.collecting_prompt_parts)
@@ -503,9 +503,9 @@ async def start_multi_prompt_input_mode(
         prompt_chunks=[],
     )
 
-    await safe_edit_message(
+    await safe_send_message(
         text.WRITE_MULTI_PROMPTS_FOR_SPECIFIC_GENERATION,
-        callback.message,
+        message,
         reply_markup=done_typing_keyboard(),
     )
 
@@ -588,7 +588,7 @@ async def send_message_with_info_for_write_prompts_for_models(
     callback: types.CallbackQuery,
     state: FSMContext,
 ):
-    await safe_edit_message(
+    await safe_send_message(
         text=text.WRITE_MODELS_NAME_TEXT,
         message=callback.message,
     )
