@@ -84,8 +84,9 @@ def setting4_get_data_array():
             "melissaxlaine",
             "14zTS2FKFmtcL-ZCYYL76paE0ZjpAJCLR",  # Updated picture folder_id
             "1Ni16IB-TyaeHNcVWdh9WALvWERYkOEsw",  # Updated videos folder_id
-            """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18, sorority girl, black hair, bob haircut, medium-large natural breasts, big butt, tan skin, green eyes""",
+            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+
+            real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, volumnous black hair, platinum-blonde hair, short hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
             [2, 1.65, -0.80, 1.75, 1.50, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
