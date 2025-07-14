@@ -409,6 +409,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     data = await getDataByModelName(model_name)
 
     # Удаляем медиагруппу
+    logger.info(f"Удаляем медиагруппу для модели {model_name}")
     await deleteMessageFromState(
         state,
         "imageGeneration_mediagroup_messages_ids",
@@ -580,8 +581,6 @@ async def finish_prompt_input(
             state=state,
             text_input=full_text,
         )
-
-    await state.clear()
 
 
 async def send_message_with_info_for_write_prompts_for_models(

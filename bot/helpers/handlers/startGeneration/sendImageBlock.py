@@ -1,5 +1,6 @@
 import asyncio
 import shutil
+import traceback
 
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
@@ -20,7 +21,6 @@ from bot.utils.handlers import (
 from bot.utils.handlers.messages import (
     safe_send_media_group,
 )
-import traceback
 
 
 # Функция для отправки сообщения со сгенерируемыми изображениями
@@ -48,7 +48,7 @@ async def sendImageBlock(
         for idx, media in enumerate(media_group_message):
             data_for_update = {
                 "model_name": model_name,
-                "image_index": idx,
+                "image_index": idx + 1,
                 "message_id": media.message_id,
             }
             await appendDataToStateArray(
@@ -57,6 +57,7 @@ async def sendImageBlock(
                 data_for_update,
                 unique_keys=("model_name", "image_index"),
             )
+
     except Exception as e:
         traceback.print_exc()
         logger.error(f"Ошибка при отправке медиагруппы: {e}")
