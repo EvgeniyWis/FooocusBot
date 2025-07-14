@@ -99,40 +99,8 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
 
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
-    # Получаем текущие данные стейта для извлечения переменных рандомайзера
-    current_state_data = await state.get_data()
-    variable_names_for_randomizer = current_state_data.get(
-        "variable_names_for_randomizer",
-        [],
-    )
-
-    # Создаем базовый initial_state
-    initial_state = {
-        "generation_step": 1,
-        "prompts_for_regenerated_models": [],
-        "regenerated_models": [],
-        "model_indexes_for_generation": [],
-        "saved_images_urls": [],
-        "faceswap_generated_models": [],
-        "imageGeneration_mediagroup_messages_ids": [],
-        "videoGeneration_messages_ids": [],
-        "process_images_steps": [],
-        "upscale_progress_messages": [],
-        "variable_names_for_randomizer": [],
-        "generated_video_paths": [],
-        "model_prompts_for_generation": [],
-        "randomizer_prompts": [],
-        "prompt_for_images": "",
-        "jobs": {},
-        "total_jobs_count": 0,
-    }
-
-    # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
-    for variable_name in variable_names_for_randomizer:
-        key = f"randomizer_{variable_name}_values"
-        initial_state[key] = []
-
-    await state.update_data(**initial_state)
+    # Очищаем стейт
+    await state.clear()
 
     # Если выбрана конкретная модель, то просим ввести название модели
     if call.data == "select_setting|specific_model":
