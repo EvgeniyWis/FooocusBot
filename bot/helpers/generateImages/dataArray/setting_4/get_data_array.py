@@ -52,8 +52,9 @@ def setting4_get_data_array():
             "britneymonroe.xo",
             "1cD32Ya4PHREjl4QtyljtNI5UkFDY9BPL",  # Updated picture folder_id
             "1RRJT7qT8ROwpVCNkNJQrqJdr-vdagvlz",  # Updated videos folder_id
-            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
-            1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, tan skin, green eyes""",
+            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+
+            real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, black hair, long hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, tan skin, skinny, cute, big lips, bright-green eyes, (((extra-wide hips))), ((extra-thin waist))""",
             [2, 2.65, -1.55, 2.25, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
@@ -206,8 +207,9 @@ def setting4_get_data_array():
             "wendy_rosemont",
             "1dhtAJziIgO8F9rETE8G9nWWcAzkrPcQF",  # Updated picture folder_id
             "15ipSjiwivPZYOHebF-8hjtGFTmw2SVVb",  # Updated videos folder_id
-            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
-            1girl, 18, sorority girl, black hair, medium-large natural breasts, big butt, extra tan skin, blue eyes""",
+            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+
+            real_beauty, igbaddie, solo, 1girl, 18 years old, sorority girl, highlighted black hair, long straight hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, high height, ((extra-tan skin)), skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist))""",
             [2, 1.20, -1.70, 2.50, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
         ),
         setting4_generate_data(
