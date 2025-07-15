@@ -106,9 +106,11 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             return
         
     else:
-        temp_path = state_data.get(
-            "temp_path_for_video_generation",
+        img2video_temp_paths_for_with_model_names = state_data.get(
+            "img2video_temp_paths_for_with_model_names", {}
         )
+
+        temp_path = img2video_temp_paths_for_with_model_names.get(model_name, None)
 
     # Удаляем сообщение пользователя
     await message.delete()

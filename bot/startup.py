@@ -12,7 +12,7 @@ from bot.helpers.handlers.startGeneration import process_image
 from bot.helpers.handlers.videoGeneration import process_video
 from bot.InstanceBot import bot, dp, redis_client, storage
 from bot.logger import logger
-from bot.middleware import ErrorHandlingMiddleware
+from bot.middleware import ErrorHandlingMiddleware, MediaGroupMiddleware
 from bot.services.comfyui.heating_models import heating_comfyui_models
 from bot.settings import settings
 from bot.storage import get_redis_storage, init_redis_storage
@@ -79,6 +79,7 @@ async def on_startup():
 
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())
+    dp.message.middleware(MediaGroupMiddleware())
 
     await bot.delete_webhook(drop_pending_updates=True)
 
