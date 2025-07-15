@@ -554,7 +554,7 @@ async def finish_prompt_input(
             state=state,
         )
     else:
-        await write_model_name_for_generation(
+        await write_model_for_generation(
             message=fake_message,
             state=state,
             text_input=full_text,
@@ -587,7 +587,15 @@ async def write_models_for_specific_generation(
         )
         return
 
-    model_indexes = message_text.split(",")
+    model_indexes = [x.strip() for x in message_text.split(",")]
+
+    # Проверяем на дублирование номеров моделей
+    if len(model_indexes) != len(set(model_indexes)):
+        await safe_send_message(
+            text=text.DUPLICATE_NUMBERS_TEXT,
+            message=message,
+        )
+        return
 
     all_data_arrays = getAllDataArrays()
     all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
@@ -618,7 +626,7 @@ async def write_models_for_specific_generation(
         )
 
 
-async def write_model_name_for_generation(
+async def write_model_for_generation(
     message: types.Message,
     state: FSMContext,
     text_input: str = None,
@@ -628,102 +636,48 @@ async def write_model_name_for_generation(
     # 1. Новый формат: 1 - текст
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
 
-    if matches:
-        model_prompts = {}
-        for index, prompt in matches:
-            if not index.isdigit():
-                continue
-            if not (1 <= int(index) <= 100):
-                await safe_send_message(
-                    text=text.MODEL_NOT_FOUND_TEXT.format(index),
-                    message=message,
-                )
-                return
-            model_prompts[str(index)] = prompt.strip()
-
-        data_for_update = {
-            f"{getModelNameByIndex(str(index))}": prompt
-            for index, prompt in model_prompts.items()
-        }
-        await appendDataToStateArray(
-            state,
-            "model_prompts_for_generation",
-            data_for_update,
-        )
-
+    if not matches:
         await safe_send_message(
-            text="✅ Промпты по моделям получены, начинаю генерацию...",
+            text=text.WRONG_FORMAT_TEXT,
             message=message,
-        )
-
-        await generateImagesInHandler(
-            prompt=model_prompts,
-            message=message,
-            state=state,
-            user_id=message.from_user.id,
-            is_test_generation=False,
-            setting_number="individual",
         )
         return
 
-    # 2. Старый формат: одна модель или через запятую
-
-    # Проверяем, что введённое значение является числом
-    model_indexes = message.text.split(",")
-    if len(model_indexes) == 1:
-        if not message.text.isdigit():
+    model_prompts = {}
+    for index, prompt in matches:
+        if not index.isdigit():
+            continue
+        if not (1 <= int(index) <= 100):
             await safe_send_message(
-                text=text.NOT_NUMBER_TEXT,
+                text=text.MODEL_NOT_FOUND_TEXT.format(index),
                 message=message,
             )
             return
-        model_indexes = [message.text]
+        model_prompts[str(index)] = prompt.strip()
 
-    # Получаем данные всех моделей
-    all_data_arrays = getAllDataArrays()
-    all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
-
-    # Проверяем, существует ли такие модели
-    for model_index in model_indexes:
-        model_index = model_index.strip()
-
-        if not model_index.isdigit():
-            await safe_send_message(
-                text=text.NOT_NUMBER_TEXT,
-                message=message,
-            )
-            return
-
-        # Если индекс больше числа моделей или меньше 1, то просим ввести другой индекс
-        if int(model_index) > all_data_arrays_length or int(model_index) < 1:
-            await safe_send_message(
-                text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
-                message=message,
-            )
-            return
-
-    await state.update_data(model_indexes_for_generation=model_indexes)
-    # Всё валидно — идём по старой логике
-    await state.update_data(
-        model_indexes_for_generation=model_indexes,
+    data_for_update = {
+        f"{getModelNameByIndex(str(index))}": prompt
+        for index, prompt in model_prompts.items()
+    }
+    await appendDataToStateArray(
+        state,
+        "model_prompts_for_generation",
+        data_for_update,
     )
 
-    await state.set_state(None)
+    await safe_send_message(
+        text="✅ Промпты по моделям получены, начинаю генерацию...",
+        message=message,
+    )
 
-    if len(model_indexes) == 1:
-        await safe_send_message(
-            text=text.GET_MODEL_INDEX_SUCCESS_TEXT,
-            message=message,
-        )
-
-        await state.set_state(StartGenerationState.write_prompt_for_images)
-
-    else:
-        await safe_send_message(
-            text=text.GET_MODELS_INDEXES_AND_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
-            message=message,
-            reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard(),
-        )
+    await generateImagesInHandler(
+        prompt=model_prompts,
+        message=message,
+        state=state,
+        user_id=message.from_user.id,
+        is_test_generation=False,
+        setting_number="individual",
+    )
 
 
 # Обработка ввода нового промпта для перегенерации изображения
@@ -839,11 +793,6 @@ def hand_add():
     router.callback_query.register(
         select_image,
         lambda call: call.data.startswith("select_image"),
-    )
-
-    router.message.register(
-        write_model_name_for_generation,
-        StateFilter(StartGenerationState.write_model_name_for_generation),
     )
 
     router.message.register(

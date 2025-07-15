@@ -10,6 +10,7 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
 from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
+from bot.utils import retryOperation
 from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
@@ -66,7 +67,9 @@ async def process_faceswap_image(
         f"{image_index}.jpg",
     )
     logger.info(
-        f"[faceswap] START: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+        f"[faceswap] START: {local_faceswap_target_path} "
+        f"exists={os.path.exists(local_faceswap_target_path)} | "
+        f"dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
     # Путь для передачи в facefusion_swap (виден внутри facefusion-контейнера)
     faceswap_target_path = f"/facefusion/.assets/images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -155,7 +158,6 @@ async def process_faceswap_image(
             )
 
             try:
-                # Логируем содержимое папки temp для диагностики
                 if temp_user_dir.exists():
                     logger.info(
                         f"[process_faceswap_image] Содержимое папки {temp_user_dir}: {os.listdir(temp_user_dir)}",
@@ -167,11 +169,13 @@ async def process_faceswap_image(
 
                 # Проверяем, существует ли файл для faceswap до запуска
                 logger.info(
-                    f"[process_faceswap_image] Проверка файла: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)}",
+                    f"[process_faceswap_image] Проверка файла: "
+                    f"{local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)}",
                 )
                 if not os.path.exists(local_faceswap_target_path):
                     logger.error(
-                        f"[process_faceswap_image] Файл не найден: {local_faceswap_target_path} (model={model_name}, image_index={image_index}, user_id={user_id})",
+                        f"[process_faceswap_image] Файл не найден: {local_faceswap_target_path} "
+                        f"(model={model_name}, image_index={image_index}, user_id={user_id})",
                     )
                     await editMessageOrAnswer(
                         call,
@@ -182,35 +186,30 @@ async def process_faceswap_image(
                 # PIL check: Проверяем валидность изображения
                 try:
                     with Image.open(local_faceswap_target_path) as img:
-                        img.verify()  # Проверяет, что файл не поврежден
+                        img.verify()
                 except Exception as pil_exc:
                     logger.error(
-                        f"[process_faceswap_image] Файл невалиден или поврежден для faceswap: {local_faceswap_target_path} (model={model_name}, image_index={image_index}, user_id={user_id}) — {pil_exc}",
+                        f"[process_faceswap_image] Файл невалиден или поврежден "
+                        f"для faceswap: {local_faceswap_target_path} (model={model_name},"
+                        f" image_index={image_index}, user_id={user_id}) — {pil_exc}",
                     )
                     await editMessageOrAnswer(
                         call,
-                        f"❌ Изображение повреждено или невалидно для замены лица! (model={model_name}, image_index={image_index})",
+                        f"❌ Изображение повреждено или невалидно для замены лица! "
+                        f"(model={model_name}, image_index={image_index})",
                     )
                     return None
                 logger.info(
                     f"[process_faceswap_image] Путь для FaceFusion в контейнере: {faceswap_target_path}",
                 )
                 # Копирование больше не требуется, так как файл уже в нужном месте
-                try:
-                    result_path = await facefusion_swap(
-                        faceswap_source_path,
-                        faceswap_target_path,
-                    )
-                except ValueError as ve:
-                    # Обрабатываем ситуацию, когда лицо не найдено или подобные ситуации (например, изображение слишком сложное для обработки)
-                    logger.warning(
-                        f"[faceswap] Не удалось заменить лицо: {ve}",
-                    )
-                    await editMessageOrAnswer(
-                        call,
-                        "❌ Не удалось заменить лицо на изображении. Возможно, лицо не распознано или изображение слишком сложное для обработки.\nПопробуйте другое фото или модель.",
-                    )
-                    return None
+                result_path = await retryOperation(
+                    facefusion_swap,
+                    5,
+                    2,
+                    faceswap_source_path,
+                    faceswap_target_path,
+                )
             except Exception as e:
                 result_path = None
                 logger.error(
@@ -240,7 +239,8 @@ async def process_faceswap_image(
 
     # После генерации удаляем модель из стейта
     logger.info(
-        f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+        f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)}"
+        f" | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
     await asyncio.sleep(5)
     logger.info(
