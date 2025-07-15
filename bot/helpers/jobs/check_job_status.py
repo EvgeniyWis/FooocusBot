@@ -131,7 +131,7 @@ async def check_job_status(
         raise ValueError("Не удалось сгенерировать изображения")
 
     # Обновляем сообщение для актуальных данных
-    if state and setting_number != "individual":
+    if state and setting_number != "individual" and checkOtherJobs:
         await edit_job_message(
             job_id,
             message_id,
