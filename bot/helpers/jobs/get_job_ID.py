@@ -19,7 +19,7 @@ async def get_job_ID(
 
     # Обновляем данные о числе изображений, в зависимости от того, есть ли мультигенерация
     state_data = await state.get_data()
-    if state_data.get("multi_select_mode", False):
+    if state_data.get("multi_select_mode", False) and job_type == "image_generation":
         dataJSON["input"]["image_number"] = 10
 
     # Получаем id работы

@@ -128,7 +128,7 @@ async def check_job_status(
     images_output = response_json.get("output", [])
 
     if images_output == []:  # Если их нет, то кидаем ошибку
-        raise Exception("Не удалось сгенерировать изображения")
+        raise ValueError("Не удалось сгенерировать изображения")
 
     # Обновляем сообщение для актуальных данных
     if state and setting_number != "individual":

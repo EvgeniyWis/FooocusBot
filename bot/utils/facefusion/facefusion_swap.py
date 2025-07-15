@@ -47,6 +47,6 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
 
     # Проверяем, что файл существует
     if not os.path.exists(output_path):
-        raise FileNotFoundError(f"Facefusion не смог сделать замену лица для изображения!")
+        raise FileNotFoundError(f"Facefusion не смог корректно сохранить результат!")
 
     return str(output_path)
