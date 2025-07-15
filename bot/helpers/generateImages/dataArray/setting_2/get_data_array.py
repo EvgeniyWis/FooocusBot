@@ -29,7 +29,7 @@ def setting2_get_data_array():
             "1zBM9p3FCCmgguUcThyHBbf6K6KhmXkFu",
             """photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, brown hair, huge breasts, slim waist, big butt, tan skin, plump lips, smirk, green eyes""",
-            [1, 0.7, 2.05, 0.05, -0.15, -1.5],
+            [1, 0.7, 1.95, 0.05, -0.15, -1.5],
         ),
         setting2_generate_data(
             "gracelowell.xo",
@@ -151,7 +151,7 @@ def setting2_get_data_array():
             "14ct1gMKVGK1OPGZ2q8iqQgrFWbhHj9w7",
             "1UvY_xBYGajrDxF8wGa9QWB1jS2fmAC0r",
             """photorealistic portrait of an 18-year-old sorority girl with voluminous long black hair, slim waist, medium saggy breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright blue eyes, sharp facial features and cheekbones, high quality and detail.""",
-            [1, 0.7, 0.90, 1.85, 0.50, -1.5],
+            [1, 0.7, 1.10, 1.85, 0.50, -1.5],
         ),
         setting2_generate_data(
             "kiaravouxelle",
