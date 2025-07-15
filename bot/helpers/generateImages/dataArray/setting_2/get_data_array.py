@@ -12,7 +12,7 @@ def setting2_get_data_array():
             "1HR7TY0jrGPIAhDypg_r0Y66kVXJhhDOD",
             "11HAN_BmkTQ4mNLrxFGMy41aOmiaEeIuz",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             [1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -20,7 +20,7 @@ def setting2_get_data_array():
             "14J7JGQQ316sjgy92-CeUsQegYQ2EvXWB",
             "1OCGYFih05ttFbumU-3XANQLavV-S3Nep",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             [1, 0.7, 1.60, -0.20, -0.95, -1.50],
         ),
         setting2_generate_data(
@@ -28,7 +28,7 @@ def setting2_get_data_array():
             "1B7XLefvkicreqiVkSwOR2FLt3MgGwukz",
             "1zBM9p3FCCmgguUcThyHBbf6K6KhmXkFu",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, brown hair, huge breasts, slim waist, big butt, tan skin, plump lips, smirk, green eyes""",
+            1girl, 18 years old, brown hair, huge breasts, slim waist, tan skin, plump lips, smirk, green eyes""",
             [1, 0.7, 1.95, 0.05, -0.15, -1.5],
         ),
         setting2_generate_data(
@@ -50,7 +50,7 @@ def setting2_get_data_array():
             "1TpYq-vUwEmvsigJ3RT1QP9VUljI_-mku",
             "110w6pKu5Zq5Cky6-frbOvZNrfT_WD7pH",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Arabian, 18 years old, black hair, huge breasts, slim waist, big butt, tan skin, plump lips, smirk, brown eyes""",
+            1girl, Arabian, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, brown eyes""",
             [1, 0.7, 2.80, 1.2, -1.90, -1.5],
         ),
         setting2_generate_data(
@@ -58,7 +58,7 @@ def setting2_get_data_array():
             "1PL4Tt0mPku_YTzvPO3A9dJJSdCr7A7zR",
             "14HmC8DkLyPxpMltc8WCgl6d9tkOglSk8",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, blonde hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, green eyes""",
+            1girl, 18 years old, blonde hair, huge breasts, slim waist, tan skin, thin lips, smirk, green eyes""",
             [1, 0.7, 0.40, 0.50, -0.95, -1.50],
         ),
         setting2_generate_data(
@@ -66,7 +66,7 @@ def setting2_get_data_array():
             "1bdhLL4ebNDvC5p9aYsPH_cLW36I5TpIt",
             "1QsFUo6HcvAeJ3QfYkIOetam7mxBxDKOc",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, blonde hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, green eyes""",
+            1girl, 18 years old, blonde hair, huge breasts, slim waist, tan skin, thin lips, smirk, green eyes""",
             [1, 0.7, 2.00, 1.20, -2.70, -1.50],
         ),
         setting2_generate_data(
@@ -74,7 +74,7 @@ def setting2_get_data_array():
             "1gHWsxePxieyeO3aODCgMbTnAWinBx1uf",
             "1HFP8g1omdDjCwZ9wr8iYUiKDeTV1sLyx",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 30 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, plump lips, smirk, brown eyes""",
+            1girl, 30 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, brown eyes""",
             [1, 0.7, 1.00, 0.30, -1.20, -1.50],
         ),
         setting2_generate_data(
@@ -96,7 +96,7 @@ def setting2_get_data_array():
             "1r7V9A1SsP2VwVZviRjLRj--2-oQEsn6D",
             "16qNLt8yM1Nk7qkqlBrHZBqI2gf7h5JPG",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 30 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, plump lips, smirk, brown eyes""",
+            1girl, 30 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, brown eyes""",
             [1, 0.7, 1.00, -0.10, -0.60, -1.50],
         ),
         setting2_generate_data(
@@ -104,7 +104,7 @@ def setting2_get_data_array():
             "17ypsWKgYYWRr_GlgWXQAykS4RFTA7Wps",
             "1wMD9gBQt28DbymZiAo41Z7YqvNJkV3yg",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Asian, 18 years old, black hair, medium-large breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, Asian, 18 years old, black hair, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 2.75, 0.15, -1.30, -1.5],
         ),
         setting2_generate_data(
@@ -112,7 +112,7 @@ def setting2_get_data_array():
             "10Dz8-R72JyQdRLTzaxufaprFDaR9o7Ru",
             "14xNrMfQr2FwkuDN9c_4ylFDzNKr7dPt6",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Asian, 18 years old, brown hair, medium-large breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, Asian, 18 years old, brown hair, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 3.70, 1.35, -2.40, -1.50],
         ),
         setting2_generate_data(
@@ -120,7 +120,7 @@ def setting2_get_data_array():
             "1KM0JmCdk-ziXpODE6dRMCQHpMoqzOgJ8",
             "1Q3UfxE4SVOrkG9zyXNyZwxSzLkjjhXPL",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Asian, 18 years old, brown hair, medium-large breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, Asian, 18 years old, brown hair, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 3, 1.4, -0.30, -1.5],
         ),
         setting2_generate_data(
@@ -128,7 +128,7 @@ def setting2_get_data_array():
             "1g_AfLI9ShH3vNPrtkQP5HbQN7W--i9Dn",
             "1st9VqQ2l_3XL5osjj3fDCvZYq12twqD5",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, redhead, 18 years old, medium-large breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, redhead, 18 years old, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 2.25, 1.10, -1.70, -1.5],
         ),
         setting2_generate_data(
@@ -143,7 +143,7 @@ def setting2_get_data_array():
             "12MDLaLuq9O34xFyxLK0J-cGX78Oe6m3z",
             "14syrl5bzVnRUhh50UWBu_IOgj8I2UXXL",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, black hair, medium-large breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 0.90, 2.5, 0.50, -1.5],
         ),
         setting2_generate_data(
@@ -158,7 +158,7 @@ def setting2_get_data_array():
             "1Aqdez6nyqnwNFF8mctMzctHNM8X8E-c-",
             "1fYL2Z4zRNDJoakvxFKXXI3dXz59h57B9",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, medium-large breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 1.85, 1.35, -1.15, -1.5, 1.1],
         ),
         setting2_generate_data(
@@ -166,7 +166,7 @@ def setting2_get_data_array():
             "1FiDd9lNyvauj8tO68NL7bV98N-qNSwkg",
             "1DvfhRjMyDVmTj67hInJL_VbYiIc_iX6v",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 2.00, 1.00, -2.30, -1.50],
         ),
         setting2_generate_data(
@@ -174,7 +174,7 @@ def setting2_get_data_array():
             "1LXoGdm0aXZmSrasZKEsDCU2CserqBEzA",
             "1SCeL6HxRp-taF7ZyNft69fkesHMvnz5f",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 2.30, 1.20, -2.35, -1.50],
         ),
         setting2_generate_data(
@@ -182,7 +182,7 @@ def setting2_get_data_array():
             "1y-ZvB2v0wFM_GtBfmwlq1_NbXph3vJV7",
             "1xqj4WKi1-BGW-iy4KQmRU9NE6BnQxd7l",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 3.45, 0.05, -1.70, -1.5],
         ),
         setting2_generate_data(
@@ -190,7 +190,7 @@ def setting2_get_data_array():
             "17ocspnKJciStoBD95IenCv5JEZCbEa15",
             "1hyg6ft5FszXlzYZjYs15BO9FSRICQgEY",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Latina, 18 years old, brown hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, Latina, 18 years old, brown hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 1.10, 0.05, -1.70, -1.5],
         ),
         setting2_generate_data(
@@ -198,7 +198,7 @@ def setting2_get_data_array():
             "1HI2o_fXxKZHpuF2hXVQlNx3z8A1xlBnO",
             "1AdfM-qUOqUhKli4jzOJ9e-7UJV-YGhHH",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, Latina, 18 years old, black hair, huge breasts, slim waist, big butt, tan skin, thin lips, smirk, blue eyes""",
+            1girl, Latina, 18 years old, black hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             [1, 0.7, 3.80, 0.1, -3.00, -1.50],
         ),
     ]
