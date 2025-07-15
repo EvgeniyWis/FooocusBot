@@ -13,7 +13,6 @@ from bot.logger import logger
 from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.utils.retryOperation import retryOperation
 
 
 async def process_faceswap_image(
@@ -49,7 +48,9 @@ async def process_faceswap_image(
         model_name,
         call.message,
         text.FACE_SWAP_WAIT_TEXT.format(
-            image_index, model_name, model_name_index
+            image_index,
+            model_name,
+            model_name_index,
         ),
         image_index,
         call.message.message_id,
@@ -137,7 +138,9 @@ async def process_faceswap_image(
                 model_name,
                 call.message,
                 text.FACE_SWAP_PROGRESS_TEXT.format(
-                    image_index, model_name, model_name_index
+                    image_index,
+                    model_name,
+                    model_name_index,
                 ),
                 image_index,
                 call.message.message_id,
@@ -193,13 +196,21 @@ async def process_faceswap_image(
                     f"[process_faceswap_image] Путь для FaceFusion в контейнере: {faceswap_target_path}",
                 )
                 # Копирование больше не требуется, так как файл уже в нужном месте
-                result_path = await retryOperation(
-                    facefusion_swap,
-                    5,
-                    2,
-                    faceswap_source_path,
-                    faceswap_target_path,
-                )
+                try:
+                    result_path = await facefusion_swap(
+                        faceswap_source_path,
+                        faceswap_target_path,
+                    )
+                except ValueError as ve:
+                    # Обрабатываем ситуацию, когда лицо не найдено или подобные ситуации (например, изображение слишком сложное для обработки)
+                    logger.warning(
+                        f"[faceswap] Не удалось заменить лицо: {ve}",
+                    )
+                    await editMessageOrAnswer(
+                        call,
+                        "❌ Не удалось заменить лицо на изображении. Возможно, лицо не распознано или изображение слишком сложное для обработки.\nПопробуйте другое фото или модель.",
+                    )
+                    return None
             except Exception as e:
                 result_path = None
                 logger.error(
@@ -230,6 +241,10 @@ async def process_faceswap_image(
     # После генерации удаляем модель из стейта
     logger.info(
         f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+    )
+    await asyncio.sleep(5)
+    logger.info(
+        "Ждем 5 секунд, чтобы модель успела нормально сохраниться и отдать ресурсы",
     )
     # После генерации удаляем модель из стейта по model_name и image_index
     state_data = await state.get_data()
