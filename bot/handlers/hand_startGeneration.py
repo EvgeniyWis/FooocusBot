@@ -303,8 +303,6 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
         await safe_send_message("❌ Произошла ошибка при генерации", message)
         return
 
-    await safe_send_message("✅ Генерация завершена", message)
-
 
 # Обработка выбора режима при генерации с одним промптом
 async def chooseOnePromptGenerationType(
