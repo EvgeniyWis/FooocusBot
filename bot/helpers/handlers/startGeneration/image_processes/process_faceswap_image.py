@@ -10,6 +10,7 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
 from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
+from bot.utils import retryOperation
 from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
@@ -202,27 +203,13 @@ async def process_faceswap_image(
                     f"[process_faceswap_image] Путь для FaceFusion в контейнере: {faceswap_target_path}",
                 )
                 # Копирование больше не требуется, так как файл уже в нужном месте
-                try:
-                    result_path = await facefusion_swap(
-                        faceswap_source_path,
-                        faceswap_target_path,
-                    )
-                except ValueError:
-                    # Обрабатываем ситуацию, когда лицо не найдено или подобные ситуации
-                    # (например, изображение слишком сложное для обработки)
-                    result_path = None
-                    await editMessageOrAnswer(
-                        call,
-                        f"❌ Не удалось заменить лицо на изображении. "
-                        f"(model={model_name}, image_index={image_index}) "
-                        "Возможно, лицо не распознано или изображение слишком сложное для обработки.\n"
-                        "Попробуйте другое фото или модель.",
-                    )
-                    logger.exception(
-                        f"[faceswap] Не удалось корректно заменить лицо на"
-                        f" изображении (model={model_name}, image_index={image_index}) - "
-                        f"стоит проверить изображение и референсную модель",
-                    )
+                result_path = await retryOperation(
+                    facefusion_swap,
+                    5,
+                    2,
+                    faceswap_source_path,
+                    faceswap_target_path,
+                )
             except Exception as e:
                 result_path = None
                 logger.error(
