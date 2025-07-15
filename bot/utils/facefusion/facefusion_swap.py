@@ -48,6 +48,7 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         if (
             "Processing to image failed" in stderr_str
             or "Finalizing image skipped" in stderr_str
+            or not os.path.exists(output_path)
         ):
             raise ValueError(
                 "FaceFusion не смог заменить лицо на изображении (возможно, не распознано лицо)",
