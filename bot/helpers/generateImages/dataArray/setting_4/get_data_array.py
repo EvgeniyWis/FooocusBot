@@ -173,8 +173,9 @@ def setting4_get_data_array():
             "isabella.flirt",
             "14HkVljdW_W-ENVz-rRqX_8xNRQs3zIoM",  # Updated picture folder_id
             "1kcjOqAa5krdXbEYYxPYz_8AEYKCA1_0S",  # Updated videos folder_id
-            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
-            1girl, mulat, 18, sorority girl, white hair, medium-large natural breasts, big butt, extra tan skin, blue eyes""",
+            """score_9, score_8_up, score_7_up, source_photo, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK 
+
+            real_beauty, igbaddie, solo, 1girl, mulat girl, 18 years old, sorority girl, highlighted white hair, long volumnous hair, medium-large breasts, sagging breasts, natural breasts, big bubble butt, high height, ((extra tan skin)), skinny, cute, big lips, bright-blue eyes, (((extra-wide hips))), ((extra-thin waist))""",
             [2, 0.70, 0.15, 1.80, 1.00, 1.70, -0.70, 0.35, -1.00],
         ),
         setting4_generate_data(
