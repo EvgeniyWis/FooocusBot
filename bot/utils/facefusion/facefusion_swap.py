@@ -41,8 +41,30 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    await process.communicate()
+    stdout, stderr = await process.communicate()
+    stdout_str = stdout.decode()
+    stderr_str = stderr.decode()
+    if process.returncode != 0 or not os.path.exists(output_path):
+        if (
+            "Processing to image failed" in stderr_str
+            or "Finalizing image skipped" in stderr_str
+            or not os.path.exists(output_path)
+        ):
+            raise ValueError(
+                "FaceFusion не смог заменить лицо на изображении (возможно, не распознано лицо)",
+            )
 
-    logger.info(f"FaceFusion успешно завершен, результат: {output_path}")
+        raise RuntimeError(
+            f"FaceFusion завершился с ошибкой (code={process.returncode}) и файл не создан:\n"
+            f"STDOUT:\n{stdout_str}\n\nSTDERR:\n{stderr_str}",
+        )
+
+    logger.info(
+        f"FaceFusion успешно завершен, результат: {output_path}, status_code: {process.returncode}",
+    )
+    logger.info(
+        f"Содержимое папки results перед чтением: {os.listdir(constants.FACEFUSION_RESULTS_DIR)}",
+    )
+    logger.info(f"Файл сохранен?: {os.path.exists(output_path)}")
 
     return str(output_path)
