@@ -107,3 +107,13 @@ def nsfw_video_generation_insert_length_video_keyboard():
         ],
     )
     return keyboard
+
+
+# Инлайн-клавиатура с кнопкой "✅ Готово" для прекращения сбора изображений для генерации видео
+def img2video_done_send_images_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="✅ Готово", callback_data="img2video|done_send_images")],
+        ],
+    )
+    return keyboard
