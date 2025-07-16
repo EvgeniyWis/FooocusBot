@@ -1,1 +1,2 @@
-from .ErrorHandlingMiddleware import ErrorHandlingMiddleware
+from bot.middleware.ErrorHandlingMiddleware import ErrorHandlingMiddleware
+from bot.middleware.MediaGroupMiddleware import MediaGroupMiddleware

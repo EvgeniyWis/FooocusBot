@@ -46,15 +46,7 @@ async def register_commands():
         BotCommand(
             command="/stop",
             description="Остановить генерацию изображений",
-        ),
-        BotCommand(
-            command="/admin",
-            description="Управление настройками",
-        ),
-        BotCommand(
-            command="/clear",
-            description="Полная очистка стейта",
-        ),
+        )
     ]
     await bot.set_my_commands(commands)
 
@@ -92,6 +84,7 @@ async def on_startup():
 
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())
+    dp.message.middleware(MediaGroupMiddleware())
 
     await bot.delete_webhook(drop_pending_updates=True)
 

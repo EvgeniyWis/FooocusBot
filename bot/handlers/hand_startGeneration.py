@@ -90,7 +90,7 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(multi_select_mode=False)
     await editMessageOrAnswer(
         call,
-        "✅ Тип генерации успешно выбран! Теперь выбери какую настройку будешь использовать:",
+        text.GET_GENERATIONS_SUCCESS_TEXT,
         reply_markup=start_generation_keyboards.selectSettingKeyboard(
             is_test_generation=False,
         ),
@@ -99,46 +99,25 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
 
 # Обработка выбора настройки
 async def choose_setting(call: types.CallbackQuery, state: FSMContext):
-    # Получаем текущие данные стейта для извлечения переменных рандомайзера
-    current_state_data = await state.get_data()
-    variable_names_for_randomizer = current_state_data.get(
-        "variable_names_for_randomizer",
-        [],
-    )
+    # Получаем данные из стейта
+    state_data = await state.get_data()
 
-    # Создаем базовый initial_state
+    # Очищаем стейт
+    await state.clear()
+
+    # Обновляем только важные значения в стейте после очистки
     initial_state = {
-        "generation_step": 1,
-        "prompts_for_regenerated_models": [],
-        "regenerated_models": [],
-        "model_indexes_for_generation": [],
-        "saved_images_urls": [],
-        "faceswap_generated_models": [],
-        "imageGeneration_mediagroup_messages_ids": [],
-        "videoGeneration_messages_ids": [],
-        "process_images_steps": [],
-        "upscale_progress_messages": [],
-        "variable_names_for_randomizer": [],
-        "generated_video_paths": [],
-        "model_prompts_for_generation": [],
-        "randomizer_prompts": [],
-        "prompt_for_images": "",
-        "jobs": {},
-        "total_jobs_count": 0,
+        "multi_select_mode": state_data.get("multi_select_mode", False),
+        "prompt_exist": state_data.get("prompt_exist", False),
+        "generations_type": state_data.get("generations_type", ""),
     }
-
-    # Добавляем все ключи с формой "randomizer_{variable_name}_values" со значением [] (для очистки данных рандомайзера)
-    for variable_name in variable_names_for_randomizer:
-        key = f"randomizer_{variable_name}_values"
-        initial_state[key] = []
-
     await state.update_data(**initial_state)
 
     # Если выбрана конкретная модель, то просим ввести название модели
     if call.data == "select_setting|specific_model":
         await safe_edit_message(
             call.message,
-            "Выберите тип генерации:",
+            "🖼 Выберите тип генерации:",
             reply_markup=start_generation_keyboards.select_type_specific_generation(),
         )
         await state.update_data(specific_model=True)
@@ -148,9 +127,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     # Если выбрана другая настройка, то продолжаем генерацию
     setting_number = call.data.split("|")[1]
     await state.update_data(setting_number=setting_number)
-    state_data = await state.get_data()
-    generations_type = state_data.get("generations_type", "")
     prompt_exist = state_data.get("prompt_exist", False)
+    generations_type = state_data.get("generations_type", "")
     await state.update_data(specific_model=False)
 
     # Если выбрана настройка для теста, то продолжаем генерацию в тестовом режиме
@@ -325,8 +303,6 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
         await safe_send_message("❌ Произошла ошибка при генерации", message)
         return
 
-    await safe_send_message("✅ Генерация завершена", message)
-
 
 # Обработка выбора режима при генерации с одним промптом
 async def chooseOnePromptGenerationType(
@@ -409,6 +385,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     data = await getDataByModelName(model_name)
 
     # Удаляем медиагруппу
+    logger.info(f"Удаляем медиагруппу для модели {model_name}")
     await deleteMessageFromState(
         state,
         "imageGeneration_mediagroup_messages_ids",
@@ -504,8 +481,8 @@ async def start_multi_prompt_input_mode(
     )
 
     await safe_edit_message(
-        text.WRITE_MULTI_PROMPTS_FOR_SPECIFIC_GENERATION,
         callback.message,
+        text.WRITE_MULTI_PROMPTS_FOR_SPECIFIC_GENERATION,
         reply_markup=done_typing_keyboard(),
     )
 
@@ -575,13 +552,11 @@ async def finish_prompt_input(
             state=state,
         )
     else:
-        await write_model_name_for_generation(
+        await write_model_for_generation(
             message=fake_message,
             state=state,
             text_input=full_text,
         )
-
-    await state.clear()
 
 
 async def send_message_with_info_for_write_prompts_for_models(
@@ -589,8 +564,8 @@ async def send_message_with_info_for_write_prompts_for_models(
     state: FSMContext,
 ):
     await safe_edit_message(
-        text=text.WRITE_MODELS_NAME_TEXT,
-        message=callback.message,
+        callback.message,
+        text.WRITE_MODELS_NAME_TEXT,
     )
     await state.set_state(
         StartGenerationState.write_models_for_specific_generation,
@@ -610,7 +585,15 @@ async def write_models_for_specific_generation(
         )
         return
 
-    model_indexes = message_text.split(",")
+    model_indexes = [x.strip() for x in message_text.split(",")]
+
+    # Проверяем на дублирование номеров моделей
+    if len(model_indexes) != len(set(model_indexes)):
+        await safe_send_message(
+            text=text.DUPLICATE_NUMBERS_TEXT,
+            message=message,
+        )
+        return
 
     all_data_arrays = getAllDataArrays()
     all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
@@ -641,7 +624,7 @@ async def write_models_for_specific_generation(
         )
 
 
-async def write_model_name_for_generation(
+async def write_model_for_generation(
     message: types.Message,
     state: FSMContext,
     text_input: str = None,
@@ -651,102 +634,48 @@ async def write_model_name_for_generation(
     # 1. Новый формат: 1 - текст
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
 
-    if matches:
-        model_prompts = {}
-        for index, prompt in matches:
-            if not index.isdigit():
-                continue
-            if not (1 <= int(index) <= 100):
-                await safe_send_message(
-                    text=text.MODEL_NOT_FOUND_TEXT.format(index),
-                    message=message,
-                )
-                return
-            model_prompts[str(index)] = prompt.strip()
-
-        data_for_update = {
-            f"{getModelNameByIndex(str(index))}": prompt
-            for index, prompt in model_prompts.items()
-        }
-        await appendDataToStateArray(
-            state,
-            "model_prompts_for_generation",
-            data_for_update,
-        )
-
+    if not matches:
         await safe_send_message(
-            text="✅ Промпты по моделям получены, начинаю генерацию...",
+            text=text.WRONG_FORMAT_TEXT,
             message=message,
-        )
-
-        await generateImagesInHandler(
-            prompt=model_prompts,
-            message=message,
-            state=state,
-            user_id=message.from_user.id,
-            is_test_generation=False,
-            setting_number="individual",
         )
         return
 
-    # 2. Старый формат: одна модель или через запятую
-
-    # Проверяем, что введённое значение является числом
-    model_indexes = message.text.split(",")
-    if len(model_indexes) == 1:
-        if not message.text.isdigit():
+    model_prompts = {}
+    for index, prompt in matches:
+        if not index.isdigit():
+            continue
+        if not (1 <= int(index) <= 100):
             await safe_send_message(
-                text=text.NOT_NUMBER_TEXT,
+                text=text.MODEL_NOT_FOUND_TEXT.format(index),
                 message=message,
             )
             return
-        model_indexes = [message.text]
+        model_prompts[str(index)] = prompt.strip()
 
-    # Получаем данные всех моделей
-    all_data_arrays = getAllDataArrays()
-    all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
-
-    # Проверяем, существует ли такие модели
-    for model_index in model_indexes:
-        model_index = model_index.strip()
-
-        if not model_index.isdigit():
-            await safe_send_message(
-                text=text.NOT_NUMBER_TEXT,
-                message=message,
-            )
-            return
-
-        # Если индекс больше числа моделей или меньше 1, то просим ввести другой индекс
-        if int(model_index) > all_data_arrays_length or int(model_index) < 1:
-            await safe_send_message(
-                text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
-                message=message,
-            )
-            return
-
-    await state.update_data(model_indexes_for_generation=model_indexes)
-    # Всё валидно — идём по старой логике
-    await state.update_data(
-        model_indexes_for_generation=model_indexes,
+    data_for_update = {
+        f"{getModelNameByIndex(str(index))}": prompt
+        for index, prompt in model_prompts.items()
+    }
+    await appendDataToStateArray(
+        state,
+        "model_prompts_for_generation",
+        data_for_update,
     )
 
-    await state.set_state(None)
+    await safe_send_message(
+        text="✅ Промпты по моделям получены, начинаю генерацию...",
+        message=message,
+    )
 
-    if len(model_indexes) == 1:
-        await safe_send_message(
-            text=text.GET_MODEL_INDEX_SUCCESS_TEXT,
-            message=message,
-        )
-
-        await state.set_state(StartGenerationState.write_prompt_for_images)
-
-    else:
-        await safe_send_message(
-            text=text.GET_MODELS_INDEXES_AND_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
-            message=message,
-            reply_markup=start_generation_keyboards.onePromptGenerationChooseTypeKeyboard(),
-        )
+    await generateImagesInHandler(
+        prompt=model_prompts,
+        message=message,
+        state=state,
+        user_id=message.from_user.id,
+        is_test_generation=False,
+        setting_number="individual",
+    )
 
 
 # Обработка ввода нового промпта для перегенерации изображения
@@ -862,11 +791,6 @@ def hand_add():
     router.callback_query.register(
         select_image,
         lambda call: call.data.startswith("select_image"),
-    )
-
-    router.message.register(
-        write_model_name_for_generation,
-        StateFilter(StartGenerationState.write_model_name_for_generation),
     )
 
     router.message.register(

@@ -73,18 +73,6 @@ async def stop_generation(message: types.Message, state: FSMContext):
     await state.update_data(stop_generation=False)
 
 
-# Обработка команды /clear
-async def clear_state(message: types.Message, state: FSMContext):
-    await state.clear()
-    await safe_send_message(text.STATE_CLEARED_TEXT, message)
-
-
-# DEV: получение file id видео
-# async def get_file_id(message: types.Message):
-#     if message.video:
-#         await message.answer(message.video.file_id)
-
-
 # Добавление обработчиков
 def hand_add():
     router.message.register(start, StateFilter("*"), CommandStart())

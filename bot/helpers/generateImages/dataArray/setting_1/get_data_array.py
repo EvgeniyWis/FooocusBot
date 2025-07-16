@@ -96,7 +96,7 @@ def setting1_get_data_array():
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, brown hair, blue eyes, tanned skin, ponytail.
             Style: realistic photography, Canon DSLR, natural daylight.""",
-            [2, 1.60, -0.90, -1.70, 3.00, 1.00, 2.65, 0.80],
+            [2, 1.60, -0.90, -1.70, 2.80, 1.00, 2.65, 0.80],
         ),
         setting1_generate_data(
             "roxie_foxx.xo",

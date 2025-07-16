@@ -10,10 +10,10 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
 from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
+from bot.utils import retryOperation
 from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.utils.retryOperation import retryOperation
 
 
 async def process_faceswap_image(
@@ -49,7 +49,9 @@ async def process_faceswap_image(
         model_name,
         call.message,
         text.FACE_SWAP_WAIT_TEXT.format(
-            image_index, model_name, model_name_index
+            image_index,
+            model_name,
+            model_name_index,
         ),
         image_index,
         call.message.message_id,
@@ -65,7 +67,9 @@ async def process_faceswap_image(
         f"{image_index}.jpg",
     )
     logger.info(
-        f"[faceswap] START: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+        f"[faceswap] START: {local_faceswap_target_path} "
+        f"exists={os.path.exists(local_faceswap_target_path)} | "
+        f"dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
     # Путь для передачи в facefusion_swap (виден внутри facefusion-контейнера)
     faceswap_target_path = f"/facefusion/.assets/images/temp/{model_name}_{user_id}/{image_index}.jpg"
@@ -137,7 +141,9 @@ async def process_faceswap_image(
                 model_name,
                 call.message,
                 text.FACE_SWAP_PROGRESS_TEXT.format(
-                    image_index, model_name, model_name_index
+                    image_index,
+                    model_name,
+                    model_name_index,
                 ),
                 image_index,
                 call.message.message_id,
@@ -152,7 +158,6 @@ async def process_faceswap_image(
             )
 
             try:
-                # Логируем содержимое папки temp для диагностики
                 if temp_user_dir.exists():
                     logger.info(
                         f"[process_faceswap_image] Содержимое папки {temp_user_dir}: {os.listdir(temp_user_dir)}",
@@ -164,11 +169,13 @@ async def process_faceswap_image(
 
                 # Проверяем, существует ли файл для faceswap до запуска
                 logger.info(
-                    f"[process_faceswap_image] Проверка файла: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)}",
+                    f"[process_faceswap_image] Проверка файла: "
+                    f"{local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)}",
                 )
                 if not os.path.exists(local_faceswap_target_path):
                     logger.error(
-                        f"[process_faceswap_image] Файл не найден: {local_faceswap_target_path} (model={model_name}, image_index={image_index}, user_id={user_id})",
+                        f"[process_faceswap_image] Файл не найден: {local_faceswap_target_path} "
+                        f"(model={model_name}, image_index={image_index}, user_id={user_id})",
                     )
                     await editMessageOrAnswer(
                         call,
@@ -179,14 +186,17 @@ async def process_faceswap_image(
                 # PIL check: Проверяем валидность изображения
                 try:
                     with Image.open(local_faceswap_target_path) as img:
-                        img.verify()  # Проверяет, что файл не поврежден
+                        img.verify()
                 except Exception as pil_exc:
                     logger.error(
-                        f"[process_faceswap_image] Файл невалиден или поврежден для faceswap: {local_faceswap_target_path} (model={model_name}, image_index={image_index}, user_id={user_id}) — {pil_exc}",
+                        f"[process_faceswap_image] Файл невалиден или поврежден "
+                        f"для faceswap: {local_faceswap_target_path} (model={model_name},"
+                        f" image_index={image_index}, user_id={user_id}) — {pil_exc}",
                     )
                     await editMessageOrAnswer(
                         call,
-                        f"❌ Изображение повреждено или невалидно для замены лица! (model={model_name}, image_index={image_index})",
+                        f"❌ Изображение повреждено или невалидно для замены лица! "
+                        f"(model={model_name}, image_index={image_index})",
                     )
                     return None
                 logger.info(
@@ -229,7 +239,12 @@ async def process_faceswap_image(
 
     # После генерации удаляем модель из стейта
     logger.info(
-        f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)} | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+        f"[faceswap] END: {local_faceswap_target_path} exists={os.path.exists(local_faceswap_target_path)}"
+        f" | dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
+    )
+    await asyncio.sleep(5)
+    logger.info(
+        "Ждем 5 секунд, чтобы модель успела нормально сохраниться и отдать ресурсы",
     )
     # После генерации удаляем модель из стейта по model_name и image_index
     state_data = await state.get_data()

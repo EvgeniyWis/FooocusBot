@@ -1,0 +1,1 @@
+from bot.helpers.handlers.img2video.process_video import process_video

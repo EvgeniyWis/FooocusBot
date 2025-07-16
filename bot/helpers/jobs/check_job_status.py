@@ -38,6 +38,8 @@ async def check_job_status(
 
     response_json = None
 
+    logger.info(f"Проверяем статус работы: {job_id}")
+
     try:
         start_time = asyncio.get_event_loop().time()
 
@@ -86,10 +88,7 @@ async def check_job_status(
             stop_generation = state_data.get("stop_generation", False)
 
             if response_json["status"] in ["FAILED", "CANCELLED"] or stop_generation:
-                if response_json["status"] == "FAILED":
-                    response_json = response_json["error"]
-
-                elif response_json["status"] == "CANCELLED" or stop_generation:
+                if response_json["status"] == "CANCELLED" or stop_generation:
                     response_json = CANCELLED_JOB_TEXT
 
                     await edit_job_message(
@@ -118,17 +117,21 @@ async def check_job_status(
     await delete_job(job_id, state)
 
     # Если работа не завершена, то возвращаем False
-    if not response_json or isinstance(response_json, str):
+    if not response_json or response_json == CANCELLED_JOB_TEXT:
         return False
+
+    # Если работа зафейлилась, то кидаем ошибку
+    if response_json["status"] == "FAILED":
+        raise ValueError(response_json["error"])
 
     # Проверяем наличие выходных данных
     images_output = response_json.get("output", [])
 
     if images_output == []:  # Если их нет, то кидаем ошибку
-        raise Exception("Не удалось сгенерировать изображения")
+        raise ValueError("Не удалось сгенерировать изображения")
 
     # Обновляем сообщение для актуальных данных
-    if state:
+    if state and setting_number != "individual" and checkOtherJobs:
         await edit_job_message(
             job_id,
             message_id,

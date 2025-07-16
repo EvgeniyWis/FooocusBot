@@ -1,8 +1,6 @@
-import logging
-
 from aiogram.fsm.context import FSMContext
 
-logger = logging.getLogger(__name__)
+from bot.logger import logger
 
 
 async def deleteMessageFromState(
@@ -23,7 +21,11 @@ async def deleteMessageFromState(
 
     state_data = await state.get_data()
     data_list = state_data.get(key, [])
-    
+
+    logger.info(f"[deleteMessageFromState] data_list: {data_list}, state_data: {state_data}")
+
+    logger.info(f"[deleteMessageFromState] model_name: {model_name}, image_index: {image_index}")
+
     # Собираем только message_id медиагруппы (type == 'media' или без type)
     if image_index is None:
         messages_to_delete = [
