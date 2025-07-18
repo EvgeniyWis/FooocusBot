@@ -118,13 +118,20 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
                 message,
             )
             return
-        
+
     else:
         img2video_temp_paths_for_with_model_names = state_data.get(
             "img2video_temp_paths_for_with_model_names", {}
         )
 
         temp_path = img2video_temp_paths_for_with_model_names.get(model_name, None)
+
+        if not temp_path:
+            await safe_send_message(
+                "Ошибка: не удалось найти путь к изображению",
+                message,
+            )
+            return
 
     # Удаляем сообщение пользователя
     await message.delete()

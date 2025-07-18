@@ -32,6 +32,9 @@ async def start_generate_video(
         None: Если произошла ошибка
     """
 
+    if not image_path and not image_url:
+        raise Exception("Не удалось найти изображение для генерации видео!")
+
     logger.info(
         f"Генерация видео с помощью kling: \nПромпт: {prompt}\nСсылка на изображение: {image_url}\nПуть к изображению: {image_path}",
     )
