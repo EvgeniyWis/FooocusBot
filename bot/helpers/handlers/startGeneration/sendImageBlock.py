@@ -6,6 +6,7 @@ from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 
 import bot.constants as constants
+from bot.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
@@ -101,7 +102,7 @@ async def sendImageBlock(
                     start_generation_keyboards.selectMultiImageKeyboard(
                         model_name,
                         setting_number,
-                        10,
+                        MULTI_IMAGE_NUMBER,
                         selected_indexes,
                     )
                 )
