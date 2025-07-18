@@ -2,13 +2,15 @@ import os
 from datetime import datetime
 
 from aiogram import types
-from logger import logger
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
+from bot.helpers.generateImages.dataArray.getDataByModelName import (
     getDataByModelName,
+)
+from bot.helpers.generateImages.dataArray.getModelNameIndex import (
     getModelNameIndex,
 )
+from bot.logger import logger
 from bot.settings import settings
 from bot.utils.googleDrive.files import saveFile
 from bot.utils.googleDrive.folders import getFolderDataByID
@@ -26,7 +28,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     user_id = message.from_user.id
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = await getModelNameIndex(model_name, user_id)
 
     # Отправляем сообщение о начале сохранения видео
     message_for_delete = await safe_send_message(

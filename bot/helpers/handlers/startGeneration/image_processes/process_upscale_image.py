@@ -2,15 +2,19 @@ import os
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+from helpers.generateImages.dataArray.getDataByModelName import (
+    getDataByModelName,
+)
+from helpers.generateImages.dataArray.getModelNameIndex import (
+    getModelNameIndex,
+)
+from helpers.generateImages.dataArray.getSettingNumberByModelName import (
+    getSettingNumberByModelName,
+)
 from PIL import Image
 
 from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
-    getDataByModelName,
-    getModelNameIndex,
-    getSettingNumberByModelName,
-)
 from bot.helpers.generateImages.upscale import upscale_image
 from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
@@ -40,7 +44,7 @@ async def process_upscale_image(
     user_id = call.from_user.id
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = await getModelNameIndex(model_name, user_id)
 
     image_path = (
         TEMP_FOLDER_PATH / f"{model_name}_{user_id}" / f"{image_index}.jpg"
@@ -56,7 +60,11 @@ async def process_upscale_image(
         "upscale_progress_messages",
         model_name,
         call.message,
-        text.UPSCALE_IMAGE_PROGRESS_TEXT.format(image_index, model_name, model_name_index),
+        text.UPSCALE_IMAGE_PROGRESS_TEXT.format(
+            image_index,
+            model_name,
+            model_name_index,
+        ),
         image_index,
         call.message.message_id,
     )
@@ -93,7 +101,7 @@ async def process_upscale_image(
     base_model = data["json"]["input"]["base_model_name"]
 
     # Получаем номер настройки
-    setting_number = getSettingNumberByModelName(model_name)
+    setting_number = await getSettingNumberByModelName(model_name, user_id)
 
     # Делаем upscale изображения
     await upscale_image(

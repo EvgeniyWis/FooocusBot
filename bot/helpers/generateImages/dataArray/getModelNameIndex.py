@@ -4,9 +4,9 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 
 
 # Функция для получения индекса модели
-def getModelNameIndex(model_name: str):
+async def getModelNameIndex(model_name: str, user_id: int):
     # Получаем все настройки
-    all_settings = getAllDataArrays()
+    all_settings = await getAllDataArrays(user_id)
 
     # Ищем, в какой настройке находится модель с таким названием
     for index, setting in enumerate(all_settings):

@@ -10,6 +10,9 @@ class UserSettingsService:
         if user_db_id is None:
             await self.repo.add_user(user_id)
 
+    async def get_user_by_user_id(self, user_id: int):
+        return await self.repo.get_user_by_user_id(user_id)
+
     # --- Superadmin ---
 
     async def superadmin_get_all_loras(self, setting_number: int):
@@ -179,8 +182,8 @@ class UserSettingsService:
     async def user_get_prompt(
         self,
         user_id: int,
-        model_id: int,
-        setting_number: int,
+        model_id: int | None,
+        setting_number: int | None,
         prompt_type: str = "positive",
     ):
         return await self.repo.user_get_prompt(

@@ -4,15 +4,16 @@ from datetime import datetime
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from constants import TEMP_FOLDER_PATH
-from utils.handlers.messages.rate_limiter_for_send_photo import safe_send_photo
 
 from bot.assets.mocks.links import (
     MOCK_LINK_FOR_SAVE_IMAGE,
 )
+from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
+from bot.helpers.generateImages.dataArray.getDataByModelName import (
     getDataByModelName,
+)
+from bot.helpers.generateImages.dataArray.getModelNameIndex import (
     getModelNameIndex,
 )
 from bot.keyboards import video_generation_keyboards
@@ -23,6 +24,9 @@ from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.handlers.messages.rate_limiter_for_send_photo import (
+    safe_send_photo,
+)
 
 
 async def process_save_image(
@@ -50,7 +54,7 @@ async def process_save_image(
     )
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = await getModelNameIndex(model_name, user_id)
 
     # Меняем текст на сообщении
     saving_progress_message = await editMessageOrAnswer(
@@ -59,7 +63,7 @@ async def process_save_image(
     )
 
     # Получаем данные модели
-    model_data = await getDataByModelName(model_name)
+    model_data = await getDataByModelName(model_name, user_id)
 
     # Сохраняем изображение
     now = datetime.now().strftime("%Y-%m-%d")

@@ -4,13 +4,15 @@ import traceback
 
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
+from helpers.generateImages.dataArray.getDataByModelName import (
+    getDataByModelName,
+)
+from helpers.generateImages.dataArray.getModelNameIndex import (
+    getModelNameIndex,
+)
 
 import bot.constants as constants
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
-    getDataByModelName,
-    getModelNameIndex,
-)
 from bot.InstanceBot import bot
 from bot.keyboards import start_generation_keyboards
 from bot.logger import logger
@@ -87,10 +89,10 @@ async def sendImageBlock(
             )
 
         # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
+        model_name_index = await getModelNameIndex(model_name, user_id)
 
         # Получаем данные модели
-        model_data = await getDataByModelName(model_name)
+        model_data = await getDataByModelName(model_name, user_id)
 
         # Отправляем клавиатуру для выбора изображения
         try:
@@ -114,7 +116,7 @@ async def sendImageBlock(
                     reply_markup=reply_markup,
                 )
                 await state.update_data(
-                    imageGeneration_select_message_id=select_message.message_id
+                    imageGeneration_select_message_id=select_message.message_id,
                 )
             else:
                 reply_markup = start_generation_keyboards.selectImageKeyboard(

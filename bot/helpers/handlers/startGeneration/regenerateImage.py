@@ -2,8 +2,10 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
+from bot.helpers.generateImages.dataArray.getDataByModelName import (
     getDataByModelName,
+)
+from bot.helpers.generateImages.dataArray.getModelNameIndex import (
     getModelNameIndex,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
@@ -23,34 +25,39 @@ async def regenerateImage(
     is_test_generation = state_data.get("generations_type", "") == "test"
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = await getModelNameIndex(model_name, call.from_user.id)
 
     # Получаем id пользователя
     user_id = call.from_user.id
 
     # Отправляем сообщение о перегенерации изображения
     regenerate_message = await editMessageOrAnswer(
-        call, text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index)
+        call,
+        text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index),
     )
 
     # Получаем промпт для перегенерации изображения в зависимости от режима генерации
     randomizer_prompts = state_data.get("randomizer_prompts", [])
     randomizer_prompt = await getDataInDictsArray(
-        randomizer_prompts, model_name
+        randomizer_prompts,
+        model_name,
     )
 
     prompt_for_images = state_data.get("prompt_for_images", None)
 
     prompts_for_regenerated_models = state_data.get(
-        "prompts_for_regenerated_models", []
+        "prompts_for_regenerated_models",
+        [],
     )
     prompt_for_regenerate_image = await getDataInDictsArray(
-        prompts_for_regenerated_models, model_name
+        prompts_for_regenerated_models,
+        model_name,
     )
 
     prompts_for_models = state_data.get("model_prompts_for_generation", [])
     prompt_for_model = await getDataInDictsArray(
-        prompts_for_models, model_name
+        prompts_for_models,
+        model_name,
     )
 
     logger.info(
@@ -59,7 +66,7 @@ async def regenerateImage(
         randomizer_prompt: {randomizer_prompt}
         prompt_for_images: {prompt_for_images}
         prompt_for_model: {prompt_for_model}
-        """
+        """,
     )
 
     if prompt_for_regenerate_image:
@@ -70,19 +77,19 @@ async def regenerateImage(
     elif randomizer_prompt:
         prompt = randomizer_prompt
         logger.info(
-            f"Промпт для перегенерации изображения, полученный из рандомайзера: {prompt}"
+            f"Промпт для перегенерации изображения, полученный из рандомайзера: {prompt}",
         )
 
     elif prompt_for_images:
         prompt = prompt_for_images
         logger.info(
-            f"Промпт для перегенерации изображения, полученный из стейта: {prompt}"
+            f"Промпт для перегенерации изображения, полученный из стейта: {prompt}",
         )
 
     elif prompt_for_model:
         prompt = prompt_for_model
         logger.info(
-            f"Промпт для перегенерации изображения, полученный из уникальных промптов для моделей: {prompt}"
+            f"Промпт для перегенерации изображения, полученный из уникальных промптов для моделей: {prompt}",
         )
 
     else:

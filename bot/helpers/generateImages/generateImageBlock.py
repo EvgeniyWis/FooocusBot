@@ -1,7 +1,9 @@
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from bot.helpers.generateImages.dataArray import getSettingNumberByModelName
+from bot.helpers.generateImages.dataArray.getSettingNumberByModelName import (
+    getSettingNumberByModelName,
+)
 from bot.helpers.jobs.get_job_ID import get_job_ID
 
 
@@ -22,7 +24,7 @@ async def generateImageBlock(
         variable_prompt = " "
 
     # Проверяем наличие json в данных модели
-    if not "json" in data:
+    if "json" not in data:
         raise ValueError(f"Не получилось обнаружить json в {data}")
 
     # Прибавляем к постоянному промпту переменный промпт
@@ -36,7 +38,7 @@ async def generateImageBlock(
     model_name = data["model_name"]
 
     # Получаем номер настройки по имени модели
-    setting_number = getSettingNumberByModelName(model_name)
+    setting_number = await getSettingNumberByModelName(model_name, user_id)
 
     # Логируем наш json
     logger.info(

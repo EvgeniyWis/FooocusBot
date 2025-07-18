@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
+from bot.logger import logger
 from bot.utils.handlers import appendDataToStateArray, getDataInDictsArray
 from bot.utils.handlers.messages import safe_edit_message, safe_send_message
 
@@ -29,18 +30,27 @@ async def send_progress_message(state: FSMContext, array_key: str, model_name: s
     message_is_exist = any(item.get("model_name") == model_name and item.get("image_index") == image_index for item in messages)
 
     if not message_is_exist:
-        if message_id_for_edit:
-            message = await safe_edit_message(
-                message,
-                message_text,
-            )
-        else:
-            message = await safe_send_message(
-                message_text,
-                message,
-            )
+        try:
+            if message_id_for_edit:
+                message = await safe_edit_message(
+                    message,
+                    message_text,
+                )
+            else:
+                message = await safe_send_message(
+                    message_text,
+                    message,
+                )
 
-        message_id = message.message_id
+            if message is None:
+                logger.error(f"Failed to send progress message for model {model_name}, image {image_index}")
+                return None
+                
+            message_id = message.message_id
+            
+        except Exception as e:
+            logger.error(f"Error in send_progress_message: {str(e)}")
+            return None
 
         # Добавляем в массив с тем, для каких моделей отправлены сообщения о прогрессе
         data_for_update = {

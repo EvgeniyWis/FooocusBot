@@ -79,8 +79,6 @@ def hand_add():
 
     router.message.register(stop_generation, Command("stop"))
 
-    router.message.register(clear_state, Command("clear"))
-
     router.message.register(admin, Command("admin"))
 
     router.message.register(super_admin, Command("superadmin"))

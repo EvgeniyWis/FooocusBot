@@ -5,12 +5,14 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import getDataByModelName
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )
 from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
+)
+from bot.helpers.generateImages.dataArray.getDataByModelName import (
+    getDataByModelName,
 )
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
@@ -31,7 +33,7 @@ async def generateImagesByAllSettings(
     )
 
     # Получаем все настройки
-    dataArrays = getAllDataArrays()
+    dataArrays = await getAllDataArrays(message.from_user.id)
     settings_numbers_success = []
     semaphore = asyncio.Semaphore(5)
 

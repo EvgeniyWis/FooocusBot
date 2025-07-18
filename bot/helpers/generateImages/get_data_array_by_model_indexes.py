@@ -6,7 +6,9 @@ from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
 )
 
 
-async def get_data_array_by_model_indexes(model_indexes: list[int]) -> list[dict]:
+async def get_data_array_by_model_indexes(
+    model_indexes: list[int], user_id: int
+) -> list[dict]:
     """
     Получает массив индексом моделей, а на выход отдаёт массив данных этих моделей для генерации
 
@@ -17,7 +19,7 @@ async def get_data_array_by_model_indexes(model_indexes: list[int]) -> list[dict
         list[dict] - массив данных моделей для генерации
     """
     model_names_for_generation = [
-        getModelNameByIndex(model_index)
+        await getModelNameByIndex(model_index, user_id)
         for model_index in model_indexes
     ]
     data_array = [

@@ -4,7 +4,7 @@ from bot.helpers.generateImages.dataArray.getModelNameIndex import (
 from bot.utils.googleDrive.auth import service
 
 
-async def getAllFolders(model_names: list[str] = None):
+async def getAllFolders(user_id: int, model_names: list[str] = None):
     """
     Получает отформатированный список папок в Google Drive с основными ссылками на папки моделей
     Args:
@@ -63,7 +63,7 @@ async def getAllFolders(model_names: list[str] = None):
         # Создаем список кортежей (индекс, имя, ссылка) для сортировки
         model_data = []
         for model_name, link in models_info.items():
-            model_index = getModelNameIndex(model_name)
+            model_index = await getModelNameIndex(model_name, user_id)
             if model_index:
                 model_data.append((model_index, model_name, link))
 
@@ -71,7 +71,7 @@ async def getAllFolders(model_names: list[str] = None):
         formatted_output = []
         for model_index, model_name, link in sorted(model_data):
             formatted_output.append(
-                f"👱‍♀️ ({model_index}) Модель: {model_name}\n📁 Папка: {link}"
+                f"👱‍♀️ ({model_index}) Модель: {model_name}\n📁 Папка: {link}",
             )
 
         return "\n\n".join(formatted_output)

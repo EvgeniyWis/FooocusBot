@@ -3,12 +3,12 @@ from typing import Optional
 from adapters.redis_task_storage_repository import key_for_video
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+from helpers.generateImages.dataArray.getModelNameIndex import (
+    getModelNameIndex,
+)
 
 from bot.domain.entities.task import TaskProcessVideoDTO
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
-    getModelNameIndex,
-)
 from bot.helpers.handlers.messages import send_progress_message
 from bot.helpers.handlers.videoGeneration.check_video_path import (
     check_video_path,
@@ -54,7 +54,7 @@ async def process_video(
         call is not None and message is not None
     ):
         raise ValueError(
-            "Нужно передать либо call, либо message, но не оба и не ни одного."
+            "Нужно передать либо call, либо message, но не оба и не ни одного.",
         )
 
     if call is not None:
@@ -84,7 +84,7 @@ async def process_video(
     await redis_storage.add_task(settings.PROCESS_VIDEO_TASK, task_dto)
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = await getModelNameIndex(model_name, user_id)
 
     video_progress_message_id = await send_progress_message(
         state,

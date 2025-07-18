@@ -4,9 +4,9 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 )
 
 
-async def getDataByModelName(model_name: str) -> dict:
+async def getDataByModelName(model_name: str, user_id: int) -> dict:
     # Получаем все настройки
-    all_settings = getAllDataArrays()
+    all_settings = await getAllDataArrays(user_id)
 
     # Ищем, в какой настройке находится модель с таким названием
     for setting in all_settings:

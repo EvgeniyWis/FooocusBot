@@ -4,16 +4,20 @@ import traceback
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from helpers.generateImages.dataArray.getAllDataArrays import getAllDataArrays
+from helpers.generateImages.dataArray.getModelNameByIndex import (
+    getModelNameByIndex,
+)
+from helpers.generateImages.dataArray.getModelNameIndex import (
+    getModelNameIndex,
+)
 from keyboards.startGeneration.keyboards import done_typing_keyboard
 from pydantic import ValidationError
 from utils.handlers.messages import safe_edit_message
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getAllDataArrays,
     getDataByModelName,
-    getModelNameByIndex,
-    getModelNameIndex,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
@@ -199,12 +203,12 @@ async def start_write_prompts_for_models_multiline_input(
     # Получаем допустимые индексы моделей
     if setting_number == "all":
         # Если выбрано all — берём все модели
-        all_data_arrays = getAllDataArrays()
+        all_data_arrays = await getAllDataArrays(callback.from_user.id)
         start_index = 1
         end_index = sum(len(setting) for setting in all_data_arrays)
     else:
         # Берём только модели из выбранной настройки
-        all_data_arrays = getAllDataArrays()
+        all_data_arrays = await getAllDataArrays(callback.from_user.id)
         setting_index = int(setting_number) - 1
 
         # Считаем смещение как сумму длин всех предыдущих сетов
@@ -428,7 +432,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Если данные не найдены, ищем во всех доступных массивах
         if data is None:
-            all_data_arrays = getAllDataArrays()
+            all_data_arrays = getAllDataArrays(call.from_user.id)
             for arr in all_data_arrays:
                 data = next(
                     (d for d in arr if d["model_name"] == model_name),
@@ -458,7 +462,10 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     except Exception as e:
         traceback.print_exc()
-        model_name_index = getModelNameIndex(model_name)
+        model_name_index = await getModelNameIndex(
+            model_name,
+            call.from_user.id,
+        )
 
         await editMessageOrAnswer(
             call,
@@ -595,7 +602,7 @@ async def write_models_for_specific_generation(
         )
         return
 
-    all_data_arrays = getAllDataArrays()
+    all_data_arrays = getAllDataArrays(message.from_user.id)
     all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
 
     for model_index in model_indexes:
@@ -724,7 +731,7 @@ async def write_new_prompt_for_regenerate_image(
     )
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = await getModelNameIndex(model_name, user_id)
 
     # Отправляем сообщение о перегенерации изображения
     modified_prompt = prompt[:30] + "..." if len(prompt) > 30 else prompt

@@ -7,6 +7,14 @@ class PostgresRepository:
     def __init__(self, db: Pool):
         self.db = db
 
+    async def get_user_by_user_id(self, user_id: int):
+        async with self.db.acquire() as conn:
+            logger.info(f"Checking user in db {user_id}")
+            return await conn.fetch(
+                "SELECT id FROM users WHERE user_id = $1",
+                user_id,
+            )
+
     # --- Superadmin ---
 
     async def superadmin_add_lora(self, title: str, setting_number: int):
@@ -66,13 +74,15 @@ class PostgresRepository:
             )
             return row["id"] if row else None
 
-    async def superadmin_get_all_loras(self, setting_number: int):
+    async def superadmin_get_all_loras(self, setting_number: int) -> list[dict]:
         logger.info(f"Getting all LoRAs for setting {setting_number}")
         async with self.db.acquire() as conn:
-            return await conn.fetch(
+            rows = await conn.fetch(
                 "SELECT title FROM loras WHERE setting_number = $1",
                 setting_number,
             )
+            # Convert asyncpg Records to dictionaries
+            return [dict(r) for r in rows]
 
     async def get_all_setting_numbers(self):
         logger.info("Getting all setting numbers")
@@ -123,12 +133,13 @@ class PostgresRepository:
         setting_number: int,
     ) -> list[dict]:
         query = """
-                SELECT id, name
-                FROM models
-                WHERE setting_number = $1
-                ORDER BY name; \
-                """
+            SELECT id, name
+            FROM models
+            WHERE setting_number = $1
+            ORDER BY name;
+            """
         rows = await self.db.fetch(query, setting_number)
+        # Convert asyncpg Records to dictionaries
         return [dict(r) for r in rows]
 
     # --- User LoRA / Prompts ---
@@ -141,15 +152,10 @@ class PostgresRepository:
         setting_number: int,
     ) -> float | None:
         async with self.db.acquire() as conn:
-            base_weight = await conn.fetchval(
-                """
-                SELECT weight FROM user_loras
-                WHERE user_id = $1 AND lora_id = $2
-                  AND model_id IS NULL AND setting_number = $3
-                  AND is_override = FALSE
-                """,
+            base_weight = await self.user_get_lora_weight(
                 user_id,
                 lora_id,
+                model_id,
                 setting_number,
             )
 
@@ -216,12 +222,12 @@ class PostgresRepository:
         self,
         user_id: int,
         setting_number: int,
-    ):
+    ) -> list[dict]:
         async with self.db.acquire() as conn:
             logger.info(
                 f"Getting LoRAs for user {user_id} and setting {setting_number}",
             )
-            return await conn.fetch(
+            rows = await conn.fetch(
                 """
                 SELECT ul.lora_id, ul.model_id, ul.weight, m.name AS model_name
                 FROM user_loras ul
@@ -231,6 +237,26 @@ class PostgresRepository:
                 user_id,
                 setting_number,
             )
+            # Convert asyncpg Records to dictionaries
+            # Convert asyncpg Records to dictionaries
+            result = [dict(r) for r in rows]
+            logger.info(f"Fetched user LoRAs for setting: {result}")
+            return result
+            
+    async def user_get_loras(self, user_id: int) -> list[dict]:
+        async with self.db.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT lora_id, model_id, setting_number, weight
+                FROM user_loras
+                WHERE user_id = $1
+                """,
+                user_id,
+            )
+            # Convert asyncpg Records to dictionaries
+            result = [dict(r) for r in rows]
+            logger.info(f"Fetched all user LoRAs: {result}")
+            return result
 
     async def user_add_lora(
         self,

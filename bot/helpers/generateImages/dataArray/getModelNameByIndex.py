@@ -4,9 +4,9 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 
 
 # Функция для получения имени модели по его номеру
-def getModelNameByIndex(index):
+async def getModelNameByIndex(index, user_id: int):
     # Получаем все массивы данных из всех настроек
-    all_settings = getAllDataArrays()
+    all_settings = await getAllDataArrays(user_id)
 
     # Преобразуем индекс в число
     index = int(index)

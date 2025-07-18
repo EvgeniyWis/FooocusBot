@@ -5,8 +5,10 @@ from aiogram.fsm.context import FSMContext
 from utils.handlers.messages import safe_edit_message
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
+from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
     getDataArrayBySettingNumber,
+)
+from bot.helpers.generateImages.dataArray.getModelNameIndex import (
     getModelNameIndex,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
@@ -68,7 +70,10 @@ async def generateImagesInHandler(
                     message_for_edit,
                     text.GET_PROMPT_SUCCESS_TEXT,
                 )
-                dataArray = getDataArrayBySettingNumber(setting_number)
+                dataArray = getDataArrayBySettingNumber(
+                    setting_number,
+                    user_id,
+                )
                 data = dataArray[0]
                 result = [
                     await generateImageBlock(
@@ -114,12 +119,20 @@ async def generateImagesInHandler(
                     prompt_for_current_model = {}
 
                     if setting_number != "individual":
-                        dataArray = getDataArrayBySettingNumber(setting_number)
+                        dataArray = await getDataArrayBySettingNumber(
+                            setting_number,
+                            user_id,
+                        )
                     else:
-                        dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
+                        dataArray = await get_data_array_by_model_indexes(
+                            model_indexes_for_generation,
+                        )
 
                     for data in dataArray:
-                        model_index = getModelNameIndex(data["model_name"])
+                        model_index = await getModelNameIndex(
+                            data["model_name"],
+                            user_id,
+                        )
                         prompt_for_current_model[model_index] = prompt
 
                     result = await generateImages(

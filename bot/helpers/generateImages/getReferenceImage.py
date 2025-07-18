@@ -2,15 +2,16 @@ import os
 
 import aiofiles
 
+from bot.helpers.generateImages.dataArray.getModelNameIndex import (
+    getModelNameIndex,
+)
 from bot.logger import logger
-
-from bot.helpers.generateImages.dataArray import getModelNameIndex
 
 
 # Функция для получения референсного изображения
-async def getReferenceImage(model_name: str) -> str:
+async def getReferenceImage(model_name: str, user_id: int) -> str:
     # Получаем индекс модели
-    model_index = getModelNameIndex(model_name)
+    model_index = await getModelNameIndex(model_name, user_id)
 
     reference_image_path = os.path.abspath(
         os.path.join(

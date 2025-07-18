@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
@@ -12,7 +10,6 @@ from bot.helpers.generateImages.dataArray.random_choice_variables_for_images imp
 from bot.helpers.generateImages.get_data_array_by_model_indexes import (
     get_data_array_by_model_indexes,
 )
-from bot.utils.handlers import appendDataToStateArray
 
 
 # Функция для применения переменных рандомайзера к промптам массива данных
@@ -34,7 +31,9 @@ async def getDataArrayByRandomizer(
     if not model_indexes_for_generation:
         dataArray = getDataArrayBySettingNumber(setting_number)
     else:
-        dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
+        dataArray = await get_data_array_by_model_indexes(
+            model_indexes_for_generation,
+        )
 
     logger.info(
         f"Массив данных до применения переменных рандомайзера: {dataArray} для настройки {setting_number}",
@@ -69,10 +68,10 @@ async def getDataArrayByRandomizer(
             model_randomizer_prompt += formated_prompt
 
         # Добавляем к постонному промпту промпт рандомайзера
-        data["json"]["input"]["prompt"] = (
-            model_randomizer_prompt.replace("\n", "")
-            + data["json"]["input"]["prompt"].lstrip(" ")
-        )
+        data["json"]["input"]["prompt"] = model_randomizer_prompt.replace(
+            "\n",
+            "",
+        ) + data["json"]["input"]["prompt"].lstrip(" ")
 
         data_for_update = {f"{data['model_name']}": model_randomizer_prompt}
 
