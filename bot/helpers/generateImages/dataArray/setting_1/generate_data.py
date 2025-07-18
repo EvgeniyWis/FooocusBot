@@ -1,6 +1,6 @@
 from factory.user_factory import get_user_settings_service
 from helpers.generateImages.dataArray.get_final_loras_for_user import (
-    get_final_loras_for_user,
+    get_final_loras_for_model,
 )
 
 from bot.helpers.generateImages.dataArray.generate_data import generate_data
@@ -24,7 +24,8 @@ async def setting1_generate_data(
 ):
     settings_service = await get_user_settings_service()
     user_id_db = await settings_service.repo.get_user_by_user_id(user_id)
-    loras = await get_final_loras_for_user(user_id_db, 1)
+    model_id = await settings_service.repo.get_model_id(model_name, 1)
+    loras = await get_final_loras_for_model(user_id_db, 1, model_id)
 
     if len(loras) == 0:
         # 👇 Попробуем вытащить веса из default_data_array

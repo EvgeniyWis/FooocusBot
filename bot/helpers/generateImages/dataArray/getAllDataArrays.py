@@ -19,10 +19,13 @@ from bot.helpers.generateImages.dataArray.setting_4.get_data_array import (
 
 # Получение данных для всех настроек
 async def getAllDataArrays(user_id: int):
-    return await asyncio.gather(
+    cors = [
         setting1_get_data_array(user_id),
         setting2_get_data_array(),
         setting3_get_data_array(),
         setting4_get_data_array(),
         extra_setting_get_data_array(),
-    )
+    ]
+    all_arrays = await asyncio.gather(*cors)
+
+    return all_arrays

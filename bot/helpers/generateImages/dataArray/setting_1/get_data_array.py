@@ -8,10 +8,14 @@ from bot.helpers.generateImages.dataArray.setting_1.generate_data import (
 )
 from bot.settings import settings
 
+# TODO: доделать логику с лорами, ибо щас не работает корректно override
+# TODO:
+
 
 async def setting1_get_data_array(user_id: int):
     service = await get_user_settings_service()
     setting_number = 1
+    user_id_db = await service.repo.get_user_by_user_id(user_id)
 
     # Все доступные модели (общие)
     models = await service.repo.superadmin_get_models_by_setting(
@@ -27,7 +31,7 @@ async def setting1_get_data_array(user_id: int):
 
         # Промпты: если не заданы пользователем — берем из дефолта
         user_prompt = await service.user_get_prompt(
-            user_id=user_id,
+            user_id=user_id_db,
             model_id=model_id,
             setting_number=setting_number,
             prompt_type="positive",
@@ -38,7 +42,7 @@ async def setting1_get_data_array(user_id: int):
         )
 
         user_negative_prompt = await service.user_get_prompt(
-            user_id=user_id,
+            user_id=user_id_db,
             prompt_type="negative",
             model_id=None,
             setting_number=None,

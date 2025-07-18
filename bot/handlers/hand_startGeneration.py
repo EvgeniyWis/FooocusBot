@@ -602,7 +602,7 @@ async def write_models_for_specific_generation(
         )
         return
 
-    all_data_arrays = getAllDataArrays(message.from_user.id)
+    all_data_arrays = await getAllDataArrays(message.from_user.id)
     all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
 
     for model_index in model_indexes:

@@ -52,7 +52,9 @@ async def process_image_block(
             check_other_jobs=checkOtherJobs,
             chat_id=chat_id,
         )
-        await redis_storage.add_task(settings.PROCESS_IMAGE_BLOCK_TASK, task_dto)
+        await redis_storage.add_task(
+            settings.PROCESS_IMAGE_BLOCK_TASK, task_dto
+        )
 
         # Проверяем статус работы
         response_json = await retryOperation(
@@ -84,7 +86,7 @@ async def process_image_block(
         media_group = []
 
         # Получаем референсное изображение и добавляем его в медиагруппу
-        reference_image = await getReferenceImage(model_name)
+        reference_image = await getReferenceImage(model_name, user_id)
         if reference_image:
             media_group.append(
                 types.InputMediaPhoto(
@@ -123,7 +125,9 @@ async def process_image_block(
         from helpers.handlers.startGeneration import sendImageBlock
 
         if not len(media_group):
-            logger.error(f"Медиагруппа изображений для отправки пользователю {user_id} для модели {model_name} пуста: {media_group}")
+            logger.error(
+                f"Медиагруппа изображений для отправки пользователю {user_id} для модели {model_name} пуста: {media_group}"
+            )
             return False
 
         await sendImageBlock(

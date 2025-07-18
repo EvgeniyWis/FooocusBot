@@ -4,7 +4,7 @@ from bot.helpers.generateImages.dataArray.setting_2.generate_data import (
 
 
 # Функция для генерации массива данных для запроса для настройки 2
-def setting2_get_data_array():
+async def setting2_get_data_array():
     # Массив дат с нужными параметрами для запроса
     dataArray = [
         setting2_generate_data(

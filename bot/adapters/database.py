@@ -10,10 +10,13 @@ class PostgresRepository:
     async def get_user_by_user_id(self, user_id: int):
         async with self.db.acquire() as conn:
             logger.info(f"Checking user in db {user_id}")
-            return await conn.fetch(
+            row = await conn.fetchrow(
                 "SELECT id FROM users WHERE user_id = $1",
                 user_id,
             )
+            if not row:
+                raise ValueError(f"User with tg_id={user_id} not found")
+            return row["id"]
 
     # --- Superadmin ---
 
@@ -74,7 +77,10 @@ class PostgresRepository:
             )
             return row["id"] if row else None
 
-    async def superadmin_get_all_loras(self, setting_number: int) -> list[dict]:
+    async def superadmin_get_all_loras(
+        self,
+        setting_number: int,
+    ) -> list[dict]:
         logger.info(f"Getting all LoRAs for setting {setting_number}")
         async with self.db.acquire() as conn:
             rows = await conn.fetch(
@@ -139,7 +145,9 @@ class PostgresRepository:
             ORDER BY name;
             """
         rows = await self.db.fetch(query, setting_number)
-        # Convert asyncpg Records to dictionaries
+        logger.info(
+            f"Getting all models for setting {setting_number} - {rows}",
+        )
         return [dict(r) for r in rows]
 
     # --- User LoRA / Prompts ---
@@ -229,20 +237,18 @@ class PostgresRepository:
             )
             rows = await conn.fetch(
                 """
-                SELECT ul.lora_id, ul.model_id, ul.weight, m.name AS model_name
+                SELECT ul.lora_id, ul.model_id, ul.weight, l.title AS model_name, ul.is_override
                 FROM user_loras ul
-                LEFT JOIN models m ON ul.model_id = m.id AND m.setting_number = $2
+                         LEFT JOIN loras l ON ul.lora_id = l.id
                 WHERE ul.user_id = $1 AND ul.setting_number = $2
                 """,
                 user_id,
                 setting_number,
             )
-            # Convert asyncpg Records to dictionaries
-            # Convert asyncpg Records to dictionaries
             result = [dict(r) for r in rows]
             logger.info(f"Fetched user LoRAs for setting: {result}")
             return result
-            
+
     async def user_get_loras(self, user_id: int) -> list[dict]:
         async with self.db.acquire() as conn:
             rows = await conn.fetch(
@@ -558,7 +564,7 @@ class PostgresRepository:
             logger.info(
                 f"Getting {prompt_type} prompt for user {user_id} for model {model_id} and setting {setting_number}",
             )
-            return await conn.fetchval(
+            row = await conn.fetchval(
                 """
                 SELECT prompt FROM user_prompts
                 WHERE user_id = $1
@@ -571,3 +577,5 @@ class PostgresRepository:
                 setting_number,
                 prompt_type,
             )
+            logger.info(f"Prompt: {row}")
+            return row
