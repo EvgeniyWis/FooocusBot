@@ -29,8 +29,7 @@ def setting4_get_data_array():
             "1kBl_LxPdOcsUidiUYMrHSIxylrVJkOPw",  # Updated videos folder_id
             """photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18, sorority girl, ash-blonde hair, medium-large natural breasts, tan skin, blue eyes""",
-            [2, 1.40, 0.50, 1.00, 2.50, 1.70, -0.70, 0.35],
-            8
+            [2, 1.40, 0.50, 1.00, 2.50, 1.70, -0.70, 0.35]
         ),
         setting4_generate_data(
             "oliviarouxlyn",
