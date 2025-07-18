@@ -30,7 +30,6 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
     temp = call.data.split("|")
     model_name = temp[1]
-    state_data = await state.get_data()
 
     if len(temp) == 3:
         image_index = int(temp[2])
@@ -38,7 +37,6 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(
             model_name_for_video_generation=model_name,
             image_index_for_video_generation=image_index,
-            saved_images_urls=state_data.get("saved_images_urls", []),
         )
     else:
         image_index = None
