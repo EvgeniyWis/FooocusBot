@@ -82,7 +82,7 @@ async def generateImages(
             return image, None
         except Exception as e:
             traceback.print_exc()
-            raise Exception(f"Ошибка при генерации изображения: {e}")
+            raise Exception(e)
 
     tasks = []
     for data in dataArray:

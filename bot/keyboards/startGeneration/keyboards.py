@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+from bot.constants import MULTI_IMAGE_NUMBER
 from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
@@ -228,10 +229,10 @@ def selectMultiImageKeyboard(
 ):
     # Первое изображение (index=0) - референсное, поэтому показываем кнопки с 1 по 9
     inline_keyboard = []
-    for i in range(1, min(image_number, 10), 2):
+    for i in range(1, min(image_number, MULTI_IMAGE_NUMBER) + 1, 2):
         row = []
         for j in [i, i + 1]:
-            if j >= 10:
+            if j > MULTI_IMAGE_NUMBER:
                 continue
             idx = j
             selected = idx in selected_indexes

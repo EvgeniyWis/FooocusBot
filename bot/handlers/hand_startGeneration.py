@@ -8,6 +8,7 @@ from keyboards.startGeneration.keyboards import done_typing_keyboard
 from pydantic import ValidationError
 from utils.handlers.messages import safe_edit_message
 
+from bot.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getAllDataArrays,
@@ -59,7 +60,7 @@ async def choose_generations_type(
         await editMessageOrAnswer(
             call,
             "Выберите режим генерации:\n\n"
-            "🖼 Мультивыбор - можно выбрать несколько фотографий одновременно, присылается 10 на выбор\n"
+            f"🖼 Мультивыбор - можно выбрать несколько фотографий одновременно, присылается {MULTI_IMAGE_NUMBER} на выбор\n"
             "✅ Одиночный - можно выбрать только одну генерацию, присылается 4 на выбор",
             reply_markup=start_generation_keyboards.generationModeKeyboard(),
         )
@@ -661,6 +662,7 @@ async def write_model_for_generation(
         state,
         "model_prompts_for_generation",
         data_for_update,
+        unique_keys=("model_name"),
     )
 
     await safe_send_message(
@@ -721,6 +723,7 @@ async def write_new_prompt_for_regenerate_image(
         state,
         "prompts_for_regenerated_models",
         data_for_update,
+        unique_keys=("model_name"),
     )
 
     # Получаем индекс модели

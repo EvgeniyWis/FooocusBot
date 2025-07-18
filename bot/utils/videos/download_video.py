@@ -17,10 +17,10 @@ async def download_video(url: str) -> str:
     """
     try:
         # Создаем временную директорию, если её нет
-        os.makedirs(constants.VIDEOS_TEMP_DIR, exist_ok=True)
+        os.makedirs(constants.TEMP_VIDEOS_FILES_DIR, exist_ok=True)
 
         # Генерируем уникальное имя файла
-        video_path = f"{constants.VIDEOS_TEMP_DIR}/{os.urandom(8).hex()}.mp4"
+        video_path = f"{constants.TEMP_VIDEOS_FILES_DIR}/{os.urandom(8).hex()}.mp4"
 
         # Скачиваем видео
         response = await httpx_get(url, timeout=180, stream=True)
