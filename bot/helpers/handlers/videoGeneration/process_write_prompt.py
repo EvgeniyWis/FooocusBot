@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import getModelNameIndex
+from bot.logger import logger
 from bot.states import StartGenerationState
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
@@ -51,9 +52,12 @@ async def process_write_prompt(
         types.ContentType.PHOTO,
         types.ContentType.VIDEO,
     ]:
-        write_prompt_message = await call.message.edit_caption(
-            caption=message_text,
-        )
+        try:
+            write_prompt_message = await call.message.edit_caption(
+                    caption=message_text,
+                )
+        except Exception as e:
+            logger.error(f"Ошибка при редактировании сообщения: {e}")
     else:
         write_prompt_message = await editMessageOrAnswer(
             call,
