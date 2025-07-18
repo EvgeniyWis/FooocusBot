@@ -266,16 +266,20 @@ async def handle_model_index_for_video_generation_from_image(
     await state.set_state(None)
 
     # Обрабатываем все изображения в видео
-    tasks = [
-        process_video(
-            message=message,
-            prompt=prompt,
-            image_index=image_index,
-            model_index=model_index,
-            temp_paths_for_video_generation=temp_paths_for_video_generation,
+    # Задачи запускаются параллельно, но старт каждой с задержкой 0.5 секунды
+    tasks = []
+    for image_index, model_index in model_indexes:
+        task = asyncio.create_task(
+            process_video(
+                message=message,
+                prompt=prompt,
+                image_index=image_index,
+                model_index=model_index,
+                temp_paths_for_video_generation=temp_paths_for_video_generation,
+            )
         )
-        for image_index, model_index in model_indexes
-    ]
+        tasks.append(task)
+        await asyncio.sleep(0.5)
 
     # После завершения задачи — обновляем state
     for coro in asyncio.as_completed(tasks):

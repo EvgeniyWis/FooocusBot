@@ -7,7 +7,7 @@ from aiogram.types import (
     TelegramObject,
 )
 
-DEFAULT_DELAY = 1.5
+DEFAULT_DELAY = 2
 
 class MediaGroupMiddleware(BaseMiddleware):
     ALBUM_DATA: Dict[str, List[Message]] = {}
