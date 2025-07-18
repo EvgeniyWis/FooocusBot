@@ -41,12 +41,26 @@ async def facefusion_swap(source_filename: str, target_filename: str) -> str:
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    await process.communicate()
+    stdout, stderr = await process.communicate()
+    logger.info(
+        f"[facefusion_swap] STDOUT: {stdout.decode(errors='ignore')}\n"
+        f"STDERR: {stderr.decode(errors='ignore')}",
+    )
+
+    if process.returncode != 0:
+        logger.error(
+            f"[facefusion_swap] Ошибка выполнения FaceFusion:\n"
+            f"Return code: {process.returncode}\n"
+            f"STDOUT: {stdout.decode(errors='ignore')}\n"
+            f"STDERR: {stderr.decode(errors='ignore')}",
+        )
+        raise RuntimeError("FaceFusion завершился с ошибкой")
+
+    if not os.path.exists(output_path):
+        raise FileNotFoundError(
+            "Facefusion не смог корректно сохранить результат!",
+        )
 
     logger.info(f"FaceFusion успешно завершен, результат: {output_path}")
-
-    # Проверяем, что файл существует
-    if not os.path.exists(output_path):
-        raise FileNotFoundError(f"Facefusion не смог корректно сохранить результат!")
 
     return str(output_path)
