@@ -662,6 +662,7 @@ async def write_model_for_generation(
         state,
         "model_prompts_for_generation",
         data_for_update,
+        unique_keys=("model_name"),
     )
 
     await safe_send_message(
@@ -722,6 +723,7 @@ async def write_new_prompt_for_regenerate_image(
         state,
         "prompts_for_regenerated_models",
         data_for_update,
+        unique_keys=("model_name"),
     )
 
     # Получаем индекс модели
