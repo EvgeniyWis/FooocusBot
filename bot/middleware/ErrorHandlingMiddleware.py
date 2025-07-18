@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 from bot.InstanceBot import bot
 from bot.logger import logger
 from bot.settings import settings
+from bot.utils.httpx.error_texts import PAYMENT_RUNPOD_ERROR_TEXT
 
 
 class ErrorHandlingMiddleware(BaseMiddleware):
@@ -22,6 +23,9 @@ class ErrorHandlingMiddleware(BaseMiddleware):
         try:
             return await handler(event, data)
         except Exception as e:
+            if str(e) in [PAYMENT_RUNPOD_ERROR_TEXT]:
+                return
+
             # Формируем сообщение об ошибке
             error_message = "❌ Произошла ошибка:\n\n"
             error_message += f"🔴 Тип ошибки: {type(e).__name__}\n"

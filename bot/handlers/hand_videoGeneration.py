@@ -1,15 +1,19 @@
+import os
+
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.videoGeneration import (
+    get_video_path_from_state,
     process_video,
     process_write_prompt,
     saveVideo,
 )
 from bot.InstanceBot import router
 from bot.logger import logger
+from bot.settings import settings
 from bot.states import StartGenerationState
 from bot.utils.handlers import (
     getDataInDictsArray,
@@ -41,6 +45,16 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(
             model_name_for_video_generation=model_name,
         )
+
+    # Получаем путь к видео (если он есть и это перегенерация)
+    video_path = await get_video_path_from_state(state, model_name, image_index, call)
+
+    # Удаляем видео из папки temp
+    if not settings.MOCK_VIDEO_MODE and video_path:
+        try:
+            os.remove(video_path)
+        except Exception as e:
+            logger.error(f"Ошибка при удалении видео из папки temp: {e}")
 
     await process_write_prompt(
         call,
@@ -104,13 +118,20 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
                 message,
             )
             return
-        
+
     else:
         img2video_temp_paths_for_with_model_names = state_data.get(
             "img2video_temp_paths_for_with_model_names", {}
         )
 
         temp_path = img2video_temp_paths_for_with_model_names.get(model_name, None)
+
+        if not temp_path:
+            await safe_send_message(
+                "Ошибка: не удалось найти путь к изображению",
+                message,
+            )
+            return
 
     # Удаляем сообщение пользователя
     await message.delete()
@@ -176,34 +197,15 @@ async def handle_video_correctness_buttons(
     state_data = await state.get_data()
 
     # Получаем путь к видео
-    generated_video_paths = state_data.get("generated_video_paths", [])
-
-    if image_index: 
-        logger.info(
-            f"Получены пути к видео: {generated_video_paths} и попытка получить путь к видео по имени модели {model_name} и индексу изображения {image_index}",
-        )
-        video_path = await getDataInDictsArray(
-            generated_video_paths,
-            model_name,
-            image_index,
-        )
-    else:
-        logger.info(
-            f"Получены пути к видео: {generated_video_paths} и попытка получить путь к видео по имени модели {model_name}",
-        )
-        video_path = await getDataInDictsArray(
-            generated_video_paths,
-            model_name,
-        )
+    video_path = await get_video_path_from_state(state, model_name, image_index, call)
 
     if not video_path:
+        error_message = "Ошибка: не удалось найти путь к видео для сохранения"
         await safe_send_message(
-            "Ошибка: не удалось найти путь к видео для сохранения",
+            error_message,
             call.message,
         )
-        return
-
-    logger.info(f"Получен путь к видео для сохранения: {video_path}")
+        return None
 
     if image_index:
         # Удаляем изображение из массива объектов saved_images_urls

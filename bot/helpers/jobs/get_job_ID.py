@@ -2,6 +2,7 @@ from aiogram.fsm.context import FSMContext
 from logger import logger
 from utils.handlers.appendDataToStateArray import appendDataToStateArray
 
+from bot.constants import MULTI_IMAGE_NUMBER
 from bot.helpers.jobs.send_run_request import send_run_request
 from bot.utils.retryOperation import retryOperation
 
@@ -20,7 +21,7 @@ async def get_job_ID(
     # Обновляем данные о числе изображений, в зависимости от того, есть ли мультигенерация
     state_data = await state.get_data()
     if state_data.get("multi_select_mode", False) and job_type == "image_generation":
-        dataJSON["input"]["image_number"] = 10
+        dataJSON["input"]["image_number"] = MULTI_IMAGE_NUMBER
 
     # Получаем id работы
     response_json = await retryOperation(
