@@ -19,4 +19,6 @@ COMFYUI_AVG_TIMES_METRICS_PATH: Final[Path] = (
 COMFYUI_HEATING_IMAGES_PATH: Final[Path] = (
     BASE_DIR / "bot" / "assets" / "comfyui" / "heating" / "img"
 )
-MULTI_IMAGE_NUMBER: Final[int] = 10
+
+# Не может быть больше 9!
+MULTI_IMAGE_NUMBER: Final[int] = 9

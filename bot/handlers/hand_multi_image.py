@@ -5,7 +5,7 @@ import shutil
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.constants import TEMP_FOLDER_PATH
+from bot.constants import MULTI_IMAGE_NUMBER, TEMP_FOLDER_PATH
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     process_image,
@@ -27,7 +27,7 @@ async def select_multi_image(call: types.CallbackQuery, state: FSMContext):
     if image_index in selected_indexes:
         selected_indexes.remove(image_index)
     else:
-        if len(selected_indexes) < 10:
+        if len(selected_indexes) < MULTI_IMAGE_NUMBER:
             selected_indexes.append(image_index)
     selected_indexes_dict[model_name] = selected_indexes
     await state.update_data(selected_indexes=selected_indexes_dict)
@@ -38,7 +38,7 @@ async def select_multi_image(call: types.CallbackQuery, state: FSMContext):
     kb = selectMultiImageKeyboard(
         model_name,
         setting_number,
-        10,
+        MULTI_IMAGE_NUMBER,
         selected_indexes,
     )
     await call.message.edit_reply_markup(reply_markup=kb)
