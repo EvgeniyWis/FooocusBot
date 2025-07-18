@@ -1,0 +1,1 @@
+PAYMENT_RUNPOD_ERROR_TEXT = "Недостаточно средств на балансе Runpod!"
