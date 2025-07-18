@@ -34,7 +34,12 @@ async def clean_temp_dirs():
                 os.remove(file_path)
 
     os.makedirs(
-        os.path.join(constants.TEMP_IMAGE_FILES_DIR, "images"),
+        os.path.join(constants.TEMP_IMAGE_FILES_DIR),
+        exist_ok=True,
+    )
+
+    os.makedirs(
+        os.path.join(constants.TEMP_VIDEOS_FILES_DIR),
         exist_ok=True,
     )
 
