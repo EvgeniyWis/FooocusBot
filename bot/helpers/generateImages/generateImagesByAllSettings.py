@@ -38,8 +38,8 @@ async def generateImagesByAllSettings(
     # Добавляем рандомные значения к промпу
     if with_randomizer:
         dataArrays = [
-            await getDataArrayByRandomizer(state, index + 1)
-            for index in enumerate(dataArrays)
+            await getDataArrayByRandomizer(state, i + 1 if i + 1 != 5 else "extra")
+            for i in range(len(dataArrays))
         ]
 
     # Создаём сообщение с прогрессом генерации настроек
@@ -84,7 +84,6 @@ async def generateImagesByAllSettings(
         for index, dataArray in enumerate(dataArrays):
             tasks = []
             if is_test_generation:
-                dataJSON = dataArray[0]["json"]
                 model_name = dataArray[0]["model_name"]
                 task = asyncio.create_task(
                     process_generation(model_name, index, variable_prompt),
@@ -94,7 +93,6 @@ async def generateImagesByAllSettings(
                 for data in dataArray:
                     # Получаем данные
                     model_name = data["model_name"]
-                    dataJSON = data["json"]
 
                     # Обновляем стейт
                     jobs = {}
@@ -103,7 +101,7 @@ async def generateImagesByAllSettings(
 
                     # Генерируем изображение
                     task = asyncio.create_task(
-                        process_generation(dataJSON, model_name, index),
+                        process_generation(model_name, index, variable_prompt),
                     )
                     tasks.append(task)
 

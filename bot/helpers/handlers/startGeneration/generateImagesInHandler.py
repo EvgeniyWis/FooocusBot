@@ -90,7 +90,7 @@ async def generateImagesInHandler(
                     user_id,
                     is_test_generation,
                     prompt if isinstance(prompt, str) else "",
-                    True,
+                    with_randomizer,
                 )
             else:
                 await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
