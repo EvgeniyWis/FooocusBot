@@ -39,9 +39,8 @@ jobs:
       - name: Deploy to server ${{ matrix.server }} (bot ${{ matrix.bot }})
         run: |
           ssh root@${{ matrix.server }} << 'EOF'
-          cd ..
-          cd FooocusBotFolder_${{ matrix.bot }}/FooocusBot
+          cd ../FooocusBotFolder_${{ matrix.bot }}/FooocusBot
           git pull origin master
           pip install -r requirements.txt
-          sudo systemctl restart fooocusbot_${{ matrix.bot }}.service
+          make restart-bot
           EOF
