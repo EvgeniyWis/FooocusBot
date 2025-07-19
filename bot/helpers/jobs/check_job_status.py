@@ -127,8 +127,16 @@ async def check_job_status(
     # Проверяем наличие выходных данных
     images_output = response_json.get("output", [])
 
-    if images_output == []:  # Если их нет, то кидаем ошибку
-        raise ValueError("Не удалось сгенерировать изображения")
+    if images_output != []:  # Если их нет, то кидаем ошибку и помечаем как фейл
+        response_json["status"] = "FAILED"
+        await edit_job_message(
+            job_id,
+            message_id,
+            state,
+            response_json,
+            user_id,
+        )
+        raise ValueError("Runpod не смог сгенерировать выходные данные!")
 
     # Обновляем сообщение для актуальных данных
     if state and setting_number != "individual" and checkOtherJobs:
