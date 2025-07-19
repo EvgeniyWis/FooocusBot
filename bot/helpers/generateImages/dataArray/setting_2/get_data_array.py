@@ -167,7 +167,7 @@ def setting2_get_data_array():
             "1DvfhRjMyDVmTj67hInJL_VbYiIc_iX6v",
             """photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
-            [1, 0.7, 2.00, 1.00, -2.30, -1.50],
+            [1, 0.7, 2.20, 1.00, -2.30, -1.50],
         ),
         setting2_generate_data(
             "nicolevalaine",
