@@ -118,13 +118,13 @@ def writePromptTypeKeyboard():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="1️⃣ Один промпт для всех моделей",
+                    text="1️⃣🎲 Один промпт + рандомайзер",
                     callback_data="write_prompt_type|one",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="✨ Уникальный промпт для каждой модели",
+                    text="✨ Уникальный промпт",
                     callback_data="write_prompt_type|unique",
                 ),
             ],
