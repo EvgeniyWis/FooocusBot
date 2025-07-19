@@ -21,5 +21,5 @@ async def httpx_get(
             except ValueError:
                 return response
 
-        logger.error(f"Ошибка при выполнении запроса: {response.status_code} Ответ: {response.text}")
+        logger.error(f"Ошибка при выполнении запроса: {response.status_code} Ответ: {response}")
         return None
