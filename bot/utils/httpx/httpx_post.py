@@ -78,7 +78,7 @@ async def httpx_post(
         await asyncio.sleep(10)
         raise
     except httpx.RequestError as e:
-        logger.error(f"Ошибка при выполнении запроса: {str(e)} Ответ: {response.text}")
+        logger.error(f"Ошибка при выполнении запроса: {str(e)} Ответ: {response}")
         await asyncio.sleep(10)
         raise
 
