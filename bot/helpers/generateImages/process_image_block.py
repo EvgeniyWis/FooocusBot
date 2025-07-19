@@ -79,7 +79,7 @@ async def process_image_block(
             images_output = response_json.get("output", [])
 
             if images_output == []:
-                raise Exception("Не удалось сгенерировать изображения")
+                raise Exception("Не удалось сгенерировать изображения (ошибка обработки на RunPod)")
 
         media_group = []
 
