@@ -41,9 +41,9 @@ async def sendImageBlock(
             f"Media group sent to user_id={user_id}, model_name={model_name}, images_count={len(media_group)}",
         )
 
-        await asyncio.sleep(0.7)
+        await asyncio.sleep(1)
         logger.info(
-            f"Slept 0.7s before sending keyboard to user_id={user_id}, model_name={model_name}",
+            f"Slept 1s before sending keyboard to user_id={user_id}, model_name={model_name}",
         )
 
         for idx, media in enumerate(media_group_message):
