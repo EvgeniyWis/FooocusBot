@@ -71,7 +71,7 @@ async def sendImageBlock(
             else:
                 await bot.send_message(
                     chat_id=user_id,
-                    text="Произошла ошибка при отправке изображений, но продолжаем работу...",
+                    text=f"Произошла ошибка при отправке изображений! Текст ошибки: {e}",
                 )
         except:
             pass
