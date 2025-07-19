@@ -354,7 +354,6 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
     reply_markup=done_typing_keyboard_for_prompts(),)
 
 
-@router.callback_query(lambda c: c.data == "done_typing_randomize_prompts")
 async def finish_prompt_input(
     callback: types.CallbackQuery,
     state: FSMContext,
@@ -442,6 +441,7 @@ async def write_one_message_for_randomizer(
             await safe_send_message(
                 f"Строка должна заканчиваться точкой с запятой (;): {line}",
                 message,
+                reply_markup=done_typing_keyboard_for_prompts()
             )
             return
 
@@ -517,4 +517,9 @@ def hand_add():
         StateFilter(
             RandomizerState.write_multi_messages_for_prompt_for_randomizer,
         ),
+    )
+
+    router.callback_query.register(
+        finish_prompt_input,
+        lambda call: call.data == "done_typing_randomize_prompts",
     )

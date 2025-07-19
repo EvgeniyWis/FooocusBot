@@ -503,7 +503,6 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
     reply_markup=done_typing_keyboard())
 
 
-@router.callback_query(lambda c: c.data == "done_typing")
 async def finish_prompt_input(
     callback: types.CallbackQuery,
     state: FSMContext,
@@ -813,6 +812,7 @@ def hand_add():
         send_message_with_info_for_write_prompts_for_models,
         lambda call: call.data.startswith("specific_generation|one_prompt"),
     )
+
     router.callback_query.register(
         start_multi_prompt_input_mode,
         lambda call: call.data.startswith("specific_generation|more_prompts"),
@@ -824,6 +824,11 @@ def hand_add():
             MultiPromptInputState.collecting_model_prompts_for_settings,
             MultiPromptInputState.collecting_prompt_parts,
         ),
+    )
+
+    router.callback_query.register(
+        finish_prompt_input,
+        lambda call: call.data == "done_typing",
     )
 
     router.message.register(
