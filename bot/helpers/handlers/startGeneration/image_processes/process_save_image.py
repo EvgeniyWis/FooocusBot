@@ -1,6 +1,7 @@
 import os
 import traceback
 from datetime import datetime
+import pytz
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
@@ -62,7 +63,8 @@ async def process_save_image(
     model_data = await getDataByModelName(model_name)
 
     # Сохраняем изображение
-    now = datetime.now().strftime("%Y-%m-%d")
+    tz = pytz.timezone("Europe/Moscow")
+    now = datetime.now(tz).strftime("%Y-%m-%d")
     if not settings.MOCK_IMAGES_MODE:
         state_data = await state.get_data()
         multi_select_mode = bool(state_data.get("multi_select_mode", False))
