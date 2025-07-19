@@ -45,7 +45,7 @@ def setting3_get_data_array():
             "1WydGjcAvmy2ofXp5rvqG-h7Dnu5hJQH0",
             "1ZiOYWCK2LB1EE7MGY2i9pYMlS4HQuK1x",
             "photorealistic portrait, 18 years old, platinum-blonde hair, big breasts, slim waist, big hips, tan skin, thin lips, smirk, green eyes, high quality.",
-            [-1.50, 1.30, 0.7, 3.5, 1.9, -0.45]),
+            [-1.50, 1.30, 0.7, 3.8, 1.9, -0.45]),
 
         setting3_generate_data(
             "noellebriar.xo",
@@ -94,7 +94,7 @@ def setting3_get_data_array():
             "1DVYcZ-QRloJNHcoYb5_yoJ_rNM7U_BIi",
             "1hiRC7o_BVtbuJmggtB1oSjd8Si7lz_3m",
             "photorealistic portrait, 18 years old, ash-platinum hair, big breasts, slim waist, tan skin, big lips, smirk, brown eyes, high quality.",
-            [-1.50, 1.30, 0.7, 3.60, 0.30, -0.80]),
+            [-1.50, 1.30, 0.7, 3.90, 0.30, -0.80]),
 
         setting3_generate_data(
             "sasha_no_limit",
