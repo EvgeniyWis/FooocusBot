@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+import pytz
 from aiogram import types
 from logger import logger
 
@@ -20,7 +21,8 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 # Функция для сохранения видео в папку модели
 async def saveVideo(video_path: str, model_name: str, message: types.Message):
     # Получаем текущую дату
-    now = datetime.now().strftime("%Y-%m-%d")
+    tz = pytz.timezone("Europe/Moscow")
+    now = datetime.now(tz).strftime("%Y-%m-%d")
 
     # Получаем id пользователя
     user_id = message.from_user.id
