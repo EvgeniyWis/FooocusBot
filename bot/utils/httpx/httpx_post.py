@@ -16,7 +16,7 @@ async def httpx_post(
     files: dict = None,
     timeout: int = 60,
     with_response_text_logging: bool = True,
-):
+) -> httpx.Response:
     response = None
     response_json = None
 
