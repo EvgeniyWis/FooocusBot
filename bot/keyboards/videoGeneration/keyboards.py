@@ -19,6 +19,12 @@ def generateVideoKeyboard(model_name: str, image_index: int):
                     callback_data=f"generate_comfyui_video|{model_name}|{image_index}",
                 ),
             ],
+            [
+                InlineKeyboardButton(
+                    text="🪄 Использовать Magnific Upscaler",
+                    callback_data=f"magnific_upscale|{model_name}|{image_index}",
+                ),
+            ],
         ],
     )
 
