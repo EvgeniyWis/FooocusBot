@@ -1,0 +1,22 @@
+from bot.logger import logger
+from bot.services.iloveapi.api_client import ILoveAPI
+from bot.utils.httpx import httpx_post
+
+
+class ILoveAPIAuth:
+    def __init__(self, api: ILoveAPI):
+        self.api = api
+        logger.info("Инициализирован аутентификатор ILoveAPI")
+
+    async def auth(self, public_key: str) -> str:
+        url = f"{self.api.base_url}/auth"
+
+        data = {
+            "public_key": public_key,
+        }
+
+        response = await httpx_post(url, data=data)
+        json = response.json()
+        jwt_token = json["token"]
+
+        return jwt_token
