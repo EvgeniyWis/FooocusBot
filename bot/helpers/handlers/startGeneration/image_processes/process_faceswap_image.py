@@ -124,10 +124,6 @@ async def process_faceswap_image(
             )
             break
 
-        logger.info(
-            f"Список генераций для замены лица: {faceswap_generated_models}",
-        )
-
         # Если список пуст, то завершаем цикл
         if not len(faceswap_generated_models):
             break
