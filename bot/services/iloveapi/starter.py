@@ -1,6 +1,6 @@
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
-from bot.services.iloveapi.types import ImagesToolType
+from bot.services.iloveapi.types import ToolType
 from bot.utils.httpx import httpx_get
 
 
@@ -9,7 +9,7 @@ class ILoveAPIStarter:
         self.api = api
         logger.info("Инициализирован стартер ILoveAPI")
 
-    async def start_task(self, tool: ImagesToolType) -> dict:
+    async def start_task(self, tool: ToolType) -> dict:
         """
         Стартер задач в ILoveAPI
 
