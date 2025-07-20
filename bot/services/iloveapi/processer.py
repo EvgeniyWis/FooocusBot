@@ -9,7 +9,8 @@ class ILoveAPIProcesser:
         self.api = api
         logger.info("Инициализирован обработчик ILoveAPI")
 
-    async def process(self, server: str, task_id: str, tool: ToolType, files: list[FileFormat]) -> str:
+    async def process(self, server: str, task_id: str, tool: ToolType, files: list[FileFormat], 
+        tool_data: dict) -> dict:
         """
         Обработка файлов в ILoveAPI
 
@@ -20,7 +21,7 @@ class ILoveAPIProcesser:
             files (list[FileFormat]): Список файлов
 
         Returns:
-            str: Имя файла на сервере
+            dict: JSON ответ
         """
         url = f"https://{server}/v1/process"
 
@@ -28,6 +29,7 @@ class ILoveAPIProcesser:
             "task": task_id,
             "tool": tool,
             "files": files,
+            **tool_data,
         }
 
         response = await httpx_post(url, data=data)
