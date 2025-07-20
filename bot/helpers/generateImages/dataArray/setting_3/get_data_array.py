@@ -45,7 +45,7 @@ def setting3_get_data_array():
             "1WydGjcAvmy2ofXp5rvqG-h7Dnu5hJQH0",
             "1ZiOYWCK2LB1EE7MGY2i9pYMlS4HQuK1x",
             "photorealistic portrait, 18 years old, platinum-blonde hair, big breasts, slim waist, big hips, tan skin, thin lips, smirk, green eyes, high quality.",
-            [-1.50, 1.30, 0.7, 3.8, 1.9, -0.45]),
+            [-1.50, 1.30, 0.7, 4.1, 1.9, -0.45]),
 
         setting3_generate_data(
             "noellebriar.xo",
@@ -66,7 +66,7 @@ def setting3_get_data_array():
             "1Kyu0U1OdsJvTzeuxa6AmdjsJCwOyGkj8",
             "1b45bniDdmM4MAHsRAESxU2v7965JZjuo",
             "photorealistic portrait, 18 years old, platinum-blonde hair with black curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
-            [-1.50, 1.30, 0.7, 2.60, 1.60, -0.85]),
+            [-1.50, 1.30, 0.7, 2.90, 1.60, -0.85]),
 
         setting3_generate_data(
             "sofiavogel.xo",
@@ -87,14 +87,14 @@ def setting3_get_data_array():
             "18cGf0zpBKPF0QdpKB8SSGLtC2zNbX7IU",
             "15k2nzs_1h5x8ua-uQ4HSAz6luB5CZ3N0",
             "photorealistic portrait, 18 years old, brown hair, big breasts, slim waist, tan skin, big lips, smirk, brown eyes, high quality.",
-            [-1.50, 1.30, 0.7, 3.45, 0.10, -0.35]),
+            [-1.50, 1.30, 0.7, 3.7, 0.10, -0.35]),
 
         setting3_generate_data(
             "alinacute.xo",
             "1DVYcZ-QRloJNHcoYb5_yoJ_rNM7U_BIi",
             "1hiRC7o_BVtbuJmggtB1oSjd8Si7lz_3m",
             "photorealistic portrait, 18 years old, ash-platinum hair, big breasts, slim waist, tan skin, big lips, smirk, brown eyes, high quality.",
-            [-1.50, 1.30, 0.7, 3.90, 0.30, -0.80]),
+            [-1.50, 1.30, 0.7, 4.20, 0.30, -0.80]),
 
         setting3_generate_data(
             "sasha_no_limit",
@@ -128,15 +128,17 @@ def setting3_get_data_array():
             "lolavexley",
             "1TZKxFpPzEUVlBU6ccAsLptFpbhHHPUcP",
             "1gioOoeFhTNcpXoyqiNVtIMjaPSnYoVrD",
-            "photorealistic portrait, 18 years old, brown hair, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, blue eyes, high quality.",
-            [-1.50, 1.30, 0.7, 2.95, 1.95, -1.00]),
+            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+
+            real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous brown hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
+            [-1.50, 1.30, 0.7, 3.2, 1.95, -1.00]),
 
         setting3_generate_data(
             "elinarayne.xo",
             "1qoA-kkQIel6U1LnWQg8WFKzD4q0Z4lBN",
             "1afKkZEEODzsaCBdW3GcIIVRB-n4dIHkk",
             "photorealistic portrait, 18 years old, black hair, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, blue eyes, high quality.",
-            [-1.50, 1.30, 0.7, 0.55, 0.45, 0.55]),
+            [-1.50, 1.30, 0.7, 0.85, 0.45, 0.55]),
 
         setting3_generate_data(
             "leonaclaive",
