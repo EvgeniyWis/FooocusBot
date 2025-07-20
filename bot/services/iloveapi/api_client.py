@@ -1,5 +1,5 @@
 from bot.services.base_api_client import BaseAPIClient
 
 
-class ComfyUIAPI(BaseAPIClient):
+class ILoveAPI(BaseAPIClient):
     pass
