@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional, TypedDict
 
 ImagesToolType = Literal[
     "compressimage",
@@ -9,5 +9,13 @@ ImagesToolType = Literal[
     "resizeimage",
     "rotateimage",
     "upscaleimage",
-    "watermarkimage"
+    "watermarkimage",
 ]
+
+ToolType = ImagesToolType
+
+class FileFormat(TypedDict):
+    server_filename: str
+    filename: str
+    rotate: Optional[int]
+    password: Optional[str]
