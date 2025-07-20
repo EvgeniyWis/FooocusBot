@@ -9,6 +9,15 @@ class ILoveAPIAuth:
         logger.info("Инициализирован аутентификатор ILoveAPI")
 
     async def auth(self, public_key: str) -> str:
+        """
+        Аутентификация в ILoveAPI
+
+        Args:
+            public_key (str): Публичный ключ
+
+        Returns:
+            str: JWT токен
+        """
         url = f"{self.api.base_url}/auth"
 
         data = {
