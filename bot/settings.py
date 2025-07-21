@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     RUNPOD_API_KEY: str
     KLING_API_KEY: str
     BOT_API_TOKEN: str
-    SECRET_ILOVEAPI_API_KEY: str
     PUBLIC_ILOVEAPI_API_KEY: str
 
     # user_id пользователей / администраторов
