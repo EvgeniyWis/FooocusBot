@@ -21,7 +21,7 @@ from bot.services.iloveapi.utils.validation import (
 )
 
 
-class ILoveAPITaskService(ILoveAPIBaseService):
+class ILoveAPITaskFacade(ILoveAPIBaseService):
     """
     Фасадный сервис для работы с задачами ILoveAPI (запуск, загрузка, обработка).
     """

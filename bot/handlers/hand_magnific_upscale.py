@@ -1,7 +1,7 @@
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from FooocusBot.bot.factory.iloveapi_factory import get_iloveapi_factory
+from bot.factory.iloveapi_task_factory import get_iloveapi_task_factory
 
 from bot.helpers import text
 from bot.InstanceBot import router
@@ -51,7 +51,7 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"URL изображения для Magnific Upscaler: {image_url}")
 
     # Получаем сервис ILoveAPI
-    iloveapi_service = get_iloveapi_factory()
+    iloveapi_service = get_iloveapi_task_factory()
 
     # Запускаем задачу
     result = await iloveapi_service.resize_image(
