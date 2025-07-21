@@ -1,19 +1,12 @@
-from bot.logger import logger
-from bot.services.freepik.magnific.api_client import MagnificAPI
+from bot.services.freepik.services.magnific.client.base_service import (
+    MagnificBaseService,
+)
 
 
-class MagnificUpscaler:
+class MagnificUpscaler(MagnificBaseService):
     """
     Сервис для upscale изображений с помощью Magnific.
     """
-    def __init__(self, api: MagnificAPI) -> None:
-        """
-        Args:
-            api (MagnificAPI): Экземпляр клиента Magnific.
-        """
-        self.api = api
-        logger.info("Инициализирован Magnific Upscaler")
-
     async def upscale(self, image: str) -> dict:
         """
         Upscale изображение с помощью Magnific.
