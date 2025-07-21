@@ -24,11 +24,11 @@ async def _download_single_video(
 
             with tempfile.NamedTemporaryFile(
                 delete=False,
-                suffix=".mp4",
+                suffix=".mov",
             ) as tmpfile:
                 tmpfile.write(await resp.read())
                 logger.info(
-                    f"Видео {idx} успешно скачано, сохранено в {tmpfile.name}"
+                    f"Видео {idx} успешно скачано, сохранено в {tmpfile.name}",
                 )
                 return DownloadedVideo(
                     path=tmpfile.name,
