@@ -1,15 +1,15 @@
-from bot.services.iloveapi.api_client import ILoveAPI
-from bot.services.iloveapi.downloader import ILoveAPIDownloader
-from bot.services.iloveapi.interfaces import (
+from bot.services.iloveapi.client.api_client import ILoveAPI
+from bot.services.iloveapi.client.interfaces import (
     DownloaderProtocol,
     ProcesserProtocol,
     StarterProtocol,
     UploaderProtocol,
 )
-from bot.services.iloveapi.processer import ILoveAPIProcesser
-from bot.services.iloveapi.starter import ILoveAPIStarter
+from bot.services.iloveapi.files.downloader import ILoveAPIDownloader
+from bot.services.iloveapi.files.uploader import ILoveAPIUploader
+from bot.services.iloveapi.services.processer import ILoveAPIProcesser
+from bot.services.iloveapi.services.starter import ILoveAPIStarter
 from bot.services.iloveapi.task_service import ILoveAPITaskService
-from bot.services.iloveapi.uploader import ILoveAPIUploader
 from bot.settings import settings
 
 

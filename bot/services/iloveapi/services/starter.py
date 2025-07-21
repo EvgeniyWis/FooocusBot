@@ -1,7 +1,7 @@
-from bot.services.iloveapi.base_service import ILoveAPIBaseService
-from bot.services.iloveapi.types import StartTaskResponse, ToolType
+from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
+from bot.services.iloveapi.client.types import StartTaskResponse, ToolType
 
-from .interfaces import StarterProtocol
+from ..client.interfaces import StarterProtocol
 
 
 class ILoveAPIStarter(ILoveAPIBaseService, StarterProtocol):
