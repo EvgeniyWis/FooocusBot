@@ -3,6 +3,10 @@ from typing import Any, Dict
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
 from bot.services.iloveapi.types import ToolType
+from bot.services.iloveapi.validation import (
+    log_task_step,
+    validate_file_format,
+)
 
 from .interfaces import (
     DownloaderProtocol,
@@ -38,6 +42,7 @@ class ILoveAPITaskService:
         self.processer = processer
         self.downloader = downloader
 
+    @log_task_step('run_image_task')
     async def run_image_task(
         self,
         tool: ToolType,
@@ -62,14 +67,18 @@ class ILoveAPITaskService:
         logger.info(f"Сервер: {server}, ID задачи: {task_id}")
 
         server_filename = await self.uploader.upload(server, task_id, file)
+
         logger.info(f"Файл загружен: {server_filename}")
 
         files = [{"server_filename": server_filename, "filename": file}]
+        for f in files:
+            validate_file_format(f)
         logger.info(f"Файлы для обработки: {files} и {tool_data}")
         await self.processer.process(server, task_id, tool, files, tool_data)
         logger.info("Обработка завершена успешно!")
 
         result = await self.downloader.download(server, task_id)
+
         logger.info(f"Файл выгружен: {result}")
         return result
 
