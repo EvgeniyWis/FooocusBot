@@ -1,9 +1,12 @@
 from bot.services.freepik.services.magnific.client.base_service import (
     MagnificBaseService,
 )
+from bot.services.freepik.services.magnific.client.interfaces import (
+    StatusServiceProtocol,
+)
 
 
-class MagnificStatusService(MagnificBaseService):
+class MagnificStatusService(MagnificBaseService, StatusServiceProtocol):
     """
     Сервис для обработки статуса задачи с помощью Magnific.
     """
