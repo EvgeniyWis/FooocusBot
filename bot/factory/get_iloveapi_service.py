@@ -12,21 +12,20 @@ from bot.services.iloveapi.task_service import ILoveAPITaskService
 from bot.services.iloveapi.uploader import ILoveAPIUploader
 from bot.settings import settings
 
-# Singleton instance
-_iloveapi_service_instance = None
 
 def get_iloveapi_service(
     uploader: UploaderProtocol = None,
     downloader: DownloaderProtocol = None,
     processer: ProcesserProtocol = None,
     starter: StarterProtocol = None,
+    api_url: str = None,
+    public_key: str = None,
 ):
-    global _iloveapi_service_instance
-    if _iloveapi_service_instance is None:
-        api = ILoveAPI(settings.ILOVEAPI_API_URL, settings.PUBLIC_ILOVEAPI_API_KEY)
-        starter = starter or ILoveAPIStarter(api)
-        uploader = uploader or ILoveAPIUploader(api)
-        processer = processer or ILoveAPIProcesser(api)
-        downloader = downloader or ILoveAPIDownloader(api)
-        _iloveapi_service_instance = ILoveAPITaskService(api, starter, uploader, processer, downloader)
-    return _iloveapi_service_instance
+    api_url = api_url or settings.ILOVEAPI_API_URL
+    public_key = public_key or settings.PUBLIC_ILOVEAPI_API_KEY
+    api = ILoveAPI(api_url, public_key)
+    starter = starter or ILoveAPIStarter(api)
+    uploader = uploader or ILoveAPIUploader(api)
+    processer = processer or ILoveAPIProcesser(api)
+    downloader = downloader or ILoveAPIDownloader(api)
+    return ILoveAPITaskService(api, starter, uploader, processer, downloader)
