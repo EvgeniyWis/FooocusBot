@@ -13,7 +13,7 @@ from bot.services.iloveapi.services.uploader import ILoveAPIUploader
 from bot.settings import settings
 
 
-def get_iloveapi_service(
+def get_iloveapi_factory(
     uploader: UploaderProtocol = None,
     downloader: DownloaderProtocol = None,
     processer: ProcesserProtocol = None,
