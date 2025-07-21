@@ -4,6 +4,12 @@ import httpx
 
 from bot.logger import logger
 from bot.services.iloveapi.client.api_client import ILoveAPI
+from bot.services.iloveapi.client.interfaces import (
+    DownloaderProtocol,
+    ProcesserProtocol,
+    StarterProtocol,
+    UploaderProtocol,
+)
 from bot.services.iloveapi.client.types import (
     StartTaskResponse,
     ToolDataResizeImage,
@@ -12,13 +18,6 @@ from bot.services.iloveapi.client.types import (
 from bot.services.iloveapi.utils.validation import (
     log_task_step,
     validate_file_format,
-)
-
-from .client.interfaces import (
-    DownloaderProtocol,
-    ProcesserProtocol,
-    StarterProtocol,
-    UploaderProtocol,
 )
 
 
