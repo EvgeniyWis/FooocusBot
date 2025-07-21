@@ -3,18 +3,18 @@ from typing import Any, Dict
 import httpx
 
 from bot.logger import logger
-from bot.services.iloveapi.api_client import ILoveAPI
-from bot.services.iloveapi.types import (
+from bot.services.iloveapi.client.api_client import ILoveAPI
+from bot.services.iloveapi.client.types import (
     StartTaskResponse,
     ToolDataResizeImage,
     ToolType,
 )
-from bot.services.iloveapi.validation import (
+from bot.services.iloveapi.utils.validation import (
     log_task_step,
     validate_file_format,
 )
 
-from .interfaces import (
+from .client.interfaces import (
     DownloaderProtocol,
     ProcesserProtocol,
     StarterProtocol,

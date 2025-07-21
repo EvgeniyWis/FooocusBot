@@ -1,7 +1,7 @@
 from functools import wraps
 
 from bot.logger import logger
-from bot.services.iloveapi.types import FileFormat
+from bot.services.iloveapi.client.types import FileFormat
 
 
 def validate_file_format(data: FileFormat) -> None:
