@@ -118,7 +118,7 @@ async def process_faceswap_image(
         current_time = datetime.now()
         elapsed_time = (current_time - start_time).total_seconds()
         if elapsed_time > 1200:  # 20 минут = 1200 секунд
-            error_message = f"Таймаут ожидания обновления списка faceswap_generated_models для модели {model_name}"
+            error_message = f"Время ожидания замены лица для модели {model_name} истекло!"
             logger.error(
                 error_message,
             )
