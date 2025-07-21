@@ -1,18 +1,16 @@
-from enum import Enum
-from typing import Optional, TypedDict
+from typing import Literal, Optional, TypedDict
 
-
-class ImagesToolType(Enum):
-    COMPRESS_IMAGE = "compressimage"
-    CROP_IMAGE = "cropimage"
-    CONVERT_IMAGE = "convertimage"
-    REMOVE_BACKGROUND_IMAGE = "removebackgroundimage"
-    REPAIR_IMAGE = "repairimage"
-    RESIZE_IMAGE = "resizeimage"
-    ROTATE_IMAGE = "rotateimage"
-    UPSCALE_IMAGE = "upscaleimage"
-    WATERMARK_IMAGE = "watermarkimage"
-
+ImagesToolType = Literal[
+    "compressimage",
+    "cropimage",
+    "convertimage",
+    "removebackgroundimage",
+    "repairimage",
+    "resizeimage",
+    "rotateimage",
+    "upscaleimage",
+    "watermarkimage",
+]
 
 ToolType = ImagesToolType
 

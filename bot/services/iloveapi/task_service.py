@@ -33,7 +33,7 @@ class ILoveAPITaskService:
     async def run_image_task(
         self,
         tool: ToolType,
-        file_path: str,
+        file: str,
         tool_data: Dict[str, Any],
     ) -> Dict[str, Any]:
         """
@@ -41,7 +41,7 @@ class ILoveAPITaskService:
 
         Args:
             tool (ToolType): Тип инструмента.
-            file_path (str): Путь к файлу.
+            file (str): Путь к файлу.
             tool_data (dict): Дополнительные параметры инструмента.
 
         Returns:
@@ -50,14 +50,14 @@ class ILoveAPITaskService:
         task_json = await self.starter.start_task(tool)
         server = task_json["server"]
         task_id = task_json["task"]
-        server_filename = await self.uploader.upload(server, task_id, file_path)
-        files = [{"server_filename": server_filename, "filename": file_path}]
+        server_filename = await self.uploader.upload(server, task_id, file)
+        files = [{"server_filename": server_filename, "filename": file}]
         result = await self.processer.process(server, task_id, tool, files, tool_data)
         return result
 
     async def resize_image(
         self,
-        file_path: str,
+        file: str,
         width: int,
         height: int,
     ) -> Dict[str, Any]:
@@ -65,15 +65,20 @@ class ILoveAPITaskService:
         Обёртка для задачи изменения размера изображения.
 
         Args:
-            file_path (str): Путь к файлу.
+            file (str): Путь к файлу.
             width (int): Новая ширина.
             height (int): Новая высота.
 
         Returns:
             dict: Результат обработки.
         """
+        tool_data = {
+            "pixels_width": width,
+            "pixels_height": height,
+            "maintain_ratio": True,
+        }
         return await self.run_image_task(
-            ToolType.RESIZE_IMAGE,
-            file_path,
-            {"pixels_width": width, "pixels_height": height}
+            "resizeimage",
+            file,
+            tool_data
         )
