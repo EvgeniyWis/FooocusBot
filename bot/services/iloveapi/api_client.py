@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from bot.services.base_api_client import BaseAPIClient
 from bot.services.iloveapi.auth import ILoveAPIAuth
@@ -16,18 +16,9 @@ class ILoveAPI(BaseAPIClient):
             public_key (str): Публичный ключ для аутентификации.
         """
         super().__init__(base_url)
-        self.public_key: str = public_key
-        self.token: Optional[str] = None
-        self.auth_service: ILoveAPIAuth = ILoveAPIAuth(self)
+        self.auth_service: ILoveAPIAuth = ILoveAPIAuth(base_url, public_key)
 
-    async def ensure_token(self) -> None:
-        """
-        Проверяет наличие токена, если его нет — выполняет аутентификацию.
-        """
-        if not self.token:
-            self.token = await self.auth_service.auth(self.public_key)
-
-    async def post(self, path: str, json: Optional[Dict[str, Any]] = None, files: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def post(self, path: str, json: Dict[str, Any] = None, files: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Выполняет POST-запрос к ILoveAPI с автоматическим добавлением токена.
 
@@ -39,9 +30,9 @@ class ILoveAPI(BaseAPIClient):
         Returns:
             dict: Ответ от сервера.
         """
-        await self.ensure_token()
+        token = await self.auth_service.get_token()
         url = f"{self.base_url}{path}"
-        headers = {"Authorization": f"Bearer {self.token}"}
+        headers = {"Authorization": f"Bearer {token}"}
         resp = await httpx_post(url, json=json, files=files, headers=headers)
-        json = resp.json()
-        return json
+        json_resp = resp.json()
+        return json_resp
