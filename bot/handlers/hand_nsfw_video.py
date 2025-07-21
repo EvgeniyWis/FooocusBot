@@ -291,7 +291,7 @@ async def handle_ask_video_length_input(
             if length > 15:
                 length = 15
             if length < 1:
-                length = 5
+                length = 1
     except Exception:
         length = None
     await generate_nsfw_video_and_send_result(

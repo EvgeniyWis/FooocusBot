@@ -79,7 +79,7 @@ class ComfyUIWorkflowPreparer:
                     workflow[WorkflowNodes.VIDEO_LENGTH_NODE]["inputs"][
                         "length"
                     ] = length
-                    logger.debug(
+                    logger.info(
                         f"Установлена длительность видео: {seconds}с ({length} кадров)",
                     )
 
