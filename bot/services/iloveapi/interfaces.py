@@ -1,17 +1,44 @@
 from typing import Any, Dict, List, Protocol
 
-from .types import FileFormat, ToolType
+import httpx
+
+from .types import (
+    FileFormat,
+    StartTaskResponse,
+    ToolType,
+)
 
 
 class UploaderProtocol(Protocol):
+    """
+    Протокол загрузчика файлов для ILoveAPI.
+    Пример:
+        class MyUploader:
+            async def upload(self, server: str, task_id: str, cloud_file: str) -> str:
+                ...
+    """
     async def upload(self, server: str, task_id: str, cloud_file: str) -> str:
         ...
 
 class DownloaderProtocol(Protocol):
-    async def download(self, server: str, task_id: str) -> str:
+    """
+    Протокол скачивателя файлов для ILoveAPI.
+    Пример:
+        class MyDownloader:
+            async def download(self, server: str, task_id: str) -> str:
+                ...
+    """
+    async def download(self, server: str, task_id: str) -> httpx.Response:
         ...
 
 class ProcesserProtocol(Protocol):
+    """
+    Протокол процессора задач для ILoveAPI.
+    Пример:
+        class MyProcesser:
+            async def process(self, server: str, task_id: str, tool: ToolType, files: List[FileFormat], tool_data: Dict[str, Any]) -> Dict[str, Any]:
+                ...
+    """
     async def process(
         self,
         server: str,
@@ -23,5 +50,12 @@ class ProcesserProtocol(Protocol):
         ...
 
 class StarterProtocol(Protocol):
-    async def start_task(self, tool: ToolType) -> Dict[str, Any]:
+    """
+    Протокол стартера задач для ILoveAPI.
+    Пример:
+        class MyStarter:
+            async def start_task(self, tool: ToolType) -> Dict[str, Any]:
+                ...
+    """
+    async def start_task(self, tool: ToolType) -> StartTaskResponse:
         ...

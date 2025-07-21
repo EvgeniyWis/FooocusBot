@@ -1,5 +1,6 @@
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
+from bot.services.iloveapi.types import UploadResponse
 
 from .interfaces import UploaderProtocol
 
@@ -31,7 +32,7 @@ class ILoveAPIUploader(UploaderProtocol):
         url = f"https://{server}/v1/upload"
         data = {"task": task_id, "cloud_file": cloud_file}
         logger.info(f"Загружаем файл {cloud_file} в ILoveAPI")
-        response = await self.api.iloveapi_post(
+        response: UploadResponse = await self.api.iloveapi_post(
             url,
             data=data,
             with_base_url=False,
