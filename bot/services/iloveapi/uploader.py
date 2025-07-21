@@ -32,7 +32,7 @@ class ILoveAPIUploader(UploaderProtocol):
         url = f"https://{server}/v1/upload"
         data = {"task": task_id, "cloud_file": cloud_file}
         logger.info(f"Загружаем файл {cloud_file} в ILoveAPI")
-        response: UploadResponse = await self.api.iloveapi_post(
+        response: UploadResponse = await self.api.post(
             url,
             data=data,
             with_base_url=False,

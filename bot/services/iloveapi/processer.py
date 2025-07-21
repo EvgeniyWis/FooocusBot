@@ -43,6 +43,6 @@ class ILoveAPIProcesser(ProcesserProtocol):
         url = f"https://{server}/v1/process"
         json = {"task": task_id, "tool": tool, "files": files, **tool_data}
         logger.info(f"Отправляем данные для обработки: {json}")
-        response = await self.api.iloveapi_post(url, json=json, with_base_url=False)
+        response = await self.api.post(url, json=json, with_base_url=False)
         return response
 
