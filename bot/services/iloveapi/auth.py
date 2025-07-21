@@ -28,6 +28,10 @@ class ILoveAPIAuth:
         """
         if not self._token:
             self._token = await self._auth()
+
+            if not self._token:
+                raise RuntimeError("Не удалось получить токен от ILoveAPI (пустой токен)")
+
         return self._token
 
     async def _auth(self) -> str:
@@ -39,7 +43,13 @@ class ILoveAPIAuth:
         """
         url = f"{self.base_url}/auth"
         data = {"public_key": self.public_key}
-        response = await httpx_post(url, data=data)
-        json = response.json()
-        jwt_token: str = json["token"]
-        return jwt_token
+        try:
+            response = await httpx_post(url, data=data)
+            jwt_token = response.get("token")
+            if not jwt_token:
+                logger.error(f"Ответ от ILoveAPI не содержит токен: {response}")
+                return None
+            return jwt_token
+        except Exception as e:
+            logger.error(f"Ошибка при аутентификации в ILoveAPI: {e}")
+            return None
