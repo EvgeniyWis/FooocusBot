@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     ALLOWED_USERS: list[int]
 
     # Режимы и флаги
-    DEVELOPMENT_MODE: bool = False
     MOCK_IMAGES_MODE: bool = False
     MOCK_VIDEO_MODE: bool = False
     UPSCALE_MODE: bool = True
