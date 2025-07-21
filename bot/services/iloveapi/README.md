@@ -8,7 +8,7 @@
 - **Сервисы (uploader.py, downloader.py, processer.py, starter.py):** Реализации соответствующих протоколов, используют ILoveAPI для общения с API.
 - **ILoveAPITaskService (task_service.py):** Фасад для работы с задачами: объединяет стартер, загрузчик, процессор и скачиватель, реализует бизнес-логику.
 - **validation.py:** Валидация и логирование шагов задач.
-- **get_iloveapi_service.py (factory):** Фабрика для создания экземпляра фасада и всех зависимостей (без синглтона, поддерживает DI).
+- **get_iloveapi_factory.py (factory):** Фабрика для создания экземпляра фасада и всех зависимостей (без синглтона, поддерживает DI).
 - **types.py:** Строгие типы (TypedDict) для всех структур данных.
 
 ## Принципы архитектуры
@@ -22,10 +22,10 @@
 ## Пример использования
 
 ```python
-from bot.factory.get_iloveapi_service import get_iloveapi_service
+from bot.factory.get_iloveapi_factory import get_iloveapi_factory
 
 # Получить сервис (можно передать свои реализации для тестов)
-iloveapi_service = get_iloveapi_service()
+iloveapi_service = get_iloveapi_factory()
 
 # Запустить задачу изменения размера изображения
 result = await iloveapi_service.resize_image(
@@ -41,7 +41,7 @@ result = await iloveapi_service.resize_image(
 
 ```python
 mock_uploader = MyMockUploader()
-iloveapi_service = get_iloveapi_service(uploader=mock_uploader)
+iloveapi_service = get_iloveapi_factory(uploader=mock_uploader)
 ```
 
 - Для новых типов задач добавьте TypedDict в types.py и расширьте соответствующие сервисы.
