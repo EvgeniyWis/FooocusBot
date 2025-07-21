@@ -1,20 +1,12 @@
-from bot.logger import logger
-from bot.services.iloveapi.api_client import ILoveAPI
+from bot.services.iloveapi.base_service import ILoveAPIBaseService
 
 from .interfaces import DownloaderProtocol
 
 
-class ILoveAPIDownloader(DownloaderProtocol):
+class ILoveAPIDownloader(ILoveAPIBaseService, DownloaderProtocol):
     """
     Сервис для загрузки файлов из ILoveAPI.
     """
-    def __init__(self, api: ILoveAPI) -> None:
-        """
-        Args:
-            api (ILoveAPI): Экземпляр клиента ILoveAPI.
-        """
-        self.api = api
-        logger.info("Инициализирован выгрузчик ILoveAPI")
 
     async def download(self, server: str, task_id: str) -> str:
         """
