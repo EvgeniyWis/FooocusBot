@@ -142,13 +142,13 @@ async def generate_nsfw_video_and_send_result(
         return
 
     video_service = get_video_service()
+
+    result_final = None
     try:
-        result_final = await video_service.wait_for_result(
-            prompt_id,
-        )
+        result_final = await video_service.wait_for_result(prompt_id)
     except Exception:
         try:
-            await retryOperation(
+            result_final = await retryOperation(
                 video_service.wait_for_result,
                 5,
                 5,
@@ -161,6 +161,13 @@ async def generate_nsfw_video_and_send_result(
             )
             await progress_message.delete()
             return
+
+    if not result_final:
+        await safe_send_message(
+            "❌ Результат не получен. Скорее всего, ComfyUI не отвечает. Администрация уже уведомлена.",
+            get_target_message(message_or_call),
+        )
+        return
 
     await progress_message.delete()
 
@@ -294,7 +301,6 @@ async def handle_ask_video_length_input(
         temp_path,
         seconds=length,
     )
-
 
 
 # Добавление обработчиков
