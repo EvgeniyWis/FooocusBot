@@ -4,6 +4,7 @@ from aiogram import types
 from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
+from factory.user_factory import get_user_settings_service
 
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
@@ -18,7 +19,7 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 
 
 async def admin(message: types.Message, state: FSMContext):
-    await state.clear()
+    await state.set_state(None)
     await safe_send_message(
         text.ADMIN_TEXT,
         message,
@@ -31,7 +32,7 @@ async def super_admin(message: types.Message, state: FSMContext):
         await safe_send_message(text.ACCESS_DENIED_TEXT, message)
         return
 
-    await state.clear()
+    await state.set_state(None)
     await safe_send_message(
         text.SUPER_ADMIN_TEXT,
         message,
@@ -43,7 +44,13 @@ async def super_admin(message: types.Message, state: FSMContext):
 async def start(message: types.Message, state: FSMContext):
     await state.set_state(None)
 
-    if message.from_user.id not in settings.ALLOWED_USERS:
+    user_service = await get_user_settings_service()
+    if (
+        message.from_user.id
+        not in await user_service.superadmin_get_current_allowed_user(
+            message.from_user.id,
+        )
+    ):
         await safe_send_message(text.ACCESS_DENIED_TEXT, message)
         return
 

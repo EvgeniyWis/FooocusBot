@@ -15,6 +15,18 @@ class UserSettingsService:
 
     # --- Superadmin ---
 
+    async def superadmin_add_allowed_user(self, tg_id: int):
+        return await self.repo.superadmin_add_allowed_user(tg_id)
+
+    async def superadmin_delete_allowed_user(self, tg_id: int):
+        return await self.repo.superadmin_delete_allowed_user(tg_id)
+
+    async def superadmin_get_all_allowed_users(self):
+        return await self.repo.superadmin_get_all_allowed_users()
+
+    async def superadmin_get_current_allowed_user(self, tg_id: int):
+        return await self.repo.superadmin_get_current_allowed_user(tg_id)
+
     async def superadmin_get_all_loras(self, setting_number: int):
         return await self.repo.superadmin_get_all_loras(setting_number)
 

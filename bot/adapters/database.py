@@ -20,6 +20,43 @@ class PostgresRepository:
 
     # --- Superadmin ---
 
+    async def superadmin_add_allowed_user(self, tg_id: int):
+        async with self.db.acquire() as conn:
+            logger.info(f"Adding allowed_user: {tg_id}")
+            await conn.execute(
+                """
+                INSERT INTO allowed_users (tg_id)
+                VALUES ($1)
+                ON CONFLICT (tg_id) DO NOTHING
+                """,
+                tg_id,
+            )
+
+    async def superadmin_delete_allowed_user(self, tg_id: int):
+        async with self.db.acquire() as conn:
+            logger.info(f"Deleting allowed_user: {tg_id}")
+            await conn.execute(
+                "DELETE FROM allowed_users WHERE tg_id = $1",
+                tg_id,
+            )
+
+    async def superadmin_get_all_allowed_users(self):
+        async with self.db.acquire() as conn:
+            result = await conn.fetch(
+                "SELECT tg_id FROM allowed_users",
+            )
+            logger.info(f"Getting all allowed users - {result}")
+            return [row["tg_id"] for row in result]
+
+    async def superadmin_get_current_allowed_user(self, tg_id):
+        async with self.db.acquire() as conn:
+            result = await conn.fetch(
+                "SELECT tg_id FROM allowed_users WHERE tg_id = $1",
+                tg_id,
+            )
+            logger.info(f"Getting info for allowed_user({tg_id}) - {result}")
+            return [row["tg_id"] for row in result]
+
     async def superadmin_add_lora(self, title: str, setting_number: int):
         async with self.db.acquire() as conn:
             logger.info(f"Adding LoRA: {title} (setting {setting_number})")

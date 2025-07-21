@@ -37,3 +37,8 @@ CREATE TABLE IF NOT EXISTS user_prompts (
     prompt TEXT NOT NULL,
     UNIQUE (user_id, model_id, setting_number, type)
 );
+
+CREATE TABLE IF NOT EXISTS allowed_users (
+    id SERIAL PRIMARY KEY,
+    tg_id BIGINT NOT NULL UNIQUE
+);

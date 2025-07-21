@@ -1,6 +1,10 @@
+import re
+
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from states.AdminState import UserAccessStates
 from states.StartGenerationState import LoraEditStates, ModelEditStates
 from utils.handlers.messages import safe_edit_message
 
@@ -252,6 +256,135 @@ async def handle_delete_model(
     )
 
 
+def extract_user_id(message: types.Message) -> int | None:
+    if message.forward_from:
+        return message.forward_from.id
+
+    text = message.text.strip()
+
+    if text.isdigit():
+        return int(text)
+
+    match = re.search(r"tg://user\?id=(\d+)", text)
+    if match:
+        return int(match.group(1))
+
+    return None
+
+
+async def handle_add_user(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_state(UserAccessStates.waiting_for_add_user)
+    await safe_edit_message(
+        callback.message,
+        "➕ Перешлите сообщение от пользователя ИЛИ отправьте `tg_id`, ИЛИ `tg://user?id=123456789`:",
+    )
+
+
+async def process_add_user(message: types.Message, state: FSMContext):
+    tg_id = extract_user_id(message)
+    if tg_id is None:
+        await message.answer(
+            "❌ Не удалось определить ID пользователя. "
+            "Попробуйте другой способ (например, отправьте полную ссылку на профиль пользователя)",
+        )
+        return
+
+    service = await get_user_settings_service()
+
+    if tg_id in await service.superadmin_get_current_allowed_user(tg_id):
+        await safe_edit_message(message, "❌ Пользователь уже добавлен.")
+        await state.set_state(None)
+        return
+
+    await service.superadmin_add_allowed_user(tg_id)
+
+    await message.answer(
+        f"✅ Пользователь с ID `{tg_id}` добавлен.",
+        parse_mode="Markdown",
+    )
+    await state.set_state(None)
+
+
+async def handle_delete_user_button(callback: types.CallbackQuery):
+    _, _, tg_id_str = callback.data.split("|")
+    tg_id = int(tg_id_str)
+
+    service = await get_user_settings_service()
+    await service.superadmin_delete_allowed_user(tg_id)
+
+    await callback.answer("✅ Пользователь удалён.")
+
+    users = await service.superadmin_get_all_allowed_users()
+
+    if not users:
+        text = "📭 Нет ни одного разрешённого пользователя."
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="➕ Добавить пользователя",
+                        callback_data="user_access|add",
+                    ),
+                ],
+            ],
+        )
+    else:
+        text = "👥 Разрешённые пользователи:\nНажмите на пользователя, чтобы удалить."
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=f"🗑 {uid}",
+                        callback_data=f"user_access|delete|{uid}",
+                    ),
+                ]
+                for uid in users
+            ]
+            + [
+                [
+                    InlineKeyboardButton(
+                        text="➕ Добавить пользователя",
+                        callback_data="user_access|add",
+                    ),
+                ],
+            ],
+        )
+
+    await safe_edit_message(callback.message, text, reply_markup=kb)
+
+
+async def handle_allowed_users(callback: types.CallbackQuery):
+    service = await get_user_settings_service()
+    users = await service.superadmin_get_all_allowed_users()
+
+    if not users:
+        text = "📭 Нет ни одного разрешённого пользователя."
+    else:
+        text = "👥 Разрешённые пользователи:\nНажмите на пользователя, чтобы удалить."
+
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=f"🗑 {uid}",
+                    callback_data=f"user_access|delete|{uid}",
+                ),
+            ]
+            for uid in users
+        ]
+        + [
+            [
+                InlineKeyboardButton(
+                    text="➕ Добавить пользователя",
+                    callback_data="user_access|add",
+                ),
+            ],
+        ],
+    )
+
+    await safe_edit_message(callback.message, text, reply_markup=kb)
+
+
 def hand_add():
     router.callback_query.register(
         handle_model_menu,
@@ -312,4 +445,20 @@ def hand_add():
     router.message.register(
         process_lora_add,
         StateFilter(LoraEditStates.waiting_for_add_title),
+    )
+    router.callback_query.register(
+        handle_add_user,
+        lambda call: call.data.startswith("user_access|add"),
+    )
+    router.message.register(
+        process_add_user,
+        StateFilter(UserAccessStates.waiting_for_add_user),
+    )
+    router.callback_query.register(
+        handle_delete_user_button,
+        lambda call: call.data.startswith("user_access|delete|"),
+    )
+    router.callback_query.register(
+        handle_allowed_users,
+        lambda call: call.data.startswith("super_admin|allowed_users"),
     )

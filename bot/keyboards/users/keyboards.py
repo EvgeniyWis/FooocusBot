@@ -67,6 +67,35 @@ def super_admin_keyboard():
                     callback_data="super_admin|model_settings",
                 ),
             ],
+            [
+                InlineKeyboardButton(
+                    text="👨‍💻 Доступ пользователей",
+                    callback_data="super_admin|allowed_users",
+                ),
+            ],
+        ],
+    )
+
+
+def user_access_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="➕ Добавить пользователя",
+                    callback_data="user_access|add",
+                ),
+                InlineKeyboardButton(
+                    text="🗑 Удалить пользователя",
+                    callback_data="user_access|delete",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="📋 Список разрешённых",
+                    callback_data="user_access|list",
+                ),
+            ],
         ],
     )
 
