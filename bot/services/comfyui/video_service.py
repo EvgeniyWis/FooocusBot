@@ -107,8 +107,19 @@ class ComfyUIVideoService:
     def _build_url(self, endpoint: str, file_info: dict) -> str:
         filename = file_info["filename"]
         subfolder = file_info.get("subfolder")
+
+        if filename.endswith(".mp4"):
+            filename_for_url = filename.replace(".mp4", ".mov")
+            format_param = "video/quicktime"
+        else:
+            filename_for_url = filename
+            format_param = "video/h264-mp4"
+
         base = (
-            f"{self.api.base_url}/{endpoint}?filename={filename}&type=output"
+            f"{self.api.base_url}/{endpoint}"
+            f"?filename={filename_for_url}"
+            f"&type=output"
+            f"&format={format_param}"
         )
         if subfolder:
             base += f"&subfolder={subfolder}"
