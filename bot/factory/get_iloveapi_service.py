@@ -1,4 +1,5 @@
 from bot.services.iloveapi.api_client import ILoveAPI
+from bot.services.iloveapi.downloader import ILoveAPIDownloader
 from bot.services.iloveapi.processer import ILoveAPIProcesser
 from bot.services.iloveapi.starter import ILoveAPIStarter
 from bot.services.iloveapi.task_service import ILoveAPITaskService
@@ -11,5 +12,6 @@ def get_iloveapi_service():
     starter = ILoveAPIStarter(api)
     uploader = ILoveAPIUploader(api)
     processer = ILoveAPIProcesser(api)
-    task_service = ILoveAPITaskService(api, starter, uploader, processer)
+    downloader = ILoveAPIDownloader(api)
+    task_service = ILoveAPITaskService(api, starter, uploader, processer, downloader)
     return task_service
