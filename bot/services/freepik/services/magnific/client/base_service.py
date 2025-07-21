@@ -1,5 +1,7 @@
 from bot.logger import logger
-from bot.services.freepik.magnific.client.api_client import MagnificAPI
+from bot.services.freepik.services.magnific.client.api_client import (
+    MagnificAPI,
+)
 
 
 class MagnificBaseService:

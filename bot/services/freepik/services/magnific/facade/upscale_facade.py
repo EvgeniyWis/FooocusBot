@@ -1,5 +1,3 @@
-
-
 import asyncio
 
 from bot.services.freepik.services.magnific.client.base_service import (
@@ -13,7 +11,7 @@ from bot.services.freepik.services.magnific.services.upscaler import (
 )
 
 
-class MagnificUpscaleService(MagnificBaseService):
+class MagnificUpscaleFacade(MagnificBaseService):
     """
     Фасадный сервис для работы с upscale Magnific.
     """

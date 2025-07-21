@@ -1,9 +1,12 @@
 from bot.services.freepik.services.magnific.client.base_service import (
     MagnificBaseService,
 )
+from bot.services.freepik.services.magnific.client.interfaces import (
+    UpscalerProtocol,
+)
 
 
-class MagnificUpscaler(MagnificBaseService):
+class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
     """
     Сервис для upscale изображений с помощью Magnific.
     """
