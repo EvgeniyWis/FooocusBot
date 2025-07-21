@@ -60,7 +60,7 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
         height="auto",
     )
 
-    logger.info(f"Результат обработки: {result.content}")
+    logger.info(f"Результат обработки ILoveAPI после resize_image: {result}")
 
 
 # Добавление обработчиков

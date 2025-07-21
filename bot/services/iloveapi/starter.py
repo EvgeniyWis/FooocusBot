@@ -1,8 +1,6 @@
-from typing import Any, Dict
-
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
-from bot.services.iloveapi.types import ToolType
+from bot.services.iloveapi.types import StartTaskResponse, ToolType
 
 from .interfaces import StarterProtocol
 
@@ -19,7 +17,7 @@ class ILoveAPIStarter(StarterProtocol):
         self.api = api
         logger.info("Инициализирован стартер ILoveAPI")
 
-    async def start_task(self, tool: ToolType) -> Dict[str, Any]:
+    async def start_task(self, tool: ToolType) -> StartTaskResponse:
         """
         Стартер задач в ILoveAPI.
 
@@ -37,5 +35,5 @@ class ILoveAPIStarter(StarterProtocol):
             }
         """
         url = f"/start/{tool}"
-        response = await self.api.iloveapi_get(url)
+        response: StartTaskResponse = await self.api.iloveapi_get(url)
         return response

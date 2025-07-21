@@ -1,8 +1,14 @@
 from typing import Any, Dict
 
+import httpx
+
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
-from bot.services.iloveapi.types import ToolType
+from bot.services.iloveapi.types import (
+    StartTaskResponse,
+    ToolDataResizeImage,
+    ToolType,
+)
 from bot.services.iloveapi.validation import (
     log_task_step,
     validate_file_format,
@@ -47,8 +53,8 @@ class ILoveAPITaskService:
         self,
         tool: ToolType,
         file: str,
-        tool_data: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        tool_data: ToolDataResizeImage,
+    ) -> httpx.Response:
         """
         Запускает задачу обработки изображения в ILoveAPI.
 
@@ -60,13 +66,13 @@ class ILoveAPITaskService:
         Returns:
             dict: Результат обработки.
         """
-        task_json = await self.starter.start_task(tool)
+        task_json: StartTaskResponse = await self.starter.start_task(tool)
         logger.info(f"Задача запущена: {task_json}")
         server = task_json["server"]
         task_id = task_json["task"]
         logger.info(f"Сервер: {server}, ID задачи: {task_id}")
 
-        server_filename = await self.uploader.upload(server, task_id, file)
+        server_filename: str = await self.uploader.upload(server, task_id, file)
 
         logger.info(f"Файл загружен: {server_filename}")
 
@@ -99,7 +105,7 @@ class ILoveAPITaskService:
         Returns:
             dict: Результат обработки.
         """
-        tool_data = {
+        tool_data: ToolDataResizeImage = {
             "pixels_width": width,
             "pixels_height": height,
             "maintain_ratio": True,

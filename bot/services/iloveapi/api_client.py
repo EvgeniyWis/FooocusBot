@@ -1,5 +1,3 @@
-from typing import Any, Dict
-
 from bot.services.base_api_client import BaseAPIClient
 from bot.services.iloveapi.auth import ILoveAPIAuth
 
@@ -20,11 +18,11 @@ class ILoveAPI(BaseAPIClient):
     async def iloveapi_post(
         self,
         url: str,
-        json: Dict[str, Any] = None,
-        data: Dict[str, Any] = None,
-        files: Dict[str, Any] = None,
+        json: dict = None,
+        data: dict = None,
+        files: dict = None,
         with_base_url: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict:
         """
         Выполняет POST-запрос к ILoveAPI с автоматическим добавлением токена.
 
@@ -48,8 +46,8 @@ class ILoveAPI(BaseAPIClient):
         self,
         url: str,
         with_base_url: bool = True,
-        extra_headers: Dict[str, Any] = None,
-    ) -> Dict[str, Any]:
+        extra_headers: dict = None,
+    ) -> dict:
         token = await self.auth_service.get_token()
         if not token:
             raise RuntimeError("Не удалось получить токен для ILoveAPI")

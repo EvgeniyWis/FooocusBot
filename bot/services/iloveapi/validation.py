@@ -1,10 +1,10 @@
 from functools import wraps
-from typing import Any, Dict
 
 from bot.logger import logger
+from bot.services.iloveapi.types import FileFormat
 
 
-def validate_file_format(data: Dict[str, Any]) -> None:
+def validate_file_format(data: FileFormat) -> None:
     """
     Валидация структуры данных FileFormat.
     """
