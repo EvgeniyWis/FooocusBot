@@ -1,19 +1,12 @@
-from bot.logger import logger
-from bot.services.freepik.magnific.api_client import MagnificAPI
+from bot.services.freepik.services.magnific.client.base_service import (
+    MagnificBaseService,
+)
 
 
-class MagnificGetStatus:
+class MagnificGetStatus(MagnificBaseService):
     """
     Сервис для получения статуса задачи с помощью Magnific.
     """
-    def __init__(self, api: MagnificAPI) -> None:
-        """
-        Args:
-            api (MagnificAPI): Экземпляр клиента Magnific.
-        """
-        self.api = api
-        logger.info("Инициализирован получатель статуса Magnific")
-
     async def get_status(self, task_id: str) -> dict:
         """
         Получает статус задачи с помощью Magnific.

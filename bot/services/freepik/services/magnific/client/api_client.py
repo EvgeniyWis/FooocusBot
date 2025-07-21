@@ -1,4 +1,4 @@
-from bot.services.freepik.api_client import FreepikAPI
+from bot.services.freepik.client.api_client import FreepikAPI
 
 
 class MagnificAPI(FreepikAPI):
