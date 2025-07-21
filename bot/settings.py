@@ -66,6 +66,13 @@ class Settings(BaseSettings):
 
     # Параметры ComfyUI
     COMFYUI_API_URL: str
+    COMFYUI_API_KEY: str
+    COMFYUI_POD_NAME: str = "comfyui-video_gen"
+    COMFYUI_HEATING_PROMPT: str = (
+        "A naked girl strokes her bare breasts with her hands, "
+        "sensual movement, static camera, cinematic lighting, "
+        "natural body physics, 4K detail, eye contact"
+    )
 
 
 settings = Settings()  # type: ignore
