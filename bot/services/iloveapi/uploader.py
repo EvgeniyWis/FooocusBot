@@ -1,22 +1,14 @@
 from bot.logger import logger
-from bot.services.iloveapi.api_client import ILoveAPI
+from bot.services.iloveapi.base_service import ILoveAPIBaseService
 from bot.services.iloveapi.types import UploadResponse
 
 from .interfaces import UploaderProtocol
 
 
-class ILoveAPIUploader(UploaderProtocol):
+class ILoveAPIUploader(ILoveAPIBaseService, UploaderProtocol):
     """
     Сервис для загрузки файлов в ILoveAPI.
     """
-    def __init__(self, api: ILoveAPI) -> None:
-        """
-        Args:
-            api (ILoveAPI): Экземпляр клиента ILoveAPI.
-        """
-        self.api = api
-        logger.info("Инициализирован загрузчик ILoveAPI")
-
     async def upload(self, server: str, task_id: str, cloud_file: str) -> str:
         """
         Загружает файл в ILoveAPI.

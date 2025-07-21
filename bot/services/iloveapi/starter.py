@@ -1,22 +1,13 @@
-from bot.logger import logger
-from bot.services.iloveapi.api_client import ILoveAPI
+from bot.services.iloveapi.base_service import ILoveAPIBaseService
 from bot.services.iloveapi.types import StartTaskResponse, ToolType
 
 from .interfaces import StarterProtocol
 
 
-class ILoveAPIStarter(StarterProtocol):
+class ILoveAPIStarter(ILoveAPIBaseService, StarterProtocol):
     """
     Сервис для старта задач в ILoveAPI.
     """
-    def __init__(self, api: ILoveAPI) -> None:
-        """
-        Args:
-            api (ILoveAPI): Экземпляр клиента ILoveAPI.
-        """
-        self.api = api
-        logger.info("Инициализирован стартер ILoveAPI")
-
     async def start_task(self, tool: ToolType) -> StartTaskResponse:
         """
         Стартер задач в ILoveAPI.
