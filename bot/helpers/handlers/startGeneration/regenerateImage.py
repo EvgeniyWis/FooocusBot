@@ -109,4 +109,7 @@ async def regenerateImage(
             call, text.REGENERATE_IMAGE_ERROR_TEXT.format(model_name, model_name_index, e)
         )
     finally:
-        await regenerate_message.delete()
+        try:
+            await regenerate_message.delete()
+        except Exception as e:
+            logger.error(f"Ошибка при удалении сообщения о перегенерации изображения: {e}")
