@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
 from bot.services.iloveapi.types import FileFormat, ToolType
-from bot.utils.httpx import httpx_post
 
 
 class ILoveAPIProcesser:
@@ -40,8 +39,8 @@ class ILoveAPIProcesser:
             dict: JSON ответ.
         """
         url = f"https://{server}/v1/process"
-        data = {"task": task_id, "tool": tool, "files": files, **tool_data}
-        response = await httpx_post(url, data=data)
-        json = response.json()
-        return json
+        json = {"task": task_id, "tool": tool, "files": files, **tool_data}
+        logger.info(f"Отправляем данные для обработки: {json}")
+        response = await self.api.iloveapi_post(url, json=json, with_base_url=False)
+        return response
 

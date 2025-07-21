@@ -3,7 +3,6 @@ from typing import Any, Dict
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
 from bot.services.iloveapi.types import ToolType
-from bot.utils.httpx import httpx_get
 
 
 class ILoveAPIStarter:
@@ -35,7 +34,6 @@ class ILoveAPIStarter:
                 "remaining_credits": 1234
             }
         """
-        url = f"{self.api.base_url}/start/{tool}"
-        response = await httpx_get(url)
-        json = response.json()
-        return json
+        url = f"/start/{tool}"
+        response = await self.api.iloveapi_get(url)
+        return response

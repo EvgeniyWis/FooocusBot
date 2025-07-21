@@ -10,13 +10,13 @@ from bot.utils.httpx.error_texts import PAYMENT_RUNPOD_ERROR_TEXT
 # Функция-обёртка для отправки POST-запросов с настройками таймаутов
 async def httpx_post(
     url: str,
-    headers: dict,
+    headers: dict = None,
     json: dict = None,
     data: dict = None,
     files: dict = None,
     timeout: int = 60,
     with_response_text_logging: bool = True,
-) -> httpx.Response:
+) -> dict:
     response = None
     response_json = None
 
@@ -45,7 +45,7 @@ async def httpx_post(
             if response.status_code != 200:
                 if response.status_code == 404:
                     logger.info(
-                        f"Найдена завершенная/удаленная генерация. Ответ от сервера: {response}",
+                        f"Несуществующий URL. Ответ от сервера: {response}",
                     )
 
                 if response.status_code == 402:
