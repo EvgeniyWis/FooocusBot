@@ -3,7 +3,7 @@ from typing import Any, Dict
 import httpx
 
 from bot.logger import logger
-from bot.services.iloveapi.client.api_client import ILoveAPI
+from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
 from bot.services.iloveapi.client.interfaces import (
     DownloaderProtocol,
     ProcesserProtocol,
@@ -21,13 +21,12 @@ from bot.services.iloveapi.utils.validation import (
 )
 
 
-class ILoveAPITaskService:
+class ILoveAPITaskService(ILoveAPIBaseService):
     """
     Фасадный сервис для работы с задачами ILoveAPI (запуск, загрузка, обработка).
     """
     def __init__(
         self,
-        api: ILoveAPI,
         starter: StarterProtocol,
         uploader: UploaderProtocol,
         processer: ProcesserProtocol,
@@ -35,13 +34,11 @@ class ILoveAPITaskService:
     ) -> None:
         """
         Args:
-            api (ILoveAPI): Экземпляр клиента ILoveAPI.
             starter (StarterProtocol): Сервис старта задач.
             uploader (UploaderProtocol): Сервис загрузки файлов.
             processer (ProcesserProtocol): Сервис обработки файлов.
             downloader (DownloaderProtocol): Сервис загрузки файлов.
         """
-        self.api = api
         self.starter = starter
         self.uploader = uploader
         self.processer = processer
