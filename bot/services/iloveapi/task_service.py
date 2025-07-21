@@ -2,11 +2,14 @@ from typing import Any, Dict
 
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
-from bot.services.iloveapi.downloader import ILoveAPIDownloader
-from bot.services.iloveapi.processer import ILoveAPIProcesser
-from bot.services.iloveapi.starter import ILoveAPIStarter
 from bot.services.iloveapi.types import ToolType
-from bot.services.iloveapi.uploader import ILoveAPIUploader
+
+from .interfaces import (
+    DownloaderProtocol,
+    ProcesserProtocol,
+    StarterProtocol,
+    UploaderProtocol,
+)
 
 
 class ILoveAPITaskService:
@@ -16,17 +19,18 @@ class ILoveAPITaskService:
     def __init__(
         self,
         api: ILoveAPI,
-        starter: ILoveAPIStarter,
-        uploader: ILoveAPIUploader,
-        processer: ILoveAPIProcesser,
-        downloader: ILoveAPIDownloader,
+        starter: StarterProtocol,
+        uploader: UploaderProtocol,
+        processer: ProcesserProtocol,
+        downloader: DownloaderProtocol,
     ) -> None:
         """
         Args:
             api (ILoveAPI): Экземпляр клиента ILoveAPI.
-            starter (ILoveAPIStarter): Сервис старта задач.
-            uploader (ILoveAPIUploader): Сервис загрузки файлов.
-            processer (ILoveAPIProcesser): Сервис обработки файлов.
+            starter (StarterProtocol): Сервис старта задач.
+            uploader (UploaderProtocol): Сервис загрузки файлов.
+            processer (ProcesserProtocol): Сервис обработки файлов.
+            downloader (DownloaderProtocol): Сервис загрузки файлов.
         """
         self.api = api
         self.starter = starter

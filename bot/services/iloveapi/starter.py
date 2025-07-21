@@ -4,8 +4,10 @@ from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
 from bot.services.iloveapi.types import ToolType
 
+from .interfaces import StarterProtocol
 
-class ILoveAPIStarter:
+
+class ILoveAPIStarter(StarterProtocol):
     """
     Сервис для старта задач в ILoveAPI.
     """

@@ -1,8 +1,10 @@
 from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
 
+from .interfaces import DownloaderProtocol
 
-class ILoveAPIDownloader:
+
+class ILoveAPIDownloader(DownloaderProtocol):
     """
     Сервис для загрузки файлов из ILoveAPI.
     """

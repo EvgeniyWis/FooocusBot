@@ -4,8 +4,10 @@ from bot.logger import logger
 from bot.services.iloveapi.api_client import ILoveAPI
 from bot.services.iloveapi.types import FileFormat, ToolType
 
+from .interfaces import ProcesserProtocol
 
-class ILoveAPIProcesser:
+
+class ILoveAPIProcesser(ProcesserProtocol):
     """
     Сервис для запуска обработки файлов в ILoveAPI.
     """
