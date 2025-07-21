@@ -4,28 +4,30 @@ from bot.utils.httpx import httpx_post
 
 
 class ILoveAPIAuth:
-    def __init__(self, api: ILoveAPI):
+    """
+    Сервис аутентификации для ILoveAPI.
+    """
+    def __init__(self, api: ILoveAPI) -> None:
+        """
+        Args:
+            api (ILoveAPI): Экземпляр клиента ILoveAPI.
+        """
         self.api = api
         logger.info("Инициализирован аутентификатор ILoveAPI")
 
     async def auth(self, public_key: str) -> str:
         """
-        Аутентификация в ILoveAPI
+        Аутентификация в ILoveAPI.
 
         Args:
-            public_key (str): Публичный ключ
+            public_key (str): Публичный ключ.
 
         Returns:
-            str: JWT токен
+            str: JWT токен.
         """
         url = f"{self.api.base_url}/auth"
-
-        data = {
-            "public_key": public_key,
-        }
-
+        data = {"public_key": public_key}
         response = await httpx_post(url, data=data)
         json = response.json()
-        jwt_token = json["token"]
-
+        jwt_token: str = json["token"]
         return jwt_token
