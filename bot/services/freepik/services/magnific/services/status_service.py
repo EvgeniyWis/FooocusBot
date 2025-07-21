@@ -3,10 +3,11 @@ from bot.services.freepik.services.magnific.client.base_service import (
 )
 
 
-class MagnificGetStatus(MagnificBaseService):
+class MagnificStatusService(MagnificBaseService):
     """
-    Сервис для получения статуса задачи с помощью Magnific.
+    Сервис для обработки статуса задачи с помощью Magnific.
     """
+
     async def get_status(self, task_id: str) -> dict:
         """
         Получает статус задачи с помощью Magnific.
@@ -20,16 +21,15 @@ class MagnificGetStatus(MagnificBaseService):
             Пример ответа:
             {
                 "generated": [
-                    "https://openapi-generator.tech",
-                    "https://openapi-generator.tech"
+                "https://ai-statics.freepik.com/completed_task_image.jpg"
                 ],
                 "task_id": "046b6c7f-0b8a-43b9-b35d-6489e6daee91",
-                "status": "IN_PROGRESS"
+                "status": "COMPLETED"
             }
         """
 
         response = await self.api.get(
             f"{self.api.base_url}/{task_id}",
         )
-        return response
 
+        return response
