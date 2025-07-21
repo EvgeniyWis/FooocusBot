@@ -35,5 +35,5 @@ class ILoveAPIStarter(StarterProtocol):
             }
         """
         url = f"/start/{tool}"
-        response: StartTaskResponse = await self.api.iloveapi_get(url)
+        response: StartTaskResponse = await self.api.get(url)
         return response

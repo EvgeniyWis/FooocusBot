@@ -28,6 +28,6 @@ class ILoveAPIDownloader(DownloaderProtocol):
             ArrayBuffer: Содержимое файла.
         """
         url = f"https://{server}/v1/download/{task_id}"
-        response = await self.api.iloveapi_get(url, with_base_url=False)
+        response = await self.api.get(url, with_base_url=False)
         return response
 

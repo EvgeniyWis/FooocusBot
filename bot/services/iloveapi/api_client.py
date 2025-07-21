@@ -15,7 +15,7 @@ class ILoveAPI(BaseAPIClient):
         super().__init__(base_url)
         self.auth_service: ILoveAPIAuth = ILoveAPIAuth(base_url, public_key)
 
-    async def iloveapi_post(
+    async def post(
         self,
         url: str,
         json: dict = None,
@@ -39,10 +39,10 @@ class ILoveAPI(BaseAPIClient):
             raise RuntimeError("Не удалось получить токен для ILoveAPI")
 
         headers = {"Authorization": f"Bearer {token}"}
-        resp = await self.post(url, json=json, data=data, files=files, headers=headers, with_base_url=with_base_url)
+        resp = await super().post(url, json=json, data=data, files=files, headers=headers, with_base_url=with_base_url)
         return resp
 
-    async def iloveapi_get(
+    async def get(
         self,
         url: str,
         with_base_url: bool = True,
@@ -57,5 +57,5 @@ class ILoveAPI(BaseAPIClient):
         if extra_headers:
             headers.update(extra_headers)
 
-        resp = await self.get(url, headers=headers, with_base_url=with_base_url)
+        resp = await super().get(url, headers=headers, with_base_url=with_base_url)
         return resp
