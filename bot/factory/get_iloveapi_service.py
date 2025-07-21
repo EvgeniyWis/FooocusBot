@@ -5,11 +5,11 @@ from bot.services.iloveapi.client.interfaces import (
     StarterProtocol,
     UploaderProtocol,
 )
-from bot.services.iloveapi.files.downloader import ILoveAPIDownloader
-from bot.services.iloveapi.files.uploader import ILoveAPIUploader
+from bot.services.iloveapi.facade.task_service import ILoveAPITaskService
+from bot.services.iloveapi.services.downloader import ILoveAPIDownloader
 from bot.services.iloveapi.services.processer import ILoveAPIProcesser
 from bot.services.iloveapi.services.starter import ILoveAPIStarter
-from bot.services.iloveapi.task_service import ILoveAPITaskService
+from bot.services.iloveapi.services.uploader import ILoveAPIUploader
 from bot.settings import settings
 
 
