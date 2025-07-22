@@ -117,6 +117,7 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
         model_name,
         image_index,
         result_url=magnific_result_url,
+        name_postfix="_magnific_upscale",
     )
 
 

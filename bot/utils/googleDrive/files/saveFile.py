@@ -20,6 +20,7 @@ async def saveFile(
     image_index: int | None = None,
     file_path: str = None,
     file_url: str = None,
+    name_postfix: str = None,
 ):
     try:
         if not initial_folder_id:
@@ -86,7 +87,7 @@ async def saveFile(
         files_count = len(results.get("files", []))
 
         # Создаем имя для файла
-        name = f"{files_count + 1}.jpg"
+        name = f"{files_count + 1}_{name_postfix}.jpg" if name_postfix else f"{files_count + 1}.jpg"
 
         # Создаем метаданные для файла
         file_metadata = {
