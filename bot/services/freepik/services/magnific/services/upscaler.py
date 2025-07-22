@@ -29,12 +29,21 @@ class UpscalerService(BaseService, UpscalerProtocol, ValidationMixin):
         resemblance: int = -10,
         fractality: int = 6,
         engine: str = "magnific_sharpy",
+        scale_factor: str = "2x",
     ) -> MagnificTaskResponse:
         """
         Upscale изображение с помощью Magnific.
 
         Args:
             image (str): Base64-encoded изображение.
+            Настройки upscale:
+            optimized_for (str): Оптимизация для.
+            creativity (int): Креативность.
+            hdr (int): HDR.
+            resemblance (int): Сходство.
+            fractality (int): Фрактальность.
+            engine (str): Движок.
+            scale_factor (str): Масштаб.
 
         Returns:
             dict: Ответ сервера.
@@ -58,6 +67,7 @@ class UpscalerService(BaseService, UpscalerProtocol, ValidationMixin):
             "resemblance": resemblance,
             "fractality": fractality,
             "engine": engine,
+            "scale_factor": scale_factor,
         }
         headers = {
             "Content-Type": "application/json",
