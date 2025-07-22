@@ -1,8 +1,8 @@
 import os
 import traceback
 from datetime import datetime
-import pytz
 
+import pytz
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from constants import TEMP_FOLDER_PATH
@@ -30,8 +30,9 @@ async def process_save_image(
     call: types.CallbackQuery,
     state: FSMContext,
     model_name: str,
-    result_path: str,
     image_index: int,
+    result_path: str = None,
+    result_url: str = None,
 ):
     """
     Обрабатывает сохранение изображения после этапа замены лица.
@@ -41,6 +42,8 @@ async def process_save_image(
         - state: FSMContext, контекст состояния
         - model_name: str, название модели
         - result_path: str, путь к результату, полученный с замены лица
+        - result_url: str, URL результата, полученный с замены лица
+        - image_index: int, индекс изображения
     """
 
     # Получаем данные пользователя
@@ -70,12 +73,13 @@ async def process_save_image(
         multi_select_mode = bool(state_data.get("multi_select_mode", False))
 
         link = await saveFile(
-            result_path,
-            user_id,
-            model_name,
-            model_data["picture_folder_id"],
-            now,
-            image_index if multi_select_mode else None,
+            file_path=result_path,
+            file_url=result_url,
+            user_id=user_id,
+            folder_name=model_name,
+            initial_folder_id=model_data["picture_folder_id"],
+            current_date=now,
+            image_index=image_index if multi_select_mode else None,
         )
     else:
         link = MOCK_LINK_FOR_SAVE_IMAGE
@@ -140,10 +144,6 @@ async def process_save_image(
         await saving_progress_message.delete()
     except Exception as e:
         logger.error(f"Произошла ошибка при удалении сообщения: {e}")
-
-    # Удаляем изображение с замененным лицом
-    # if not settings.MOCK_IMAGES_MODE and result_path != MOCK_FACEFUSION_PATH:
-    #     os.remove(result_path)
 
     logger.info(
         f"[save] END: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",

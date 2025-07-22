@@ -43,11 +43,11 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
 
     # Сохраняем видео
     link = await saveFile(
-        video_path,
-        user_id,
-        model_name,
-        model_data["video_folder_id"],
-        now,
+        file_path=video_path,
+        user_id=user_id,
+        folder_name=model_name,
+        initial_folder_id=model_data["video_folder_id"],
+        current_date=now,
     )
 
     if not link:

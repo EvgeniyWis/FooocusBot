@@ -7,6 +7,9 @@ from aiogram.fsm.context import FSMContext
 from bot.factory.iloveapi_task_factory import get_iloveapi_task_factory
 from bot.factory.magnific_task_factory import get_magnific_task_factory
 from bot.helpers import text
+from bot.helpers.handlers.startGeneration.image_processes.process_save_image import (
+    process_save_image,
+)
 from bot.InstanceBot import router
 from bot.logger import logger
 from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
@@ -91,7 +94,7 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
 
     # Запускаем upscale
     try:
-        magnific_result = await magnific_service.upscale_image(
+        magnific_result_url = await magnific_service.upscale_image(
             image=resize_result_base64,
         )
     except Exception as e:
@@ -104,8 +107,17 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
         )
         raise e
 
-    # Отправляем результат
-    logger.info(f"Результат upscale: {magnific_result}")
+    # Удаляем сообщение о начале upscale
+    await message_for_edit.delete()
+
+    # Сохраняем результат
+    await process_save_image(
+        call,
+        state,
+        model_name,
+        image_index,
+        result_url=magnific_result_url,
+    )
 
 
 # Добавление обработчиков
