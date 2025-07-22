@@ -30,4 +30,10 @@ def get_iloveapi_task_factory(
     uploader = uploader or ILoveAPIUploader(api)
     processor = processor or ILoveAPIProcessor(api)
     downloader = downloader or ILoveAPIDownloader(api)
-    return ILoveAPITaskFacade(api, starter, uploader, processor, downloader)
+    return ILoveAPITaskFacade(
+        api=api,
+        starter=starter,
+        uploader=uploader,
+        processor=processor,
+        downloader=downloader,
+    )

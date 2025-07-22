@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional, TypedDict
 
-Status = Literal["IN_PROGRESS", "COMPLETED", "FAILED"]
+Status = Literal["IN_PROGRESS", "COMPLETED", "FAILED", "CREATED"]
 
 class MagnificTaskResponse(TypedDict):
     generated: List[str]

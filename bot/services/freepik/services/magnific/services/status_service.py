@@ -43,13 +43,15 @@ class StatusService(BaseService, StatusServiceProtocol, ValidationMixin):
         self.validate_task_id(task_id)
         try:
             logger.info(f"[MagnificStatusService] Получение статуса для task_id={task_id}")
+            url = f"/{task_id}"
             response = await self.api.get(
-                f"{self.api.base_url}/{task_id}",
+                url,
             )
-            logger.info(f"[MagnificStatusService] Ответ: {response}")
-            if not isinstance(response, dict) or "status" not in response:
-                raise MagnificAPIError(f"Некорректный ответ от Magnific: {response}")
-            return response
+            data = response["data"]
+            logger.info(f"[MagnificStatusService] Ответ: {data}")
+            if not isinstance(data, dict) or "status" not in data:
+                raise MagnificAPIError(f"Некорректный ответ от Magnific: {data}")
+            return data
         except MagnificAPIError:
             raise
         except Exception as e:

@@ -1,6 +1,9 @@
 import asyncio
 
 from bot.logger import logger
+from bot.services.freepik.services.magnific.client.api_client import (
+    MagnificAPI,
+)
 from bot.services.freepik.services.magnific.client.base_service import (
     BaseService,
 )
@@ -31,14 +34,17 @@ class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
     """
     def __init__(
         self,
+        api: MagnificAPI,
         upscaler: UpscalerService,
         status_service: StatusService,
     ) -> None:
         """
         Args:
+            api (MagnificAPI): API клиент.
             upscaler (UpscalerService): Сервис upscale.
             status_service (StatusService): Сервис получения статуса.
         """
+        super().__init__(api)
         self.upscaler = upscaler
         self.status_service = status_service
 
@@ -76,7 +82,7 @@ class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
             fractality=fractality,
             engine=engine,
         )
-        task_id = task.get('task_id')
+        task_id = task.get("task_id")
         if not task_id:
             raise MagnificAPIError(f"Не получен task_id от Magnific: {task}")
         return await self._wait_for_completion(task_id)

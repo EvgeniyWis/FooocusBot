@@ -1,8 +1,7 @@
-from typing import Any, Dict
-
 import httpx
 
 from bot.logger import logger
+from bot.services.iloveapi.client.api_client import ILoveAPI
 from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
 from bot.services.iloveapi.client.interfaces import (
     DownloaderProtocol,
@@ -29,6 +28,7 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
     """
     def __init__(
         self,
+        api: ILoveAPI,
         starter: StarterProtocol,
         uploader: UploaderProtocol,
         processor: ProcessorProtocol,
@@ -36,11 +36,13 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
     ) -> None:
         """
         Args:
+            api (ILoveAPI): API клиент.
             starter (StarterProtocol): Сервис старта задач.
             uploader (UploaderProtocol): Сервис загрузки файлов.
             processor (ProcessorProtocol): Сервис обработки файлов.
             downloader (DownloaderProtocol): Сервис загрузки файлов.
         """
+        super().__init__(api)
         self.starter = starter
         self.uploader = uploader
         self.processor = processor
@@ -91,7 +93,7 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
         file: str,
         width: int,
         height: int,
-    ) -> Dict[str, Any]:
+    ) -> httpx.Response:
         """
         Обёртка для задачи изменения размера изображения.
 
@@ -111,5 +113,5 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
         return await self.run_image_task(
             "resizeimage",
             file,
-            tool_data
+            tool_data,
         )

@@ -11,9 +11,12 @@ from bot.services.freepik.services.magnific.interfaces.protocols import (
 from bot.services.freepik.services.magnific.types.responses import (
     MagnificTaskResponse,
 )
+from bot.services.freepik.services.magnific.utils.validation import (
+    ValidationMixin,
+)
 
 
-class UpscalerService(BaseService, UpscalerProtocol):
+class UpscalerService(BaseService, UpscalerProtocol, ValidationMixin):
     """
     Сервис для upscale изображений с помощью Magnific.
     """
@@ -62,14 +65,14 @@ class UpscalerService(BaseService, UpscalerProtocol):
         try:
             logger.info("[MagnificUpscaler] Отправка изображения на upscale")
             response = await self.api.post(
-                self.api.base_url,
                 json=json,
                 headers=headers,
             )
-            logger.info(f"[MagnificUpscaler] Ответ: {response}")
-            if not isinstance(response, dict) or "task_id" not in response:
-                raise MagnificAPIError(f"Некорректный ответ от Magnific: {response}")
-            return response
+            data = response["data"]
+            logger.info(f"[MagnificUpscaler] Ответ: {data}")
+            if not isinstance(data, dict) or "task_id" not in data:
+                raise MagnificAPIError(f"Некорректный ответ от Magnific: {data}")
+            return data
         except MagnificAPIError:
             raise
         except Exception as e:
