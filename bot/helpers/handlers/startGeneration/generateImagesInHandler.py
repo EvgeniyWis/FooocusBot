@@ -2,6 +2,7 @@ import traceback
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
+from InstanceBot import bot
 from utils.handlers.messages import safe_edit_message
 
 from bot.helpers import text
@@ -36,6 +37,18 @@ async def generateImagesInHandler(
     setting_number: str,
     with_randomizer: bool = False,
 ):
+    data = await state.get_data()
+    if data.get("message_to_del"):
+        try:
+            await bot.delete_message(
+                message.chat.id,
+                data["message_to_del"],
+            )
+        except Exception:
+            logger.warning(
+                f"Не удалось удалить сообщение бота: {data['message_to_del']}",
+            )
+
     message_for_edit = await safe_send_message(
         text=text.CANCEL_PREVIOUS_JOBS_TEXT,
         message=message,
@@ -116,7 +129,9 @@ async def generateImagesInHandler(
                     if setting_number != "individual":
                         dataArray = getDataArrayBySettingNumber(setting_number)
                     else:
-                        dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
+                        dataArray = await get_data_array_by_model_indexes(
+                            model_indexes_for_generation,
+                        )
 
                     for data in dataArray:
                         model_index = getModelNameIndex(data["model_name"])
@@ -157,5 +172,8 @@ async def generateImagesInHandler(
             pass
         logger.error(f"Ошибка при генерации изображения: {e}")
         traceback.print_exc()
-        await safe_send_message(text.GENERATION_IMAGE_ERROR_TEXT.format(e), message)
+        await safe_send_message(
+            text.GENERATION_IMAGE_ERROR_TEXT.format(e),
+            message,
+        )
         raise e
