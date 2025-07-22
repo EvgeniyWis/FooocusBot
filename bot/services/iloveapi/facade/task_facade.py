@@ -92,7 +92,7 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
         self,
         file: str,
         width: int,
-        height: int,
+        height: int | str,
     ) -> httpx.Response:
         """
         Обёртка для задачи изменения размера изображения.

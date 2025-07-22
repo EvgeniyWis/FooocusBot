@@ -58,6 +58,7 @@ class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
         resemblance: int = -10,
         fractality: int = 6,
         engine: str = "magnific_sharpy",
+        scale_factor: str = "2x",
     ) -> str:
         """
         Upscale изображение с помощью Magnific.
@@ -70,6 +71,7 @@ class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
             resemblance (int): Сходство.
             fractality (int): Фрактальность.
             engine (str): Движок.
+            scale_factor (str): Масштаб.
         Returns:
             str: URL upscale изображения.
         """
@@ -81,6 +83,7 @@ class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
             resemblance=resemblance,
             fractality=fractality,
             engine=engine,
+            scale_factor=scale_factor,
         )
         task_id = task.get("task_id")
         if not task_id:
