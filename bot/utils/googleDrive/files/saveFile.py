@@ -13,12 +13,14 @@ from bot.utils.retryOperation import retryOperation
 
 # Сохранение одного файла
 async def saveFile(
-    file_path: str,
     user_id: int,
     folder_name: str,
     initial_folder_id: int,
     current_date: str,
     image_index: int | None = None,
+    file_path: str = None,
+    file_url: str = None,
+    name_postfix: str = None,
 ):
     try:
         if not initial_folder_id:
@@ -85,7 +87,7 @@ async def saveFile(
         files_count = len(results.get("files", []))
 
         # Создаем имя для файла
-        name = f"{files_count + 1}.{file_path.split('.')[-1]}"
+        name = f"{files_count + 1}_{name_postfix}.jpg" if name_postfix else f"{files_count + 1}.jpg"
 
         # Создаем метаданные для файла
         file_metadata = {
@@ -96,32 +98,34 @@ async def saveFile(
         # Загружаем файл
         file = await retryOperation(
             uploadFile,
-            10,
+            3,
             2,
-            file_path,
             file_metadata,
             name,
             folder_name,
+            file_path,
+            file_url,
         )
 
-        if image_index is not None:
-            # Удаляем файл изображения
-            temp_path = os.path.join(
-                constants.TEMP_FOLDER_PATH,
-                f"{folder_name}_{user_id}",
-                f"{image_index}.jpg",
-            )
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
+        if not file_url:
+            if image_index is not None:
+                # Удаляем файл изображения
+                temp_path = os.path.join(
+                    constants.TEMP_FOLDER_PATH,
+                    f"{folder_name}_{user_id}",
+                    f"{image_index}.jpg",
+                )
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
 
-        else:
-            # Удаляем папку с изображениями
-            temp_path = os.path.join(
-                constants.TEMP_FOLDER_PATH,
-                f"{folder_name}_{user_id}",
-            )
-            if os.path.exists(temp_path):
-                shutil.rmtree(temp_path)
+            else:
+                # Удаляем папку с изображениями
+                temp_path = os.path.join(
+                    constants.TEMP_FOLDER_PATH,
+                    f"{folder_name}_{user_id}",
+                )
+                if os.path.exists(temp_path):
+                    shutil.rmtree(temp_path)
 
         return file["webViewLink"]
 
