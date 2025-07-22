@@ -4,30 +4,31 @@ from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
 # Инлайн-клавиатура для генерации видео
-def generateVideoKeyboard(model_name: str, image_index: int):
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="⚡️ Генерация обычного видео",
-                    callback_data=f"quick_video_generation|{model_name}|{image_index}",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🤖 Генерация NSFW видео",
-                    callback_data=f"generate_comfyui_video|{model_name}|{image_index}",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🪄 Использовать Magnific Upscaler",
-                    callback_data=f"magnific_upscale|{model_name}|{image_index}",
-                ),
-            ],
+def generateVideoKeyboard(model_name: str, image_index: int, with_magnific_upscale: bool = True):
+    inline_keyboard = [
+        [
+            InlineKeyboardButton(
+                text="⚡️ Генерация обычного видео",
+                callback_data=f"quick_video_generation|{model_name}|{image_index}",
+            ),
         ],
-    )
+        [
+            InlineKeyboardButton(
+                text="🤖 Генерация NSFW видео",
+                callback_data=f"generate_comfyui_video|{model_name}|{image_index}",
+            ),
+        ],
+    ]
 
+    if with_magnific_upscale:
+        inline_keyboard.insert(
+            InlineKeyboardButton(
+                text="🪄 Использовать Magnific Upscaler",
+                callback_data=f"magnific_upscale|{model_name}|{image_index}",
+            ),
+        )
+
+    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return kb
 
 
