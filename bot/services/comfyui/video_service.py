@@ -108,7 +108,7 @@ class ComfyUIVideoService:
         filename = file_info["filename"]
         subfolder = file_info.get("subfolder")
         base = (
-            f"{self.api.base_url}/{endpoint}?filename={filename}&type=output"
+            f"/{endpoint}?filename={filename}&type=output"
         )
         if subfolder:
             base += f"&subfolder={subfolder}"

@@ -1,0 +1,2 @@
+class MagnificAPIError(Exception):
+    pass

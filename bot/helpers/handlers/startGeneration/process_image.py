@@ -210,8 +210,8 @@ async def process_image(
             call,
             state,
             model_name,
-            result_path,
             image_index,
+            result_path=result_path,
         )
 
         state_data = await state.get_data()

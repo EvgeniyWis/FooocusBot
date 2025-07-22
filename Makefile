@@ -12,6 +12,9 @@ up-all:
 down-all:
 	docker-compose down
 
+restart-all:
+	docker-compose restart
+
 up-bot:
 	docker-compose up -d telegram_bot
 

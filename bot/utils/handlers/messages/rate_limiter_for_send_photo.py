@@ -63,7 +63,7 @@ async def safe_send_photo(
                     "RetryAfter повторная попытка отправки фото не удалась",
                 )
         except TelegramAPIError as e:
-            logger.warning(f"Telegram API ошибка (photo): {e}")
+            logger.error(f"Telegram API ошибка (photo): {e}")
         except Exception:
             logger.exception("Неожиданная ошибка в safe_send_photo")
 

@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     RUNPOD_API_KEY: str
     KLING_API_KEY: str
     BOT_API_TOKEN: str
+    PUBLIC_ILOVEAPI_API_KEY: str
+    FREEPIK_API_KEY: str
 
     # user_id пользователей / администраторов
     ADMIN_ID: int
@@ -17,7 +19,6 @@ class Settings(BaseSettings):
     ALLOWED_USERS: list[int]
 
     # Режимы и флаги
-    DEVELOPMENT_MODE: bool = False
     MOCK_IMAGES_MODE: bool = False
     MOCK_VIDEO_MODE: bool = False
     UPSCALE_MODE: bool = True
@@ -67,6 +68,12 @@ class Settings(BaseSettings):
 
     # Параметры ComfyUI
     COMFYUI_API_URL: str
+
+    # Параметры ILoveAPI
+    ILOVEAPI_API_URL: str
+
+    # Параметры Freepik API
+    FREEPIK_API_URL: str
 
 
 settings = Settings()  # type: ignore
