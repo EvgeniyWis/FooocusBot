@@ -155,7 +155,7 @@ class ComfyUIVideoService:
     def cleanup_local_output(self, folder="./ComfyUI/output"):
         for root, _, files in os.walk(folder):
             for f in files:
-                if f.endswith((".mp4", ".jpg", ".png")):
+                if f.endswith((".mp4", ".jpg", ".png", ".mov", ".gif")):
                     try:
                         os.remove(os.path.join(root, f))
                         logger.info(
