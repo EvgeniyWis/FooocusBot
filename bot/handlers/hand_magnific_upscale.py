@@ -1,13 +1,19 @@
 
+import base64
+
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from bot.factory.iloveapi_task_factory import get_iloveapi_task_factory
 
+from bot.factory.iloveapi_task_factory import get_iloveapi_task_factory
+from bot.factory.magnific_task_factory import get_magnific_task_factory
 from bot.helpers import text
 from bot.InstanceBot import router
 from bot.logger import logger
 from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
+    safe_edit_message,
+)
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
 
@@ -18,8 +24,8 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
     await call.message.delete()
 
     # Отправляем сообщение о начале использования Magnific Upscaler
-    await safe_send_message(
-        text.START_MAGNIFIC_UPSCALER_TEXT,
+    message_for_edit = await safe_send_message(
+        text.RESIZE_IMAGE_TEXT,
         call,
     )
 
@@ -54,13 +60,52 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
     iloveapi_service = get_iloveapi_task_factory()
 
     # Запускаем задачу
-    result = await iloveapi_service.resize_image(
-        file=image_url,
-        width=720,
-        height="auto",
+    try:
+        resize_result_response = await iloveapi_service.resize_image(
+            file=image_url,
+            width=720,
+            height="auto",
+        )
+        resize_result = resize_result_response.content
+    except Exception as e:
+        await message_for_edit.delete()
+        error_text = f"Ошибка при уменьшении разрешения изображения: {e}"
+        logger.error(error_text)
+        await safe_send_message(
+            error_text,
+            call.message,
+        )
+        raise e
+
+    # Изменяем сообщение
+    await safe_edit_message(
+        message_for_edit,
+        text.MAGNIFIC_UPSCALE_TEXT,
     )
 
-    logger.info(f"Результат обработки ILoveAPI после resize_image: {result}")
+    # Получаем сервис Magnific
+    magnific_service = get_magnific_task_factory()
+
+    # Преобразуем в base64
+    resize_result_base64 = base64.b64encode(resize_result).decode("utf-8")
+
+    # Запускаем upscale
+    try:
+        magnific_result = await magnific_service.upscale_image(
+            image=resize_result_base64,
+        )
+    except Exception as e:
+        await message_for_edit.delete()
+        error_text = f"Ошибка при Magnific Upscale изображения: {e}"
+        logger.error(error_text)
+        await safe_send_message(
+            error_text,
+            call.message,
+        )
+        raise e
+
+    # Отправляем результат
+    logger.info(f"Результат upscale: {magnific_result}")
 
 
 # Добавление обработчиков
