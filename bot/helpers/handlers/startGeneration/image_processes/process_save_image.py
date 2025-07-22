@@ -34,6 +34,7 @@ async def process_save_image(
     result_path: str = None,
     result_url: str = None,
     name_postfix: str = None,
+    kb_with_magnific_upscale: bool = True,
 ):
     """
     Обрабатывает сохранение изображения после этапа замены лица.
@@ -45,6 +46,7 @@ async def process_save_image(
         - result_path: str, путь к результату, полученный с замены лица
         - result_url: str, URL результата, полученный с замены лица
         - image_index: int, индекс изображения
+        - kb_with_magnific_upscale: bool, флаг для отображения клавиатуры с Magnific Upscaler
     """
 
     # Получаем данные пользователя
@@ -126,10 +128,16 @@ async def process_save_image(
         f"Отправляем сообщение о сохранении изображения: {direct_url}",
     )
 
+    message_text = (
+        text.SAVE_IMAGES_SUCCESS_TEXT_WITH_MAGNIFIC_UPSCALER
+        if not kb_with_magnific_upscale
+        else text.SAVE_IMAGES_SUCCESS_TEXT
+    )
+
     await safe_send_photo(
         photo=direct_url,
         message=call,
-        caption=text.SAVE_IMAGES_SUCCESS_TEXT.format(
+        caption=message_text.format(
             link,
             model_name,
             parent_folder["webViewLink"],
@@ -138,6 +146,7 @@ async def process_save_image(
         reply_markup=video_generation_keyboards.generateVideoKeyboard(
             model_name,
             image_index=image_index,
+            with_magnific_upscale=kb_with_magnific_upscale,
         ),
     )
 
