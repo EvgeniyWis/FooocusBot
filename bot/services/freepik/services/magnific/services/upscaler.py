@@ -11,9 +11,6 @@ from bot.services.freepik.services.magnific.client.interfaces import (
 from bot.services.freepik.services.magnific.client.types import (
     MagnificTaskResponse,
 )
-from bot.services.freepik.services.magnific.utils.validation import (
-    validate_base64_image,
-)
 
 
 class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
@@ -49,7 +46,7 @@ class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
                 "status": "IN_PROGRESS"
             }
         """
-        validate_base64_image(image)
+        self.validate_base64_image(image)
         json = {
             "image": image,
             "optimized_for": optimized_for,
@@ -70,7 +67,11 @@ class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
                 headers=headers,
             )
             logger.info(f"[MagnificUpscaler] Ответ: {response}")
+            if not isinstance(response, dict) or "task_id" not in response:
+                raise MagnificAPIError(f"Некорректный ответ от Magnific: {response}")
             return response
+        except MagnificAPIError:
+            raise
         except Exception as e:
             logger.error(f"[MagnificUpscaler] Ошибка upscale: {e}")
             raise MagnificAPIError(str(e))
