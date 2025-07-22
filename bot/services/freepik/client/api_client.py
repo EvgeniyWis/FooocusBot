@@ -14,10 +14,10 @@ class FreepikAPI(BaseAPIClient):
             return {**headers, **auth_header}
         return auth_header
 
-    async def post(self, url, data=None, headers=None, files=None, json=None):
+    async def post(self, url="", data=None, headers=None, files=None, json=None):
         headers = self._add_auth_header(headers)
         return await super().post(url, data=data, headers=headers, files=files, json=json)
 
-    async def get(self, url, headers=None):
+    async def get(self, url="", headers=None):
         headers = self._add_auth_header(headers)
         return await super().get(url, headers=headers)

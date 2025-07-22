@@ -1,5 +1,5 @@
 from bot.services.base_api_client import BaseAPIClient
-from bot.services.iloveapi.auth import ILoveAPIAuth
+from bot.services.iloveapi.auth.auth import ILoveAPIAuth
 
 
 class ILoveAPI(BaseAPIClient):
