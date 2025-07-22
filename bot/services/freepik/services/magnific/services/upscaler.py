@@ -1,19 +1,19 @@
 from bot.logger import logger
 from bot.services.freepik.services.magnific.client.base_service import (
-    MagnificBaseService,
+    BaseService,
 )
 from bot.services.freepik.services.magnific.client.exceptions import (
     MagnificAPIError,
 )
-from bot.services.freepik.services.magnific.client.interfaces import (
+from bot.services.freepik.services.magnific.interfaces.protocols import (
     UpscalerProtocol,
 )
-from bot.services.freepik.services.magnific.client.types import (
+from bot.services.freepik.services.magnific.types.responses import (
     MagnificTaskResponse,
 )
 
 
-class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
+class UpscalerService(BaseService, UpscalerProtocol):
     """
     Сервис для upscale изображений с помощью Magnific.
     """

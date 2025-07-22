@@ -1,14 +1,14 @@
 from bot.logger import logger
 from bot.services.freepik.services.magnific.client.base_service import (
-    MagnificBaseService,
+    BaseService,
 )
 from bot.services.freepik.services.magnific.client.exceptions import (
     MagnificAPIError,
 )
-from bot.services.freepik.services.magnific.client.interfaces import (
+from bot.services.freepik.services.magnific.interfaces.protocols import (
     StatusServiceProtocol,
 )
-from bot.services.freepik.services.magnific.client.types import (
+from bot.services.freepik.services.magnific.types.responses import (
     MagnificStatusResponse,
 )
 from bot.services.freepik.services.magnific.utils.validation import (
@@ -16,7 +16,7 @@ from bot.services.freepik.services.magnific.utils.validation import (
 )
 
 
-class MagnificStatusService(MagnificBaseService, StatusServiceProtocol, ValidationMixin):
+class StatusService(BaseService, StatusServiceProtocol, ValidationMixin):
     """
     Сервис для обработки статуса задачи с помощью Magnific.
     """

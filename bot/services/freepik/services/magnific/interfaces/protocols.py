@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from bot.services.freepik.services.magnific.client.types import (
+from bot.services.freepik.services.magnific.types.responses import (
     MagnificStatusResponse,
     MagnificTaskResponse,
 )

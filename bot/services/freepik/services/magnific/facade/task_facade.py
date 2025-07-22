@@ -2,42 +2,42 @@ import asyncio
 
 from bot.logger import logger
 from bot.services.freepik.services.magnific.client.base_service import (
-    MagnificBaseService,
+    BaseService,
 )
 from bot.services.freepik.services.magnific.client.exceptions import (
     MagnificAPIError,
 )
-from bot.services.freepik.services.magnific.client.interfaces import (
+from bot.services.freepik.services.magnific.interfaces.protocols import (
     MagnificTaskFacadeProtocol,
 )
-from bot.services.freepik.services.magnific.client.types import (
-    MagnificStatusResponse,
-    MagnificTaskResponse,
-)
 from bot.services.freepik.services.magnific.services.status_service import (
-    MagnificStatusService,
+    StatusService,
 )
 from bot.services.freepik.services.magnific.services.upscaler import (
-    MagnificUpscaler,
+    UpscalerService,
+)
+from bot.services.freepik.services.magnific.types.responses import (
+    MagnificStatusResponse,
+    MagnificTaskResponse,
 )
 from bot.services.freepik.services.magnific.utils.logger import (
     log_magnific_step,
 )
 
 
-class MagnificTaskFacade(MagnificBaseService, MagnificTaskFacadeProtocol):
+class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
     """
     Универсальный фасад для работы с задачами Magnific (upscale).
     """
     def __init__(
         self,
-        upscaler: MagnificUpscaler,
-        status_service: MagnificStatusService,
+        upscaler: UpscalerService,
+        status_service: StatusService,
     ) -> None:
         """
         Args:
-            upscaler (MagnificUpscaler): Сервис upscale.
-            status_service (MagnificGetStatus): Сервис получения статуса.
+            upscaler (UpscalerService): Сервис upscale.
+            status_service (StatusService): Сервис получения статуса.
         """
         self.upscaler = upscaler
         self.status_service = status_service
