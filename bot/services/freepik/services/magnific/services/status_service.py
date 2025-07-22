@@ -12,11 +12,11 @@ from bot.services.freepik.services.magnific.client.types import (
     MagnificStatusResponse,
 )
 from bot.services.freepik.services.magnific.utils.validation import (
-    validate_task_id,
+    ValidationMixin,
 )
 
 
-class MagnificStatusService(MagnificBaseService, StatusServiceProtocol):
+class MagnificStatusService(MagnificBaseService, StatusServiceProtocol, ValidationMixin):
     """
     Сервис для обработки статуса задачи с помощью Magnific.
     """
@@ -40,14 +40,18 @@ class MagnificStatusService(MagnificBaseService, StatusServiceProtocol):
                 "status": "COMPLETED"
             }
         """
-        validate_task_id(task_id)
+        self.validate_task_id(task_id)
         try:
             logger.info(f"[MagnificStatusService] Получение статуса для task_id={task_id}")
             response = await self.api.get(
                 f"{self.api.base_url}/{task_id}",
             )
             logger.info(f"[MagnificStatusService] Ответ: {response}")
+            if not isinstance(response, dict) or "status" not in response:
+                raise MagnificAPIError(f"Некорректный ответ от Magnific: {response}")
             return response
+        except MagnificAPIError:
+            raise
         except Exception as e:
             logger.error(f"[MagnificStatusService] Ошибка получения статуса: {e}")
             raise MagnificAPIError(str(e))
