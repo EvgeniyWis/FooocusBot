@@ -66,7 +66,7 @@ cd facefusion-docker
 
 3. Запустите контейнер:
 ```bash
-docker-compose up -d
+docker-compose -f docker-compose.cpu.yml up -d --build      
 ```
 
 4. Проверьте, что контейнер запустился:
