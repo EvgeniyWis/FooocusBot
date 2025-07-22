@@ -4,6 +4,7 @@ from bot.services.freepik.services.magnific.client.base_service import (
 from bot.services.freepik.services.magnific.client.interfaces import (
     UpscalerProtocol,
 )
+from bot.logger import logger
 
 
 class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
@@ -30,6 +31,9 @@ class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
                 "status": "IN_PROGRESS"
             }
         """
+        if not image or not isinstance(image, str):
+            logger.error("[MagnificUpscaler] Некорректный формат изображения (ожидается base64-строка)")
+            raise ValueError("Некорректный формат изображения (ожидается base64-строка)")
         json = {
             "image": image,
             "optimized_for": "standard",
@@ -39,15 +43,19 @@ class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
             "fractality": 6,
             "engine": "magnific_sharpy",
         }
-
         headers = {
             "Content-Type": "application/json",
         }
-
-        response = await self.api.post(
-            self.api.base_url,
-            json=json,
-            headers=headers,
-        )
-        return response
+        try:
+            logger.info("[MagnificUpscaler] Отправка изображения на upscale")
+            response = await self.api.post(
+                self.api.base_url,
+                json=json,
+                headers=headers,
+            )
+            logger.info(f"[MagnificUpscaler] Ответ: {response}")
+            return response
+        except Exception as e:
+            logger.error(f"[MagnificUpscaler] Ошибка upscale: {e}")
+            raise
 

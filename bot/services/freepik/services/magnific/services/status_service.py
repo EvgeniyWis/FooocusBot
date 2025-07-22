@@ -1,3 +1,4 @@
+from bot.logger import logger
 from bot.services.freepik.services.magnific.client.base_service import (
     MagnificBaseService,
 )
@@ -30,9 +31,16 @@ class MagnificStatusService(MagnificBaseService, StatusServiceProtocol):
                 "status": "COMPLETED"
             }
         """
-
-        response = await self.api.get(
-            f"{self.api.base_url}/{task_id}",
-        )
-
-        return response
+        if not task_id or not isinstance(task_id, str):
+            logger.error("[MagnificStatusService] Некорректный task_id")
+            raise ValueError("Некорректный task_id")
+        try:
+            logger.info(f"[MagnificStatusService] Получение статуса для task_id={task_id}")
+            response = await self.api.get(
+                f"{self.api.base_url}/{task_id}",
+            )
+            logger.info(f"[MagnificStatusService] Ответ: {response}")
+            return response
+        except Exception as e:
+            logger.error(f"[MagnificStatusService] Ошибка получения статуса: {e}")
+            raise

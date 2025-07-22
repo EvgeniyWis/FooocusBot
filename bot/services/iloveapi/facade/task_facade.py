@@ -15,8 +15,10 @@ from bot.services.iloveapi.client.types import (
     ToolDataResizeImage,
     ToolType,
 )
-from bot.services.iloveapi.utils.validation import (
+from bot.services.iloveapi.utils.logger import (
     log_task_step,
+)
+from bot.services.iloveapi.utils.validation import (
     validate_file_format,
 )
 
