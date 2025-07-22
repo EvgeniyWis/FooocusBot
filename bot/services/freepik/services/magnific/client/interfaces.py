@@ -22,3 +22,7 @@ class UpscalerProtocol(Protocol):
     """
     async def upscale(self, image: str) -> dict:
         ...
+
+class MagnificTaskFacadeProtocol(Protocol):
+    async def upscale_image(self, image: str) -> str:
+        ...

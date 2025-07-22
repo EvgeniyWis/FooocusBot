@@ -4,6 +4,16 @@ from bot.logger import logger
 from bot.services.freepik.services.magnific.client.base_service import (
     MagnificBaseService,
 )
+from bot.services.freepik.services.magnific.client.exceptions import (
+    MagnificAPIError,
+)
+from bot.services.freepik.services.magnific.client.interfaces import (
+    MagnificTaskFacadeProtocol,
+)
+from bot.services.freepik.services.magnific.client.types import (
+    MagnificStatusResponse,
+    MagnificTaskResponse,
+)
 from bot.services.freepik.services.magnific.services.status_service import (
     MagnificStatusService,
 )
@@ -15,7 +25,7 @@ from bot.services.freepik.services.magnific.utils.logger import (
 )
 
 
-class MagnificTaskFacade(MagnificBaseService):
+class MagnificTaskFacade(MagnificBaseService, MagnificTaskFacadeProtocol):
     """
     Универсальный фасад для работы с задачами Magnific (upscale).
     """
@@ -33,18 +43,42 @@ class MagnificTaskFacade(MagnificBaseService):
         self.status_service = status_service
 
     @log_magnific_step("upscale_image")
-    async def upscale_image(self, image: str) -> str:
+    async def upscale_image(
+        self,
+        image: str,
+        optimized_for: str = "standard",
+        creativity: int = -8,
+        hdr: int = 8,
+        resemblance: int = -10,
+        fractality: int = 6,
+        engine: str = "magnific_sharpy",
+    ) -> str:
         """
         Upscale изображение с помощью Magnific.
         Args:
             image (str): Base64-encoded изображение.
+            Настройки апскейла:
+            optimized_for (str): Оптимизация для.
+            creativity (int): Креативность.
+            hdr (int): HDR.
+            resemblance (int): Сходство.
+            fractality (int): Фрактальность.
+            engine (str): Движок.
         Returns:
             str: URL upscale изображения.
         """
-        task = await self.upscaler.upscale(image)
+        task: MagnificTaskResponse = await self.upscaler.upscale(
+            image,
+            optimized_for=optimized_for,
+            creativity=creativity,
+            hdr=hdr,
+            resemblance=resemblance,
+            fractality=fractality,
+            engine=engine,
+        )
         task_id = task.get('task_id')
         if not task_id:
-            raise RuntimeError(f"Не получен task_id от Magnific: {task}")
+            raise MagnificAPIError(f"Не получен task_id от Magnific: {task}")
         return await self._wait_for_completion(task_id)
 
     async def _wait_for_completion(self, task_id: str, poll_interval: int = 10) -> str:
@@ -54,13 +88,13 @@ class MagnificTaskFacade(MagnificBaseService):
             str: URL результата.
         """
         while True:
-            response = await self.status_service.get_status(task_id)
+            response: MagnificStatusResponse = await self.status_service.get_status(task_id)
             logger.info(f"[Magnific] Статус задачи {task_id}: {response}")
             if response.get("status") == "COMPLETED":
                 generated = response.get("generated")
                 if not generated:
-                    raise RuntimeError(f"Magnific: нет результата в ответе: {response}")
+                    raise MagnificAPIError(f"Magnific: нет результата в ответе: {response}")
                 return generated[0]
             if response.get("status") == "FAILED":
-                raise RuntimeError(f"Magnific: задача завершилась с ошибкой: {response}")
+                raise MagnificAPIError(f"Magnific: задача завершилась с ошибкой: {response}")
             await asyncio.sleep(poll_interval)

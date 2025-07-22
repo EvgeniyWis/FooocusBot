@@ -1,17 +1,35 @@
+from bot.logger import logger
 from bot.services.freepik.services.magnific.client.base_service import (
     MagnificBaseService,
+)
+from bot.services.freepik.services.magnific.client.exceptions import (
+    MagnificAPIError,
 )
 from bot.services.freepik.services.magnific.client.interfaces import (
     UpscalerProtocol,
 )
-from bot.logger import logger
+from bot.services.freepik.services.magnific.client.types import (
+    MagnificTaskResponse,
+)
+from bot.services.freepik.services.magnific.utils.validation import (
+    validate_base64_image,
+)
 
 
 class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
     """
     Сервис для upscale изображений с помощью Magnific.
     """
-    async def upscale(self, image: str) -> dict:
+    async def upscale(
+        self,
+        image: str,
+        optimized_for: str = "standard",
+        creativity: int = -8,
+        hdr: int = 8,
+        resemblance: int = -10,
+        fractality: int = 6,
+        engine: str = "magnific_sharpy",
+    ) -> MagnificTaskResponse:
         """
         Upscale изображение с помощью Magnific.
 
@@ -31,17 +49,15 @@ class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
                 "status": "IN_PROGRESS"
             }
         """
-        if not image or not isinstance(image, str):
-            logger.error("[MagnificUpscaler] Некорректный формат изображения (ожидается base64-строка)")
-            raise ValueError("Некорректный формат изображения (ожидается base64-строка)")
+        validate_base64_image(image)
         json = {
             "image": image,
-            "optimized_for": "standard",
-            "creativity": -8,
-            "hdr": 8,
-            "resemblance": -10,
-            "fractality": 6,
-            "engine": "magnific_sharpy",
+            "optimized_for": optimized_for,
+            "creativity": creativity,
+            "hdr": hdr,
+            "resemblance": resemblance,
+            "fractality": fractality,
+            "engine": engine,
         }
         headers = {
             "Content-Type": "application/json",
@@ -57,5 +73,5 @@ class MagnificUpscaler(MagnificBaseService, UpscalerProtocol):
             return response
         except Exception as e:
             logger.error(f"[MagnificUpscaler] Ошибка upscale: {e}")
-            raise
+            raise MagnificAPIError(str(e))
 
