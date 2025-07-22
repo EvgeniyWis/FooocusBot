@@ -4,7 +4,7 @@ from bot.services.freepik.services.magnific.client.api_client import (
 )
 
 
-class MagnificBaseService:
+class BaseService:
     def __init__(self, api: MagnificAPI) -> None:
         self.api = api
         logger.info(f"Инициализирован сервис {self.__class__.__name__}")
