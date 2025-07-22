@@ -2,12 +2,25 @@ from googleapiclient.http import MediaFileUpload
 from logger import logger
 
 from bot.utils.googleDrive.auth import service
+import aiohttp
+import tempfile
 
 
 # Функция для загрузки файла на Google Drive
 async def uploadFile(
-    file_path: str, file_metadata: dict, name: str, folder_name: str
+    file_metadata: dict, name: str, folder_name: str,
+    file_path: str = None, file_url: str = None, 
 ):
+    if file_url:
+        # Скачиваем файл по URL во временный файл
+        async with aiohttp.ClientSession() as session:
+            async with session.get(file_url) as resp:
+                if resp.status != 200:
+                    raise Exception(f"Ошибка скачивания файла: {resp.status}")
+                with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                    tmp_file.write(await resp.read())
+                    file_path = tmp_file.name
+
     media = MediaFileUpload(file_path, resumable=True)
     try:
         file = (
@@ -23,7 +36,7 @@ async def uploadFile(
             "type": "anyone",
             "role": "reader",
         }
-        
+
         try:
             service.permissions().create(
                 fileId=file["id"],
