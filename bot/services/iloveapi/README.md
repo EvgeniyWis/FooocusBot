@@ -56,7 +56,7 @@ flowchart TD
     subgraph "Сервисы"
         B[ILoveAPIStarter]
         C[ILoveAPIUploader]
-        D[ILoveAPIProcesser]
+        D[ILoveAPIProcessor]
         E[ILoveAPIDownloader]
     end
     subgraph "Клиент"

@@ -2,12 +2,12 @@ from typing import Any, Dict, List
 
 from bot.logger import logger
 from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
-from bot.services.iloveapi.client.types import FileFormat, ToolType
+from bot.services.iloveapi.client.types import TaskFileFormat, ToolType
 
-from ..client.interfaces import ProcesserProtocol
+from ..client.interfaces import ProcessorProtocol
 
 
-class ILoveAPIProcesser(ILoveAPIBaseService, ProcesserProtocol):
+class ILoveAPIProcessor(ILoveAPIBaseService, ProcessorProtocol):
     """
     Сервис для запуска обработки файлов в ILoveAPI.
     """
@@ -16,7 +16,7 @@ class ILoveAPIProcesser(ILoveAPIBaseService, ProcesserProtocol):
         server: str,
         task_id: str,
         tool: ToolType,
-        files: List[FileFormat],
+        files: List[TaskFileFormat],
         tool_data: Dict[str, Any],
     ) -> Dict[str, Any]:
         """
@@ -26,7 +26,7 @@ class ILoveAPIProcesser(ILoveAPIBaseService, ProcesserProtocol):
             server (str): Сервер (получается из ответа стартера).
             task_id (str): ID задачи (получается из ответа стартера).
             tool (ToolType): Тип инструмента.
-            files (list[FileFormat]): Список файлов.
+            files (list[TaskFileFormat]): Список файлов.
             tool_data (dict): Дополнительные параметры инструмента.
 
         Returns:
