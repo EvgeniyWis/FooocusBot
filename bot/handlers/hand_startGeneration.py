@@ -499,8 +499,11 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
         last_chat_id=message.chat.id,
         last_message_id=message.message_id,
     )
-    await safe_send_message(text.MESSAGE_IS_SUCCESFULLY_DONE, message, 
-    reply_markup=done_typing_keyboard())
+    await safe_send_message(
+        text.MESSAGE_IS_SUCCESFULLY_DONE,
+        message,
+        reply_markup=done_typing_keyboard(),
+    )
 
 
 async def finish_prompt_input(
@@ -665,11 +668,11 @@ async def write_model_for_generation(
         unique_keys=("model_name"),
     )
 
-    await safe_send_message(
+    message_to_del = await safe_send_message(
         text="✅ Промпты по моделям получены, начинаю генерацию...",
         message=message,
     )
-
+    await state.update_data(message_to_del=message_to_del.message_id)
     await generateImagesInHandler(
         prompt=model_prompts,
         message=message,

@@ -4,6 +4,7 @@ import os
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from utils.handlers.messages import safe_edit_message
 
 import bot.constants as constants
 from bot.factory.comfyui_video_service import get_video_service
@@ -220,6 +221,35 @@ async def handle_prompt_for_nsfw_generation(
 ):
     prompt = message.text
     await state.update_data(prompt_for_nsfw_video=prompt)
+
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.warning(
+            f"Не удалось удалить сообщение пользователя с промптом: {e}",
+        )
+
+    state_data = await state.get_data()
+    write_prompt_messages = state_data.get("write_prompt_messages_ids", [])
+    model_name = state_data.get("model_name_for_video_generation")
+
+    target_msg_id = None
+    for entry in write_prompt_messages:
+        if entry.get("model_name") == model_name:
+            target_msg_id = entry.get("message_id")
+            break
+
+    if target_msg_id:
+        try:
+            await bot.delete_message(
+                chat_id=message.chat.id,
+                message_id=target_msg_id,
+            )
+        except Exception as e:
+            logger.warning(
+                f"Не удалось удалить сообщение бота с запросом промпта: {e}",
+            )
+
     state_data = await state.get_data()
     file_id = state_data.get("image_file_id_for_nsfw_img2video")
 
@@ -245,11 +275,13 @@ async def handle_prompt_for_nsfw_generation(
         return
 
     await state.update_data(temp_path_for_nsfw=temp_path)
-    await safe_send_message(
+    duration_msg = await safe_send_message(
         "⏳ Выберите способ задания длительности видео:",
         message,
         reply_markup=video_generation_keyboards.nsfw_video_generation_insert_length_video_keyboard(),
     )
+
+    await state.update_data(duration_prompt_msg_id=duration_msg.message_id)
     await state.set_state(StartGenerationState.ask_video_length_input)
 
 
@@ -261,7 +293,14 @@ async def handle_ask_video_length_choice(
     state_data = await state.get_data()
     temp_path = state_data.get("temp_path_for_nsfw")
     prompt = state_data.get("prompt_for_nsfw_video")
+
     if choice == "default":
+        await safe_edit_message(
+            call.message,
+            "⚙️ Генерация началась. Ожидайте...",
+            reply_markup=None,
+        )
+
         await generate_nsfw_video_and_send_result(
             call,
             state,
@@ -270,10 +309,11 @@ async def handle_ask_video_length_choice(
             seconds=None,
         )
     elif choice == "input":
-        await safe_send_message(
+        input_msg = await safe_edit_message(
+            call.message,
             "Введите желаемую длительность видео в секундах (максимум 15):",
-            call,
         )
+        await state.update_data(duration_prompt_msg_id=input_msg.message_id)
         await state.set_state(StartGenerationState.ask_video_length_input)
 
 
@@ -281,19 +321,33 @@ async def handle_ask_video_length_input(
     message: types.Message,
     state: FSMContext,
 ):
+    try:
+        await message.delete()
+    except Exception as e:
+        logger.warning(
+            f"Не удалось удалить сообщение пользователя с длиной: {e}",
+        )
+
     state_data = await state.get_data()
+    duration_msg_id = state_data.get("duration_prompt_msg_id")
+    if duration_msg_id:
+        try:
+            await bot.delete_message(message.chat.id, duration_msg_id)
+        except Exception as e:
+            logger.warning(
+                f"Не удалось удалить сообщение бота с запросом длительности: {e}",
+            )
+
     temp_path = state_data.get("temp_path_for_nsfw")
     prompt = state_data.get("prompt_for_nsfw_video")
     length = None
     try:
         if message.text and message.text.strip():
             length = int(message.text.strip())
-            if length > 15:
-                length = 15
-            if length < 1:
-                length = 1
+            length = max(1, min(length, 15))
     except Exception:
         length = None
+
     await generate_nsfw_video_and_send_result(
         message,
         state,
