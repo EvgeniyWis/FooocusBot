@@ -33,6 +33,7 @@ async def process_save_image(
     image_index: int,
     result_path: str = None,
     result_url: str = None,
+    name_postfix: str = None,
 ):
     """
     Обрабатывает сохранение изображения после этапа замены лица.
@@ -80,6 +81,7 @@ async def process_save_image(
             initial_folder_id=model_data["picture_folder_id"],
             current_date=now,
             image_index=image_index if multi_select_mode else None,
+            name_postfix=name_postfix,
         )
     else:
         link = MOCK_LINK_FOR_SAVE_IMAGE
