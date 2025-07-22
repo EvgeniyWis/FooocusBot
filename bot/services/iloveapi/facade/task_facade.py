@@ -6,7 +6,7 @@ from bot.logger import logger
 from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
 from bot.services.iloveapi.client.interfaces import (
     DownloaderProtocol,
-    ProcesserProtocol,
+    ProcessorProtocol,
     StarterProtocol,
     UploaderProtocol,
 )
@@ -31,19 +31,19 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
         self,
         starter: StarterProtocol,
         uploader: UploaderProtocol,
-        processer: ProcesserProtocol,
+        processor: ProcessorProtocol,
         downloader: DownloaderProtocol,
     ) -> None:
         """
         Args:
             starter (StarterProtocol): Сервис старта задач.
             uploader (UploaderProtocol): Сервис загрузки файлов.
-            processer (ProcesserProtocol): Сервис обработки файлов.
+            processor (ProcessorProtocol): Сервис обработки файлов.
             downloader (DownloaderProtocol): Сервис загрузки файлов.
         """
         self.starter = starter
         self.uploader = uploader
-        self.processer = processer
+        self.processor = processor
         self.downloader = downloader
 
     @log_task_step('run_image_task')
@@ -78,7 +78,7 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
         for f in files:
             validate_file_format(f)
         logger.info(f"Файлы для обработки: {files} и {tool_data}")
-        await self.processer.process(server, task_id, tool, files, tool_data)
+        await self.processor.process(server, task_id, tool, files, tool_data)
         logger.info("Обработка завершена успешно!")
 
         result = await self.downloader.download(server, task_id)

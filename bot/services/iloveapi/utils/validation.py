@@ -1,13 +1,13 @@
-from bot.services.iloveapi.client.types import FileFormat
+from bot.services.iloveapi.client.types import TaskFileFormat
 
 
-def validate_file_format(data: FileFormat) -> None:
+def validate_file_format(data: TaskFileFormat) -> None:
     """
-    Валидация структуры данных FileFormat.
+    Валидация структуры данных TaskFileFormat.
     """
     required_keys = ["server_filename", "filename"]
     for key in required_keys:
         if key not in data:
-            raise ValueError(f"Отсутствует обязательное поле '{key}' в FileFormat: {data}")
+            raise ValueError(f"Отсутствует обязательное поле '{key}' в TaskFileFormat: {data}")
     # Можно добавить дополнительные проверки типов и значений
 

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Protocol
 import httpx
 
 from .types import (
-    FileFormat,
+    TaskFileFormat,
     StartTaskResponse,
     ToolType,
 )
@@ -31,12 +31,12 @@ class DownloaderProtocol(Protocol):
     async def download(self, server: str, task_id: str) -> httpx.Response:
         ...
 
-class ProcesserProtocol(Protocol):
+class ProcessorProtocol(Protocol):
     """
     Протокол процессора задач для ILoveAPI.
     Пример:
-        class MyProcesser:
-            async def process(self, server: str, task_id: str, tool: ToolType, files: List[FileFormat], tool_data: Dict[str, Any]) -> Dict[str, Any]:
+        class MyProcessor:
+            async def process(self, server: str, task_id: str, tool: ToolType, files: List[TaskFileFormat], tool_data: Dict[str, Any]) -> Dict[str, Any]:
                 ...
     """
     async def process(
@@ -44,7 +44,7 @@ class ProcesserProtocol(Protocol):
         server: str,
         task_id: str,
         tool: ToolType,
-        files: List[FileFormat],
+        files: List[TaskFileFormat],
         tool_data: Dict[str, Any],
     ) -> Dict[str, Any]:
         ...

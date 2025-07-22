@@ -1,6 +1,6 @@
 from typing import Literal, Optional, TypedDict
 
-ImagesToolType = Literal[
+ToolType = Literal[
     "compressimage",
     "cropimage",
     "convertimage",
@@ -12,9 +12,7 @@ ImagesToolType = Literal[
     "watermarkimage",
 ]
 
-ToolType = ImagesToolType
-
-class FileFormat(TypedDict):
+class TaskFileFormat(TypedDict):
     server_filename: str
     filename: str
     rotate: Optional[int]
