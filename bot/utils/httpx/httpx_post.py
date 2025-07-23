@@ -3,7 +3,6 @@ import asyncio
 import httpx
 
 from bot.logger import logger
-from bot.settings import settings
 from bot.utils.httpx.error_texts import PAYMENT_RUNPOD_ERROR_TEXT
 
 
@@ -48,14 +47,11 @@ async def httpx_post(
                         f"Несуществующий URL. Ответ от сервера: {response}",
                     )
 
-                if response.status_code == 402:
-                    if settings.RUNPOD_HOST in url:
-                        raise Exception(
-                            PAYMENT_RUNPOD_ERROR_TEXT
-                        )
+                if response.status_code == 402 and "runpod" in url.lower():
+                    raise Exception(PAYMENT_RUNPOD_ERROR_TEXT)
 
                 raise Exception(
-                    f"Сервер вернул ошибку: {response.status_code}",
+                    f"Сервер вернул ошибку: {response.status_code} с ошибкой: {response.get('error', 'Описание отсутствует')}",
                 )
 
             try:
