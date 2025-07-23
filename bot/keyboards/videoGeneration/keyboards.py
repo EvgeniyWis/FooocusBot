@@ -21,11 +21,11 @@ def generateVideoKeyboard(model_name: str, image_index: int, with_magnific_upsca
     ]
 
     if with_magnific_upscale:
-        inline_keyboard.insert(
-            InlineKeyboardButton(
+        inline_keyboard.append(
+            [InlineKeyboardButton(
                 text="🪄 Использовать Magnific Upscaler",
                 callback_data=f"magnific_upscale|{model_name}|{image_index}",
-            ),
+            )],
         )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
