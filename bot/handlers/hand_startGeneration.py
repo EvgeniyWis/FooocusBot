@@ -441,6 +441,12 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         # Сохраняем название модели и id папки для видео
         await state.update_data(model_name=model_name)
 
+        if not call.message:
+            return await editMessageOrAnswer(
+                call,
+                "Не получилось обнаружить сообщение!"
+            )
+
         try:
             logger.info("Обрабатываем изображение")
             await process_image(
@@ -456,6 +462,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 call,
                 f"❌ Ошибка при обработке изображения: {e}",
             )
+            raise e
 
     except Exception as e:
         traceback.print_exc()
