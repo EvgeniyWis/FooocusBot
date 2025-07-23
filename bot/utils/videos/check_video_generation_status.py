@@ -46,14 +46,8 @@ async def check_video_generation_status(request_id: str) -> str | None:
                 # Обрабатываем ошибку промпта, непройденного модераций
                 error_text = json["result"][0]
 
-                if (
-                    error_text
-                    == PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT
-                ):
-                    return {"error": error_text}
-
                 logger.error(f"Ошибка при генерации видео: {json}")
-                raise Exception(json["result"][0])
+                return {"error": error_text}
 
             elif json["status"] == "success":
                 # Получаем ссылку на выходное видео
