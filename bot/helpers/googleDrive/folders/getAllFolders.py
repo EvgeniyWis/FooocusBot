@@ -1,7 +1,9 @@
+from aiogoogle import Aiogoogle
+
 from bot.helpers.generateImages.dataArray.getModelNameIndex import (
     getModelNameIndex,
 )
-from bot.utils.googleDrive.auth import service
+from bot.utils.googleDrive.auth import client_creds, user_creds
 
 
 async def getAllFolders(model_names: list[str] = None):
@@ -23,42 +25,42 @@ async def getAllFolders(model_names: list[str] = None):
         folder_dates = {}
         page_token = None
 
-        while True:
-            response = (
-                service.files()
-                .list(
-                    q=query,
-                    spaces="drive",
-                    fields="nextPageToken, files(id, name, webViewLink, createdTime)",
-                    pageToken=page_token,
-                    supportsAllDrives=True,
-                    includeItemsFromAllDrives=True,
+        async with Aiogoogle(client_creds=client_creds, user_creds=user_creds) as aiogoogle:
+            drive_v3 = await aiogoogle.discover('drive', 'v3')
+            while True:
+                response = await aiogoogle.as_user(
+                    drive_v3.files.list(
+                        q=query,
+                        spaces="drive",
+                        fields="nextPageToken, files(id, name, webViewLink, createdTime)",
+                        pageToken=page_token,
+                        supportsAllDrives=True,
+                        includeItemsFromAllDrives=True,
+                    )
                 )
-                .execute()
-            )
 
-            for folder in response.get("files", []):
-                folder_name = folder.get("name")
-                if folder_name not in ["video", "picture", "2025-06-03"] and (
-                    model_names is None or folder_name in model_names
-                ):
-                    model_name = folder.get("name")
-                    created_time = folder.get("createdTime")
+                for folder in response.get("files", []):
+                    folder_name = folder.get("name")
+                    if folder_name not in ["video", "picture", "2025-06-03"] and (
+                        model_names is None or folder_name in model_names
+                    ):
+                        model_name = folder.get("name")
+                        created_time = folder.get("createdTime")
 
-                    # Проверяем, существует ли уже папка с таким именем
-                    if model_name in folder_dates:
-                        # Если новая папка создана позже, обновляем информацию
-                        if created_time > folder_dates[model_name]:
+                        # Проверяем, существует ли уже папка с таким именем
+                        if model_name in folder_dates:
+                            # Если новая папка создана позже, обновляем информацию
+                            if created_time > folder_dates[model_name]:
+                                folder_dates[model_name] = created_time
+                                models_info[model_name] = folder.get("webViewLink")
+                        else:
+                            # Если папка с таким именем встречается впервые
                             folder_dates[model_name] = created_time
                             models_info[model_name] = folder.get("webViewLink")
-                    else:
-                        # Если папка с таким именем встречается впервые
-                        folder_dates[model_name] = created_time
-                        models_info[model_name] = folder.get("webViewLink")
 
-            page_token = response.get("nextPageToken")
-            if not page_token:
-                break
+                page_token = response.get("nextPageToken")
+                if not page_token:
+                    break
 
         # Создаем список кортежей (индекс, имя, ссылка) для сортировки
         model_data = []

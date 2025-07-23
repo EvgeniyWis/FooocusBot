@@ -48,6 +48,7 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
         folder_name=model_name,
         initial_folder_id=model_data["video_folder_id"],
         current_date=now,
+        extension="mp4",
     )
 
     if not link:
@@ -58,9 +59,9 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
         return
 
     # Получаем данные родительской папки
-    folder = getFolderDataByID(model_data["video_folder_id"])
+    folder = await getFolderDataByID(model_data["video_folder_id"])
     parent_folder_id = folder["parents"][0]
-    parent_folder = getFolderDataByID(parent_folder_id)
+    parent_folder = await getFolderDataByID(parent_folder_id)
 
     logger.info(
         f"Данные папки по id {model_data['video_folder_id']}: {folder}",
