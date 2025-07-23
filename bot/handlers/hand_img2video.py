@@ -60,14 +60,16 @@ async def get_images_for_img2video(
     img2video_images_file_ids = state_data.get("img2video_images_file_ids", [])
 
     if not album:
-        photo = message.photo[-1]
-        image_file_id = photo.file_id
-        img2video_images_file_ids.append(image_file_id)
-    else:
-        for message in album:
+        if message.photo:
             photo = message.photo[-1]
             image_file_id = photo.file_id
             img2video_images_file_ids.append(image_file_id)
+    else:
+        for message in album:
+            if message.photo:
+                photo = message.photo[-1]
+                image_file_id = photo.file_id
+                img2video_images_file_ids.append(image_file_id)
 
     # Сохраняем путь в стейт
     await state.update_data(img2video_images_file_ids=img2video_images_file_ids)
