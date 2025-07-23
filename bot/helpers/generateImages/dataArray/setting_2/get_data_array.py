@@ -29,7 +29,7 @@ def setting2_get_data_array():
             "1zBM9p3FCCmgguUcThyHBbf6K6KhmXkFu",
             """photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, brown hair, huge breasts, slim waist, tan skin, plump lips, smirk, green eyes""",
-            [1, 0.7, 1.95, 0.05, -0.15, -1.5],
+            [1, 0.7, 1.9, 0, -0.15, -1.5],
         ),
         setting2_generate_data(
             "gracelowell.xo",
