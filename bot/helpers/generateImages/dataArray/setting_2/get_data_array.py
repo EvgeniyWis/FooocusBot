@@ -43,7 +43,7 @@ def setting2_get_data_array():
             "1DDRr8VUJeVIPvNG05uv9YdhGpcZY4zii",
             "1bRREBOn7UttfMR5TWPWpy2AXcUcwT9Rc",
             """photorealistic portrait of an 18-year-old Arabian girl with voluminous long black hair, slim waist, large breasts and hips, toned legs, high tan skin, big plump lips, smirk, bright brown eyes, realistic style, high quality and detail.""",
-            [1, 0.7, 2.40, 0.55, -0.35, -1.5],
+            [1, 0.7, 2.50, 0.55, -0.35, -1.5],
         ),
         setting2_generate_data(
             "ivyxhart",
