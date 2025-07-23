@@ -1,29 +1,37 @@
+import json
 import os
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 import pickle
 
-# Авторизация и инициализация клиента google drive через OAuth 2.0
+from aiogoogle.auth.creds import ClientCreds
+
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 current_dir = os.path.dirname(os.path.abspath(__file__))
 CLIENT_SECRET_FILE = os.path.join(current_dir, "..", "..", "config", "googleDrive.json")
 TOKEN_PICKLE = os.path.join(current_dir, "..", "..", "config", "token.pickle")
 
-creds = None
-# Проверяем, есть ли уже сохранённый токен
-if os.path.exists(TOKEN_PICKLE):
-    with open(TOKEN_PICKLE, 'rb') as token:
-        creds = pickle.load(token)
-# Если нет токена или он недействителен — проходим авторизацию
-if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-    else:
-        flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
-        creds = flow.run_local_server(port=0)
-    # Сохраняем токен для будущих запусков
-    with open(TOKEN_PICKLE, 'wb') as token:
-        pickle.dump(creds, token)
+# Чтение client_id и client_secret из googleDrive.json
+with open(CLIENT_SECRET_FILE) as f:
+    client_info = json.load(f)["installed"]
 
-service = build("drive", "v3", credentials=creds)
+client_creds = ClientCreds(
+    client_id=client_info["client_id"],
+    client_secret=client_info["client_secret"],
+    scopes=SCOPES,
+    redirect_uri=client_info["redirect_uris"][0],
+)
+
+user_creds = None
+if os.path.exists(TOKEN_PICKLE):
+    with open(TOKEN_PICKLE, "rb") as token:
+        creds_obj = pickle.load(token)
+        # Преобразуем объект в словарь
+        user_creds = {
+            "access_token": creds_obj.token,
+            "refresh_token": creds_obj.refresh_token,
+            "expires_at": creds_obj.expiry.isoformat(),
+            "token_type": "Bearer",
+            "id_token": getattr(creds_obj, "id_token", None),
+            "scope": creds_obj.scopes,
+            "client_id": creds_obj.client_id,
+            "client_secret": creds_obj.client_secret,
+        }

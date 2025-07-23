@@ -112,9 +112,9 @@ async def process_save_image(
         return
 
     # Получаем данные родительской папки
-    folder = getFolderDataByID(model_data["picture_folder_id"])
+    folder = await getFolderDataByID(model_data["picture_folder_id"])
     parent_folder_id = folder["parents"][0]
-    parent_folder = getFolderDataByID(parent_folder_id)
+    parent_folder = await getFolderDataByID(parent_folder_id)
 
     logger.info(
         f"Данные папки по id {model_data['picture_folder_id']}: {folder}",
