@@ -6,15 +6,18 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 import bot.constants as constants
+from bot.domain.entities.video_generation import ProcessingStatus
 from bot.factory.comfyui_video_service import get_video_service
 from bot.helpers.handlers.videoGeneration import (
     process_write_prompt,
+    saveVideo,
 )
 from bot.InstanceBot import bot, router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
 from bot.utils import retryOperation
+from bot.utils.handlers import appendDataToStateArray, getDataInDictsArray
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
@@ -40,7 +43,6 @@ async def quick_generate_nsfw_video(
     file_id = photo.file_id
 
     await state.update_data(
-        model_name_for_nsfw_video_generation=model_name,
         image_file_id_for_nsfw_img2video=file_id,
     )
 
@@ -68,6 +70,10 @@ async def generate_nsfw_video_and_send_result(
             if isinstance(message_or_call, types.CallbackQuery)
             else message_or_call
         )
+
+    state_data = await state.get_data()
+    model_name = state_data.get("model_name_for_video_generation", "")
+    image_index = state_data.get("image_index_for_video_generation", None)
 
     progress_message = await safe_send_message(
         "⏳ Генерация NSFW видео через ComfyUI...",
@@ -168,7 +174,7 @@ async def generate_nsfw_video_and_send_result(
         video_urls = result_final["video_urls"]
         await state.update_data(generated_nsfw_video_urls=video_urls)
 
-        async for v in download_nsfw_videos(video_urls):
+        async for v, idx in download_nsfw_videos(video_urls):
             if not v.path:
                 continue
 
@@ -180,7 +186,25 @@ async def generate_nsfw_video_and_send_result(
                     types.CallbackQuery,
                 )
                 else message_or_call.answer_video
-            )(video=video, caption=v.caption)
+            )(video=video, caption=v.caption,
+            reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
+                model_name=model_name,
+                image_index=image_index,
+                is_nsfw=True,
+            ))
+
+            data_for_update = {
+                "video_index": idx,
+                "image_index": image_index,
+                "model_name": model_name,
+                "direct_url": v.path,
+            }
+            await appendDataToStateArray(
+                state,
+                "generated_nsfw_video_paths",
+                data_for_update,
+                unique_keys=("model_name", "image_index", "video_index"),
+            )
 
             try:
                 os.remove(v.path)
@@ -295,6 +319,51 @@ async def handle_ask_video_length_input(
         seconds=length,
     )
 
+
+# Обработка нажатия на кнопку сохранения видео
+async def handle_video_save_button(
+    call: types.CallbackQuery,
+    state: FSMContext,
+):
+    # Получаем тип кнопки
+    temp = call.data.split("|")
+    model_name = temp[2]
+    image_index = int(temp[3])
+    video_index = int(temp[4])
+
+    # Убираем кнопки у сообщения
+    await call.message.edit_reply_markup(None)
+
+    # Получаем данные
+    state_data = await state.get_data()
+
+    # Получаем путь к видео
+    generated_nsfw_video_paths = state_data.get("generated_nsfw_video_paths", [])
+    video_path = await getDataInDictsArray(
+        generated_nsfw_video_paths,
+        model_name,
+        image_index,
+        video_index,
+    )
+
+    if not video_path:
+        error_message = "Ошибка: не удалось найти путь к видео для сохранения"
+        await safe_send_message(
+            error_message,
+            call.message,
+        )
+        return None
+
+    if image_index:
+        # Удаляем изображение из массива объектов saved_images_urls
+        saved_images_urls = state_data.get("saved_images_urls", [])
+        for item in saved_images_urls:
+            if model_name == item["model_name"] and image_index == item["image_index"] and video_index == item["video_index"]:
+                saved_images_urls.remove(item)
+        await state.update_data(saved_images_urls=saved_images_urls)
+
+    # Сохраняем видео
+    await saveVideo(video_path, model_name, call.message)
 
 
 # Добавление обработчиков

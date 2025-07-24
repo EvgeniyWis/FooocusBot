@@ -45,7 +45,7 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
         )
 
     # Получаем путь к видео (если он есть и это перегенерация)
-    video_path = await get_video_path_from_state(state, model_name, image_index, call)
+    video_path = await get_video_path_from_state(state, model_name, image_index)
 
     # Удаляем видео из папки temp
     if not settings.MOCK_VIDEO_MODE and video_path:
@@ -174,8 +174,8 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         )
 
 
-# Обработка нажатия на кнопки корректности видео
-async def handle_video_correctness_buttons(
+# Обработка нажатия на кнопку сохранения видео
+async def handle_video_save_button(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
@@ -195,7 +195,7 @@ async def handle_video_correctness_buttons(
     state_data = await state.get_data()
 
     # Получаем путь к видео
-    video_path = await get_video_path_from_state(state, model_name, image_index, call)
+    video_path = await get_video_path_from_state(state, model_name, image_index)
 
     if not video_path:
         error_message = "Ошибка: не удалось найти путь к видео для сохранения"
@@ -247,6 +247,6 @@ def hand_add():
     )
 
     router.callback_query.register(
-        handle_video_correctness_buttons,
-        lambda call: call.data.startswith("video_correctness"),
+        handle_video_save_button,
+        lambda call: call.data.startswith("video_correctness|correct"),
     )

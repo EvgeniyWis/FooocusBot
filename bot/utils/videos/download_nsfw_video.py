@@ -44,7 +44,7 @@ async def _download_single_video(
 
 async def download_nsfw_videos(
     video_urls: list[str],
-) -> AsyncGenerator[DownloadedVideo, None]:
+) -> AsyncGenerator[tuple[DownloadedVideo, int], None]:
     """
     Асинхронно скачивает видео по списку URL.
 
@@ -59,7 +59,7 @@ async def download_nsfw_videos(
         for idx, url in enumerate(video_urls, 1):
             try:
                 video = await _download_single_video(session, url, idx)
-                yield video
+                yield video, idx
             except Exception as e:
                 logger.error(f"Ошибка при обработке видео {idx}: {e}")
                 yield DownloadedVideo(path=None, caption=None)

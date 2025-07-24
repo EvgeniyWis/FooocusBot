@@ -35,6 +35,7 @@ async def process_write_prompt(
     model_name_index = getModelNameIndex(model_name)
 
     await state.update_data(model_name_for_video_generation=model_name)
+    await state.update_data(image_index_for_video_generation=image_index)
 
     message_text = (
         text.WRITE_PROMPT_FOR_VIDEO_TEXT.format(
