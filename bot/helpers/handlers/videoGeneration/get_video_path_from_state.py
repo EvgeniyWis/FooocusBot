@@ -5,16 +5,12 @@ from bot.logger import logger
 from bot.utils.handlers import (
     getDataInDictsArray,
 )
-from bot.utils.handlers.messages.rate_limiter_for_send_message import (
-    safe_send_message,
-)
 
 
 async def get_video_path_from_state(
     state: FSMContext,
     model_name: str,
     image_index: int | None = None,
-    call: types.CallbackQuery | None = None,
 ) -> str | None:
     """
     Получает путь к видео из стейта по ключу generated_video_paths.
