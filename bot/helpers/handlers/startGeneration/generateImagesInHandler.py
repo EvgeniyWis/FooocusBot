@@ -97,6 +97,8 @@ async def generateImagesInHandler(
                 await message_for_edit.pin()
 
                 if isinstance(prompt, dict):
+                    model_indexes_for_generation = list(prompt.keys())
+
                     result = await generateImages(
                         setting_number="individual",
                         prompt_for_current_model=prompt,
@@ -105,9 +107,7 @@ async def generateImagesInHandler(
                         user_id=user_id,
                         is_test_generation=is_test_generation,
                         with_randomizer=False,
-                        model_indexes_for_generation=list(
-                            map(int, prompt.keys()),
-                        ),
+                        model_indexes_for_generation=model_indexes_for_generation,
                     )
                 else:
                     # Формируем словарь model_name -> prompt
@@ -116,7 +116,9 @@ async def generateImagesInHandler(
                     if setting_number != "individual":
                         dataArray = getDataArrayBySettingNumber(setting_number)
                     else:
-                        dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
+                        dataArray = await get_data_array_by_model_indexes(
+                            model_indexes_for_generation,
+                        )
 
                     for data in dataArray:
                         model_index = getModelNameIndex(data["model_name"])
@@ -157,5 +159,8 @@ async def generateImagesInHandler(
             pass
         logger.error(f"Ошибка при генерации изображения: {e}")
         traceback.print_exc()
-        await safe_send_message(text.GENERATION_IMAGE_ERROR_TEXT.format(e), message)
+        await safe_send_message(
+            text.GENERATION_IMAGE_ERROR_TEXT.format(e),
+            message,
+        )
         raise e

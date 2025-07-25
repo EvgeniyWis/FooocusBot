@@ -3,30 +3,29 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 )
 
 
-# Функция для получения имени модели по его номеру
 def getModelNameByIndex(index):
-    # Получаем все массивы данных из всех настроек
-    all_settings = getAllDataArrays()
+    if not isinstance(index, str):
+        index = str(index)
 
-    # Преобразуем индекс в число
-    index = int(index)
+    # Обрезаем суффикс +N, если он есть
+    base_index = index.split("+")[0]
 
-    # Проверяем, что индекс больше 0
-    if index <= 0:
+    try:
+        base_index_int = int(base_index)
+    except ValueError:
+        return None  # или raise, если нужно
+
+    if base_index_int <= 0:
         return None
 
-    # Уменьшаем индекс на 1, так как в массиве индексация с 0
-    index = index - 1
+    base_index_int -= 1
 
-    # Проходим по всем настройкам
+    all_settings = getAllDataArrays()
+
     current_length = 0
     for setting in all_settings:
-        # Если индекс меньше длины текущей настройки + текущая длина,
-        # значит модель находится в этой настройке
-        if index < len(setting) + current_length:
-            # Возвращаем имя модели из текущей настройки
-            return setting[index - current_length]["model_name"]
+        if base_index_int < len(setting) + current_length:
+            return setting[base_index_int - current_length]["model_name"]
         current_length += len(setting)
 
-    # Если индекс больше, чем общее количество моделей
     return None
