@@ -1,3 +1,5 @@
+import uuid
+
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
@@ -52,7 +54,10 @@ async def process_image_block(
             check_other_jobs=checkOtherJobs,
             chat_id=chat_id,
         )
-        await redis_storage.add_task(settings.PROCESS_IMAGE_BLOCK_TASK, task_dto)
+        await redis_storage.add_task(
+            settings.PROCESS_IMAGE_BLOCK_TASK,
+            task_dto,
+        )
 
         # Проверяем статус работы
         response_json = await retryOperation(
@@ -79,7 +84,9 @@ async def process_image_block(
             images_output = response_json.get("output", [])
 
             if images_output == []:
-                raise Exception("Не удалось сгенерировать изображения (ошибка обработки на RunPod)")
+                raise Exception(
+                    "Не удалось сгенерировать изображения (ошибка обработки на RunPod)",
+                )
 
         media_group = []
 
@@ -119,13 +126,18 @@ async def process_image_block(
                 regenerated_models=regenerated_models,
             )
 
-        # Отправляем изображение
         from helpers.handlers.startGeneration import sendImageBlock
 
         if not len(media_group):
-            logger.error(f"Медиагруппа изображений для отправки пользователю {user_id} для модели {model_name} пуста: {media_group}")
+            logger.error(
+                f"Медиагруппа изображений для отправки пользователю {user_id} для модели {model_name} пуста: {media_group}",
+            )
             return False
 
+        # уникальний ид для дальнейшей работы с КОНКРЕТНОЙ генерацией
+        generation_id = str(
+            uuid.uuid4(),
+        )
         await sendImageBlock(
             state,
             media_group,
@@ -133,6 +145,7 @@ async def process_image_block(
             setting_number,
             is_test_generation,
             user_id,
+            generation_id=generation_id,
         )
 
         return True
