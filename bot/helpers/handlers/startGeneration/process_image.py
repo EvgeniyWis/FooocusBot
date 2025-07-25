@@ -95,6 +95,15 @@ async def process_image(
                     model_name,
                 )
 
+                if settings.SECOND_UPSCALE_MODE:
+                    await process_upscale_image(
+                        call=call,
+                        state=state,
+                        image_index=image_index,
+                        model_name=model_name,
+                        is_second=True,
+                    )
+
             logger.info(
                 f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}",
             )

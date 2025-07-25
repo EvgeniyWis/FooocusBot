@@ -2,11 +2,9 @@ from typing import Any, Dict, List, Protocol
 
 import httpx
 
-from .types import (
-    TaskFileFormat,
-    StartTaskResponse,
-    ToolType,
-)
+from bot.services.iloveapi.types.start_task_response import StartTaskResponse
+from bot.services.iloveapi.types.task_file_format import TaskFileFormat
+from bot.services.iloveapi.types.tool_type import ToolType
 
 
 class UploaderProtocol(Protocol):

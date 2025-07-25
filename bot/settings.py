@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     MOCK_IMAGES_MODE: bool = False
     MOCK_VIDEO_MODE: bool = False
     UPSCALE_MODE: bool = True
+    SECOND_UPSCALE_MODE: bool = True
     FACEFUSION_MODE: bool = True
     RECOVERING_TASKS: bool = True
     HEATING_COMFYUI_MODELS: bool = True

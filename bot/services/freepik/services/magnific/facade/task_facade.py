@@ -99,11 +99,11 @@ class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
         while True:
             response: MagnificStatusResponse = await self.status_service.get_status(task_id)
             logger.info(f"[Magnific] Статус задачи {task_id}: {response}")
-            if response.get("status") == "COMPLETED":
-                generated = response.get("generated")
+            if response["status"] == "COMPLETED":
+                generated = response["generated"]
                 if not generated:
                     raise MagnificAPIError(f"Magnific: нет результата в ответе: {response}")
                 return generated[0]
-            if response.get("status") == "FAILED":
+            if response["status"] == "FAILED":
                 raise MagnificAPIError(f"Magnific: задача завершилась с ошибкой: {response}")
             await asyncio.sleep(poll_interval)
