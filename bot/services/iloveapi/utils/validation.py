@@ -1,4 +1,4 @@
-from bot.services.iloveapi.client.types import TaskFileFormat
+from bot.services.iloveapi.types.task_file_format import TaskFileFormat
 
 
 def validate_file_format(data: TaskFileFormat) -> None:

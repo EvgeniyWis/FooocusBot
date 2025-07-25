@@ -1,8 +1,7 @@
 from bot.logger import logger
 from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
-from bot.services.iloveapi.client.types import UploadResponse
-
-from ..client.interfaces import UploaderProtocol
+from bot.services.iloveapi.client.interfaces import UploaderProtocol
+from bot.services.iloveapi.types.upload_response import UploadResponse
 
 
 class ILoveAPIUploader(ILoveAPIBaseService, UploaderProtocol):
