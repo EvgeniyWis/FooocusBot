@@ -1,3 +1,5 @@
+import copy
+
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
@@ -22,11 +24,11 @@ async def generateImageBlock(
         variable_prompt = " "
 
     # Проверяем наличие json в данных модели
-    if not "json" in data:
+    if "json" not in data:
         raise ValueError(f"Не получилось обнаружить json в {data}")
 
     # Прибавляем к постоянному промпту переменный промпт
-    json = data["json"].copy()
+    json = copy.deepcopy(data["json"])
     json["input"]["prompt"] = (
         variable_prompt.replace("\n", " ") + " " + json["input"]["prompt"]
     )

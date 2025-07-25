@@ -1,5 +1,6 @@
 import re
 import traceback
+from collections import defaultdict
 
 from aiogram import types
 from aiogram.filters import StateFilter
@@ -255,29 +256,38 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
     setting_number = state_data.get("setting_number", "1")
 
     model_prompts = {}
+    prompt_counter = defaultdict(int)
+    unique_model_indexes: set[int] = set()
+
     for index_str, prompt in matches:
-        if not index_str.isdigit():
-            continue
-        index = int(index_str)
-        if not (start_index <= index <= end_index):
+        index_base = int(index_str.split("+")[0])
+
+        if not (start_index <= index_base <= end_index):
             await safe_send_message(
-                text.MODEL_NOT_FOUND_TEXT.format(index),
+                text.MODEL_NOT_FOUND_TEXT.format(index_base),
                 message,
             )
             return
-        model_prompts[str(index)] = prompt.strip()
 
-    if len(model_prompts) != expected_count:
+        unique_model_indexes.add(index_base)
+
+        count = prompt_counter[str(index_base)]
+        full_key = str(index_base) if count == 0 else f"{index_base}+{count}"
+        model_prompts[full_key] = prompt.strip()
+        prompt_counter[str(index_base)] += 1
+
+    if len(unique_model_indexes) != expected_count:
         await safe_send_message(
-            f"⚠️ Нужно указать <b>ровно {expected_count}</b> промптов (а не {len(model_prompts)}).",
+            f"⚠️ Нужно указать <b>ровно {expected_count}</b> моделей с промптами (а не {len(unique_model_indexes)}).",
             message,
         )
         return
 
     data_for_update = {
-        f"{getModelNameByIndex(str(index))}": prompt
-        for index, prompt in model_prompts.items()
+        f"{getModelNameByIndex(key)}_{key}": prompt
+        for key, prompt in model_prompts.items()
     }
+
     await appendDataToStateArray(
         state,
         "model_prompts_for_generation",
@@ -444,7 +454,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         if not call.message:
             return await editMessageOrAnswer(
                 call,
-                "Не получилось обнаружить сообщение!"
+                "Не получилось обнаружить сообщение!",
             )
 
         try:
@@ -506,8 +516,11 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
         last_chat_id=message.chat.id,
         last_message_id=message.message_id,
     )
-    await safe_send_message(text.MESSAGE_IS_SUCCESFULLY_DONE, message, 
-    reply_markup=done_typing_keyboard())
+    await safe_send_message(
+        text.MESSAGE_IS_SUCCESFULLY_DONE,
+        message,
+        reply_markup=done_typing_keyboard(),
+    )
 
 
 async def finish_prompt_input(
@@ -593,15 +606,8 @@ async def write_models_for_specific_generation(
         )
         return
 
-    model_indexes = [x.strip() for x in message_text.split(",")]
-
-    # Проверяем на дублирование номеров моделей
-    if len(model_indexes) != len(set(model_indexes)):
-        await safe_send_message(
-            text=text.DUPLICATE_NUMBERS_TEXT,
-            message=message,
-        )
-        return
+    raw_model_indexes = [x.strip() for x in message_text.split(",")]
+    model_indexes = make_unique_model_keys(raw_model_indexes)
 
     all_data_arrays = getAllDataArrays()
     all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
@@ -632,6 +638,16 @@ async def write_models_for_specific_generation(
         )
 
 
+def make_unique_model_keys(model_indexes: list[str]) -> list[str]:
+    counter = defaultdict(int)
+    result = []
+    for index in model_indexes:
+        count = counter[index]
+        result.append(index if count == 0 else f"{index}+{count}")
+        counter[index] += 1
+    return result
+
+
 async def write_model_for_generation(
     message: types.Message,
     state: FSMContext,
@@ -639,7 +655,6 @@ async def write_model_for_generation(
 ):
     text_input = text_input or message.text.strip()
 
-    # 1. Новый формат: 1 - текст
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
 
     if not matches:
@@ -649,7 +664,9 @@ async def write_model_for_generation(
         )
         return
 
+    prompt_counter = defaultdict(int)
     model_prompts = {}
+
     for index, prompt in matches:
         if not index.isdigit():
             continue
@@ -659,18 +676,22 @@ async def write_model_for_generation(
                 message=message,
             )
             return
-        model_prompts[str(index)] = prompt.strip()
+
+        count = prompt_counter[index]
+        key = index if count == 0 else f"{index}+{count}"
+        model_prompts[key] = prompt.strip()
+        prompt_counter[index] += 1
 
     data_for_update = {
-        f"{getModelNameByIndex(str(index))}": prompt
-        for index, prompt in model_prompts.items()
+        f"{getModelNameByIndex(key)}_{key}": prompt
+        for key, prompt in model_prompts.items()
     }
-    await appendDataToStateArray(
-        state,
-        "model_prompts_for_generation",
-        data_for_update,
-        unique_keys=("model_name"),
-    )
+
+    await state.update_data(model_prompts_for_generation=data_for_update)
+
+    logger.info(f"Обновляем промпты в состоянии: {data_for_update}")
+
+    await state.update_data(model_prompts_for_generation=data_for_update)
 
     await safe_send_message(
         text="✅ Промпты по моделям получены, начинаю генерацию...",

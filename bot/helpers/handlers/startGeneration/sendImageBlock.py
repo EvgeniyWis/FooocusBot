@@ -32,6 +32,7 @@ async def sendImageBlock(
     setting_number: str,
     is_test_generation: bool,
     user_id: int,
+    generation_id: str,
 ):
     try:
         # Ограничиваем media_group до 10 элементов (Telegram лимит)
@@ -49,14 +50,16 @@ async def sendImageBlock(
         for idx, media in enumerate(media_group_message):
             data_for_update = {
                 "model_name": model_name,
+                "generation_id": generation_id,
                 "image_index": idx + 1,
                 "message_id": media.message_id,
+                "type": "media",
             }
             await appendDataToStateArray(
                 state,
                 "imageGeneration_mediagroup_messages_ids",
                 data_for_update,
-                unique_keys=("model_name", "image_index"),
+                unique_keys=("model_name", "image_index", "generation_id"),
             )
 
     except Exception as e:
@@ -114,8 +117,16 @@ async def sendImageBlock(
                     ),
                     reply_markup=reply_markup,
                 )
-                await state.update_data(
-                    imageGeneration_select_message_id=select_message.message_id
+                await appendDataToStateArray(
+                    state,
+                    "imageGeneration_mediagroup_messages_ids",
+                    {
+                        "model_name": model_name,
+                        "generation_id": generation_id,
+                        "message_id": select_message.message_id,
+                        "type": "keyboard",
+                    },
+                    unique_keys=("model_name", "generation_id", "type"),
                 )
             else:
                 reply_markup = start_generation_keyboards.selectImageKeyboard(
