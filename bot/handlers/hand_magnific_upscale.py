@@ -4,7 +4,7 @@ import base64
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.factory.iloveapi_task_factory import get_iloveapi_task_factory
+from bot.factory.image_service_factory import create_resizer
 from bot.factory.magnific_task_factory import get_magnific_task_factory
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes.process_save_image import (
@@ -60,12 +60,12 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
     logger.info(f"URL изображения для Magnific Upscaler: {image_url}")
 
     # Получаем сервис ILoveAPI
-    iloveapi_service = get_iloveapi_task_factory()
+    resize_service = create_resizer()
 
     # Запускаем задачу
     try:
-        resize_result_response = await iloveapi_service.resize_image(
-            file=image_url,
+        resize_result_response = await resize_service.resize_image_cloud_file(
+            cloud_file=image_url,
             width=720,
             height="auto",
         )

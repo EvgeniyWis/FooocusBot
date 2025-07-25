@@ -1,9 +1,8 @@
-from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
+from bot.services.iloveapi.adapters.base_adapter import ILoveAPIBaseService
+from bot.services.iloveapi.client.interfaces import DownloaderProtocol
 
-from ..client.interfaces import DownloaderProtocol
 
-
-class ILoveAPIDownloader(ILoveAPIBaseService, DownloaderProtocol):
+class Downloader(ILoveAPIBaseService, DownloaderProtocol):
     """
     Сервис для загрузки файлов из ILoveAPI.
     """
