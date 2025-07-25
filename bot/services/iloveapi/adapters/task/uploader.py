@@ -10,17 +10,26 @@ class Uploader(ILoveAPIBaseService, UploaderProtocol):
     """
     Сервис для загрузки файлов в ILoveAPI.
     """
-    async def _upload(self, server: str, task_id: str, data: Dict[str, str]) -> str:
+    async def _upload(self, server: str, task_id: str, file: str | None = None, 
+    cloud_file: str | None = None) -> str:
         """
         Внутренний метод для загрузки файла в ILoveAPI.
         """
         url = f"https://{server}/v1/upload"
-        data = {"task": task_id, **data}
-        logger.info(f"Загружаем файл {data.get('file') or data.get('cloud_file')} в ILoveAPI")
+
+        files = None
+        if file:
+            data = {"task": task_id}
+            files = {'file': open(file, 'rb')}
+        elif cloud_file:
+            data = {"task": task_id, "cloud_file": cloud_file}
+            logger.info(f"Загружаем файл {cloud_file} в ILoveAPI: {data}")
+
         response: UploadResponse = await self.api.post(
             url,
             data=data,
             with_base_url=False,
+            files=files,
         )
         server_filename: str = response["server_filename"]
         return server_filename
@@ -37,7 +46,8 @@ class Uploader(ILoveAPIBaseService, UploaderProtocol):
         Returns:
             str: Имя файла на сервере.
         """
-        return await self._upload(server, task_id, {"file": file})
+        logger.info(f"Загружаем локальный файл {file} в ILoveAPI")
+        return await self._upload(server, task_id, file=file)
 
     async def upload_cloud_file(self, server: str, task_id: str, cloud_file: str) -> str:
         """
@@ -51,5 +61,6 @@ class Uploader(ILoveAPIBaseService, UploaderProtocol):
         Returns:
             str: Имя файла на сервере.
         """
-        return await self._upload(server, task_id, {"cloud_file": cloud_file})
+        logger.info(f"Загружаем файл из облака {cloud_file} в ILoveAPI")
+        return await self._upload(server, task_id, cloud_file=cloud_file)
 

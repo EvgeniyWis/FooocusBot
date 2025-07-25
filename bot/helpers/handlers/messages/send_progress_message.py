@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
+from bot.logger import logger
 from bot.utils.handlers import appendDataToStateArray, getDataInDictsArray
 from bot.utils.handlers.messages import safe_edit_message, safe_send_message
 
@@ -30,10 +31,17 @@ async def send_progress_message(state: FSMContext, array_key: str, model_name: s
 
     if not message_is_exist:
         if message_id_for_edit:
-            message = await safe_edit_message(
-                message,
-                message_text,
-            )
+            try:
+                message = await safe_edit_message(
+                        message,
+                        message_text,
+                    )
+            except Exception as e:
+                logger.error(f"Ошибка при редактировании сообщения: {e}")
+                message = await safe_send_message(
+                    message_text,
+                    message,
+                )
         else:
             message = await safe_send_message(
                 message_text,

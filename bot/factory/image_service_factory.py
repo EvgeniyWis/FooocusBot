@@ -21,10 +21,10 @@ def create_task_facade() -> TaskFacade:
     downloader = Downloader(api)
     return TaskFacade(api, starter, uploader, processor, downloader)
 
-def create_resizer() -> ResizerProtocol:
+def create_image_resizer() -> ResizerProtocol:
     task_facade = create_task_facade()
     return ResizeImageService(task_facade)
 
-def create_upscaler() -> UpscalerProtocol:
+def create_image_upscaler() -> UpscalerProtocol:
     task_facade = create_task_facade()
     return UpscaleImageService(task_facade)
