@@ -3,8 +3,10 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 )
 
 
-# Функция для получения индекса модели
 def getModelNameIndex(model_name: str):
+    # Убираем +N, если он есть (например: "1+1" → "1")
+    model_name = model_name.split("+")[0]
+
     # Получаем все настройки
     all_settings = getAllDataArrays()
 
@@ -15,12 +17,10 @@ def getModelNameIndex(model_name: str):
                 if index == 0:
                     return setting.index(dataArray) + 1
                 else:
-                    # Берём длины всех массивов предыдущих настроек и суммируем их
                     return (
                         sum(len(setting) for setting in all_settings[:index])
                         + setting.index(dataArray)
                         + 1
                     )
 
-    # Если модель не найдена, то возвращаем None
     return None
