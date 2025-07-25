@@ -14,10 +14,16 @@ class UploaderProtocol(Protocol):
     Протокол загрузчика файлов для ILoveAPI.
     Пример:
         class MyUploader:
-            async def upload(self, server: str, task_id: str, cloud_file: str) -> str:
+            async def upload_file(self, server: str, task_id: str, file: str) -> str:
+                ...
+
+            async def upload_cloud_file(self, server: str, task_id: str, cloud_file: str) -> str:
                 ...
     """
-    async def upload(self, server: str, task_id: str, cloud_file: str) -> str:
+    async def upload_file(self, server: str, task_id: str, file: str) -> str:
+        ...
+
+    async def upload_cloud_file(self, server: str, task_id: str, cloud_file: str) -> str:
         ...
 
 class DownloaderProtocol(Protocol):
@@ -58,4 +64,33 @@ class StarterProtocol(Protocol):
                 ...
     """
     async def start_task(self, tool: ToolType) -> StartTaskResponse:
+        ...
+
+
+class ResizerProtocol(Protocol):
+    """
+    Протокол ресайзера изображений для ILoveAPI.
+    Пример:
+        class MyResizer:
+            async def resize_image(self, file: str, width: int, height: int | str) -> httpx.Response:
+                ...
+    """
+    async def resize_image_file(self, file: str, width: int, height: int | str) -> httpx.Response:
+        ...
+
+    async def resize_image_cloud_file(self, cloud_file: str, width: int, height: int | str) -> httpx.Response:
+        ...
+
+class UpscalerProtocol(Protocol):
+    """
+    Протокол ускользателя изображений для ILoveAPI.
+    Пример:
+        class MyUpscaler:
+            async def upscale_image(self, file: str, multiplier: int) -> httpx.Response:
+                ...
+    """
+    async def upscale_image_file(self, file: str, multiplier: int) -> httpx.Response:
+        ...
+
+    async def upscale_image_cloud_file(self, cloud_file: str, multiplier: int) -> httpx.Response:
         ...
