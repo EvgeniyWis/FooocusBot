@@ -118,7 +118,7 @@ def writePromptTypeKeyboard():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="1️⃣🎲 Один промпт + рандомайзер",
+                    text="1️⃣ Один промпт + рандомайзер 🎲",
                     callback_data="write_prompt_type|one",
                 ),
             ],
