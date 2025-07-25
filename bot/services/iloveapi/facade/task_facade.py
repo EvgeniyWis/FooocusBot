@@ -9,10 +9,12 @@ from bot.services.iloveapi.client.interfaces import (
     StarterProtocol,
     UploaderProtocol,
 )
-from bot.services.iloveapi.client.types import (
-    StartTaskResponse,
-    ToolDataResizeImage,
-    ToolType,
+from bot.services.iloveapi.types.resize_image import ToolDataResizeImage
+from bot.services.iloveapi.types.start_task_response import StartTaskResponse
+from bot.services.iloveapi.types.tool_type import ToolType
+from bot.services.iloveapi.types.upscale_image import (
+    ToolDataUpscaleImage,
+    UpscaleMultiplier,
 )
 from bot.services.iloveapi.utils.logger import (
     log_task_step,
@@ -112,6 +114,26 @@ class ILoveAPITaskFacade(ILoveAPIBaseService):
         }
         return await self.run_image_task(
             "resizeimage",
+            file,
+            tool_data,
+        )
+
+    async def upscale_image(self, file: str, multiplier: UpscaleMultiplier) -> httpx.Response:
+        """
+        Обёртка для задачи увеличения качества изображения.
+
+        Args:
+            file (str): Путь к файлу.
+            multiplier (UpscaleMultiplier): Множитель увеличения качества.
+
+        Returns:
+            dict: Результат обработки.
+        """
+        tool_data: ToolDataUpscaleImage = {
+            "multiplier": multiplier,
+        }
+        return await self.run_image_task(
+            "upscaleimage",
             file,
             tool_data,
         )

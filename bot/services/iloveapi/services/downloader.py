@@ -1,6 +1,5 @@
 from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
-
-from ..client.interfaces import DownloaderProtocol
+from bot.services.iloveapi.client.interfaces import DownloaderProtocol
 
 
 class ILoveAPIDownloader(ILoveAPIBaseService, DownloaderProtocol):

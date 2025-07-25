@@ -2,9 +2,9 @@ from typing import Any, Dict, List
 
 from bot.logger import logger
 from bot.services.iloveapi.client.base_service import ILoveAPIBaseService
-from bot.services.iloveapi.client.types import TaskFileFormat, ToolType
-
-from ..client.interfaces import ProcessorProtocol
+from bot.services.iloveapi.client.interfaces import ProcessorProtocol
+from bot.services.iloveapi.types.task_file_format import TaskFileFormat
+from bot.services.iloveapi.types.tool_type import ToolType
 
 
 class ILoveAPIProcessor(ILoveAPIBaseService, ProcessorProtocol):
