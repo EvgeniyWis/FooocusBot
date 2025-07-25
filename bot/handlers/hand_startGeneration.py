@@ -693,11 +693,11 @@ async def write_model_for_generation(
 
     await state.update_data(model_prompts_for_generation=data_for_update)
 
-    await safe_send_message(
+    message_to_del = await safe_send_message(
         text="✅ Промпты по моделям получены, начинаю генерацию...",
         message=message,
     )
-
+    await state.update_data(message_to_del=message_to_del.message_id)
     await generateImagesInHandler(
         prompt=model_prompts,
         message=message,
