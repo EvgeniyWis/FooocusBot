@@ -66,29 +66,30 @@ async def process_write_prompt(
         )
 
     # Сохраняем в стейт сообщение о написании промпта для последующего удаления
-    if image_index is not None:
-        data_for_update = {
-            "model_name": model_name,
-            "image_index": image_index,
-            "message_id": write_prompt_message.message_id,
-        }
-        await appendDataToStateArray(
-            state,
-            "write_prompt_messages_ids",
-            data_for_update,
-            unique_keys=("model_name", "image_index"),
-        )
-    else:
-        data_for_update = {
-            "model_name": model_name,
-            "message_id": write_prompt_message.message_id,
-        }
-        await appendDataToStateArray(
-            state,
-            "write_prompt_messages_ids",
-            data_for_update,
-            unique_keys=("model_name"),
-        )
+    if write_prompt_message:
+        if image_index is not None:
+            data_for_update = {
+                "model_name": model_name,
+                "image_index": image_index,
+                "message_id": write_prompt_message.message_id,
+            }
+            await appendDataToStateArray(
+                state,
+                "write_prompt_messages_ids",
+                data_for_update,
+                unique_keys=("model_name", "image_index"),
+            )
+        else:
+            data_for_update = {
+                "model_name": model_name,
+                "message_id": write_prompt_message.message_id,
+            }
+            await appendDataToStateArray(
+                state,
+                "write_prompt_messages_ids",
+                data_for_update,
+                unique_keys=("model_name"),
+            )
 
     # Переключаем стейт
     if is_quick_generation:
