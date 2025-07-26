@@ -1,7 +1,10 @@
 import base64
 
+from aiogram.fsm.context import FSMContext
+
 from bot.factory.image_service_factory import create_image_upscaler
 from bot.logger import logger
+from bot.utils.handlers import appendDataToStateArray
 from bot.utils.images import base64_to_image
 
 
@@ -10,6 +13,7 @@ async def second_upscale_image(
     model_name: str,
     image_index: int,
     user_id: int,
+    state: FSMContext,
 ):
     """
     Функция для второго upscale изображения с помощью ILoveAPI
@@ -19,6 +23,7 @@ async def second_upscale_image(
         model_name (str): название модели
         image_index (int): индекс изображения
         user_id (int): айди пользователя
+        state (FSMContext): контекст состояния
 
     Returns:
         str: путь к изображению
@@ -48,4 +53,13 @@ async def second_upscale_image(
     except Exception as e:
         error_text = f"Ошибка при увеличении качества изображения: {e}"
         logger.error(error_text)
+        data_for_update = {
+            "model_name": model_name,
+            "image_index": image_index,
+        }
+        await appendDataToStateArray(
+            state,
+            "second_upscale_errors",
+            data_for_update,
+        )
         raise e

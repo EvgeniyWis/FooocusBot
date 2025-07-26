@@ -74,6 +74,7 @@ async def process_save_image(
     # Сохраняем изображение
     tz = pytz.timezone("Europe/Moscow")
     now = datetime.now(tz).strftime("%Y-%m-%d")
+
     if not settings.MOCK_IMAGES_MODE:
         state_data = await state.get_data()
         multi_select_mode = bool(state_data.get("multi_select_mode", False))
@@ -108,6 +109,15 @@ async def process_save_image(
 
     if not link:
         traceback.print_exc()
+        data_for_update = {
+            "model_name": model_name,
+            "image_index": image_index,
+        }
+        await appendDataToStateArray(
+            state,
+            "save_image_errors",
+            data_for_update,
+        )
         await editMessageOrAnswer(
             call,
             text.SAVE_FILE_ERROR_TEXT.format(model_name, model_name_index),

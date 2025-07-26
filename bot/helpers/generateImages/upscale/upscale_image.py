@@ -64,14 +64,26 @@ async def upscale_image(
     )
 
     # Проверяем статус работы
-    result = await check_upscale_status(
-        job_id,
-        setting_number,
-        state,
-        model_name,
-        image_index,
-        user_id,
-        message_id,
-    )
+    try:
+        result = await check_upscale_status(
+            job_id,
+            setting_number,
+            state,
+            model_name,
+            image_index,
+            user_id,
+            message_id,
+        )
+    except Exception as e:
+        data_for_update = {
+            "model_name": model_name,
+            "image_index": image_index,
+        }
+        await appendDataToStateArray(
+            state,
+            "upscale_errors",
+            data_for_update,
+        )
+        raise Exception(e)
 
     return result

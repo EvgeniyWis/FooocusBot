@@ -109,6 +109,7 @@ async def process_upscale_image(
             model_name,
             image_index,
             user_id,
+            state,
         )
     else:
         await upscale_image(

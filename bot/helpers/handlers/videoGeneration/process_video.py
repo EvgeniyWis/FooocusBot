@@ -123,6 +123,15 @@ async def process_video(
     )
 
     if not video_path:
+        data_for_update = {
+            "model_name": model_name,
+            "image_index": image_index,
+        }
+        await appendDataToStateArray(
+            state,
+            "video_generation_errors",
+            data_for_update,
+        )
         return
 
     # Добавляем путь к видео в стейт
