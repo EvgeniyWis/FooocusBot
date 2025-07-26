@@ -291,13 +291,13 @@ def select_type_specific_generation():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="1️⃣ Обычная генерация",
+                    text="1️⃣ Обычная",
                     callback_data="specific_generation|one_prompt",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="🔢 Генерация с уникальным промптом",
+                    text="🔢 С уникальным промптом",
                     callback_data="specific_generation|more_prompts",
                 ),
             ],
