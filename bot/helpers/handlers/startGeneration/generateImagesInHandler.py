@@ -135,7 +135,7 @@ async def generateImagesInHandler(
 
                     for data in dataArray:
                         model_index = getModelNameIndex(data["model_name"])
-                        prompt_for_current_model[model_index] = prompt
+                        prompt_for_current_model[str(model_index)] = prompt
 
                     result = await generateImages(
                         setting_number=setting_number,
@@ -154,7 +154,7 @@ async def generateImagesInHandler(
         stop_generation = state_data.get("stop_generation", False)
 
         if not result and not stop_generation:
-            raise Exception("Произошла ошибка при генерации изображения")
+            raise Exception("Не получилось сгенерировать изображения!")
         else:
             state_data = await state.get_data()
             stop_generation = state_data.get("stop_generation", False)

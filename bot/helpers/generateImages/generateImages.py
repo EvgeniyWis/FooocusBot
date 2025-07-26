@@ -12,6 +12,9 @@ from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
 from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
     getDataArrayBySettingNumber,
 )
+from bot.helpers.generateImages.dataArray.getModelNameIndex import (
+    getModelNameIndex,
+)
 from bot.helpers.generateImages.get_data_array_by_model_indexes import (
     get_data_array_by_model_indexes,
 )
@@ -57,21 +60,28 @@ async def generateImages(
 
     await state.update_data(
         jobs={},
-        total_jobs_count=len(model_indexes_for_generation),
+        total_jobs_count=len(model_indexes_for_generation) if len(model_indexes_for_generation) > 0 else len(dataArrayBase),
     )
     images = []
 
     async def process_image(key: str):
         try:
+            logger.info(f"Генерация изображения для модели {key}")
             base_index = int(key.split("+")[0])
-            try:
-                pos = base_model_indexes.index(base_index)
-            except ValueError:
-                raise Exception(f"Модель с индексом {base_index} не найдена")
+
+            if len(base_model_indexes) > 0:
+                try:
+                    pos = base_model_indexes.index(base_index)
+                except ValueError:
+                    raise Exception(f"Модель с индексом {base_index} не найдена")
+            else:
+                pos = int(base_index) - 1
 
             data = dataArrayBase[pos]
 
             prompt_for_model = prompt_for_current_model.get(key, "")
+
+            logger.info(f"Генерация изображения для модели {data['model_name']} с промптом {prompt_for_model}")
 
             image = await generateImageBlock(
                 data,
@@ -85,15 +95,24 @@ async def generateImages(
             )
             images.append(image)
             return image, None
-        except Exception:
+        except Exception as e:
             traceback.print_exc()
-            raise
+            raise e
 
     tasks = []
+
+    # Если индексы не переданы, то получаем их из массива данных
+    if not model_indexes_for_generation:
+        model_indexes_for_generation = [str(getModelNameIndex(data["model_name"])) for data in dataArrayBase]
+
     for key in model_indexes_for_generation:
         state_data = await state.get_data()
+
         if state_data.get("stop_generation", False):
+            logger.info("Генерация остановлена пользователем")
             break
+
+        logger.info(f"Создание задачи для генерации изображения для модели {key}")
         tasks.append(asyncio.create_task(process_image(key)))
         await asyncio.sleep(0.1)
 
