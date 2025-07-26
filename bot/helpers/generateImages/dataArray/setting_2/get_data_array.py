@@ -136,7 +136,7 @@ def setting2_get_data_array():
             "147ea4MsXPNyrIlTA2uEltvhHtcDo0N9S",
             "1if8k_1zMZNqPLJBEBTT4ffRnw9t1aQiK",
             "photorealistic portrait of an 18-year-old Asian girl with voluminous long ash-blonde hair, slim waist, medium saggy breasts, large hips, toned legs, tan skin, cute, big thin lips, smirk, bright blue eyes, sharp facial features and cheekbones, high quality and detail.",
-            [1, 0.7, 1.55, 0.75, -0.75, -1.5, 1.1],
+            [1, 0.7, 1.6, 0.8, -0.75, -1.5, 1.1],
         ),
         setting2_generate_data(
             "janiceblair.xo",
