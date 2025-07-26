@@ -54,9 +54,7 @@ async def httpx_post(
                 response_json = response.json()
                 error_message = response_json["error"]["message"] if "error" in response_json and "message" in response_json["error"] else "Описание отсутствует"
 
-                raise Exception(
-                    f"Сервер вернул ошибку: {response.status_code} с ошибкой: {error_message}",
-                )
+                raise Exception(error_message)
 
             try:
                 response_json = response.json()

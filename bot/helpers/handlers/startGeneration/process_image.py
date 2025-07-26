@@ -69,7 +69,8 @@ async def process_image(
         f"[process_image] step for ({model_name}, {image_index}) = {process_image_step}",
     )
 
-    if not settings.MOCK_IMAGES_MODE:
+    # TODO: вернуть not
+    if settings.MOCK_IMAGES_MODE:
         temp_image_path = (
             TEMP_FOLDER_PATH
             / f"{model_name}_{call.from_user.id}"
@@ -95,21 +96,32 @@ async def process_image(
                     model_name,
                 )
 
-                if settings.SECOND_UPSCALE_MODE:
-                    await process_upscale_image(
-                        call=call,
-                        state=state,
-                        image_index=image_index,
-                        model_name=model_name,
-                        is_second=True,
-                    )
-
             logger.info(
                 f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}",
             )
             logger.info(
                 f"[process_image] temp dir after UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
             )
+
+            process_image_step = await update_process_image_step(
+                state,
+                model_name,
+                image_index,
+                ProcessImageStep.SECOND_UPSCALE,
+            )
+
+            if (
+                settings.SECOND_UPSCALE_MODE
+                and process_image_step == ProcessImageStep.SECOND_UPSCALE
+            ):
+                await process_upscale_image(
+                    call=call,
+                    state=state,
+                    image_index=image_index,
+                    model_name=model_name,
+                    is_second=True,
+                )
+
             process_image_step = await update_process_image_step(
                 state,
                 model_name,

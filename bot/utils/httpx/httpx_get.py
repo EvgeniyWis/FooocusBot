@@ -23,5 +23,6 @@ async def httpx_get(
                 logger.error(f"Ошибка при парсинге ответа от сервера: {e}")
                 return response
 
-        logger.error(f"Ошибка при выполнении запроса: {response.status_code} Ответ: {response}")
+        response_json = response.json()
+        logger.error(f"Ошибка при выполнении запроса: {response.status_code} Ответ: {response_json}")
         return None
