@@ -19,6 +19,10 @@ from bot.logger import logger
 from bot.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils import retryOperation
+from bot.utils.handlers import (
+    appendDataToStateArray,
+    getDataInDictsArray,
+)
 
 
 async def process_image(
@@ -227,7 +231,7 @@ async def process_image(
         or not settings.FACEFUSION_MODE
     ):
         logger.info(f"Сохраняем изображение для ({model_name}, {image_index})")
-        await process_save_image(
+        direct_url = await process_save_image(
             call,
             state,
             model_name,
@@ -247,6 +251,27 @@ async def process_image(
         ]
 
         await state.update_data(process_images_steps=process_images_steps)
+
+        saved_images_urls = state_data.get("saved_images_urls", [])
+
+        saved_image_url = await getDataInDictsArray(
+            saved_images_urls,
+            model_name,
+            image_index,
+        )
+
+        if not saved_image_url:
+            data_for_update = {
+                "model_name": model_name,
+                "image_index": image_index,
+                "direct_url": direct_url,
+            }
+            await appendDataToStateArray(
+                state,
+                "saved_images_urls",
+                data_for_update,
+                unique_keys=("model_name", "image_index"),
+            )
 
     redis_storage = get_redis_storage()
     await redis_storage.delete_task(

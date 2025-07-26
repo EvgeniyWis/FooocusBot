@@ -35,7 +35,7 @@ async def process_save_image(
     result_url: str = None,
     name_postfix: str = None,
     kb_with_magnific_upscale: bool = True,
-):
+) -> str:
     """
     Обрабатывает сохранение изображения после этапа замены лица.
 
@@ -47,6 +47,9 @@ async def process_save_image(
         - result_url: str, URL результата, полученный с замены лица
         - image_index: int, индекс изображения
         - kb_with_magnific_upscale: bool, флаг для отображения клавиатуры с Magnific Upscaler
+
+    Returns:
+        - direct_url: ссылка на сохранённое изображение
     """
 
     # Получаем данные пользователя
@@ -159,3 +162,5 @@ async def process_save_image(
     logger.info(
         f"[save] END: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
+
+    return direct_url
