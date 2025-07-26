@@ -258,6 +258,15 @@ async def process_faceswap_image(
     )
 
     if error_message:
+        data_for_update = {
+            "model_name": model_name,
+            "image_index": image_index,
+        }
+        await appendDataToStateArray(
+            state,
+            "faceswap_errors",
+            data_for_update,
+        )
         raise Exception(error_message)
 
     return result_path
