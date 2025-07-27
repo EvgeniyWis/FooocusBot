@@ -105,7 +105,7 @@ async def check_video_path(
         )
 
     if isinstance(video_path, dict):
-        error = video_path.get("error")
+        error = video_path.get("error", "Не удалось получить сообщение об ошибке!")
         if error:
             await send_error_message(message, image_index, model_name, error)
 
