@@ -103,7 +103,7 @@ async def generateImages(
 
     # Если индексы не переданы, то получаем их из массива данных
     if not model_indexes_for_generation:
-        model_indexes_for_generation = [str(getModelNameIndex(data["model_name"])) for data in dataArrayBase]
+        model_indexes_for_generation = [str(index) for index, _ in enumerate(dataArrayBase)]
 
     for key in model_indexes_for_generation:
         state_data = await state.get_data()
