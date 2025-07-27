@@ -159,7 +159,7 @@ def setting2_get_data_array():
             "1fYL2Z4zRNDJoakvxFKXXI3dXz59h57B9",
             """photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
-            [1, 0.7, 1.85, 1.35, -1.15, -1.5, 1.1],
+            [1, 0.7, 1.95, 1.45, -1.15, -1.5, 1.1],
         ),
         setting2_generate_data(
             "lilith_rayne.xo",
