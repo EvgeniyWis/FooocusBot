@@ -14,10 +14,36 @@ from bot.InstanceBot import router
 from bot.logger import logger
 
 
-async def select_multi_image(call: types.CallbackQuery, state: FSMContext):
+async def select_multi_image(
+    call: types.CallbackQuery,
+    state: FSMContext,
+):
     _, model_name, setting_number, image_index = call.data.split("|")
     image_index = int(image_index)
+    message_id = call.message.message_id
     state_data = await state.get_data()
+    mediagroup_data = state_data.get(
+        "imageGeneration_mediagroup_messages_ids",
+        [],
+    )
+
+    generation_id = None
+
+    # Ищем generation_id по текущему message_id и type='keyboard'
+    for item in mediagroup_data:
+        if (
+            item.get("type") == "keyboard"
+            and item.get("message_id") == message_id
+        ):
+            generation_id = item.get("generation_id")
+            break
+
+    if not generation_id:
+        logger.exception(
+            f"[select_multi_image] generation_id not found for message_id={message_id} in state_data={state_data}",
+        )
+        raise Exception("generation_id is None")
+
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
         selected_indexes_dict = {model_name: selected_indexes_raw}
@@ -40,6 +66,7 @@ async def select_multi_image(call: types.CallbackQuery, state: FSMContext):
         setting_number,
         MULTI_IMAGE_NUMBER,
         selected_indexes,
+        generation_id,
     )
     await call.message.edit_reply_markup(reply_markup=kb)
     await call.answer()
@@ -47,7 +74,8 @@ async def select_multi_image(call: types.CallbackQuery, state: FSMContext):
 
 async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     state_data = await state.get_data()
-    model_name = call.data.split("|")[1]
+    _, model_name, setting_number, generation_id = call.data.split("|")
+
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
         selected_indexes_dict = {model_name: selected_indexes_raw}
@@ -103,6 +131,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         model_name,
         call.message.chat.id,
         delete_keyboard_message=True,
+        generation_id=generation_id,
     )
 
     tasks = []

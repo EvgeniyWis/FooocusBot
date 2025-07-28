@@ -1,7 +1,6 @@
 import asyncio
 
 import runpod
-from factory.comfyui_video_service import get_video_service
 from requests import ReadTimeout
 from runpod.error import RunPodError
 from services.comfyui.video_service import ComfyUIVideoService
@@ -77,7 +76,7 @@ class PodManager:
         if settings.HEATING_COMFYUI_MODELS:
             sleep_sec = 80
             logger.info(
-                f"Ожидаем {sleep_sec} секунд перед прогревом моделей ComfyUI"
+                f"Ожидаем {sleep_sec} секунд перед прогревом моделей ComfyUI",
             )
             await asyncio.sleep(sleep_sec)
             await self.heating_comfyui_models()
@@ -119,12 +118,3 @@ class PodManager:
                 logger.exception(
                     "Не удалось прогреть модели ComfyUI даже после повторной попытки",
                 )
-
-
-if __name__ == "__main__":
-
-    async def main():
-        manager = PodManager(settings.COMFYUI_API_KEY, get_video_service())
-        await manager.start_pod_if_not_running()
-
-    asyncio.run(main())
