@@ -49,6 +49,7 @@ async def process_write_prompt(
         )
     )
 
+    write_prompt_message = None
     if call.message.content_type in [
         types.ContentType.PHOTO,
         types.ContentType.VIDEO,
