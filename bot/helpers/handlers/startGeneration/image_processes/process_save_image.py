@@ -100,12 +100,17 @@ async def process_save_image(
         "image_index": image_index,
         "direct_url": direct_url,
     }
-    await appendDataToStateArray(
-        state,
-        "saved_images_urls",
-        data_for_update,
-        unique_keys=("model_name", "image_index"),
-    )
+    state_data = await state.get_data()
+    saved_images_urls = state_data.get("saved_images_urls", [])
+    updated = False
+    for idx, obj in enumerate(saved_images_urls):
+        if obj["model_name"] == model_name and obj["image_index"] == image_index:
+            saved_images_urls[idx] = data_for_update
+            updated = True
+            break
+    if not updated:
+        saved_images_urls.append(data_for_update)
+    await state.update_data(saved_images_urls=saved_images_urls)
 
     if not link:
         traceback.print_exc()
@@ -147,7 +152,7 @@ async def process_save_image(
         else text.SAVE_IMAGES_SUCCESS_TEXT
     )
 
-    await safe_send_photo(
+    message_with_saved_image = await safe_send_photo(
         photo=direct_url,
         message=call,
         caption=message_text.format(
@@ -161,6 +166,18 @@ async def process_save_image(
             image_index=image_index,
             with_magnific_upscale=kb_with_magnific_upscale,
         ),
+    )
+
+    data_for_update = {
+        "model_name": model_name,
+        "image_index": image_index,
+        "message_id": message_with_saved_image.message_id,
+    }
+    await appendDataToStateArray(
+        state,
+        "messages_with_saved_images",
+        data_for_update,
+        unique_keys=("model_name", "image_index"),
     )
 
     # Удаляем сообщение о сохранении изображения

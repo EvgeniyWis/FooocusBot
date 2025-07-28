@@ -1,9 +1,11 @@
+import asyncio
 import os
 
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
+from bot.helpers import text
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.videoGeneration import (
     get_video_path_from_state,
@@ -216,6 +218,54 @@ async def handle_video_save_button(
         )
 
 
+# Обработка нажатия на кнопку "✨ Сгенерировать все видео по 1 промпту"
+async def handle_generate_video_by_one_prompt(call: types.CallbackQuery, state: FSMContext):
+    await call.message.edit_text(
+        text.WRITE_PROMPT_FOR_VIDEO_GENERATION_BY_ONE_PROMPT_TEXT,
+        reply_markup=None,
+    )
+
+    await state.set_state(StartGenerationState.write_prompt_for_video_generation_by_one_prompt)
+
+
+# Обработка ввода промпта на генерацию видео по 1 промпту
+async def write_prompt_for_video_generation_by_one_prompt(message: types.Message, state: FSMContext):
+    prompt = message.text
+    await state.update_data(prompt_for_video_generation_by_one_prompt=prompt)
+
+    await state.set_state(None)
+
+    state_data = await state.get_data()
+    saved_images_urls = state_data.get("saved_images_urls", [])
+
+    tasks = []
+    for obj in saved_images_urls:
+        task = asyncio.create_task(
+            process_video(
+                state=state,
+                model_name=obj["model_name"],
+                prompt=prompt,
+                image_url=obj["direct_url"],
+                image_index=obj["image_index"],
+                message=message,
+            ),
+        )
+        tasks.append(task)
+
+        # Удаляем сообщение с изображением
+        await deleteMessageFromState(
+            state,
+            "messages_with_saved_images",
+            obj["model_name"],
+            message.chat.id,
+            image_index=obj["image_index"],
+        )
+        await asyncio.sleep(0.5)
+
+    # Если нужно дождаться завершения всех задач:
+    await asyncio.gather(*tasks)
+
+
 # Добавление обработчиков
 def hand_add():
     router.callback_query.register(
@@ -238,4 +288,14 @@ def hand_add():
     router.callback_query.register(
         handle_video_save_button,
         lambda call: call.data.startswith("video_correctness|correct"),
+    )
+
+    router.callback_query.register(
+        handle_generate_video_by_one_prompt,
+        lambda call: call.data.startswith("generate_video_by_one_prompt"),
+    )
+
+    router.message.register(
+        write_prompt_for_video_generation_by_one_prompt,
+        StateFilter(StartGenerationState.write_prompt_for_video_generation_by_one_prompt),
     )
