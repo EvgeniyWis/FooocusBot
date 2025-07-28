@@ -305,3 +305,16 @@ def select_type_specific_generation():
             ],
         ],
     )
+
+# Клавиатура, когда все изображения успешно сохранены
+def all_images_successfully_saved_keyboard():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✨ Сгенерировать все видео по 1 промпту",
+                    callback_data="generate_video_by_one_prompt",
+                ),
+            ],
+        ],
+    )

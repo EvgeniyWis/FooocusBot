@@ -15,6 +15,7 @@ class StartGenerationState(StatesGroup):
     choose_generated_video = State()
     write_multi_prompts_for_models = State()
     write_models_for_specific_generation = State()
+    write_prompt_for_video_generation_by_one_prompt = State()
 
 
 class MultiPromptInputState(StatesGroup):
