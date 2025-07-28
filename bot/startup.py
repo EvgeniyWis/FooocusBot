@@ -72,10 +72,10 @@ async def on_startup():
     handlers.hand_commands.hand_add()
     handlers.hand_startGeneration.hand_add()
     handlers.hand_randomizer.hand_add()
+    handlers.hand_nsfw_video.hand_add()
     handlers.hand_videoGeneration.hand_add()
     handlers.hand_multi_image.hand_add()
     handlers.hand_img2video.hand_add()
-    handlers.hand_nsfw_video.hand_add()
     handlers.hand_magnific_upscale.hand_add()
 
     # Добавление middleware
