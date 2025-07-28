@@ -1,5 +1,6 @@
 import asyncio
 import os
+import time
 
 from bot.logger import logger
 from bot.utils.get_api_headers import get_kling_headers
@@ -24,7 +25,16 @@ async def check_video_generation_status(request_id: str) -> str | None:
         f"https://api.gen-api.ru/api/v1/request/get/{request_id}"
     )
 
+    start_time = time.monotonic()
+    timeout_seconds = 300  # 5 минут
+
     while True:
+        # Проверка на таймаут
+        elapsed = time.monotonic() - start_time
+        if elapsed > timeout_seconds:
+            logger.error(f"Таймаут: ожидание генерации видео превысило {timeout_seconds // 60} минут")
+            raise TimeoutError(f"Ожидание генерации видео превысило {timeout_seconds // 60} минут")
+
         try:
             json = await httpx_get(
                 url_status_endpoint,
