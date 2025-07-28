@@ -107,6 +107,7 @@ async def sendImageBlock(
                         setting_number,
                         MULTI_IMAGE_NUMBER,
                         selected_indexes,
+                        generation_id,
                     )
                 )
                 select_message = await bot.send_message(
