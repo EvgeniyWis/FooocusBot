@@ -2,13 +2,12 @@ import asyncio
 import os
 import time
 
+import httpx
+
 from bot.logger import logger
 from bot.utils.get_api_headers import get_kling_headers
 from bot.utils.httpx import httpx_get
 from bot.utils.videos import download_video
-from bot.utils.videos.errors_texts import (
-    PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT,
-)
 
 
 async def check_video_generation_status(request_id: str) -> str | None:
@@ -99,6 +98,10 @@ async def check_video_generation_status(request_id: str) -> str | None:
 
                 return video_path
 
+        except httpx.ReadTimeout as e:
+            logger.warning(f"ReadTimeout при получении статуса задания: {e}. Повтор через 10 секунд.")
+            await asyncio.sleep(10)
+            continue
         except Exception as e:
             logger.error(
                 f"Ошибка при получении статуса задания: {e}",
