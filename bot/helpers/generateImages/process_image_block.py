@@ -1,5 +1,3 @@
-import uuid
-
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
@@ -134,10 +132,6 @@ async def process_image_block(
             )
             return False
 
-        # уникальний ид для дальнейшей работы с КОНКРЕТНОЙ генерацией
-        generation_id = str(
-            uuid.uuid4(),
-        )
         await sendImageBlock(
             state,
             media_group,
@@ -145,7 +139,7 @@ async def process_image_block(
             setting_number,
             is_test_generation,
             user_id,
-            generation_id=generation_id,
+            generation_id=job_id,
         )
 
         return True

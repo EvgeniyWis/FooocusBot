@@ -508,8 +508,16 @@ async def start_multi_prompt_input_mode(
 async def handle_chunk_input(message: types.Message, state: FSMContext):
     data = await state.get_data()
     chunks = data.get("prompt_chunks", [])
+    msg = message.text.strip()
 
-    chunks.append(message.text.strip())
+    if not msg:
+        await safe_send_message(
+            text.EMPTY_PROMPT_TEXT,
+            message,
+        )
+        return
+
+    chunks.append(msg)
     await state.update_data(
         prompt_chunks=chunks,
         last_user_id=message.from_user.id,
