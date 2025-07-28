@@ -205,7 +205,7 @@ async def handle_video_save_button(
         return None
 
     # Сохраняем видео
-    await saveVideo(video_path, model_name, call.message)
+    await saveVideo(video_path=video_path, model_name=model_name, message=call.message)
 
     if image_index:
         # Удаляем сообщение о генерации видео

@@ -1,7 +1,7 @@
-from bot.helpers.generateImages.dataArray.generate_data import generate_data
 from bot.helpers.generateImages.dataArray.extra_setting.generate_loras import (
     extra_setting_generate_loras,
 )
+from bot.helpers.generateImages.dataArray.generate_data import generate_data
 from bot.settings import settings
 
 
@@ -10,6 +10,7 @@ def extra_setting_generate_data(
     model_name: str,
     picture_folder_id: str,
     video_folder_id: str,
+    nsfw_video_folder_id: str,
     prompt: str,
     loras_weights: list[int],
     image_number: int = 4,
@@ -21,6 +22,7 @@ def extra_setting_generate_data(
         model_name,
         picture_folder_id,
         video_folder_id,
+        nsfw_video_folder_id,
         prompt,
         loras,
         base_config_model_name,

@@ -16,10 +16,18 @@ from bot.utils.googleDrive.folders import getFolderDataByID
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+from bot.utils.videos.download_nsfw_video import download_nsfw_videos
 
 
 # Функция для сохранения видео в папку модели
-async def saveVideo(video_path: str, model_name: str, message: types.Message):
+async def saveVideo(
+    model_name: str,
+    message: types.Message,
+    video_path: str | None = None,
+    video_url: str | None = None,
+    is_nsfw_generation: bool = False,
+    extension: str = "mp4",
+):
     # Получаем текущую дату
     tz = pytz.timezone("Europe/Moscow")
     now = datetime.now(tz).strftime("%Y-%m-%d")
@@ -44,11 +52,12 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
     # Сохраняем видео
     link = await saveFile(
         file_path=video_path,
+        file_url=video_url,
         user_id=user_id,
         folder_name=model_name,
-        initial_folder_id=model_data["video_folder_id"],
+        initial_folder_id=model_data["video_folder_id"] if not is_nsfw_generation else model_data["nsfw_video_folder_id"],
         current_date=now,
-        extension="mp4",
+        extension=extension,
     )
 
     if not link:
@@ -76,19 +85,25 @@ async def saveVideo(video_path: str, model_name: str, message: types.Message):
         )
 
     # Отправляем сообщение о сохранении видео
+    caption = text.SAVE_VIDEO_SUCCESS_TEXT.format(
+        link,
+        model_name,
+        parent_folder["webViewLink"],
+        model_name_index,
+    )
+
+    if video_url:
+        video_paths = [v async for v in download_nsfw_videos([video_url])]
+        video_path = video_paths[0][0].path
+
     video = types.FSInputFile(video_path)
     await message.answer_video(
         video=video,
-        caption=text.SAVE_VIDEO_SUCCESS_TEXT.format(
-            link,
-            model_name,
-            parent_folder["webViewLink"],
-            model_name_index,
-        ),
+        caption=caption,
     )
 
     # Удаляем видео из папки temp
-    if not settings.MOCK_VIDEO_MODE:
+    if not settings.MOCK_VIDEO_MODE and video_path:
         try:
             os.remove(video_path)
         except Exception as e:

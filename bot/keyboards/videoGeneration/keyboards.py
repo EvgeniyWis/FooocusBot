@@ -74,6 +74,7 @@ def videoCorrectnessKeyboard(
     image_index: int | None = None,
     is_nsfw: bool = False,
     video_index: int | None = None,
+    with_regenerate: bool = True,
 ):
     if is_nsfw:
         postfix = f"nsfw|{model_name}"
@@ -86,22 +87,27 @@ def videoCorrectnessKeyboard(
     if video_index is not None:
         postfix += f"|{video_index}"
 
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
+    inline_keyboard = [
             [
                 InlineKeyboardButton(
                     text="✅ Сохранить видео",
                     callback_data=f"video_correctness|correct|{postfix}",
                 ),
             ],
+        ]
+
+    if with_regenerate:
+        inline_keyboard.append(
             [
                 InlineKeyboardButton(
                     text="🔄 Перегенерировать с новым промптом",
-                    callback_data=f"quick_video_generation|{postfix}"
-                    if not is_nsfw else f"generate_comfyui_video|{model_name}|{image_index}",
+                    callback_data=f"quick_video_generation|{postfix}",
                 ),
             ],
-        ],
+        )
+
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=inline_keyboard,
     )
 
     return kb
