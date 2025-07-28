@@ -7,6 +7,7 @@ from aiogram.fsm.context import FSMContext
 from bot.assets.mocks.links import MOCK_FACEFUSION_PATH
 from bot.constants import TEMP_FOLDER_PATH
 from bot.domain.entities.task import TaskProcessImageDTO
+from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes import (
     ProcessImageStep,
     get_current_process_image_step,
@@ -15,6 +16,7 @@ from bot.helpers.handlers.startGeneration.image_processes import (
     process_upscale_image,
     update_process_image_step,
 )
+from bot.keyboards.startGeneration import keyboards
 from bot.logger import logger
 from bot.settings import settings
 from bot.storage import get_redis_storage
@@ -23,6 +25,7 @@ from bot.utils.handlers import (
     appendDataToStateArray,
     getDataInDictsArray,
 )
+from bot.utils.handlers.messages import safe_send_message
 
 
 async def process_image(
@@ -277,5 +280,17 @@ async def process_image(
         settings.PROCESS_IMAGE_TASK,
         key_for_image(call.from_user.id, image_index, model_name),
     )
+
+    # Получаем стейт и если кол-во сохраненных изображений равно количеству изображений, то отправляем сообщение с возможностью генерации видео по 1 промпту
+    state_data = await state.get_data()
+    saved_images_urls = state_data.get("saved_images_urls", [])
+    total_jobs_count = state_data.get("total_jobs_count", 0)
+
+    if len(saved_images_urls) == total_jobs_count:
+        await safe_send_message(
+            text.ALL_IMAGES_SUCCESSFULLY_SAVED_TEXT,
+            call.message,
+            reply_markup=keyboards.all_images_successfully_saved_keyboard(),
+        )
 
     return True
