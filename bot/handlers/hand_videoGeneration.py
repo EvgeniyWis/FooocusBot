@@ -111,11 +111,8 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         )
 
         if not image_url:
-            await safe_send_message(
-                "Ошибка: не удалось найти URL изображения",
-                message,
-            )
-            return
+            error_message = "Ошибка: не удалось найти URL изображения"
+            raise Exception(error_message)
 
     else:
         img2video_temp_paths_for_with_model_names = state_data.get(
