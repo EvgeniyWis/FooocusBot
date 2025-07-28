@@ -286,7 +286,7 @@ async def process_image(
     saved_images_urls = state_data.get("saved_images_urls", [])
     total_jobs_count = state_data.get("total_jobs_count", 0)
 
-    if len(saved_images_urls) == total_jobs_count:
+    if len(saved_images_urls) == total_jobs_count > 1:
         await safe_send_message(
             text.ALL_IMAGES_SUCCESSFULLY_SAVED_TEXT,
             call.message,
