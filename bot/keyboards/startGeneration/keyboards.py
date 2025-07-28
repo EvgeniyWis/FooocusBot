@@ -226,6 +226,7 @@ def selectMultiImageKeyboard(
     setting_number: str,
     image_number: int,
     selected_indexes: list[int],
+    generation_id: str,
 ):
     # Первое изображение (index=0) - референсное, поэтому показываем кнопки с 1 по 9
     inline_keyboard = []
@@ -246,11 +247,12 @@ def selectMultiImageKeyboard(
         if row:
             inline_keyboard.append(row)
 
+    short_generation_id = generation_id[:8]
     inline_keyboard.append(
         [
             InlineKeyboardButton(
                 text="Готово",
-                callback_data=f"multi_image_done|{model_name}|{setting_number}",
+                callback_data=f"multi_image_done|{model_name}|{setting_number}|{short_generation_id}",
             ),
         ],
     )

@@ -1,5 +1,7 @@
 from aiogram.fsm.context import FSMContext
 
+from bot.logger import logger
+
 
 async def appendDataToStateArray(
     state: FSMContext,
@@ -18,7 +20,12 @@ async def appendDataToStateArray(
     if unique_keys is None:
         data_list.append(value)
         await state.update_data(**{key: data_list})
+        logger.info(
+            f"[appendDataToStateArray] Обновлен стейт {key}: {data_list}"
+        )
         return
     if not updated:
         data_list.append(value)
+
     await state.update_data(**{key: data_list})
+    logger.info(f"[appendDataToStateArray] Обновлен стейт {key}: {data_list}")
