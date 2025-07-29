@@ -21,6 +21,9 @@ from bot.helpers.generateImages.get_data_array_by_model_indexes import (
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
+from bot.keyboards.startGeneration import (
+    keyboards as start_generation_keyboards,
+)
 from bot.logger import logger
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
@@ -164,6 +167,15 @@ async def generateImagesInHandler(
                 or len(model_indexes_for_generation) == 0
             ):
                 await safe_send_message(text.GENERATION_SUCCESS_TEXT, message)
+
+            await safe_send_message(
+                text.ASK_FOR_NEW_GENERATION_TEXT,
+                message,
+                reply_markup=start_generation_keyboards.generationsTypeKeyboard(
+                    with_video_from_image_generation=False,
+                    with_test_generation=False,
+                ),
+            )
 
     except Exception as e:
         try:
