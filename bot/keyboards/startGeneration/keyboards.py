@@ -8,22 +8,25 @@ from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 def generationsTypeKeyboard(
     with_work_generation: bool = True,
     with_test_generation: bool = True,
+    with_video_from_image_generation: bool = True,
 ):
     inline_keyboard = getGenerationsTypeButtons(
         "generations_type",
         with_test_generation,
         with_work_generation,
     )
-    inline_keyboard.extend(
-        [
+
+    if with_video_from_image_generation:
+        inline_keyboard.extend(
             [
-                InlineKeyboardButton(
-                    text="📹 Сгенерировать видео из изображения",
-                    callback_data="generateVideoFromImage",
-                ),
+                [
+                    InlineKeyboardButton(
+                        text="📹 Сгенерировать видео из изображения",
+                        callback_data="generateVideoFromImage",
+                    ),
+                ],
             ],
-        ],
-    )
+        )
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
