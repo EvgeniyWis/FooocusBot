@@ -13,7 +13,6 @@ async def _download_single_video(
     url: str,
     idx: int,
 ) -> DownloadedVideo:
-    """Скачивает одно видео и возвращает результат."""
     try:
         async with session.get(url) as resp:
             if resp.status != 200:
@@ -32,7 +31,9 @@ async def _download_single_video(
                 )
                 return DownloadedVideo(
                     path=tmpfile.name,
-                    caption=f"Видео {idx}",
+                    caption=f"Видео №{idx} (один из референсов для последующих/прошлых, вы можете "
+                    f"выбрать один из предложенных вариантов, в зависимости от качества "
+                    f"сгенерированного видео)",
                 )
     except ClientError as e:
         logger.error(f"Ошибка сети при скачивании видео {idx}: {e}")
