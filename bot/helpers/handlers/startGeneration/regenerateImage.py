@@ -92,7 +92,7 @@ async def regenerateImage(
     data = await getDataByModelName(model_name)
 
     try:
-        return await generateImageBlock(
+        result = await generateImageBlock(
             data,
             call.message.message_id,
             state,
@@ -103,6 +103,9 @@ async def regenerateImage(
             False,
             chat_id=call.message.chat.id,
         )
+
+        if not result:
+            raise Exception("Ошибка обработки на RunPod!")
     except Exception as e:
         logger.error(f"Ошибка при перегенерации изображения: {e}")
         await editMessageOrAnswer(
