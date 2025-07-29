@@ -38,6 +38,20 @@ async def sendImageBlock(
         # Ограничиваем media_group до 10 элементов (Telegram лимит)
         media_group = media_group[:10]
         media_group_message = await safe_send_media_group(user_id, media_group)
+        if media_group_message is None:
+            logger.error("media_group_message is None! Возможно, не удалось отправить медиагруппу.")
+            await bot.send_message(
+                chat_id=user_id,
+                text="Произошла ошибка при отправке изображений! (media_group_message is None)",
+            )
+            return
+        if not hasattr(media_group_message, '__iter__'):
+            logger.error(f"media_group_message не итерируемый объект: {type(media_group_message)}")
+            await bot.send_message(
+                chat_id=user_id,
+                text="Произошла ошибка при отправке изображений! (media_group_message не итерируемый)",
+            )
+            return
         logger.info(
             f"Media group sent to user_id={user_id}, model_name={model_name}, images_count={len(media_group)}",
         )
