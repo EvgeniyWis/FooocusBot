@@ -50,9 +50,15 @@ async def httpx_post(
                 if response.status_code == 402 and "runpod" in url.lower():
                     raise Exception(PAYMENT_RUNPOD_ERROR_TEXT)
 
-                # Если response содержит ["error"]["message"]
                 response_json = response.json()
-                error_message = response_json["error"]["message"] if "error" in response_json and "message" in response_json["error"] else response_json["message"] if "message" in response_json else "Описание отсутствует"
+                if "error" in response_json and "message" in response_json["error"]:
+                    error_message = response_json["error"]["message"]
+                elif "message" in response_json:
+                    error_message = response_json["message"]
+                elif "result" in response_json:
+                    error_message = response_json["result"]
+                else:
+                    error_message = "Описание отсутствует"
 
                 raise Exception(error_message)
 

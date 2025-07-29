@@ -121,10 +121,6 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         f"[multi_image_done] SORTED selected_indexes: {selected_indexes_sorted}",
     )
 
-    await call.message.answer(
-        f"Вы выбрали изображения с номерами: {', '.join(str(i) for i in selected_indexes_sorted)}.\nОбрабатываю выбор изображений...",
-    )
-
     await deleteMessageFromState(
         state,
         "imageGeneration_mediagroup_messages_ids",
