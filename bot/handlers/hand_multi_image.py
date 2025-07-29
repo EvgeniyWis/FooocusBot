@@ -46,17 +46,20 @@ async def select_multi_image(
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
-        selected_indexes_dict = {model_name: selected_indexes_raw}
+        selected_indexes_dict = {generation_id: selected_indexes_raw}
     else:
         selected_indexes_dict = selected_indexes_raw
-    selected_indexes = selected_indexes_dict.get(model_name, [])
+    selected_indexes = selected_indexes_dict.get(generation_id, [])
+
     if image_index in selected_indexes:
         selected_indexes.remove(image_index)
     else:
         if len(selected_indexes) < MULTI_IMAGE_NUMBER:
             selected_indexes.append(image_index)
-    selected_indexes_dict[model_name] = selected_indexes
+
+    selected_indexes_dict[generation_id] = selected_indexes
     await state.update_data(selected_indexes=selected_indexes_dict)
+
     from bot.keyboards.startGeneration.keyboards import (
         selectMultiImageKeyboard,
     )
@@ -78,10 +81,19 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
-        selected_indexes_dict = {model_name: selected_indexes_raw}
+        selected_indexes_dict = {generation_id: selected_indexes_raw}
     else:
         selected_indexes_dict = selected_indexes_raw
-    selected_indexes = selected_indexes_dict.get(model_name, [])
+    full_generation_id = next(
+        (
+            k
+            for k in selected_indexes_dict.keys()
+            if k.startswith(generation_id)
+        ),
+        None,
+    )
+    selected_indexes = selected_indexes_dict.get(full_generation_id, [])
+
     if not selected_indexes:
         await call.answer(
             "Выберите хотя бы одно изображение!",
