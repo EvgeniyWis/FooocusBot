@@ -32,11 +32,11 @@ def generationsTypeKeyboard(
     return kb
 
 
-# Инлайн-клавиатура для выбора одного из изображений
 def selectImageKeyboard(
     model_name: str,
     setting_number: str,
     image_number: int,
+    generation_id: str,
 ):
     inline_keyboard = []
 
@@ -45,11 +45,11 @@ def selectImageKeyboard(
             [
                 InlineKeyboardButton(
                     text=f"{i}",
-                    callback_data=f"select_image|{model_name}|{setting_number}|{i}",
+                    callback_data=f"select_image|{model_name}|{setting_number}|{i}|{generation_id[:8]}",
                 ),
                 InlineKeyboardButton(
                     text=f"{i + 1}",
-                    callback_data=f"select_image|{model_name}|{setting_number}|{i + 1}",
+                    callback_data=f"select_image|{model_name}|{setting_number}|{i + 1}|{generation_id[:8]}",
                 ),
             ],
         )
@@ -58,22 +58,20 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
+                callback_data=f"select_image|{model_name}|{setting_number}|regenerate|{generation_id[:8]}",
             ),
-        ],
+        ]
     )
     inline_keyboard.append(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt",
+                callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt|{generation_id[:8]}",
             ),
-        ],
+        ]
     )
 
-    kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
-
-    return kb
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
 # Инлайн-клавиатура для выбора настройки
@@ -308,6 +306,7 @@ def select_type_specific_generation():
             ],
         ],
     )
+
 
 # Клавиатура, когда все изображения успешно сохранены
 def all_images_successfully_saved_keyboard():
