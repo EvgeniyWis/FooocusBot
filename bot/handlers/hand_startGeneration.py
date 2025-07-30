@@ -387,10 +387,9 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         text.SELECT_IMAGE_PROGRESS_TEXT,
     )
 
-    # Получаем индекс работы и индекс изображения
-    model_name = call.data.split("|")[1]
-    setting_number = call.data.split("|")[2]
-    image_index = call.data.split("|")[3]
+    model_name, setting_number, image_index, generation_id_prefix = (
+        call.data.split("|")[1:]
+    )
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -402,6 +401,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         "imageGeneration_mediagroup_messages_ids",
         model_name,
         call.message.chat.id,
+        generation_id=generation_id_prefix,
     )
 
     try:

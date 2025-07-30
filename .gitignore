@@ -214,4 +214,4 @@ grafana_data/
 # nginx-basic-auth
 nginx/.htpasswd
 
-avg_times_metrics.json
+bot/assets/comfyui/avg_times_metrics.json

@@ -77,7 +77,6 @@ class ComfyUIVideoService:
                 duration = time.time() - start
                 await self.metrics.save(duration)
                 video_urls = self.get_video_urls(status)
-                self.cleanup_local_output()
 
                 return {"video_urls": video_urls, "duration": duration}
         logger.error(

@@ -3,7 +3,6 @@ from typing import Optional
 
 import runpod
 from domain.entities.comfyui_pod import PodStatus
-from factory.comfyui_video_service import get_video_service
 from requests import ReadTimeout
 from runpod.error import RunPodError
 from services.comfyui.video_service import ComfyUIVideoService
@@ -150,11 +149,3 @@ class PodManager:
                 logger.exception(
                     "Не удалось прогреть модели даже после повторной попытки.",
                 )
-
-
-if __name__ == "__main__":
-    pod_manager = PodManager(
-        api_key=settings.COMFYUI_API_KEY,
-        video_service=get_video_service(),
-    )
-    asyncio.run(pod_manager.start_pod())
