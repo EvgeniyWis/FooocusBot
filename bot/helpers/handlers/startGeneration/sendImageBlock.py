@@ -39,14 +39,18 @@ async def sendImageBlock(
         media_group = media_group[:10]
         media_group_message = await safe_send_media_group(user_id, media_group)
         if media_group_message is None:
-            logger.error("media_group_message is None! Возможно, не удалось отправить медиагруппу.")
+            logger.error(
+                "media_group_message is None! Возможно, не удалось отправить медиагруппу."
+            )
             await bot.send_message(
                 chat_id=user_id,
                 text="Произошла ошибка при отправке изображений! (media_group_message is None)",
             )
             return
-        if not hasattr(media_group_message, '__iter__'):
-            logger.error(f"media_group_message не итерируемый объект: {type(media_group_message)}")
+        if not hasattr(media_group_message, "__iter__"):
+            logger.error(
+                f"media_group_message не итерируемый объект: {type(media_group_message)}"
+            )
             await bot.send_message(
                 chat_id=user_id,
                 text="Произошла ошибка при отправке изображений! (media_group_message не итерируемый)",
@@ -148,6 +152,7 @@ async def sendImageBlock(
                     model_name,
                     setting_number,
                     model_data["json"]["input"]["image_number"],
+                    generation_id,
                 )
                 await bot.send_message(
                     chat_id=user_id,
