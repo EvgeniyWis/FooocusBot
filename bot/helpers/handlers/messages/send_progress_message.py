@@ -48,7 +48,20 @@ async def send_progress_message(state: FSMContext, array_key: str, model_name: s
                 message,
             )
 
-        message_id = message.message_id
+        # Проверяем, что message существует и имеет message_id
+        if message and hasattr(message, 'message_id'):
+            message_id = message.message_id
+        else:
+            logger.warning('message не существует или не содержит message_id, пробую отправить заново')
+            message = await safe_send_message(
+                message_text,
+                message,
+            )
+            if message and hasattr(message, 'message_id'):
+                message_id = message.message_id
+            else:
+                logger.error('Не удалось отправить сообщение повторно')
+                message_id = None
 
         # Добавляем в массив с тем, для каких моделей отправлены сообщения о прогрессе
         data_for_update = {
