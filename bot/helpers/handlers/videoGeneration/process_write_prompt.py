@@ -92,6 +92,12 @@ async def process_write_prompt(
                 unique_keys=("model_name"),
             )
 
+    # Проверяем, добавилось ли имя модели в стейт
+    state_data = await state.get_data()
+    model_name_for_video_generation = state_data.get("model_name_for_video_generation", "")
+    if model_name_for_video_generation != model_name:
+        await state.update_data(model_name_for_video_generation=model_name)
+
     # Переключаем стейт
     if is_quick_generation:
         await state.set_state(

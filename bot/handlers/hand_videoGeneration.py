@@ -56,6 +56,12 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
         except Exception as e:
             logger.error(f"Ошибка при удалении видео из папки temp: {e}")
 
+    # Проверяем, добавилось ли имя модели в стейт
+    state_data = await state.get_data()
+    model_name_for_video_generation = state_data.get("model_name_for_video_generation", "")
+    if model_name_for_video_generation != model_name:
+        await state.update_data(model_name_for_video_generation=model_name)
+
     await process_write_prompt(
         call,
         state,
@@ -74,6 +80,9 @@ async def handle_rewrite_prompt_button(
     state_data = await state.get_data()
     current_prompt = state_data.get("prompt_for_video", "")
 
+    # Сохраняем model_name, чтобы потом знать куда применить
+    await state.update_data(model_name_for_video_generation=model_name)
+
     # Обновляем сообщение
     await editMessageOrAnswer(
         call,
@@ -81,8 +90,11 @@ async def handle_rewrite_prompt_button(
         reply_markup=None,
     )
 
-    # Сохраняем model_name, чтобы потом знать куда применить
-    await state.update_data(model_name_for_video_generation=model_name)
+    # Проверяем, добавилось ли имя модели в стейт
+    state_data = await state.get_data()
+    model_name_for_video_generation = state_data.get("model_name_for_video_generation", "")
+    if model_name_for_video_generation != model_name:
+        await state.update_data(model_name_for_video_generation=model_name)
 
     # Ставим стейт для обработки ввода
     await state.set_state(StartGenerationState.write_prompt_for_quick_video_generation)
