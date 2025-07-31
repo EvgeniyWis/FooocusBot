@@ -41,7 +41,7 @@ async def second_upscale_image(
         task = client.create_task("upscaleimage")
         
         logger.info(f"Обрабатываю файл: {temp_image_path} с множителем 2")
-        task.process_files(temp_image_path, multiplier=2)
+        task.process_files(temp_image_path, multiplier=4)
         
         logger.info("Загружаю обработанный файл")
         task.download(temp_image_path)
