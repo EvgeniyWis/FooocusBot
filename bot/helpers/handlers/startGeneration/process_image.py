@@ -76,7 +76,7 @@ async def process_image(
         f"[process_image] step for ({model_name}, {image_index}) = {process_image_step}",
     )
 
-    if not settings.MOCK_IMAGES_MODE:
+    if settings.MOCK_IMAGES_MODE:
         temp_image_path = (
             TEMP_FOLDER_PATH
             / f"{model_name}_{call.from_user.id}"
