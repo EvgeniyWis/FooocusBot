@@ -8,6 +8,16 @@ from aiogram.fsm.storage.redis import RedisStorage
 from bot.factory.redis_factory import create_redis_client
 from bot.settings import settings
 
+# Создаём отдельные роутеры для каждого хендлера
+commands_router = Router()
+start_generation_router = Router()
+randomizer_router = Router()
+nsfw_video_router = Router()
+video_generation_router = Router()
+multi_image_router = Router()
+img2video_router = Router()
+magnific_upscale_router = Router()
+
 bot = Bot(
     token=settings.BOT_API_TOKEN,
     default=DefaultBotProperties(parse_mode="HTML"),
@@ -22,8 +32,16 @@ storage = RedisStorage(
 )
 
 dp = Dispatcher(storage=storage)
-router = Router()
 
 bot.session = AiohttpSession(timeout=180)
 
-dp.include_router(router)
+
+# Подключаем роутеры к диспетчеру
+dp.include_router(commands_router)
+dp.include_router(start_generation_router)
+dp.include_router(randomizer_router)
+dp.include_router(nsfw_video_router)
+dp.include_router(video_generation_router)
+dp.include_router(multi_image_router)
+dp.include_router(img2video_router)
+dp.include_router(magnific_upscale_router)
