@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration import generateImagesInHandler
-from bot.InstanceBot import router
+from bot.InstanceBot import randomizer_router
 from bot.keyboards import randomizer_keyboards
 from bot.states.RandomizerState import RandomizerState
 from bot.utils.handlers.messages import editMessageOrAnswer
@@ -482,44 +482,44 @@ async def write_one_message_for_randomizer(
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    randomizer_router.callback_query.register(
         handle_variable_action_buttons,
         lambda call: call.data.startswith("var"),
     )
 
-    router.callback_query.register(
+    randomizer_router.callback_query.register(
         handle_delete_value_for_variable_buttons,
         lambda call: call.data.startswith("randomizer_delete_value"),
     )
 
-    router.callback_query.register(
+    randomizer_router.callback_query.register(
         handle_randomizer_buttons,
         lambda call: call.data.startswith("randomizer"),
     )
 
-    router.message.register(
+    randomizer_router.message.register(
         write_variable_for_randomizer,
         StateFilter(RandomizerState.write_variable_for_randomizer),
     )
 
-    router.message.register(
+    randomizer_router.message.register(
         write_value_for_variable_for_randomizer,
         StateFilter(RandomizerState.write_value_for_variable_for_randomizer),
     )
 
-    router.message.register(
+    randomizer_router.message.register(
         write_one_message_for_randomizer,
         StateFilter(RandomizerState.write_one_message_for_randomizer),
     )
 
-    router.message.register(
+    randomizer_router.message.register(
         handle_chunk_input,
         StateFilter(
             RandomizerState.write_multi_messages_for_prompt_for_randomizer,
         ),
     )
 
-    router.callback_query.register(
+    randomizer_router.callback_query.register(
         finish_prompt_input,
         lambda call: call.data == "done_typing_randomize_prompts",
     )

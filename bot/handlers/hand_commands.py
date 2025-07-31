@@ -9,7 +9,7 @@ from bot.helpers import text
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
-from bot.InstanceBot import router
+from bot.InstanceBot import commands_router
 from bot.keyboards import start_generation_keyboards
 from bot.settings import settings
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
@@ -79,6 +79,5 @@ async def stop_generation(message: types.Message, state: FSMContext):
 
 # Добавление обработчиков
 def hand_add():
-    router.message.register(start, StateFilter("*"), CommandStart())
-
-    router.message.register(stop_generation, Command("stop"))
+    commands_router.message.register(start, StateFilter("*"), CommandStart())
+    commands_router.message.register(stop_generation, Command("stop"))

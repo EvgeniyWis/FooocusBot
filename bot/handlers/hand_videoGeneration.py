@@ -13,7 +13,7 @@ from bot.helpers.handlers.videoGeneration import (
     process_write_prompt,
     saveVideo,
 )
-from bot.InstanceBot import router
+from bot.InstanceBot import video_generation_router
 from bot.logger import logger
 from bot.settings import settings
 from bot.states import StartGenerationState
@@ -280,16 +280,16 @@ async def write_prompt_for_video_generation_by_one_prompt(message: types.Message
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         quick_generate_video,
         lambda call: call.data.startswith("quick_video_generation"),
     )
 
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         handle_rewrite_prompt_button,
         lambda call: call.data.startswith("rewrite_prompt|"),
     )
-    router.message.register(
+    video_generation_router.message.register(
         write_prompt_for_video,
         StateFilter(
             StartGenerationState.write_prompt_for_video,
@@ -297,17 +297,17 @@ def hand_add():
         ),
     )
 
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         handle_video_save_button,
         lambda call: call.data.startswith("video_correctness|correct"),
     )
 
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         handle_generate_video_by_one_prompt,
         lambda call: call.data.startswith("generate_video_by_one_prompt"),
     )
 
-    router.message.register(
+    video_generation_router.message.register(
         write_prompt_for_video_generation_by_one_prompt,
         StateFilter(StartGenerationState.write_prompt_for_video_generation_by_one_prompt),
     )

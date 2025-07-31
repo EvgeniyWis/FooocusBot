@@ -10,7 +10,7 @@ from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     process_image,
 )
-from bot.InstanceBot import router
+from bot.InstanceBot import multi_image_router
 from bot.logger import logger
 
 
@@ -198,12 +198,11 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    multi_image_router.callback_query.register(
         select_multi_image,
         lambda call: call.data.startswith("select_multi_image"),
     )
-
-    router.callback_query.register(
+    multi_image_router.callback_query.register(
         multi_image_done,
         lambda call: call.data.startswith("multi_image_done"),
     )

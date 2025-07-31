@@ -13,7 +13,7 @@ from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
     getModelNameByIndex,
 )
 from bot.helpers.handlers.img2video import process_video
-from bot.InstanceBot import bot, router
+from bot.InstanceBot import bot, img2video_router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
@@ -305,29 +305,25 @@ async def handle_model_index_for_video_generation_from_image(
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    img2video_router.callback_query.register(
         start_generateVideoFromImage,
         lambda call: call.data == "generateVideoFromImage",
     )
-
-    router.message.register(
+    img2video_router.message.register(
         get_images_for_img2video,
         StateFilter(StartGenerationState.send_image_for_video_generation),
     )
-
-    router.callback_query.register(
+    img2video_router.callback_query.register(
         done_send_images_for_img2video,
         lambda call: call.data == "img2video|done_send_images",
     )
-
-    router.message.register(
+    img2video_router.message.register(
         handle_prompt_for_img2video,
         StateFilter(
             StartGenerationState.write_prompt_for_img2video,
         ),
     )
-
-    router.message.register(
+    img2video_router.message.register(
         handle_model_index_for_video_generation_from_image,
         StateFilter(
             StartGenerationState.ask_for_model_index_for_img2video,

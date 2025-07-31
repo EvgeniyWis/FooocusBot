@@ -10,7 +10,7 @@ from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes.process_save_image import (
     process_save_image,
 )
-from bot.InstanceBot import router
+from bot.InstanceBot import magnific_upscale_router
 from bot.logger import logger
 from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
@@ -124,7 +124,7 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    magnific_upscale_router.callback_query.register(
         start_magnific_upscale,
         lambda call: call.data.startswith("magnific_upscale"),
     )

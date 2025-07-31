@@ -24,7 +24,7 @@ from bot.helpers.handlers.startGeneration import (
     process_image,
     regenerateImage,
 )
-from bot.InstanceBot import bot, router
+from bot.InstanceBot import bot, start_generation_router
 from bot.keyboards import (
     randomizer_keyboards,
     start_generation_keyboards,
@@ -797,64 +797,64 @@ async def write_new_prompt_for_regenerate_image(
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         choose_generations_type,
         lambda call: call.data.startswith("generations_type"),
     )
 
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         choose_generation_mode,
         lambda call: call.data.startswith("generation_mode"),
     )
 
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         choose_setting,
         lambda call: call.data.startswith("select_setting"),
     )
 
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         choose_writePrompt_type,
         lambda call: call.data.startswith("write_prompt_type"),
     )
 
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         chooseOnePromptGenerationType,
         lambda call: call.data.startswith("one_prompt_generation_type"),
     )
 
-    router.message.register(
+    start_generation_router.message.register(
         write_prompt,
         StateFilter(StartGenerationState.write_prompt_for_images),
     )
 
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         select_image,
         lambda call: call.data.startswith("select_image"),
     )
 
-    router.message.register(
+    start_generation_router.message.register(
         write_new_prompt_for_regenerate_image,
         StateFilter(
             StartGenerationState.write_new_prompt_for_regenerate_image,
         ),
     )
-    router.message.register(
+    start_generation_router.message.register(
         write_prompts_for_models,
         StateFilter(
             StartGenerationState.write_multi_prompts_for_models,
         ),
     )
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         send_message_with_info_for_write_prompts_for_models,
         lambda call: call.data.startswith("specific_generation|one_prompt"),
     )
 
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         start_multi_prompt_input_mode,
         lambda call: call.data.startswith("specific_generation|more_prompts"),
     )
 
-    router.message.register(
+    start_generation_router.message.register(
         handle_chunk_input,
         StateFilter(
             MultiPromptInputState.collecting_model_prompts_for_settings,
@@ -862,12 +862,12 @@ def hand_add():
         ),
     )
 
-    router.callback_query.register(
+    start_generation_router.callback_query.register(
         finish_prompt_input,
         lambda call: call.data == "done_typing",
     )
 
-    router.message.register(
+    start_generation_router.message.register(
         write_models_for_specific_generation,
         StateFilter(StartGenerationState.write_models_for_specific_generation),
     )

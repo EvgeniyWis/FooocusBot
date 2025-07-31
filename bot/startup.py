@@ -9,7 +9,12 @@ from bot import handlers
 from bot.helpers.generateImages.process_image_block import process_image_block
 from bot.helpers.handlers.startGeneration import process_image
 from bot.helpers.handlers.videoGeneration import process_video
-from bot.InstanceBot import bot, dp, redis_client, storage
+from bot.InstanceBot import (
+    bot,
+    dp,
+    redis_client,
+    storage,
+)
 from bot.logger import logger
 from bot.middleware import ErrorHandlingMiddleware, MediaGroupMiddleware
 from bot.settings import settings
