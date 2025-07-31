@@ -414,8 +414,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 setting_number,
             )
 
-        # Если индекс изображения равен "regenerate_with_new_prompt", то перегенерируем изображение с новым промптом
-        elif image_index == "regenerate_with_new_prompt":
+        # Если индекс изображения равен "prompt_regen", то перегенерируем изображение с новым промптом
+        elif image_index == "prompt_regen":
             # Устанавливаем стейт для ввода нового промпта
             await state.update_data(model_name_for_regenerate_image=model_name)
             await state.update_data(

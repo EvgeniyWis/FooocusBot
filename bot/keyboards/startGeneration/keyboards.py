@@ -66,7 +66,7 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt|{generation_id[:8]}",
+                callback_data=f"select_image|{model_name}|{setting_number}|prompt_regen|{generation_id[:8]}",
             ),
         ]
     )
@@ -269,7 +269,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt",
+                callback_data=f"select_image|{model_name}|{setting_number}|prompt_regen",
             ),
         ],
     )
