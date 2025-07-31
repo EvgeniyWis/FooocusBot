@@ -1,11 +1,10 @@
-import base64
 
 from aiogram.fsm.context import FSMContext
+from iloveapi import ILoveApi
 
-from bot.factory.image_service_factory import create_image_upscaler
 from bot.logger import logger
+from bot.settings import settings
 from bot.utils.handlers import appendDataToStateArray
-from bot.utils.images import base64_to_image
 
 
 async def second_upscale_image(
@@ -28,31 +27,30 @@ async def second_upscale_image(
     Returns:
         str: путь к изображению
     """
-    # Получаем сервис ILoveAPI для увеличения качества изображения
-    upscale_service = create_image_upscaler()
+    logger.info(f"Начинаю второй upscale изображения: {temp_image_path}, модель: {model_name}, индекс: {image_index}, пользователь: {user_id}")
 
     # Запускаем задачу
     try:
-        upscale_result_response = await upscale_service.upscale_image_file(
-            file=temp_image_path,
-            multiplier=2,
+        logger.info("Создаю клиент ILoveApi")
+        client = ILoveApi(
+            public_key=settings.PUBLIC_ILOVEAPI_API_KEY,
+            secret_key=settings.SECRET_ILOVEAPI_API_KEY,
         )
-        upscale_result = upscale_result_response.content
 
-        # ArrayBuffer to base64
-        image_data = base64.b64encode(upscale_result).decode("utf-8")
-
-        # Сохраняем изображения по этому же пути
-        return await base64_to_image(
-            image_data,
-            model_name,
-            image_index,
-            user_id,
-            False,
-        )
+        logger.info("Создаю задачу upscaleimage")
+        task = client.create_task("upscaleimage")
+        
+        logger.info(f"Обрабатываю файл: {temp_image_path} с множителем 2")
+        task.process_files(temp_image_path, multiplier=2)
+        
+        logger.info("Загружаю обработанный файл")
+        task.download(temp_image_path)
+        
+        logger.info(f"Второй upscale успешно завершен для: {temp_image_path}")
     except Exception as e:
         error_text = f"Ошибка при увеличении качества изображения: {e}"
         logger.error(error_text)
+        logger.error(f"Детали ошибки - путь: {temp_image_path}, модель: {model_name}, индекс: {image_index}, пользователь: {user_id}")
         data_for_update = {
             "model_name": model_name,
             "image_index": image_index,

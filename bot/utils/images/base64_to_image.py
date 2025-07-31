@@ -61,6 +61,9 @@ async def base64_to_image(
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
 
+    # Инициализируем file_path значением None для использования в except блоке
+    file_path = None
+
     # Удаляем префикс Data URL если он присутствует
     if image_data.startswith("data:image/"):
         image_data = image_data.split(",", 1)[1]
@@ -76,6 +79,8 @@ async def base64_to_image(
         if not image_bytes.startswith(
             b"\x89PNG\r\n\x1a\n",
         ) and not image_bytes.startswith(b"\xff\xd8"):
+            logger.error(f"Полученные данные не являются изображением PNG или JPEG. Первые 20 байт: {image_bytes[:20]}")
+            logger.error(f"Размер данных: {len(image_bytes)} байт")
             raise ValueError(
                 "Полученные данные не являются изображением PNG или JPEG",
             )
