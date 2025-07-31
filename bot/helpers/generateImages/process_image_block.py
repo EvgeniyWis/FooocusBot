@@ -60,7 +60,7 @@ async def process_image_block(
         # Проверяем статус работы
         response_json = await retryOperation(
             check_job_status,
-            3,
+            5,
             2,
             job_id,
             setting_number,
