@@ -5,9 +5,9 @@ from bot.utils.get_api_headers import get_runpod_headers
 
 
 # Функция для отправки запроса на генерацию
-async def send_run_request(dataJSON: dict, group_number: int | str):
+async def send_run_request(dataJSON: dict, setting_number: int | str):
     # Получаем ID эндпоинта для генерации изображений
-    ENDPOINT_ID = await get_endpoint_ID(group_number)
+    ENDPOINT_ID = await get_endpoint_ID(setting_number)
 
     # Формируем URL для отправки запроса
     url = f"{settings.RUNPOD_HOST}/{ENDPOINT_ID}/run"

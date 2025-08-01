@@ -10,7 +10,7 @@ from bot.utils.retryOperation import retryOperation
 # Функция для отправки запроса на Runpod с обработкой сетевых ошибок и получения id работы
 async def get_job_ID(
     dataJSON: dict,
-    group_number: int | str,
+    setting_number: int | str,
     state: FSMContext,
     user_id: int,
     job_type: str,
@@ -29,7 +29,7 @@ async def get_job_ID(
         10,
         2,
         dataJSON,
-        group_number,
+        setting_number,
     )
 
     logger.info(f"Ответ на запрос: {response_json}")
@@ -41,7 +41,7 @@ async def get_job_ID(
     # Сохраняем его в стейт
     data_for_update = {
         "job_id": job_id,
-        "group_number": group_number,
+        "setting_number": setting_number,
         "user_id": user_id,
         "job_type": job_type,
     }

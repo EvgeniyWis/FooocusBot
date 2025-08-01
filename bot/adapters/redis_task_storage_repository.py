@@ -239,7 +239,7 @@ class RedisTaskStorageRepository:
                     success = await callback(
                         job_id=task.job_id,
                         model_name=task.model_name,
-                        group_number=task.group_number,
+                        setting_number=task.setting_number,
                         is_test_generation=getattr(
                             task,
                             "is_test_generation",
