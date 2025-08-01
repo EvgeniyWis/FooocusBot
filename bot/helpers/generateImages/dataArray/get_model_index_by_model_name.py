@@ -3,7 +3,16 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 )
 
 
-def getModelNameIndex(model_name: str):
+def get_model_index_by_model_name(model_name: str):
+    """
+    Получает индекс модели по её названию
+
+    Args:
+        model_name: str - название модели
+
+    Returns:
+        int | None - индекс модели или None, если модель не найдена
+    """
     # Убираем +N, если он есть (например: "1+1" → "1")
     model_name = model_name.split("+")[0]
 
@@ -11,16 +20,9 @@ def getModelNameIndex(model_name: str):
     all_groups = getAllDataArrays()
 
     # Ищем, в какой группе находится модель с таким названием
-    for index, group in enumerate(all_groups):
+    for _, group in enumerate(all_groups):
         for dataArray in group:
             if dataArray["model_name"] == model_name:
-                if index == 0:
-                    return group.index(dataArray) + 1
-                else:
-                    return (
-                        sum(len(group) for group in all_groups[:index])
-                        + group.index(dataArray)
-                        + 1
-                    )
+                return dataArray["model_index"]
 
     return None

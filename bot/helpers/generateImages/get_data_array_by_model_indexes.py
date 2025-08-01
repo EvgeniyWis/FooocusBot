@@ -1,8 +1,8 @@
 from bot.helpers.generateImages.dataArray.getDataByModelName import (
     getDataByModelName,
 )
-from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
-    getModelNameByIndex,
+from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
+    get_model_name_by_index,
 )
 
 
@@ -17,7 +17,7 @@ async def get_data_array_by_model_indexes(model_indexes: list[int]) -> list[dict
         list[dict] - массив данных моделей для генерации
     """
     model_names_for_generation = [
-        getModelNameByIndex(model_index)
+        get_model_name_by_index(model_index)
         for model_index in model_indexes
     ]
     data_array = [

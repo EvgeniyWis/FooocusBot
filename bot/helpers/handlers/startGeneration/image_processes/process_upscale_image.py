@@ -8,7 +8,7 @@ from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
-    getModelNameIndex,
+    get_model_index_by_model_name,
     get_group_number_by_model_name,
 )
 from bot.helpers.generateImages.upscale import (
@@ -45,7 +45,7 @@ async def process_upscale_image(
     user_id = call.from_user.id
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     image_path = (
         TEMP_FOLDER_PATH / f"{model_name}_{user_id}" / f"{image_index}.jpg"

@@ -9,6 +9,7 @@ def extra_group_get_data_array():
     data_array = [
         extra_setting_generate_data(
             "isla_latina",
+            101,
             "1Brd_uLUafazD8IfVmIiSQMMMTioaYbdc",
             "1eROCCB950JjAeG7nDsSJuvg80J2E0Z1z",
             "1550MJr1dQw6Y7KoQMcaq_xgTf0uL2YqA",

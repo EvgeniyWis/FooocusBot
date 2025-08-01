@@ -3,7 +3,16 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 )
 
 
-def getModelNameByIndex(index):
+def get_model_name_by_index(index: int | str):
+    """
+    Получает название модели по её индексу
+
+    Args:
+        index: int | str - индекс модели
+
+    Returns:
+        str | None - название модели или None, если модель не найдена
+    """
     if not isinstance(index, str):
         index = str(index)
 
@@ -17,15 +26,14 @@ def getModelNameByIndex(index):
 
     if base_index_int <= 0:
         return None
-
-    base_index_int -= 1
-
+    
+    # Получаем все группы
     all_groups = getAllDataArrays()
 
-    current_length = 0
-    for group in all_groups:
-        if base_index_int < len(group) + current_length:
-            return group[base_index_int - current_length]["model_name"]
-        current_length += len(group)
+    # Ищем, в какой группе находится модель с таким названием
+    for _, group in enumerate(all_groups):
+        for dataArray in group:
+            if dataArray["model_index"] == base_index_int:
+                return dataArray["model_name"]
 
     return None

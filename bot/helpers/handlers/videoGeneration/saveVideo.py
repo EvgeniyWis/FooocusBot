@@ -8,7 +8,7 @@ from logger import logger
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
-    getModelNameIndex,
+    get_model_index_by_model_name,
 )
 from bot.settings import settings
 from bot.utils.googleDrive.files import saveFile
@@ -36,7 +36,7 @@ async def saveVideo(
     user_id = message.from_user.id
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     # Отправляем сообщение о начале сохранения видео
     message_for_delete = await safe_send_message(

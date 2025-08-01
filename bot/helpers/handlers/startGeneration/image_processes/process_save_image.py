@@ -14,7 +14,7 @@ from bot.assets.mocks.links import (
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
-    getModelNameIndex,
+    get_model_index_by_model_name,
 )
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
@@ -60,7 +60,7 @@ async def process_save_image(
     )
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     # Меняем текст на сообщении
     saving_progress_message = await editMessageOrAnswer(

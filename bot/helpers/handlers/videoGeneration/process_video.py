@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from bot.domain.entities.task import TaskProcessVideoDTO
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getModelNameIndex,
+    get_model_index_by_model_name,
 )
 from bot.helpers.handlers.messages import send_progress_message
 from bot.helpers.handlers.videoGeneration.check_video_path import (
@@ -84,7 +84,7 @@ async def process_video(
     await redis_storage.add_task(settings.PROCESS_VIDEO_TASK, task_dto)
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     video_progress_message_id = await send_progress_message(
         state,

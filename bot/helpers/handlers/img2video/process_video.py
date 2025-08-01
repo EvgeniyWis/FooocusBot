@@ -3,8 +3,8 @@ import traceback
 from aiogram import types
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
-    getModelNameByIndex,
+from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
+    get_model_name_by_index,
 )
 from bot.helpers.handlers.videoGeneration import (
     check_video_path,
@@ -38,7 +38,7 @@ async def process_video(
     Returns:
         str: Путь к сгенерированному видео.
     """
-    model_name = getModelNameByIndex(model_index)
+    model_name = get_model_name_by_index(model_index)
     generate_video_from_image_progress_message = await safe_send_message(
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_index),
         message,

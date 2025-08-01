@@ -14,8 +14,8 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getAllDataArrays,
     getDataByModelName,
-    getModelNameByIndex,
-    getModelNameIndex,
+    get_model_name_by_index,
+    get_model_index_by_model_name,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
@@ -284,7 +284,7 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
         return
 
     data_for_update = {
-        f"{getModelNameByIndex(key)}_{key}": prompt
+        f"{get_model_name_by_index(key)}_{key}": prompt
         for key, prompt in model_prompts.items()
     }
 
@@ -476,7 +476,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
     except Exception as e:
         traceback.print_exc()
-        model_name_index = getModelNameIndex(model_name)
+        model_name_index = get_model_index_by_model_name(model_name)
 
         await editMessageOrAnswer(
             call,
@@ -691,7 +691,7 @@ async def write_model_for_generation(
         prompt_counter[index] += 1
 
     data_for_update = {
-        f"{getModelNameByIndex(key)}_{key}": prompt
+        f"{get_model_name_by_index(key)}_{key}": prompt
         for key, prompt in model_prompts.items()
     }
 
@@ -763,7 +763,7 @@ async def write_new_prompt_for_regenerate_image(
     )
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     # Отправляем сообщение о перегенерации изображения
     modified_prompt = prompt[:30] + "..." if len(prompt) > 30 else prompt
