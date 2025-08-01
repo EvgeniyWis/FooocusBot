@@ -15,13 +15,13 @@ def get_setting_number_by_model_name(model_name: str):
         int | str | None - номер настройки или None, если модель не найдена
     """
     # Получаем все группы
-    all_groups = getAllDataArrays()
+    all_data_arrays = getAllDataArrays()
 
     # Ищем, в какой группе находится модель с таким названием
-    for _, group in enumerate(all_groups):
-        for dataArray in group:
-            if dataArray["model_name"] == model_name:
-                return dataArray["setting_number"]
+    for _, dataArray in enumerate(all_data_arrays):
+        for data in dataArray:
+            if data["model_name"] == model_name:
+                return data["setting_number"]
 
     # Если модель не найдена, то возвращаем None
     return None

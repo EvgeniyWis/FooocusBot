@@ -10,14 +10,14 @@ from bot.helpers.generateImages.dataArray import (
     get_data_array_by_group_number,
     get_model_index_by_model_name,
 )
+from bot.helpers.generateImages.dataArray.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
+)
 from bot.helpers.generateImages.generate_images_by_all_groups import (
     generate_images_by_all_groups,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.generateImages.generateImages import generateImages
-from bot.helpers.generateImages.get_data_array_by_model_indexes import (
-    get_data_array_by_model_indexes,
-)
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
@@ -135,6 +135,8 @@ async def generateImagesInHandler(
                         dataArray = await get_data_array_by_model_indexes(
                             model_indexes_for_generation,
                         )
+
+                    logger.info(f"[generateImagesInHandler] dataArray: {dataArray}")
 
                     for data in dataArray:
                         model_index = get_model_index_by_model_name(data["model_name"])

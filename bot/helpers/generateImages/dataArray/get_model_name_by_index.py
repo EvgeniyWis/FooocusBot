@@ -28,12 +28,12 @@ def get_model_name_by_index(index: int | str):
         return None
     
     # Получаем все группы
-    all_groups = getAllDataArrays()
+    all_data_arrays = getAllDataArrays()
 
     # Ищем, в какой группе находится модель с таким названием
-    for _, group in enumerate(all_groups):
-        for dataArray in group:
-            if dataArray["model_index"] == base_index_int:
-                return dataArray["model_name"]
+    for _, dataArray in enumerate(all_data_arrays):
+        for data in dataArray:
+            if data["model_index"] == base_index_int:
+                return data["model_name"]
 
     return None

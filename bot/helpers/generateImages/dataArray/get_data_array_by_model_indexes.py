@@ -1,8 +1,8 @@
-from bot.helpers.generateImages.dataArray.getDataByModelName import (
-    getDataByModelName,
-)
 from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
     get_model_name_by_index,
+)
+from bot.helpers.generateImages.dataArray.getDataByModelName import (
+    getDataByModelName,
 )
 
 

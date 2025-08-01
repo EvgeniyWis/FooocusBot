@@ -6,11 +6,17 @@ from aiogram.fsm.context import FSMContext
 
 import bot.constants as constants
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray.getAllDataArrays import (
-    getAllDataArrays,
+from bot.helpers.generateImages.dataArray.check_model_index_is_exist import (
+    check_model_index_is_exist,
+)
+from bot.helpers.generateImages.dataArray.get_all_model_indexes import (
+    get_all_model_indexes,
 )
 from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
     get_model_name_by_index,
+)
+from bot.helpers.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
 )
 from bot.helpers.handlers.img2video import process_video
 from bot.InstanceBot import bot, img2video_router
@@ -24,6 +30,8 @@ from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+
+all_model_indexes = get_all_model_indexes()
 
 
 # Обработка нажатия на кнопку "📹 Сгенерировать видео из изображения'"
@@ -204,6 +212,14 @@ async def handle_model_index_for_video_generation_from_image(
         # Получаем данные по имени модели
         try:
             model_index = int(message.text)
+
+            if not check_model_index_is_exist(model_index):
+                await safe_send_message(
+                    text.MODEL_NOT_FOUND_TEXT.format(model_index, all_model_indexes),
+                    message,
+                )
+                return
+
             model_indexes.append((1, model_index))
         except Exception as e:
             logger.error(f"Произошла ошибка при получении индекса модели: {e}")
@@ -260,7 +276,7 @@ async def handle_model_index_for_video_generation_from_image(
     for image_index, model_index in model_indexes:
         if model_index > all_data_arrays_length or model_index < 1:
             await safe_send_message(
-                text.MODEL_NOT_FOUND_TEXT.format(model_index, image_index),
+                text.MODEL_NOT_FOUND_TEXT.format(model_index, all_model_indexes),
             message,
             )
             return
