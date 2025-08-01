@@ -1,7 +1,7 @@
 from bot.settings import settings
 
 
-# Получение ID эндпоинта для генерации изображений с помощью номера настройки
+# Получение ID эндпоинта для генерации изображений с помощью номера группы
 async def get_endpoint_ID(group_number: str | int):
     # Если передана строка, преобразуем её в число
     if isinstance(group_number, str):
@@ -20,4 +20,4 @@ async def get_endpoint_ID(group_number: str | int):
         case "extra":
             return settings.EXTRA_SETTING_ENDPOINT_ID
         case _:
-            raise Exception(f"Неверный номер настройки: {group_number}")
+            raise Exception(f"Неверный номер группы: {group_number}")

@@ -20,7 +20,7 @@ async def check_upscale_status(
 
     Attributes:
         job_id (str): id работы
-        group_number (int): номер настройки
+        group_number (int): номер группы
         state (FSMContext): контекст состояния
         model_name (str): название модели
         image_index (int): индекс изображения

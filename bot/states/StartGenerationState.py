@@ -20,4 +20,4 @@ class StartGenerationState(StatesGroup):
 
 class MultiPromptInputState(StatesGroup):
     collecting_prompt_parts = State()
-    collecting_model_prompts_for_settings = State()
+    collecting_model_prompts_for_groups = State()

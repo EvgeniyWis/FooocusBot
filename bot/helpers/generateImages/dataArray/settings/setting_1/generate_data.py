@@ -5,7 +5,7 @@ from bot.helpers.generateImages.dataArray.settings.setting_1.generate_loras impo
 from bot.settings import settings
 
 
-# Функция для генерации данных для запроса настройки 1
+# Функция для генерации данных для запроса группы 1
 def setting1_generate_data(
     model_name: str,
     picture_folder_id: str,

@@ -1,7 +1,7 @@
 from bot.helpers.generateImages.dataArray.generate_loras import generate_loras
 
 
-# Функция для генерации массива лор для экстра-настройки
+# Функция для генерации массива лор для экстра-группы
 def extra_setting_generate_loras(weights: list[int]):
     loras = [
         "Pony_Amateur.safetensors",

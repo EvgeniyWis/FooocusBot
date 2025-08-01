@@ -1,5 +1,5 @@
-from bot.helpers.generateImages.dataArray.getSettingNumberByModelName import (
-    getSettingNumberByModelName,
+from bot.helpers.generateImages.dataArray.get_group_number_by_model_name import (
+    get_group_number_by_model_name,
 )
 from bot.helpers.generateImages.dataArray.getModelNameIndex import (
     getModelNameIndex,

@@ -25,7 +25,7 @@ async def upscale_image(
     Attributes:
         input_image (str): сгенерированное входное изображение
         base_config_model_name (str): базовая модель нейросети, на которой будет сделан upscale
-        group_number (int): номер настройки
+        group_number (int): номер группы
         state (FSMContext): контекст состояния
         user_id (int): id пользователя
         model_name (str): название модели

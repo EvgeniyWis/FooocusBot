@@ -77,7 +77,7 @@ async def choose_generations_type(
     await editMessageOrAnswer(
         call,
         text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=start_generation_keyboards.selectSettingKeyboard(
+        reply_markup=start_generation_keyboards.selectGroupKeyboard(
             is_test_generation=generations_type == "test",
         ),
     )
@@ -93,14 +93,14 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
     await editMessageOrAnswer(
         call,
         text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=start_generation_keyboards.selectSettingKeyboard(
+        reply_markup=start_generation_keyboards.selectGroupKeyboard(
             is_test_generation=False,
         ),
     )
 
 
-# Обработка выбора настройки
-async def choose_setting(call: types.CallbackQuery, state: FSMContext):
+# Обработка выбора группы
+async def choose_group(call: types.CallbackQuery, state: FSMContext):
     # Получаем данные из стейта
     state_data = await state.get_data()
 
@@ -116,7 +116,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(**initial_state)
 
     # Если выбрана конкретная модель, то просим ввести название модели
-    if call.data == "select_setting|specific_model":
+    if call.data == "select_group|specific_model":
         await safe_edit_message(
             call.message,
             "🖼 Выберите тип генерации:",
@@ -126,14 +126,14 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
 
         return
 
-    # Если выбрана другая настройка, то продолжаем генерацию
+    # Если выбрана другая группа, то продолжаем генерацию
     group_number = call.data.split("|")[1]
     await state.update_data(group_number=group_number)
     prompt_exist = state_data.get("prompt_exist", False)
     generations_type = state_data.get("generations_type", "")
     await state.update_data(specific_model=False)
 
-    # Если выбрана настройка для теста, то продолжаем генерацию в тестовом режиме
+    # Если выбран тестовый режим, то продолжаем генерацию в тестовом режиме
     if generations_type == "test":
         if prompt_exist:
             prompt = state_data.get("prompt_for_images", "")
@@ -141,7 +141,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
             is_test_generation = generations_type == "test"
             group_number = group_number
 
-            # Удаляем сообщение с выбором настройки
+            # Удаляем сообщение с выбором группы
             await bot.delete_message(user_id, call.message.message_id)
 
             await generateImagesInHandler(
@@ -157,11 +157,11 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         else:
             await editMessageOrAnswer(
                 call,
-                text.GET_SETTINGS_SUCCESS_TEXT,
+                text.GET_GROUPS_SUCCESS_TEXT,
             )
             await state.set_state(StartGenerationState.write_prompt_for_images)
 
-    # Если выбрана настройка для работы, то продолжаем генерацию в рабочем режиме
+    # Если выбран рабочий режим, то продолжаем генерацию в рабочем режиме
     elif generations_type == "work":
         await editMessageOrAnswer(
             call,
@@ -203,20 +203,20 @@ async def start_write_prompts_for_models_multiline_input(
         # Если выбрано all — берём все модели
         all_data_arrays = getAllDataArrays()
         start_index = 1
-        end_index = sum(len(setting) for setting in all_data_arrays)
+        end_index = sum(len(group) for group in all_data_arrays)
     else:
-        # Берём только модели из выбранной настройки
+        # Берём только модели из выбранной группы
         all_data_arrays = getAllDataArrays()
-        setting_index = int(group_number) - 1
+        group_index = int(group_number) - 1
 
         # Считаем смещение как сумму длин всех предыдущих сетов
-        offset = sum(len(arr) for arr in all_data_arrays[:setting_index])
+        offset = sum(len(arr) for arr in all_data_arrays[:group_index])
 
         # Длина текущего сета
-        setting_length = len(all_data_arrays[setting_index])
+        group_length = len(all_data_arrays[group_index])
 
         start_index = offset + 1
-        end_index = offset + setting_length
+        end_index = offset + group_length
 
     # Сохраняем диапазон индексов в стейт
     await state.update_data(
@@ -232,11 +232,11 @@ async def start_write_prompts_for_models_multiline_input(
         reply_markup=done_typing_keyboard(),
     )
     await state.set_state(
-        MultiPromptInputState.collecting_model_prompts_for_settings,
+        MultiPromptInputState.collecting_model_prompts_for_groups,
     )
 
 
-# Обработка списка "индекс: промпт" для текущей настройки
+# Обработка списка "индекс: промпт" для текущей группы
 async def write_prompts_for_models(message: types.Message, state: FSMContext):
     text_input = message.text.strip()
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
@@ -351,7 +351,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
 
     await state.set_state(None)
 
-    # Если в стейте есть номер настройки, то используем его, иначе получаем номер настройки по названию модели
+    # Если в стейте есть номер группы, то используем его, иначе получаем номер группы по названию модели
     if "group_number" in state_data:
         group_number = state_data.get("group_number", 1)
 
@@ -574,7 +574,7 @@ async def finish_prompt_input(
 
     if (
         current_state
-        == MultiPromptInputState.collecting_model_prompts_for_settings.state
+        == MultiPromptInputState.collecting_model_prompts_for_groups.state
     ):
         await write_prompts_for_models(
             message=fake_message,
@@ -808,8 +808,8 @@ def hand_add():
     )
 
     start_generation_router.callback_query.register(
-        choose_setting,
-        lambda call: call.data.startswith("select_setting"),
+        choose_group,
+        lambda call: call.data.startswith("select_group"),
     )
 
     start_generation_router.callback_query.register(
@@ -857,7 +857,7 @@ def hand_add():
     start_generation_router.message.register(
         handle_chunk_input,
         StateFilter(
-            MultiPromptInputState.collecting_model_prompts_for_settings,
+            MultiPromptInputState.collecting_model_prompts_for_groups,
             MultiPromptInputState.collecting_prompt_parts,
         ),
     )

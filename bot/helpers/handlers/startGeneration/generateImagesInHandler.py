@@ -10,11 +10,11 @@ from bot.helpers.generateImages.dataArray import (
     get_data_array_by_group_number,
     getModelNameIndex,
 )
+from bot.helpers.generateImages.generate_images_by_all_groups import (
+    generate_images_by_all_groups,
+)
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.generateImages.generateImages import generateImages
-from bot.helpers.generateImages.generateImagesByAllSettings import (
-    generateImagesByAllSettings,
-)
 from bot.helpers.generateImages.get_data_array_by_model_indexes import (
     get_data_array_by_model_indexes,
 )
@@ -72,7 +72,7 @@ async def generateImagesInHandler(
 
         if is_test_generation:
             if group_number == "all":
-                result = await generateImagesByAllSettings(
+                result = await generate_images_by_all_groups(
                     message_for_edit,
                     state,
                     user_id,
@@ -100,7 +100,7 @@ async def generateImagesInHandler(
                 ]
         else:
             if group_number == "all":
-                result = await generateImagesByAllSettings(
+                result = await generate_images_by_all_groups(
                     message_for_edit,
                     state,
                     user_id,

@@ -1,7 +1,7 @@
 from bot.helpers.generateImages.dataArray.generate_loras import generate_loras
 
 
-# Функция для генерации массива лор для настройки 1
+# Функция для генерации массива лор для группы 1
 def setting1_generate_loras(weights: list[int]):
     loras = [
         "Pony_Realism_Slider.safetensors",

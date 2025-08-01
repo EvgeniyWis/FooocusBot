@@ -74,16 +74,16 @@ def selectImageKeyboard(
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
-# Инлайн-клавиатура для выбора настройки
-def selectSettingKeyboard(is_test_generation: bool = False):
+# Инлайн-клавиатура для выбора группы
+def selectGroupKeyboard(is_test_generation: bool = False):
     inline_keyboard = []
 
     for i in range(1, 5):
         inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    text=f"Настройка {i}",
-                    callback_data=f"select_setting|{i}",
+                    text=f"Группа {i}",
+                    callback_data=f"select_group|{i}",
                 ),
             ],
         )
@@ -91,8 +91,8 @@ def selectSettingKeyboard(is_test_generation: bool = False):
     inline_keyboard.append(
         [
             InlineKeyboardButton(
-                text="Все настройки",
-                callback_data="select_setting|all",
+                text="Все группы",
+                callback_data="select_group|all",
             ),
         ],
     )
@@ -103,7 +103,7 @@ def selectSettingKeyboard(is_test_generation: bool = False):
             [
                 InlineKeyboardButton(
                     text="🔄 Индивидуальная генерация",
-                    callback_data="select_setting|specific_model",
+                    callback_data="select_group|specific_model",
                 ),
             ],
         )
@@ -151,20 +151,20 @@ def confirmWriteUniquePromptForNextModelKeyboard():
     return kb
 
 
-# Клавиатура для тестирования с другими настройками
+# Клавиатура для тестирования
 def testGenerationImagesKeyboard(group_number: str):
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="🔄 Сгенерировать с другими настройками",
+                    text="🔄 Сгенерировать с другой группой",
                     callback_data="generations_type|test|prompt_exist",
                 ),
             ],
             [
                 InlineKeyboardButton(
                     text="✍️ Изменить промпт",
-                    callback_data=f"select_setting|{group_number}",
+                    callback_data=f"select_group|{group_number}",
                 ),
             ],
             [

@@ -101,7 +101,7 @@ async def sendImageBlock(
         # Получаем данные из стейта
         state_data = await state.get_data()
 
-        # Если номер настройки все, то получаем номер настройки из стейта
+        # Если номер группы все, то получаем номер группы из стейта
         if group_number == "all":
             group_number = state_data.get(
                 "current_group_number_for_unique_prompt",

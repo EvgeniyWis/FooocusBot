@@ -34,7 +34,7 @@ async def getDataArrayByRandomizer(
         dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
 
     logger.info(
-        f"Массив данных до применения переменных рандомайзера: {dataArray} для настройки {group_number}",
+        f"Массив данных до применения переменных рандомайзера: {dataArray} для группы {group_number}",
     )
 
     generators = {}
