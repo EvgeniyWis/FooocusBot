@@ -17,7 +17,7 @@ async def regenerateImage(
     model_name: str,
     call: types.CallbackQuery,
     state: FSMContext,
-    setting_number: str,
+    group_number: str,
 ):
     state_data = await state.get_data()
     is_test_generation = state_data.get("generations_type", "") == "test"
@@ -97,7 +97,7 @@ async def regenerateImage(
             call.message.message_id,
             state,
             user_id,
-            setting_number,
+            group_number,
             prompt,
             is_test_generation,
             False,

@@ -13,7 +13,7 @@ async def generateImageBlock(
     message_id: int,
     state: FSMContext,
     user_id: int,
-    setting_number: str,
+    group_number: str,
     variable_prompt: str,
     is_test_generation: bool = False,
     checkOtherJobs: bool = True,
@@ -38,7 +38,7 @@ async def generateImageBlock(
     model_name = data["model_name"]
 
     # Получаем номер настройки по имени модели
-    setting_number = getSettingNumberByModelName(model_name)
+    group_number = getSettingNumberByModelName(model_name)
 
     # Логируем наш json
     logger.info(
@@ -48,7 +48,7 @@ async def generateImageBlock(
     # Делаем запрос на генерацию и получаем id работы
     job_id = await get_job_ID(
         json,
-        setting_number,
+        group_number,
         state,
         user_id,
         "image_generation",
@@ -62,7 +62,7 @@ async def generateImageBlock(
     result = await process_image_block(
         job_id,
         model_name,
-        setting_number,
+        group_number,
         user_id,
         state,
         message_id,

@@ -17,7 +17,7 @@ from bot.utils.images.base64_to_image import base64_to_image
 async def process_image_block(
     job_id: str,
     model_name: str,
-    setting_number: int | str,
+    group_number: int | str,
     user_id: int,
     state: FSMContext,
     message_id: int,
@@ -31,7 +31,7 @@ async def process_image_block(
     Attributes:
         job_id (str): id работы
         model_name (str): название модели
-        setting_number (int): номер настройки
+        group_number (int): номер настройки
         user_id (int): id пользователя
         state (FSMContext): контекст состояния
         message (types.Message): сообщение
@@ -45,7 +45,7 @@ async def process_image_block(
         task_dto = TaskImageBlockDTO(
             job_id=job_id,
             model_name=model_name,
-            setting_number=setting_number,
+            group_number=group_number,
             user_id=user_id,
             message_id=message_id,
             is_test_generation=is_test_generation,
@@ -63,7 +63,7 @@ async def process_image_block(
             5,
             2,
             job_id,
-            setting_number,
+            group_number,
             user_id,
             message_id,
             state,
@@ -136,7 +136,7 @@ async def process_image_block(
             state,
             media_group,
             model_name,
-            setting_number,
+            group_number,
             is_test_generation,
             user_id,
             generation_id=job_id,

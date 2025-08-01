@@ -37,7 +37,7 @@ async def generateImagesInHandler(
     state: FSMContext,
     user_id: int,
     is_test_generation: bool,
-    setting_number: str,
+    group_number: str,
     with_randomizer: bool = False,
 ):
     data = await state.get_data()
@@ -71,7 +71,7 @@ async def generateImagesInHandler(
         )
 
         if is_test_generation:
-            if setting_number == "all":
+            if group_number == "all":
                 result = await generateImagesByAllSettings(
                     message_for_edit,
                     state,
@@ -84,7 +84,7 @@ async def generateImagesInHandler(
                     message_for_edit,
                     text.GET_PROMPT_SUCCESS_TEXT,
                 )
-                dataArray = get_data_array_by_group_number(setting_number)
+                dataArray = get_data_array_by_group_number(group_number)
                 data = dataArray[0]
                 result = [
                     await generateImageBlock(
@@ -92,14 +92,14 @@ async def generateImagesInHandler(
                         message_for_edit.message_id,
                         state,
                         user_id,
-                        setting_number,
+                        group_number,
                         prompt if isinstance(prompt, str) else "",  # fallback
                         is_test_generation,
                         chat_id=message.chat.id,
                     ),
                 ]
         else:
-            if setting_number == "all":
+            if group_number == "all":
                 result = await generateImagesByAllSettings(
                     message_for_edit,
                     state,
@@ -116,7 +116,7 @@ async def generateImagesInHandler(
                     model_indexes_for_generation = list(prompt.keys())
 
                     result = await generateImages(
-                        setting_number="individual",
+                        group_number="individual",
                         prompt_for_current_model=prompt,
                         message=message_for_edit,
                         state=state,
@@ -129,8 +129,8 @@ async def generateImagesInHandler(
                     # Формируем словарь model_name -> prompt
                     prompt_for_current_model = {}
 
-                    if setting_number != "individual":
-                        dataArray = get_data_array_by_group_number(setting_number)
+                    if group_number != "individual":
+                        dataArray = get_data_array_by_group_number(group_number)
                     else:
                         dataArray = await get_data_array_by_model_indexes(
                             model_indexes_for_generation,
@@ -141,7 +141,7 @@ async def generateImagesInHandler(
                         prompt_for_current_model[str(model_index)] = prompt
 
                     result = await generateImages(
-                        setting_number=setting_number,
+                        group_number=group_number,
                         prompt_for_current_model=prompt_for_current_model,
                         message=message_for_edit,
                         state=state,

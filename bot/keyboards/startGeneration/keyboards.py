@@ -34,7 +34,7 @@ def generationsTypeKeyboard(
 
 def selectImageKeyboard(
     model_name: str,
-    setting_number: str,
+    group_number: str,
     image_number: int,
     generation_id: str,
 ):
@@ -45,11 +45,11 @@ def selectImageKeyboard(
             [
                 InlineKeyboardButton(
                     text=f"{i}",
-                    callback_data=f"select_image|{model_name}|{setting_number}|{i}|{generation_id[:8]}",
+                    callback_data=f"select_image|{model_name}|{group_number}|{i}|{generation_id[:8]}",
                 ),
                 InlineKeyboardButton(
                     text=f"{i + 1}",
-                    callback_data=f"select_image|{model_name}|{setting_number}|{i + 1}|{generation_id[:8]}",
+                    callback_data=f"select_image|{model_name}|{group_number}|{i + 1}|{generation_id[:8]}",
                 ),
             ],
         )
@@ -58,7 +58,7 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate|{generation_id[:8]}",
+                callback_data=f"select_image|{model_name}|{group_number}|regenerate|{generation_id[:8]}",
             ),
         ]
     )
@@ -66,7 +66,7 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{setting_number}|prompt_regen|{generation_id[:8]}",
+                callback_data=f"select_image|{model_name}|{group_number}|prompt_regen|{generation_id[:8]}",
             ),
         ]
     )
@@ -152,7 +152,7 @@ def confirmWriteUniquePromptForNextModelKeyboard():
 
 
 # Клавиатура для тестирования с другими настройками
-def testGenerationImagesKeyboard(setting_number: str):
+def testGenerationImagesKeyboard(group_number: str):
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -164,7 +164,7 @@ def testGenerationImagesKeyboard(setting_number: str):
             [
                 InlineKeyboardButton(
                     text="✍️ Изменить промпт",
-                    callback_data=f"select_setting|{setting_number}",
+                    callback_data=f"select_setting|{group_number}",
                 ),
             ],
             [
@@ -224,7 +224,7 @@ def generationModeKeyboard():
 # Инлайн-клавиатура для мультивыборной генерации изображений
 def selectMultiImageKeyboard(
     model_name: str,
-    setting_number: str,
+    group_number: str,
     image_number: int,
     selected_indexes: list[int],
     generation_id: str,
@@ -242,7 +242,7 @@ def selectMultiImageKeyboard(
             row.append(
                 InlineKeyboardButton(
                     text=text,
-                    callback_data=f"select_multi_image|{model_name}|{setting_number}|{idx}",
+                    callback_data=f"select_multi_image|{model_name}|{group_number}|{idx}",
                 ),
             )
         if row:
@@ -253,7 +253,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="Готово",
-                callback_data=f"multi_image_done|{model_name}|{setting_number}|{short_generation_id}",
+                callback_data=f"multi_image_done|{model_name}|{group_number}|{short_generation_id}",
             ),
         ],
     )
@@ -261,7 +261,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
+                callback_data=f"select_image|{model_name}|{group_number}|regenerate",
             ),
         ],
     )
@@ -269,7 +269,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{setting_number}|prompt_regen",
+                callback_data=f"select_image|{model_name}|{group_number}|prompt_regen",
             ),
         ],
     )

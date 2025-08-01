@@ -127,8 +127,8 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
         return
 
     # Если выбрана другая настройка, то продолжаем генерацию
-    setting_number = call.data.split("|")[1]
-    await state.update_data(setting_number=setting_number)
+    group_number = call.data.split("|")[1]
+    await state.update_data(group_number=group_number)
     prompt_exist = state_data.get("prompt_exist", False)
     generations_type = state_data.get("generations_type", "")
     await state.update_data(specific_model=False)
@@ -139,7 +139,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
             prompt = state_data.get("prompt_for_images", "")
             user_id = call.from_user.id
             is_test_generation = generations_type == "test"
-            setting_number = setting_number
+            group_number = group_number
 
             # Удаляем сообщение с выбором настройки
             await bot.delete_message(user_id, call.message.message_id)
@@ -150,7 +150,7 @@ async def choose_setting(call: types.CallbackQuery, state: FSMContext):
                 state,
                 user_id,
                 is_test_generation,
-                setting_number,
+                group_number,
             )
 
             await state.update_data(prompt_exist=False)
@@ -196,10 +196,10 @@ async def start_write_prompts_for_models_multiline_input(
     state: FSMContext,
 ):
     state_data = await state.get_data()
-    setting_number = state_data.get("setting_number", 1)
+    group_number = state_data.get("group_number", 1)
 
     # Получаем допустимые индексы моделей
-    if setting_number == "all":
+    if group_number == "all":
         # Если выбрано all — берём все модели
         all_data_arrays = getAllDataArrays()
         start_index = 1
@@ -207,7 +207,7 @@ async def start_write_prompts_for_models_multiline_input(
     else:
         # Берём только модели из выбранной настройки
         all_data_arrays = getAllDataArrays()
-        setting_index = int(setting_number) - 1
+        setting_index = int(group_number) - 1
 
         # Считаем смещение как сумму длин всех предыдущих сетов
         offset = sum(len(arr) for arr in all_data_arrays[:setting_index])
@@ -253,7 +253,7 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
     start_index, end_index = valid_range
     user_id = message.from_user.id
     expected_count = end_index - start_index + 1
-    setting_number = state_data.get("setting_number", "1")
+    group_number = state_data.get("group_number", "1")
 
     model_prompts = {}
     prompt_counter = defaultdict(int)
@@ -307,7 +307,7 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
             state=state,
             user_id=user_id,
             is_test_generation=False,
-            setting_number=setting_number,
+            group_number=group_number,
             with_randomizer=False,
         )
     except Exception:
@@ -352,8 +352,8 @@ async def write_prompt(message: types.Message, state: FSMContext):
     await state.set_state(None)
 
     # Если в стейте есть номер настройки, то используем его, иначе получаем номер настройки по названию модели
-    if "setting_number" in state_data:
-        setting_number = state_data.get("setting_number", 1)
+    if "group_number" in state_data:
+        group_number = state_data.get("group_number", 1)
 
         # Генерируем изображения
         await generateImagesInHandler(
@@ -362,7 +362,7 @@ async def write_prompt(message: types.Message, state: FSMContext):
             state,
             user_id,
             is_test_generation,
-            setting_number,
+            group_number,
         )
     else:
         model_indexes = state_data.get("model_indexes_for_generation", [])
@@ -387,7 +387,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         text.SELECT_IMAGE_PROGRESS_TEXT,
     )
 
-    model_name, setting_number, image_index, generation_id_prefix = (
+    model_name, group_number, image_index, generation_id_prefix = (
         call.data.split("|")[1:]
     )
 
@@ -411,7 +411,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 model_name,
                 call,
                 state,
-                setting_number,
+                group_number,
             )
 
         # Если индекс изображения равен "prompt_regen", то перегенерируем изображение с новым промптом
@@ -419,7 +419,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             # Устанавливаем стейт для ввода нового промпта
             await state.update_data(model_name_for_regenerate_image=model_name)
             await state.update_data(
-                setting_number_for_regenerate_image=setting_number,
+                group_number_for_regenerate_image=group_number,
             )
 
             await state.set_state(
@@ -712,7 +712,7 @@ async def write_model_for_generation(
         state=state,
         user_id=message.from_user.id,
         is_test_generation=False,
-        setting_number="individual",
+        group_number="individual",
     )
 
 
@@ -733,7 +733,7 @@ async def write_new_prompt_for_regenerate_image(
     state_data = await state.get_data()
     is_test_generation = state_data.get("generations_type", "") == "test"
     model_name = state_data.get("model_name_for_regenerate_image", "")
-    setting_number = state_data.get("setting_number_for_regenerate_image", 1)
+    group_number = state_data.get("group_number_for_regenerate_image", 1)
     user_id = message.from_user.id
 
     # Удаляем сообщение пользователя
@@ -786,7 +786,7 @@ async def write_new_prompt_for_regenerate_image(
         regenerate_progress_message.message_id,
         state,
         user_id,
-        setting_number,
+        group_number,
         prompt,
         is_test_generation,
         False,

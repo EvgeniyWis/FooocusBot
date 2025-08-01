@@ -29,7 +29,7 @@ async def sendImageBlock(
     state: FSMContext,
     media_group: list,
     model_name: str,
-    setting_number: str,
+    group_number: str,
     is_test_generation: bool,
     user_id: int,
     generation_id: str,
@@ -102,9 +102,9 @@ async def sendImageBlock(
         state_data = await state.get_data()
 
         # Если номер настройки все, то получаем номер настройки из стейта
-        if setting_number == "all":
-            setting_number = state_data.get(
-                "current_setting_number_for_unique_prompt",
+        if group_number == "all":
+            group_number = state_data.get(
+                "current_group_number_for_unique_prompt",
                 1,
             )
 
@@ -122,7 +122,7 @@ async def sendImageBlock(
                 reply_markup = (
                     start_generation_keyboards.selectMultiImageKeyboard(
                         model_name,
-                        setting_number,
+                        group_number,
                         MULTI_IMAGE_NUMBER,
                         selected_indexes,
                         generation_id,
@@ -150,7 +150,7 @@ async def sendImageBlock(
             else:
                 reply_markup = start_generation_keyboards.selectImageKeyboard(
                     model_name,
-                    setting_number,
+                    group_number,
                     model_data["json"]["input"]["image_number"],
                     generation_id,
                 )
@@ -161,13 +161,13 @@ async def sendImageBlock(
                         model_name_index,
                     )
                     if not is_test_generation
-                    else text.SELECT_TEST_IMAGE_TEXT.format(setting_number),
+                    else text.SELECT_TEST_IMAGE_TEXT.format(group_number),
                     reply_markup=reply_markup
                     if not is_test_generation
                     else start_generation_keyboards.testGenerationImagesKeyboard(
-                        setting_number,
+                        group_number,
                     )
-                    if state_data.get("setting_number", 1) != "all"
+                    if state_data.get("group_number", 1) != "all"
                     else None,
                 )
             logger.info(

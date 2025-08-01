@@ -100,7 +100,7 @@ async def process_upscale_image(
     base_model = data["json"]["input"]["base_model_name"]
 
     # Получаем номер настройки
-    setting_number = getSettingNumberByModelName(model_name)
+    group_number = getSettingNumberByModelName(model_name)
 
     # Делаем upscale изображения
     if is_second:
@@ -115,7 +115,7 @@ async def process_upscale_image(
         await upscale_image(
             image_base64,
             base_model,
-            setting_number,
+            group_number,
             state,
             user_id,
             model_name,
