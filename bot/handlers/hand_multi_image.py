@@ -64,6 +64,7 @@ async def select_multi_image(
         selectMultiImageKeyboard,
     )
 
+    await call.answer()
     kb = selectMultiImageKeyboard(
         model_name,
         setting_number,
@@ -72,10 +73,12 @@ async def select_multi_image(
         generation_id,
     )
     await call.message.edit_reply_markup(reply_markup=kb)
-    await call.answer()
 
 
 async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
+    # Быстро отвечаем на callback query чтобы избежать timeout
+    await call.answer()
+
     state_data = await state.get_data()
     _, model_name, setting_number, generation_id = call.data.split("|")
 
