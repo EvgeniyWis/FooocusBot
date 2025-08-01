@@ -4,8 +4,8 @@ from bot.helpers.generateImages.dataArray.getSettingNumberByModelName import (
 from bot.helpers.generateImages.dataArray.getModelNameIndex import (
     getModelNameIndex,
 )
-from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
-    getDataArrayBySettingNumber,
+from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
+    get_data_array_by_group_number,
 )
 from bot.helpers.generateImages.dataArray.getDataByModelName import (
     getDataByModelName,
