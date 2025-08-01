@@ -4,7 +4,7 @@ from bot.helpers.generateImages.dataArray.settings.extra_setting.generate_data i
 
 
 # Функция для генерации массива данных для запроса для экстра-настройки
-def extra_setting_get_data_array():
+def extra_group_get_data_array():
     # Массив дат с нужными параметрами для запроса
     data_array = [
         extra_setting_generate_data(
