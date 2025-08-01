@@ -17,8 +17,8 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 )
 
 
-# Функция для генерации изображений по всем настройкам
-async def generateImagesByAllSettings(
+# Функция для генерации изображений по всем группам
+async def generate_images_by_all_groups(
     message: types.Message,
     state: FSMContext,
     user_id: int,
@@ -26,25 +26,39 @@ async def generateImagesByAllSettings(
     variable_prompt: str,
     with_randomizer: bool = False,
 ):
+    """
+    Генерирует изображения по всем группам
+
+    Args:
+        message: types.Message - сообщение с прогрессом генерации
+        state: FSMContext - контекст состояния
+        user_id: int - id пользователя
+        is_test_generation: bool - флаг тестовой генерации
+        variable_prompt: str - переменный промпт
+        with_randomizer: bool - флаг использования рандомайзера
+
+    Returns:
+        bool - флаг успешности генерации
+    """
     from bot.helpers.generateImages.generateImageBlock import (
         generateImageBlock,
     )
 
-    # Получаем все настройки
+    # Получаем все группы
     dataArrays = getAllDataArrays()
-    settings_numbers_success = []
+    groups_numbers_success = []
     semaphore = asyncio.Semaphore(5)
 
     # Добавляем рандомные значения к промпу
     if with_randomizer:
         dataArrays = [
-            await getDataArrayByRandomizer(state, i + 1 if i + 1 != 5 else "extra")
+            await getDataArrayByRandomizer(state, i + 1 if i + 1 != len(dataArrays) else "extra")
             for i in range(len(dataArrays))
         ]
 
     # Создаём сообщение с прогрессом генерации настроек
-    message_with_settings = await safe_send_message(
-        text=text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT.format(
+    message_with_groups = await safe_send_message(
+        text=text.TEST_GENERATION_WITH_ALL_GROUPS_PROGRESS_TEXT.format(
             "❌",
             "❌",
             "❌",
@@ -53,7 +67,7 @@ async def generateImagesByAllSettings(
         message=message,
     )
 
-    await message_with_settings.pin()
+    await message_with_groups.pin()
 
     # Создаём сообщение с прогрессом генерации изображений
     message_with_generations_status = await safe_send_message(
@@ -106,24 +120,24 @@ async def generateImagesByAllSettings(
                     tasks.append(task)
 
             await asyncio.gather(*tasks)
-            settings_numbers_success.append(index)
+            groups_numbers_success.append(index)
 
-            await message_with_settings.edit_text(
-                text.TEST_GENERATION_WITH_ALL_SETTINGS_PROGRESS_TEXT.format(
-                    "✅" if 0 in settings_numbers_success else "❌",
-                    "✅" if 1 in settings_numbers_success else "❌",
-                    "✅" if 2 in settings_numbers_success else "❌",
-                    "✅" if 3 in settings_numbers_success else "❌",
+            await message_with_groups.edit_text(
+                text.TEST_GENERATION_WITH_ALL_GROUPS_PROGRESS_TEXT.format(
+                    "✅" if 0 in groups_numbers_success else "❌",
+                    "✅" if 1 in groups_numbers_success else "❌",
+                    "✅" if 2 in groups_numbers_success else "❌",
+                    "✅" if 3 in groups_numbers_success else "❌",
                 ),
             )
 
-        await message_with_settings.unpin()
+        await message_with_groups.unpin()
         await message_with_generations_status.unpin()
         return True
     except Exception as e:
-        await message_with_settings.unpin()
+        await message_with_groups.unpin()
         await message_with_generations_status.unpin()
         traceback.print_exc()
         raise Exception(
-            f"Произошла ошибка при генерации изображений по всем настройкам: {e}",
+            f"Произошла ошибка при генерации изображений по всем группам: {e}",
         )

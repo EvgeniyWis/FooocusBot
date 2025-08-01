@@ -3,7 +3,7 @@ import copy
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from bot.helpers.generateImages.dataArray import getSettingNumberByModelName
+from bot.helpers.generateImages.dataArray import get_group_number_by_model_name
 from bot.helpers.jobs.get_job_ID import get_job_ID
 
 
@@ -37,8 +37,8 @@ async def generateImageBlock(
     # Получаем имя модели
     model_name = data["model_name"]
 
-    # Получаем номер настройки по имени модели
-    group_number = getSettingNumberByModelName(model_name)
+    # Получаем номер группы по имени модели
+    group_number = get_group_number_by_model_name(model_name)
 
     # Логируем наш json
     logger.info(

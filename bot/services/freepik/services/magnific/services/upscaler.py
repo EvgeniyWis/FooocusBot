@@ -36,7 +36,7 @@ class UpscalerService(BaseService, UpscalerProtocol, ValidationMixin):
 
         Args:
             image (str): Base64-encoded изображение.
-            Настройки upscale:
+            группы upscale:
             optimized_for (str): Оптимизация для.
             creativity (int): Креативность.
             hdr (int): HDR.

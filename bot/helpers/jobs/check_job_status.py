@@ -28,7 +28,7 @@ async def check_job_status(
 
     Args:
         job_id (str): ID работы
-        group_number (int): Номер настройки
+        group_number (int): Номер группы
         user_id (int): ID пользователя
         message_id (int): ID сообщения
         state (FSMContext): Контекст состояния

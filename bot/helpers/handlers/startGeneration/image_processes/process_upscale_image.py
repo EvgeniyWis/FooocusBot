@@ -9,7 +9,7 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
     getModelNameIndex,
-    getSettingNumberByModelName,
+    get_group_number_by_model_name,
 )
 from bot.helpers.generateImages.upscale import (
     second_upscale_image,
@@ -99,8 +99,8 @@ async def process_upscale_image(
     # Получаем базовую модель
     base_model = data["json"]["input"]["base_model_name"]
 
-    # Получаем номер настройки
-    group_number = getSettingNumberByModelName(model_name)
+    # Получаем номер группы
+    group_number = get_group_number_by_model_name(model_name)
 
     # Делаем upscale изображения
     if is_second:

@@ -31,7 +31,7 @@ async def process_image_block(
     Attributes:
         job_id (str): id работы
         model_name (str): название модели
-        group_number (int): номер настройки
+        group_number (int): номер группы
         user_id (int): id пользователя
         state (FSMContext): контекст состояния
         message (types.Message): сообщение
