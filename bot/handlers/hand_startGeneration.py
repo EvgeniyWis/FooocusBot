@@ -12,10 +12,15 @@ from utils.handlers.messages import safe_edit_message
 from bot.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
+    get_all_model_indexes,
+    get_group_model_indexes,
+    get_model_index_by_model_name,
+    get_model_name_by_index,
     getAllDataArrays,
     getDataByModelName,
-    get_model_name_by_index,
-    get_model_index_by_model_name,
+)
+from bot.helpers.generateImages.dataArray.check_model_index_is_exist import (
+    check_model_index_is_exist,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.helpers.handlers.messages import deleteMessageFromState
@@ -47,6 +52,8 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
 PROMPT_BY_INDEX_PATTERN = re.compile(
     r"(?s)(\d+)\s*[:\-–—]\s*(.*?)(?=(?:\n\d+\s*[:\-–—])|\Z)",
 )
+
+all_model_indexes = get_all_model_indexes()
 
 
 # Обработка выбора количества генераций
@@ -226,8 +233,10 @@ async def start_write_prompts_for_models_multiline_input(
         prompt_chunks=[],
     )
 
+    group_model_indexes = get_group_model_indexes(group_number)
+
     await safe_send_message(
-        text.WRITE_PROMPTS_FOR_MODELS_TEXT.format(start_index, end_index),
+        text.WRITE_PROMPTS_FOR_MODELS_TEXT.format(group_model_indexes),
         message=callback.message,
         reply_markup=done_typing_keyboard(),
     )
@@ -262,9 +271,9 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
     for index_str, prompt in matches:
         index_base = int(index_str.split("+")[0])
 
-        if not (start_index <= index_base <= end_index):
+        if not check_model_index_is_exist(index_base):
             await safe_send_message(
-                text.MODEL_NOT_FOUND_TEXT.format(index_base),
+                text.MODEL_NOT_FOUND_TEXT.format(index_base, all_model_indexes),
                 message,
             )
             return
@@ -617,13 +626,10 @@ async def write_models_for_specific_generation(
     raw_model_indexes = [x.strip() for x in message_text.split(",")]
     model_indexes = make_unique_model_keys(raw_model_indexes)
 
-    all_data_arrays = getAllDataArrays()
-    all_data_arrays_length = sum(len(arr) for arr in all_data_arrays)
-
     for model_index in model_indexes:
-        if int(model_index) > all_data_arrays_length or int(model_index) < 1:
+        if not check_model_index_is_exist(int(model_index)):
             await safe_send_message(
-                text=text.MODEL_NOT_FOUND_TEXT.format(model_index),
+                text=text.MODEL_NOT_FOUND_TEXT.format(model_index, all_model_indexes),
                 message=message,
             )
             return
@@ -678,9 +684,9 @@ async def write_model_for_generation(
     for index, prompt in matches:
         if not index.isdigit():
             continue
-        if not (1 <= int(index) <= 100):
+        if not check_model_index_is_exist(int(index)):
             await safe_send_message(
-                text=text.MODEL_NOT_FOUND_TEXT.format(index),
+                text=text.MODEL_NOT_FOUND_TEXT.format(index, all_model_indexes),
                 message=message,
             )
             return

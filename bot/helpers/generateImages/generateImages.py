@@ -9,11 +9,11 @@ from logger import logger
 from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
     get_data_array_by_group_number,
 )
+from bot.helpers.generateImages.dataArray.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
+)
 from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
-)
-from bot.helpers.generateImages.get_data_array_by_model_indexes import (
-    get_data_array_by_model_indexes,
 )
 
 

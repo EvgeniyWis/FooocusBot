@@ -350,8 +350,11 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
         last_chat_id=message.chat.id,
         last_message_id=message.message_id,
     )
-    await safe_send_message(text.MESSAGE_IS_SUCCESFULLY_DONE, message, 
-    reply_markup=done_typing_keyboard_for_prompts(),)
+    await safe_send_message(
+        text.MESSAGE_IS_SUCCESFULLY_DONE,
+        message,
+        reply_markup=done_typing_keyboard_for_prompts(),
+    )
 
 
 async def finish_prompt_input(

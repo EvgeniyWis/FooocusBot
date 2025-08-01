@@ -28,3 +28,12 @@ from bot.helpers.generateImages.dataArray.get_setting_number_by_model_name impor
 from bot.helpers.generateImages.dataArray.get_group_number_by_model_name import (
     get_group_number_by_model_name,
 )
+from bot.helpers.generateImages.dataArray.check_model_index_is_exist import (
+    check_model_index_is_exist,
+)
+from bot.helpers.generateImages.dataArray.get_all_model_indexes import (
+    get_all_model_indexes,
+)
+from bot.helpers.generateImages.dataArray.get_group_model_indexes import (
+    get_group_model_indexes
+)

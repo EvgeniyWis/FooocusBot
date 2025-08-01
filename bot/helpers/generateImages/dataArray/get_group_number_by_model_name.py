@@ -15,15 +15,15 @@ def get_group_number_by_model_name(model_name: str):
         int | str | None - номер группы или None, если модель не найдена
     """
     # Получаем все группы
-    all_groups = getAllDataArrays()
+    all_data_arrays = getAllDataArrays()
 
     # Ищем, в какой группе находится модель с таким названием
-    for index, group in enumerate(all_groups):
-        for dataArray in group:
-            if dataArray["model_name"] == model_name:
+    for index, dataArray in enumerate(all_data_arrays):
+        for data in dataArray:
+            if data["model_name"] == model_name:
                 result = index + 1
 
-                if result == len(all_groups):
+                if result == len(all_data_arrays):
                     return "extra"
                 else:
                     return result
