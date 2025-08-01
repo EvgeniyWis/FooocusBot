@@ -92,7 +92,7 @@ async def generateImagesInHandler(
                         message_for_edit.message_id,
                         state,
                         user_id,
-                        group_number,
+                        data["model_name"],
                         prompt if isinstance(prompt, str) else "",  # fallback
                         is_test_generation,
                         chat_id=message.chat.id,

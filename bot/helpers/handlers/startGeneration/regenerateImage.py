@@ -97,7 +97,7 @@ async def regenerateImage(
             call.message.message_id,
             state,
             user_id,
-            group_number,
+            model_name,
             prompt,
             is_test_generation,
             False,

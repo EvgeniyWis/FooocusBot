@@ -733,7 +733,6 @@ async def write_new_prompt_for_regenerate_image(
     state_data = await state.get_data()
     is_test_generation = state_data.get("generations_type", "") == "test"
     model_name = state_data.get("model_name_for_regenerate_image", "")
-    group_number = state_data.get("group_number_for_regenerate_image", 1)
     user_id = message.from_user.id
 
     # Удаляем сообщение пользователя
@@ -786,7 +785,7 @@ async def write_new_prompt_for_regenerate_image(
         regenerate_progress_message.message_id,
         state,
         user_id,
-        group_number,
+        model_name,
         prompt,
         is_test_generation,
         False,

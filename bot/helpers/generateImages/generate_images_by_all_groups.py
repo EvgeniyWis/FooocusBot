@@ -88,7 +88,7 @@ async def generate_images_by_all_groups(
                 message_with_generations_status.message_id,
                 state,
                 user_id,
-                index + 1,
+                model_name,
                 prompt,
                 is_test_generation,
                 chat_id=message.chat.id,

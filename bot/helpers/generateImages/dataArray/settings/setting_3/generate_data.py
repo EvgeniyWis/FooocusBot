@@ -22,6 +22,7 @@ def setting3_generate_data(
     data = generate_data(
         model_name,
         model_index,
+        3,
         picture_folder_id,
         video_folder_id,
         nsfw_video_folder_id,

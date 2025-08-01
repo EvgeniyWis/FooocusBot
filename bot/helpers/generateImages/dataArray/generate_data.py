@@ -5,6 +5,7 @@ from bot.settings import settings
 def generate_data(
     model_name: str,
     model_index: int,
+    setting_number: int | str,
     picture_folder_id: str,
     video_folder_id: str,
     nsfw_video_folder_id: str,
@@ -15,7 +16,28 @@ def generate_data(
     negative_prompt: str = settings.COMMON_NEGATIVE_PROMPT,
     embeddings: list[str] | None = None,
     guidance_scale: float = 3.5,
-):
+) -> dict:
+    """
+    Генерирует данные для запроса
+
+    Args:
+        model_name: str - название модели
+        model_index: int - индекс модели
+        setting_number: int | str - номер настройки
+        picture_folder_id: str - id папки с изображениями
+        video_folder_id: str - id папки с видео
+        nsfw_video_folder_id: str - id папки с NSFW видео
+        prompt: str - промпт
+        loras: list[dict] - лоры
+        base_config_model_name: str - название базовой модели
+        image_number: int - количество изображений
+        negative_prompt: str - отрицательный промпт
+        embeddings: list[str] | None - эмбеддинги
+        guidance_scale: float - параметр guidance scale
+
+    Returns:
+        dict - данные для запроса
+    """
     if embeddings is None:
         embeddings = []
     data = {
@@ -42,5 +64,6 @@ def generate_data(
         "picture_folder_id": picture_folder_id,
         "video_folder_id": video_folder_id,
         "nsfw_video_folder_id": nsfw_video_folder_id,
+        "setting_number": setting_number,
     }
     return data

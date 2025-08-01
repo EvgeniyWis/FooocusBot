@@ -2,6 +2,10 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.domain.entities.task import TaskImageBlockDTO
+from bot.helpers.generateImages.dataArray import (
+    get_group_number_by_model_name,
+    get_setting_number_by_model_name,
+)
 from bot.helpers.generateImages.getReferenceImage import getReferenceImage
 from bot.helpers.jobs.check_job_status import (
     check_job_status,
@@ -17,8 +21,6 @@ from bot.utils.images.base64_to_image import base64_to_image
 async def process_image_block(
     job_id: str,
     model_name: str,
-    setting_number: int | str,
-    group_number: int | str,
     user_id: int,
     state: FSMContext,
     message_id: int,
@@ -32,8 +34,6 @@ async def process_image_block(
     Attributes:
         job_id (str): id работы
         model_name (str): название модели
-        group_number (int): номер группы
-        setting_number (int): номер настройки
         user_id (int): id пользователя
         state (FSMContext): контекст состояния
         message (types.Message): сообщение
@@ -41,6 +41,12 @@ async def process_image_block(
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
         chat_id (int): id чата
     """
+
+    # Получаем номер настройки по имени модели
+    setting_number = get_setting_number_by_model_name(model_name)
+
+    # Получаем номер группы по имени модели
+    group_number = get_group_number_by_model_name(model_name)
 
     if not settings.MOCK_IMAGES_MODE:
         redis_storage = get_redis_storage()
@@ -66,6 +72,7 @@ async def process_image_block(
             2,
             job_id,
             setting_number,
+            group_number,
             user_id,
             message_id,
             state,

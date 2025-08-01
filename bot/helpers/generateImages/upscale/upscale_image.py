@@ -1,5 +1,8 @@
 from aiogram.fsm.context import FSMContext
 
+from bot.helpers.generateImages.dataArray import (
+    get_setting_number_by_model_name,
+)
 from bot.helpers.generateImages.upscale.check_upscale_status import (
     check_upscale_status,
 )
@@ -12,7 +15,6 @@ from bot.utils.handlers import appendDataToStateArray
 async def upscale_image(
     input_image: str,
     base_config_model_name: str,
-    setting_number: int | str,
     state: FSMContext,
     user_id: int,
     model_name: str,
@@ -25,7 +27,6 @@ async def upscale_image(
     Attributes:
         input_image (str): сгенерированное входное изображение
         base_config_model_name (str): базовая модель нейросети, на которой будет сделан upscale
-        setting_number (int): номер настройки
         state (FSMContext): контекст состояния
         user_id (int): id пользователя
         model_name (str): название модели
@@ -54,6 +55,9 @@ async def upscale_image(
         },
     }
 
+    # Получаем номер настройки по имени модели
+    setting_number = get_setting_number_by_model_name(model_name)
+
     # Делаем запрос на генерацию и получаем id работы
     job_id = await get_job_ID(
         dataJSON,
@@ -67,7 +71,6 @@ async def upscale_image(
     try:
         result = await check_upscale_status(
             job_id,
-            setting_number,
             state,
             model_name,
             image_index,
