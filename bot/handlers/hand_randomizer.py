@@ -62,9 +62,9 @@ async def handle_randomizer_buttons(
                 [],
             )
             if len(model_indexes_for_generation) == 0:
-                setting_number = state_data.get("setting_number", 1)
+                group_number = state_data.get("group_number", 1)
             else:
-                setting_number = "individual"
+                group_number = "individual"
 
             generations_type = state_data.get("generations_type", "")
             is_test_generation = generations_type == "test"
@@ -75,7 +75,7 @@ async def handle_randomizer_buttons(
                 state,
                 user_id,
                 is_test_generation,
-                setting_number,
+                group_number,
                 True,
             )
 

@@ -18,7 +18,7 @@ async def select_multi_image(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
-    _, model_name, setting_number, image_index = call.data.split("|")
+    _, model_name, group_number, image_index = call.data.split("|")
     image_index = int(image_index)
     message_id = call.message.message_id
     state_data = await state.get_data()
@@ -67,7 +67,7 @@ async def select_multi_image(
     await call.answer()
     kb = selectMultiImageKeyboard(
         model_name,
-        setting_number,
+        group_number,
         MULTI_IMAGE_NUMBER,
         selected_indexes,
         generation_id,
@@ -80,7 +80,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     await call.answer()
 
     state_data = await state.get_data()
-    _, model_name, setting_number, generation_id = call.data.split("|")
+    _, model_name, group_number, generation_id = call.data.split("|")
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):

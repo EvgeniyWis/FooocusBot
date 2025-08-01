@@ -15,7 +15,7 @@ from bot.helpers.generateImages.get_data_array_by_model_indexes import (
 # Функция для применения переменных рандомайзера к промптам массива данных
 async def getDataArrayByRandomizer(
     state: FSMContext,
-    setting_number: int | str,
+    group_number: int | str,
     model_indexes_for_generation: list[int] = None,
 ):
     # Получаем массив данных
@@ -29,12 +29,12 @@ async def getDataArrayByRandomizer(
 
     # Получаем массив данных
     if not model_indexes_for_generation:
-        dataArray = get_data_array_by_group_number(setting_number)
+        dataArray = get_data_array_by_group_number(group_number)
     else:
         dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
 
     logger.info(
-        f"Массив данных до применения переменных рандомайзера: {dataArray} для настройки {setting_number}",
+        f"Массив данных до применения переменных рандомайзера: {dataArray} для настройки {group_number}",
     )
 
     generators = {}

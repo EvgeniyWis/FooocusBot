@@ -2,13 +2,13 @@ from bot.settings import settings
 
 
 # Получение ID эндпоинта для генерации изображений с помощью номера настройки
-async def get_endpoint_ID(setting_number: str | int):
+async def get_endpoint_ID(group_number: str | int):
     # Если передана строка, преобразуем её в число
-    if isinstance(setting_number, str):
-        if setting_number.isdigit():
-            setting_number = int(setting_number)
+    if isinstance(group_number, str):
+        if group_number.isdigit():
+            group_number = int(group_number)
 
-    match setting_number:
+    match group_number:
         case 1:
             return settings.SETTING_1_ENDPOINT_ID
         case 2:
@@ -20,4 +20,4 @@ async def get_endpoint_ID(setting_number: str | int):
         case "extra":
             return settings.EXTRA_SETTING_ENDPOINT_ID
         case _:
-            raise Exception(f"Неверный номер настройки: {setting_number}")
+            raise Exception(f"Неверный номер настройки: {group_number}")

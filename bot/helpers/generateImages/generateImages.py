@@ -18,7 +18,7 @@ from bot.helpers.generateImages.get_data_array_by_model_indexes import (
 
 
 async def generateImages(
-    setting_number: int | str,
+    group_number: int | str,
     prompt_for_current_model: dict[str, Any],
     message: types.Message,
     state: FSMContext,
@@ -43,16 +43,16 @@ async def generateImages(
                 base_model_indexes,
             )
         else:
-            dataArrayBase = get_data_array_by_group_number(setting_number)
+            dataArrayBase = get_data_array_by_group_number(group_number)
     else:
         dataArrayBase = await getDataArrayByRandomizer(
             state,
-            setting_number,
+            group_number,
             base_model_indexes,
         )
 
     logger.info(
-        f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(model_indexes_for_generation)}. Переменный промпт: {prompt_for_current_model}",
+        f"Генерация изображений с помощью API для настройки {group_number}. Длина массива: {len(model_indexes_for_generation)}. Переменный промпт: {prompt_for_current_model}",
     )
 
     await state.update_data(
@@ -85,7 +85,7 @@ async def generateImages(
                 message.message_id,
                 state,
                 user_id,
-                setting_number,
+                group_number,
                 prompt_for_model,
                 is_test_generation,
                 chat_id=message.chat.id,

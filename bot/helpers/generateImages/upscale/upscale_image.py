@@ -12,7 +12,7 @@ from bot.utils.handlers import appendDataToStateArray
 async def upscale_image(
     input_image: str,
     base_config_model_name: str,
-    setting_number: int | str,
+    group_number: int | str,
     state: FSMContext,
     user_id: int,
     model_name: str,
@@ -25,7 +25,7 @@ async def upscale_image(
     Attributes:
         input_image (str): сгенерированное входное изображение
         base_config_model_name (str): базовая модель нейросети, на которой будет сделан upscale
-        setting_number (int): номер настройки
+        group_number (int): номер настройки
         state (FSMContext): контекст состояния
         user_id (int): id пользователя
         model_name (str): название модели
@@ -57,7 +57,7 @@ async def upscale_image(
     # Делаем запрос на генерацию и получаем id работы
     job_id = await get_job_ID(
         dataJSON,
-        setting_number,
+        group_number,
         state,
         user_id,
         "upscale",
@@ -67,7 +67,7 @@ async def upscale_image(
     try:
         result = await check_upscale_status(
             job_id,
-            setting_number,
+            group_number,
             state,
             model_name,
             image_index,

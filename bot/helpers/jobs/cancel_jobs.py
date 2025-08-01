@@ -17,11 +17,11 @@ async def cancel_jobs(jobs_ids: list[dict]):
 
         try:
             # Получаем id работы и номер настройки
-            setting_number = job_dict["setting_number"]
+            group_number = job_dict["group_number"]
             job_id = job_dict["job_id"]
 
             # Получаем ID эндпоинта для генерации изображений
-            ENDPOINT_ID = await get_endpoint_ID(setting_number)
+            ENDPOINT_ID = await get_endpoint_ID(group_number)
 
             # Формируем URL для отправки запроса
             url = f"{settings.RUNPOD_HOST}/{ENDPOINT_ID}/cancel/{job_id}"
