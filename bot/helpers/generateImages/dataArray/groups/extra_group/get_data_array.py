@@ -1,4 +1,4 @@
-from bot.helpers.generateImages.dataArray.extra_setting.generate_data import (
+from bot.helpers.generateImages.dataArray.settings.extra_setting.generate_data import (
     extra_setting_generate_data,
 )
 
