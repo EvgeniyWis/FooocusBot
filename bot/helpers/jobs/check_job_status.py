@@ -16,6 +16,7 @@ from bot.utils.get_api_headers import get_runpod_headers
 async def check_job_status(
     job_id: str,
     setting_number: int | str,
+    group_number: int | str,
     user_id: int,
     message_id: int,
     state: FSMContext = None,
@@ -139,7 +140,7 @@ async def check_job_status(
         raise ValueError("Runpod не смог сгенерировать выходные данные!")
 
     # Обновляем сообщение для актуальных данных
-    if state and setting_number != "individual" and checkOtherJobs:
+    if state and group_number != "individual" and checkOtherJobs:
         await edit_job_message(
             job_id,
             message_id,

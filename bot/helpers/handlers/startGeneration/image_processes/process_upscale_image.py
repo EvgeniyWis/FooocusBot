@@ -7,9 +7,8 @@ from PIL import Image
 from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getDataByModelName,
     get_model_index_by_model_name,
-    get_group_number_by_model_name,
+    getDataByModelName,
 )
 from bot.helpers.generateImages.upscale import (
     second_upscale_image,
@@ -99,9 +98,6 @@ async def process_upscale_image(
     # Получаем базовую модель
     base_model = data["json"]["input"]["base_model_name"]
 
-    # Получаем номер группы
-    group_number = get_group_number_by_model_name(model_name)
-
     # Делаем upscale изображения
     if is_second:
         await second_upscale_image(
@@ -115,7 +111,6 @@ async def process_upscale_image(
         await upscale_image(
             image_base64,
             base_model,
-            group_number,
             state,
             user_id,
             model_name,

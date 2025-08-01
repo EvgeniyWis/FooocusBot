@@ -85,7 +85,7 @@ async def generateImages(
                 message.message_id,
                 state,
                 user_id,
-                group_number,
+                data["model_name"],
                 prompt_for_model,
                 is_test_generation,
                 chat_id=message.chat.id,
