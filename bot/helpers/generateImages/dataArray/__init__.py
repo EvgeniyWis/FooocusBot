@@ -1,8 +1,8 @@
 from bot.helpers.generateImages.dataArray.get_group_number_by_model_name import (
     get_group_number_by_model_name,
 )
-from bot.helpers.generateImages.dataArray.getModelNameIndex import (
-    getModelNameIndex,
+from bot.helpers.generateImages.dataArray.get_model_index_by_model_name import (
+    get_model_index_by_model_name,
 )
 from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
     get_data_array_by_group_number,
@@ -19,6 +19,6 @@ from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
 )
 from bot.helpers.generateImages.dataArray.getNextModel import getNextModel
-from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
-    getModelNameByIndex,
+from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
+    get_model_name_by_index,
 )

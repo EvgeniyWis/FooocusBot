@@ -10,7 +10,7 @@ from bot.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
-    getModelNameIndex,
+    get_model_index_by_model_name,
 )
 from bot.InstanceBot import bot
 from bot.keyboards import start_generation_keyboards
@@ -109,7 +109,7 @@ async def sendImageBlock(
             )
 
         # Получаем индекс модели
-        model_name_index = getModelNameIndex(model_name)
+        model_name_index = get_model_index_by_model_name(model_name)
 
         # Получаем данные модели
         model_data = await getDataByModelName(model_name)

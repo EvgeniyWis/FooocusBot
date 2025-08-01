@@ -4,6 +4,7 @@ from bot.settings import settings
 # Глобальная функция для генерации данных для запроса
 def generate_data(
     model_name: str,
+    model_index: int,
     picture_folder_id: str,
     video_folder_id: str,
     nsfw_video_folder_id: str,
@@ -37,6 +38,7 @@ def generate_data(
             },
         },
         "model_name": model_name,
+        "model_index": model_index,
         "picture_folder_id": picture_folder_id,
         "video_folder_id": video_folder_id,
         "nsfw_video_folder_id": nsfw_video_folder_id,

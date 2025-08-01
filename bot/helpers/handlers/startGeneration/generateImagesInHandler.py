@@ -8,7 +8,7 @@ from utils.handlers.messages import safe_edit_message
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_data_array_by_group_number,
-    getModelNameIndex,
+    get_model_index_by_model_name,
 )
 from bot.helpers.generateImages.generate_images_by_all_groups import (
     generate_images_by_all_groups,
@@ -137,7 +137,7 @@ async def generateImagesInHandler(
                         )
 
                     for data in dataArray:
-                        model_index = getModelNameIndex(data["model_name"])
+                        model_index = get_model_index_by_model_name(data["model_name"])
                         prompt_for_current_model[str(model_index)] = prompt
 
                     result = await generateImages(

@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
-    getModelNameIndex,
+    get_model_index_by_model_name,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.logger import logger
@@ -23,7 +23,7 @@ async def regenerateImage(
     is_test_generation = state_data.get("generations_type", "") == "test"
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     # Получаем id пользователя
     user_id = call.from_user.id

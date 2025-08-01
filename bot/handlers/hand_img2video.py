@@ -9,8 +9,8 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )
-from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
-    getModelNameByIndex,
+from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
+    get_model_name_by_index,
 )
 from bot.helpers.handlers.img2video import process_video
 from bot.InstanceBot import bot, img2video_router
@@ -247,7 +247,7 @@ async def handle_model_index_for_video_generation_from_image(
     # Обновляем стейт
     img2video_temp_paths_for_with_model_names = {}
     for image_index, model_index in model_indexes:
-        img2video_temp_paths_for_with_model_names[getModelNameByIndex(model_index)] = \
+        img2video_temp_paths_for_with_model_names[get_model_name_by_index(model_index)] = \
             temp_paths_for_video_generation[image_index - 1]
 
     await state.update_data(img2video_temp_paths_for_with_model_names=img2video_temp_paths_for_with_model_names)

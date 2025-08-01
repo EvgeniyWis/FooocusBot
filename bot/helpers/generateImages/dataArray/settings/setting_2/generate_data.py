@@ -7,6 +7,7 @@ from bot.helpers.generateImages.dataArray.settings.setting_2.generate_loras impo
 # Функция для генерации данных для запроса группы 2
 def setting2_generate_data(
     model_name: str,
+    model_index: int,
     picture_folder_id: str,
     video_folder_id: str,
     nsfw_video_folder_id: str,
@@ -18,6 +19,7 @@ def setting2_generate_data(
     base_config_model_name = "CyberIllustrious_CyberRealistic.safetensors"
     data = generate_data(
         model_name,
+        model_index,
         picture_folder_id,
         video_folder_id,
         nsfw_video_folder_id,

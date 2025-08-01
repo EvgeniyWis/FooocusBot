@@ -8,6 +8,7 @@ from bot.settings import settings
 # Функция для генерации данных для запроса группы 1
 def setting1_generate_data(
     model_name: str,
+    model_index: int,
     picture_folder_id: str,
     video_folder_id: str,
     nsfw_video_folder_id: str,
@@ -20,6 +21,7 @@ def setting1_generate_data(
     base_config_model_name = "CyberRealistic_Pony.safetensors"
     data = generate_data(
         model_name,
+        model_index,
         picture_folder_id,
         video_folder_id,
         nsfw_video_folder_id,
