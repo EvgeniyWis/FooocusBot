@@ -1,12 +1,12 @@
 from bot.helpers.generateImages.dataArray.generate_data import generate_data
-from bot.helpers.generateImages.dataArray.setting_3.generate_loras import (
-    setting3_generate_loras,
+from bot.helpers.generateImages.dataArray.settings.setting_4.generate_loras import (
+    setting4_generate_loras,
 )
 from bot.settings import settings
 
 
-# Функция для генерации данных для запроса настройки 3
-def setting3_generate_data(
+# Функция для генерации данных для запроса настройки 4
+def setting4_generate_data(
     model_name: str,
     picture_folder_id: str,
     video_folder_id: str,
@@ -16,7 +16,7 @@ def setting3_generate_data(
     image_number: int = 4,
     negative_prompt: str = settings.COMMON_NEGATIVE_PROMPT,
 ):
-    loras = setting3_generate_loras(loras_weights)
+    loras = setting4_generate_loras(loras_weights)
     base_config_model_name = "CyberIllustrious_CyberRealistic.safetensors"
     data = generate_data(
         model_name,
