@@ -15,7 +15,7 @@ from bot.utils.get_api_headers import get_runpod_headers
 
 async def check_job_status(
     job_id: str,
-    group_number: int | str,
+    setting_number: int | str,
     user_id: int,
     message_id: int,
     state: FSMContext = None,
@@ -28,7 +28,7 @@ async def check_job_status(
 
     Args:
         job_id (str): ID работы
-        group_number (int): Номер группы
+        setting_number (int): Номер настройки
         user_id (int): ID пользователя
         message_id (int): ID сообщения
         state (FSMContext): Контекст состояния
@@ -51,7 +51,7 @@ async def check_job_status(
 
             try:
                 # Получаем ID эндпоинта для генерации изображений
-                ENDPOINT_ID = await get_endpoint_ID(group_number)
+                ENDPOINT_ID = await get_endpoint_ID(setting_number)
 
                 # Формируем URL для отправки запроса
                 url = f"{settings.RUNPOD_HOST}/{ENDPOINT_ID}/status/{job_id}"
@@ -139,7 +139,7 @@ async def check_job_status(
         raise ValueError("Runpod не смог сгенерировать выходные данные!")
 
     # Обновляем сообщение для актуальных данных
-    if state and group_number != "individual" and checkOtherJobs:
+    if state and setting_number != "individual" and checkOtherJobs:
         await edit_job_message(
             job_id,
             message_id,

@@ -8,7 +8,7 @@ from bot.utils.images.base64_to_image import base64_to_image
 
 async def check_upscale_status(
     job_id: str,
-    group_number: int | str,
+    setting_number: int | str,
     state: FSMContext,
     model_name: str,
     image_index: int,
@@ -20,7 +20,7 @@ async def check_upscale_status(
 
     Attributes:
         job_id (str): id работы
-        group_number (int): номер группы
+        setting_number (int): номер настройки
         state (FSMContext): контекст состояния
         model_name (str): название модели
         image_index (int): индекс изображения
@@ -30,7 +30,7 @@ async def check_upscale_status(
     # Проверяем статус работы
     response_json = await check_job_status(
         job_id,
-        group_number,
+        setting_number,
         user_id,
         message_id,
         state,

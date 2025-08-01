@@ -1,6 +1,9 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.constants import MULTI_IMAGE_NUMBER
+from bot.helpers.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
 from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
@@ -77,8 +80,9 @@ def selectImageKeyboard(
 # Инлайн-клавиатура для выбора группы
 def selectGroupKeyboard(is_test_generation: bool = False):
     inline_keyboard = []
+    dataArrays = getAllDataArrays()
 
-    for i in range(1, 5):
+    for i in range(1, len(dataArrays)):
         inline_keyboard.append(
             [
                 InlineKeyboardButton(
