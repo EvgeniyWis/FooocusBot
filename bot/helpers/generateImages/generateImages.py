@@ -6,14 +6,11 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
+from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
+    get_data_array_by_group_number,
+)
 from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
-)
-from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
-    getDataArrayBySettingNumber,
-)
-from bot.helpers.generateImages.dataArray.getModelNameIndex import (
-    getModelNameIndex,
 )
 from bot.helpers.generateImages.get_data_array_by_model_indexes import (
     get_data_array_by_model_indexes,
@@ -46,7 +43,7 @@ async def generateImages(
                 base_model_indexes,
             )
         else:
-            dataArrayBase = getDataArrayBySettingNumber(setting_number)
+            dataArrayBase = get_data_array_by_group_number(setting_number)
     else:
         dataArrayBase = await getDataArrayByRandomizer(
             state,

@@ -1,12 +1,12 @@
 from aiogram.fsm.context import FSMContext
 
-from bot.logger import logger
+from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
+    get_data_array_by_group_number,
+)
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )
-from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
-    getDataArrayBySettingNumber,
-)
+from bot.logger import logger
 
 
 # Функция для получения следующей модели в настройке
@@ -59,7 +59,7 @@ async def getNextModel(
                 await state.update_data(
                     current_setting_number_for_unique_prompt=next_setting_number,
                 )
-                dataArraysByNextSettingNumber = getDataArrayBySettingNumber(
+                dataArraysByNextSettingNumber = get_data_array_by_group_number(
                     next_setting_number,
                 )
                 return dataArraysByNextSettingNumber[0]["model_name"]
@@ -70,7 +70,7 @@ async def getNextModel(
             )
     else:
         # Получаем данные по номеру настройки
-        dataArrayBySettingNumber = getDataArrayBySettingNumber(
+        dataArrayBySettingNumber = get_data_array_by_group_number(
             int(setting_number),
         )
 

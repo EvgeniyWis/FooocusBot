@@ -7,7 +7,7 @@ from utils.handlers.messages import safe_edit_message
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getDataArrayBySettingNumber,
+    get_data_array_by_group_number,
     getModelNameIndex,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
@@ -84,7 +84,7 @@ async def generateImagesInHandler(
                     message_for_edit,
                     text.GET_PROMPT_SUCCESS_TEXT,
                 )
-                dataArray = getDataArrayBySettingNumber(setting_number)
+                dataArray = get_data_array_by_group_number(setting_number)
                 data = dataArray[0]
                 result = [
                     await generateImageBlock(
@@ -130,7 +130,7 @@ async def generateImagesInHandler(
                     prompt_for_current_model = {}
 
                     if setting_number != "individual":
-                        dataArray = getDataArrayBySettingNumber(setting_number)
+                        dataArray = get_data_array_by_group_number(setting_number)
                     else:
                         dataArray = await get_data_array_by_model_indexes(
                             model_indexes_for_generation,
