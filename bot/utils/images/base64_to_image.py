@@ -5,7 +5,7 @@ import io
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 import bot.constants as constants
 from bot.logger import logger
@@ -14,16 +14,24 @@ executor = ProcessPoolExecutor()
 
 
 def verify_and_reload_image(image_bytes):
-    image = Image.open(io.BytesIO(image_bytes))
-    image.verify()
-    image = Image.open(io.BytesIO(image_bytes))
-    return image
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        image.verify()
+        image = Image.open(io.BytesIO(image_bytes))
+        return image
+    except (OSError, UnidentifiedImageError, ValueError) as e:
+        logger.error(f"[verify_and_reload_image] Ошибка при проверке изображения: {e}")
+        raise ValueError(f"Не удалось проверить изображение: {e}")
 
 
 def save_image_to_file(image_bytes, file_path):
-    img = Image.open(io.BytesIO(image_bytes))
-    img.save(file_path, format="PNG")
-    img.close()
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        img.save(file_path, format="PNG")
+        img.close()
+    except (OSError, UnidentifiedImageError, ValueError) as e:
+        logger.error(f"[save_image_to_file] Ошибка при сохранении изображения {file_path}: {e}")
+        raise ValueError(f"Не удалось сохранить изображение: {e}")
 
 
 async def save_image_to_file_async(image_bytes, file_path):
