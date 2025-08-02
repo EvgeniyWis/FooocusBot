@@ -71,7 +71,7 @@ def first_group_get_data_array():
             "1SfIAd7S_W8RGHBatjWx3NXPpWsskZaGS",
             "18BQ8yxwk9PhZbeQMUNo2-xQjb-kO_La8",
             """photorealistic portrait of an 18-year-old Arabian girl with voluminous long black hair, slim waist, large breasts and hips, toned legs, high tan skin, big plump lips, smirk, bright brown eyes, realistic style, high quality and detail.""",
-            [1, 0.7, 2.50, 0.55, -0.35, -1.5],
+            [1, 0.7, 2.70, 0.6, -0.35, -1.5],
         ),
         setting2_generate_data(
             "mileyleclair.xo",
@@ -164,7 +164,7 @@ def first_group_get_data_array():
             "1zm1cI55s23ta4nLMO-avFZm2wgqeVr-D",
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, extra tan skin, blue eyes""",
-            [2, 1.80, -1.70, 3.05, 1.00, 1.70, -0.70, 0.35],
+            [2, 2, -1.70, 3.1, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
             "jennifer_harrington.xo",
