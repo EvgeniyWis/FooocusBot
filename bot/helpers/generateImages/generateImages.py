@@ -51,13 +51,15 @@ async def generateImages(
             base_model_indexes,
         )
 
+    total_jobs_count = len(model_indexes_for_generation) if len(model_indexes_for_generation) > 0 else len(dataArrayBase)
+
     logger.info(
-        f"Генерация изображений с помощью API для группы {group_number}. Длина массива: {len(model_indexes_for_generation)}. Переменный промпт: {prompt_for_current_model}",
+        f"Генерация изображений с помощью API для группы {group_number}. Длина массива: {total_jobs_count}. Переменный промпт: {prompt_for_current_model}",
     )
 
     await state.update_data(
         jobs={},
-        total_jobs_count=len(model_indexes_for_generation) if len(model_indexes_for_generation) > 0 else len(dataArrayBase),
+        total_jobs_count=total_jobs_count,
     )
     images = []
 

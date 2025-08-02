@@ -9,6 +9,7 @@ from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_data_array_by_group_number,
     get_model_index_by_model_name,
+    get_model_index_in_group,
 )
 from bot.helpers.generateImages.dataArray.get_data_array_by_model_indexes import (
     get_data_array_by_model_indexes,
@@ -139,7 +140,10 @@ async def generateImagesInHandler(
                     logger.info(f"[generateImagesInHandler] dataArray: {dataArray}")
 
                     for data in dataArray:
-                        model_index = get_model_index_by_model_name(data["model_name"])
+                        if group_number != "individual":
+                            model_index = get_model_index_in_group(data["model_index"], group_number)
+                        else:
+                            model_index = get_model_index_by_model_name(data["model_name"])
                         prompt_for_current_model[str(model_index)] = prompt
 
                     result = await generateImages(

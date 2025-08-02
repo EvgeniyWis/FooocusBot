@@ -37,3 +37,6 @@ from bot.helpers.generateImages.dataArray.get_all_model_indexes import (
 from bot.helpers.generateImages.dataArray.get_group_model_indexes import (
     get_group_model_indexes
 )
+from bot.helpers.generateImages.dataArray.get_model_index_in_group import (
+    get_model_index_in_group,
+)
