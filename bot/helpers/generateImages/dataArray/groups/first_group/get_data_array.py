@@ -71,7 +71,7 @@ def first_group_get_data_array():
             "1SfIAd7S_W8RGHBatjWx3NXPpWsskZaGS",
             "18BQ8yxwk9PhZbeQMUNo2-xQjb-kO_La8",
             """photorealistic portrait of an 18-year-old Arabian girl with voluminous long black hair, slim waist, large breasts and hips, toned legs, high tan skin, big plump lips, smirk, bright brown eyes, realistic style, high quality and detail.""",
-            [1, 0.7, 2.90, 0.6, -0.35, -1.5],
+            [1, 0.7, 3, 0.6, -0.35, -1.5],
         ),
         setting2_generate_data(
             "mileyleclair.xo",
