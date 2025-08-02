@@ -276,6 +276,7 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
                 text.MODEL_NOT_FOUND_TEXT.format(index_base, all_model_indexes),
                 message,
             )
+            await state.update_data(prompt_chunks=[])
             return
 
         unique_model_indexes.add(index_base)
@@ -301,7 +302,7 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
         state,
         "model_prompts_for_generation",
         data_for_update,
-        unique_keys=("model_name"),
+        unique_keys=("model_name",),
     )
 
     await safe_send_message(
@@ -632,6 +633,7 @@ async def write_models_for_specific_generation(
                 text=text.MODEL_NOT_FOUND_TEXT.format(model_index, all_model_indexes),
                 message=message,
             )
+            await state.update_data(prompt_chunks=[])
             return
 
     await state.update_data(model_indexes_for_generation=model_indexes)
@@ -689,6 +691,7 @@ async def write_model_for_generation(
                 text=text.MODEL_NOT_FOUND_TEXT.format(index, all_model_indexes),
                 message=message,
             )
+            await state.update_data(prompt_chunks=[])
             return
 
         count = prompt_counter[index]
