@@ -527,6 +527,20 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
         )
         return
 
+    # Проверяем, содержит ли сообщение формат "индекс: промпт"
+    matches = PROMPT_BY_INDEX_PATTERN.findall(msg)
+    if matches:
+        # Если найден формат "индекс: промпт", проверяем существование моделей
+        for index_str, _ in matches:
+            index_base = int(index_str.split("+")[0])
+            
+            if not check_model_index_is_exist(index_base):
+                await safe_send_message(
+                    text.MODEL_NOT_FOUND_TEXT.format(index_base, all_model_indexes),
+                    message,
+                )
+                return
+
     chunks.append(msg)
     await state.update_data(
         prompt_chunks=chunks,
