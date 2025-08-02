@@ -15,6 +15,9 @@ from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
+    safe_edit_message,
+)
 
 
 # Функция для генерации изображений по всем группам
@@ -122,13 +125,17 @@ async def generate_images_by_all_groups(
             await asyncio.gather(*tasks)
             groups_numbers_success.append(index)
 
-            await message_with_groups.edit_text(
-                text.TEST_GENERATION_WITH_ALL_GROUPS_PROGRESS_TEXT.format(
-                    "✅" if 0 in groups_numbers_success else "❌",
-                    "✅" if 1 in groups_numbers_success else "❌",
-                    "✅" if 2 in groups_numbers_success else "❌",
-                    "✅" if 3 in groups_numbers_success else "❌",
-                ),
+            # Обновляем сообщение с прогрессом групп
+            new_text = text.TEST_GENERATION_WITH_ALL_GROUPS_PROGRESS_TEXT.format(
+                "✅" if 0 in groups_numbers_success else "❌",
+                "✅" if 1 in groups_numbers_success else "❌",
+                "✅" if 2 in groups_numbers_success else "❌",
+                "✅" if 3 in groups_numbers_success else "❌",
+            )
+
+            await safe_edit_message(
+                message_with_groups,
+                new_text,
             )
 
         await message_with_groups.unpin()

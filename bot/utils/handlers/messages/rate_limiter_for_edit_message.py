@@ -64,18 +64,19 @@ async def safe_edit_message(
             except Exception:
                 logger.exception("RetryAfter second attempt failed")
         except TelegramAPIError as e:
-            if "message is not modified" not in str(e):
-                logger.warning(f"Telegram API error: {e}")
+            # Игнорируем ошибку "message is not modified"
+            if "message is not modified" in str(e):
+                logger.debug(f"Ignoring 'message is not modified' error for message {message.message_id}")
+                return message
+            
+            logger.warning(f"Telegram API error: {e}")
 
-                # При ошибке, связанной с тем, что сообщение не найдено, то отправляем новое сообщение
-                if (
-                    "message to edit not found" in e.message.lower()
-                    or "message is not modified" in e.message.lower()
-                ):
-                    return await safe_send_message(
-                        safe_text,
-                        message,
-                    )
+            # При ошибке, связанной с тем, что сообщение не найдено, то отправляем новое сообщение
+            if "message to edit not found" in e.message.lower():
+                return await safe_send_message(
+                    safe_text,
+                    message,
+                )
         except Exception:
             logger.exception("Unexpected error in safe_edit_message")
 
