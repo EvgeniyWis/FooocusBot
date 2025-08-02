@@ -34,6 +34,9 @@ from bot.helpers.generateImages.dataArray.check_model_index_is_exist import (
 from bot.helpers.generateImages.dataArray.get_all_model_indexes import (
     get_all_model_indexes,
 )
+from bot.helpers.generateImages.dataArray.get_all_model_names import (
+    get_all_model_names,
+)
 from bot.helpers.generateImages.dataArray.get_group_model_indexes import (
     get_group_model_indexes
 )
