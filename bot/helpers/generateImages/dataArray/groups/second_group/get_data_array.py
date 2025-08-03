@@ -16,80 +16,16 @@ from bot.helpers.generateImages.dataArray.settings.setting_4.generate_data impor
 def second_group_get_data_array():
     # Массив дат с нужными параметрами для запроса
     data_array = [
-        # setting_1 модели
-        setting1_generate_data(
-            "chloemay.xo.xo",
-            3,
-            "1k5VoyK5pOmVLzzONNadgWGiJrXWjuUXG",
-            "1BXpNVoneM0nSISQzyxsO9mG5SqzztP0t",
-            "1As1OBjTIhckVo1APY0oiM_Db1HwbBhXO",
-            """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 20 years old, athletic body, brown hair, blue eyes, natural skin texture.
-            Style: realistic photography, Canon DSLR, natural daylight.""",
-            [2, 2.9, -0.9, -1.7, 1.8, 0.9, 1, 0.8],
-        ),
-        setting1_generate_data(
-            "sierravexley",
-            10,
-            "12bi_ufYXj71QzV1jTHTSjYmAjPr2Utky",
-            "1Hcw9aO89wyw4dco86kt5RRCC-Ue8Rebo",
-            "1SNri9MEsRnJz9NF3YdJdub6h2X0efssM",
-            """photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, brown hair, blue eyes, tanned skin, ponytail.
-            Style: realistic photography, Canon DSLR, natural daylight.""",
-            [2, 1.60, -0.90, -1.70, 2.80, 1.00, 2.65, 0.80],
-        ),
-        setting1_generate_data(
-            "sasharoxelle",
-            25,
-            "1CC3xxDdpYqmDH-4Bm-HVA32EghXdgZlK",
-            "1scBkcxWIWasoo84FTO2M_VVb_4bnqIYX",
-            "14Q0ENXHYlVVV7Xm173D6C9oNQ_4O6jo5",
-            """photorealistic, high quality, BREAK
-            1girl, 18 years old, brown hair, blue eyes, tan skin, smiling.""",
-            [2, 1.00, -0.90, -0.35, 2.5, 1.00, 1.60, 0.55, 1.95],
-        ),
-        
         # setting_2 модели
         setting2_generate_data(
-            "vanessadior.xo",
-            26,
-            "1YpXc8m9btjYfoHD0fDbji0FpFrpruBSg",
-            "17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
-            "16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
+            "albabloomy",
+            50,
+            "1Dg7PcdufVeqX6Z4xO0oUra_8p9C5QQsw",
+            "1XmGqJ56mab2Jt0Uidt53nVoaT55hd1Jj",
+            "13BJa1CqmGefEE5tg7cVrD8pKZT460Ro4",
             """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            [1, 0.7, 2.5, 1, -1.05, -1.5],
-        ),
-        setting2_generate_data(
-            "mari_avellin",
-            37,
-            "1AybFPSd6UN4Ki9JcXlrCy99_qBpOz1p-",
-            "1YbLuKKgXrXrN-qRA6p8yMUwOh1x2aR42",
-            "1b6OkOOxNcsWDL_o7uQws4o9V1kdHlw4o",
-            """photorealistic, high quality, skin detail, BREAK
-            1girl, 30 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, brown eyes""",
-            [1, 0.7, 1.00, -0.10, -0.60, -1.50],
-        ),
-        setting2_generate_data(
-            "dianadelmar.xo",
-            39,
-            "1Ai36ERlPD65VzKyCYI29riQxmaoUfE_Z",
-            "1nlVov-QS6ci0gxyxARFLx98XmpysSAGU",
-            "1CeaLJFybbjJ5fY4Dl3Gmss9PxwAGuIcU",
-            """photorealistic, high quality, skin detail, BREAK
-            1girl, Asian, 18 years old, brown hair, medium-large breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
-            [1, 0.7, 3.70, 1.35, -2.40, -1.50],
-        ),
-        setting2_generate_data(
-            "lilith_rayne.xo",
-            46,
-            "14Sk-9RHb6NHFVapLqOZO_cfnvfn4fiJX",
-            "1CX7jzPvTdwkJ6PeFsWXh17MPEb4Iakul",
-            "1zqKil1L8WThOn1Sb_yjqcU_7dgtvIzzr",
-            """photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
-            [1, 0.7, 2.20, 1.00, -2.30, -1.50],
+            1girl, Latina, 18 years old, black hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
+            [1, 0.7, 3.80, 0.1, -3.00, -1.50],
         ),
         setting2_generate_data(
             "carolinehazel.xo",
@@ -100,6 +36,8 @@ def second_group_get_data_array():
             "photorealistic portrait, 18 years old, ash-blonde hair, big breasts, slim waist, tan skin, smirk, high quality.",
             [-1.50, 1.30, 0.7, 3.20, 0.45, -1.00],
         ),
+        
+        # setting_3 модели
         setting3_generate_data(
             "dasharomanova.xo",
             59,
@@ -119,6 +57,15 @@ def second_group_get_data_array():
             [-1.50, 1.30, 0.7, 2.00, 1.45, -1.00],
         ),
         setting3_generate_data(
+            "simona.caramella",
+            62,
+            "1HdkoJ7AbQCcTzK15rej69c_iaGYL99iP",
+            "1gmxIHgpaSF-CvzbTgiqME-RFQh4qGwLg",
+            "1Epg8G_mKJ0A7Xu_lN2w77MjVKgAQQ467",
+            "photorealistic portrait, 18 years old, brown hair, big breasts, slim waist, tan skin, big lips, smirk, brown eyes, high quality.",
+            [-1.50, 1.30, 0.7, 3.7, 0.10, -0.35],
+        ),
+        setting3_generate_data(
             "callieroux",
             66,
             "1aWuuB7pRutNzGIKGrLuUsep7McH3OxYd",
@@ -127,8 +74,29 @@ def second_group_get_data_array():
             "photorealistic portrait, 18 years old, ash-blonde hair, big breasts, slim waist, tan skin, smirk, high quality.",
             [-1.50, 1.30, 0.7, 3.65, -0.20, 0.30],
         ),
+        setting3_generate_data(
+            "lolavexley",
+            68,
+            "1dUwCO9eBw7FVY15BoEDAFsPiV3y-aCWx",
+            "1VLNdlBdq-eTJWYpJmrhfwnugIXYs1FQ9",
+            "1q4KcwSblnbR4XPmZtC4WMGVow6w7L26O",
+            """score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+
+            real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous brown hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
+            [-1.50, 1.30, 0.7, 3.2, 1.95, -1.00],
+        ),
         
         # setting_4 модели
+        setting4_generate_data(
+            "victoriadellor",
+            78,
+            "1hp5GLtfqhfoNYG6Ugn8tc7JF-uqSHLfJ",
+            "1iQReqbA4XDnPW6pfYLq400u3IF6tgEG4",
+            "1OLSVsw2cV75L4Nw7KgwB2LeYCiA47Oci",
+            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
+            1woman, milf, black hair, medium-large natural breasts, tan skin, green eyes""",
+            [2, 4.30, -1.70, 1.00, 1.00, 1.70, -0.70, 0.35],
+        ),
         setting4_generate_data(
             "abrilberries",
             82,
@@ -160,6 +128,16 @@ def second_group_get_data_array():
             [2, 1.90, -0.1, 0.85, 2.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
+            "rihannacorvelle",
+            88,
+            "13qV_K99ChXZhdnSKpBtbwvuNxV3Y49mO",
+            "1iAyyzYFW0kgR-v5hF18aT4S6Ed8estRT",
+            "1qcKmlJDkMKRdNxe_EB7gvxGo37xLrSAz",
+            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
+            1girl, 18, sorority girl, white-black hair, medium-large natural breasts, tan skin, blue eyes""",
+            [2, 3.90, -2.50, 2.00, 1.52, 1.70, -0.70, 0.35],
+        ),
+        setting4_generate_data(
             "beatricemeltie",
             89,
             "1G4Zm21FBH-MYAE6IdyaLaChalkQAj-Od",
@@ -170,6 +148,16 @@ def second_group_get_data_array():
             [2, 0.70, -0.80, 3.05, 1.00, 1.70, -0.70, 0.35],
         ),
         setting4_generate_data(
+            "avacreston",
+            93,
+            "1OIPx2V6U6tj9AzL20nN0nAMlLFyV8wzh",
+            "1zm1cI55s23ta4nLMO-avFZm2wgqeVr-D",
+            "1yC0uiIAFfsxhYcokhs-jVaSSEvsZqnVv",
+            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
+            1girl, 18, sorority girl, black hair, medium-large natural breasts, extra tan skin, blue eyes""",
+            [2, 2.1, -1.70, 3.2, 1.00, 1.70, -0.70, 0.35],
+        ),
+        setting4_generate_data(
             "ashleymoreaux.xo",
             96,
             "1jiLVZCzXLu8m4ZECwciGbZz6jhWVbBQ8",
@@ -178,6 +166,26 @@ def second_group_get_data_array():
             """photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, black hair, medium-large natural breasts, extra tan skin, blue eyes, smirk""",
             [2, 2.70, -1.70, 1.95, 1.00, 1.70, -0.70, 0.35, 0, 1.25],
+        ),
+        setting4_generate_data(
+            "jennifer_harrington.xo",
+            97,
+            "1mxmGqspHnlGaltzsJbdOeWek8K4U6ncz",
+            "1BOA9b-TPtuFMlJ6Izi9TntHtvnX4NfYo",
+            "1MKN5dp4IXt-OG2qP-vMrIsE0ZSkDGxLf",
+            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
+            1girl, 18, sorority girl, black hair, medium-large natural breasts, extra tan skin, blue eyes, smirk""",
+            [2, 3.10, -1.70, 1.30, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
+        ),
+        setting4_generate_data(
+            "jessie_valemont",
+            98,
+            "1mxmGqspHnlGaltzsJbdOeWek8K4U6ncz",
+            "1BOA9b-TPtuFMlJ6Izi9TntHtvnX4NfYo",
+            "1MKN5dp4IXt-OG2qP-vMrIsE0ZSkDGxLf",
+            """photorealistic, high quality, vibrant colors, skin detail, BREAK 
+            1girl, 18, sorority girl, black hair, medium-large natural breasts, extra tan skin, blue eyes, smirk""",
+            [2, 3.10, -1.70, 1.30, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
         ),
     ]
 
