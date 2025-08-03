@@ -16,6 +16,11 @@ class StartGenerationState(StatesGroup):
     write_multi_prompts_for_models = State()
     write_models_for_specific_generation = State()
     write_prompt_for_video_generation_by_one_prompt = State()
+    # Новые состояния для img2video с уникальными промптами
+    write_multi_prompts_for_img2video = State()
+    collecting_prompt_parts_for_img2video = State()
+    # Состояние для старого функционала одного промпта в img2video
+    write_single_prompt_for_img2video = State()
 
 
 class MultiPromptInputState(StatesGroup):

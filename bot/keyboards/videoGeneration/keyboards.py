@@ -138,3 +138,39 @@ def img2video_done_send_images_keyboard():
         ],
     )
     return keyboard
+
+
+# Инлайн-клавиатура для выбора типа ввода промпта в img2video
+def choose_prompt_type_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📝 Один промпт для всех",
+                    callback_data="img2video|prompt_type|one",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔤 Уникальный промпт для каждого",
+                    callback_data="img2video|prompt_type|multi",
+                ),
+            ],
+        ],
+    )
+    return keyboard
+
+
+# Инлайн-клавиатура для завершения ввода промптов в img2video
+def img2video_done_typing_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Готово",
+                    callback_data="img2video|finish_prompt",
+                ),
+            ],
+        ],
+    )
+    return keyboard

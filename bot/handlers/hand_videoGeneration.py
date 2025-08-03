@@ -6,6 +6,9 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
+from bot.helpers.generateImages.dataArray import (
+    get_model_name_by_index,
+)
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.videoGeneration import (
     get_video_path_from_state,
@@ -20,6 +23,7 @@ from bot.states import StartGenerationState
 from bot.utils.handlers import (
     getDataInDictsArray,
 )
+from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
 from bot.utils.handlers.messages import (
     editMessageOrAnswer,
 )
@@ -129,11 +133,26 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             raise Exception(error_message)
 
     else:
-        img2video_temp_paths_for_with_model_names = state_data.get(
-            "img2video_temp_paths_for_with_model_names", {}
-        )
-
-        temp_path = img2video_temp_paths_for_with_model_names.get(model_name, None)
+        # Сначала проверяем данные из режима уникальных промптов
+        img2video_data = state_data.get("img2video_data", [])
+        temp_path = None
+        
+        if img2video_data:
+            # Ищем путь к изображению для данной модели
+            for data in img2video_data:
+                if get_model_name_by_index(data['model_index']) == model_name:
+                    # Получаем путь к изображению из temp_paths_for_video_generation по индексу
+                    temp_paths_for_video_generation = state_data.get("temp_paths_for_video_generation", [])
+                    if data['image_index'] <= len(temp_paths_for_video_generation):
+                        temp_path = temp_paths_for_video_generation[data['image_index'] - 1]
+                    break
+        
+        # Если не найдено в img2video_data, ищем в старом формате
+        if not temp_path:
+            img2video_temp_paths_for_with_model_names = state_data.get(
+                "img2video_temp_paths_for_with_model_names", {}
+            )
+            temp_path = img2video_temp_paths_for_with_model_names.get(model_name, None)
 
         if not temp_path:
             await safe_send_message(
