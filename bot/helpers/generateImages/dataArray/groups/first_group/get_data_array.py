@@ -68,7 +68,7 @@ def first_group_get_data_array():
             "1LCR_JQEg2JIisADrnochKASReWbUCfrb",
             "18dssne4ftnQl6bwpY9QYj01UIp69HFbp",
             """photorealistic, high quality, BREAK
-            1girl, 18 years old, blonde hair, green eyes, tan skin, smiling.""",
+            1girl, 18 years old, blonde hair, green eyes, medium tan skin, smiling.""",
             [2, 3.10, -0.90, -1.70, 1.50, 0.9, 1.00, 0.40],
         ),
         setting1_generate_data(
