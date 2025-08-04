@@ -3,6 +3,8 @@ import http.client
 import socket
 import traceback
 
+import httpx
+
 from bot.logger import logger
 
 
@@ -11,7 +13,9 @@ async def retryOperation(operation, max_attempts, delay, *args):
     for attempt in range(max_attempts):
         try:
             return await operation(*args)
-        except (FileNotFoundError, ValueError, TypeError, RuntimeError, socket.gaierror, http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, OSError) as e:
+        except (FileNotFoundError, ValueError, TypeError, RuntimeError, socket.gaierror, 
+                http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, 
+                OSError, httpx.ReadTimeout, httpx.ConnectTimeout, httpx.TimeoutException) as e:
             traceback.print_exc()
             if attempt == max_attempts - 1:
                 raise e

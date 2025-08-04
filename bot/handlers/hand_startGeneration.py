@@ -2,6 +2,7 @@ import re
 import traceback
 from collections import defaultdict
 
+import httpx
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
@@ -472,6 +473,20 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 model_name,
                 image_index,
             )
+        except httpx.ReadTimeout as e:
+            logger.exception(f"Таймаут при обработке изображения: {e}")
+            await editMessageOrAnswer(
+                call,
+                "❌ Превышено время ожидания при обработке изображения. Попробуйте еще раз.",
+            )
+            raise e
+        except httpx.ConnectTimeout as e:
+            logger.exception(f"Таймаут подключения при обработке изображения: {e}")
+            await editMessageOrAnswer(
+                call,
+                "❌ Ошибка подключения при обработке изображения. Попробуйте еще раз.",
+            )
+            raise e
         except Exception as e:
             traceback.print_exc()
             logger.exception(f"Ошибка в process_image: {e}")
@@ -481,6 +496,20 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             )
             raise e
 
+    except httpx.ReadTimeout as e:
+        logger.exception(f"Таймаут при обработке изображения: {e}")
+        await editMessageOrAnswer(
+            call,
+            "❌ Превышено время ожидания при обработке изображения. Попробуйте еще раз.",
+        )
+        raise e
+    except httpx.ConnectTimeout as e:
+        logger.exception(f"Таймаут подключения при обработке изображения: {e}")
+        await editMessageOrAnswer(
+            call,
+            "❌ Ошибка подключения при обработке изображения. Попробуйте еще раз.",
+        )
+        raise e
     except Exception as e:
         traceback.print_exc()
         model_name_index = get_model_index_by_model_name(model_name)
