@@ -23,7 +23,6 @@ async def generateImages(
     message: types.Message,
     state: FSMContext,
     user_id: int,
-    is_test_generation: bool,
     with_randomizer: bool = False,
     model_indexes_for_generation: list[str] = None,
 ):
@@ -89,7 +88,6 @@ async def generateImages(
                 user_id,
                 data["model_name"],
                 prompt_for_model,
-                is_test_generation,
                 chat_id=message.chat.id,
             )
             images.append(image)

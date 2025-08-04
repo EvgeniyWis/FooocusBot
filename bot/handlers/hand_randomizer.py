@@ -66,15 +66,11 @@ async def handle_randomizer_buttons(
             else:
                 group_number = "individual"
 
-            generations_type = state_data.get("generations_type", "")
-            is_test_generation = generations_type == "test"
-
             await generateImagesInHandler(
                 "",
                 call.message,
                 state,
                 user_id,
-                is_test_generation,
                 group_number,
                 True,
             )

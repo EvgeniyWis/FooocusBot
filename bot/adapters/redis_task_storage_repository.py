@@ -240,11 +240,7 @@ class RedisTaskStorageRepository:
                         job_id=task.job_id,
                         model_name=task.model_name,
                         setting_number=task.setting_number,
-                        is_test_generation=getattr(
-                            task,
-                            "is_test_generation",
-                            False,
-                        ),
+
                         checkOtherJobs=getattr(
                             task,
                             "check_other_jobs",

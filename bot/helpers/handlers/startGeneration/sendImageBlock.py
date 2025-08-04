@@ -1,21 +1,18 @@
 import asyncio
-import shutil
 import traceback
 
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 
-import bot.constants as constants
 from bot.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getDataByModelName,
     get_model_index_by_model_name,
+    getDataByModelName,
 )
 from bot.InstanceBot import bot
 from bot.keyboards import start_generation_keyboards
 from bot.logger import logger
-from bot.settings import settings
 from bot.utils.handlers import (
     appendDataToStateArray,
 )
@@ -30,7 +27,6 @@ async def sendImageBlock(
     media_group: list,
     model_name: str,
     group_number: str,
-    is_test_generation: bool,
     user_id: int,
     generation_id: str,
 ):
@@ -159,16 +155,8 @@ async def sendImageBlock(
                     text=text.SELECT_IMAGE_TEXT.format(
                         model_name,
                         model_name_index,
-                    )
-                    if not is_test_generation
-                    else text.SELECT_TEST_IMAGE_TEXT.format(group_number),
-                    reply_markup=reply_markup
-                    if not is_test_generation
-                    else start_generation_keyboards.testGenerationImagesKeyboard(
-                        group_number,
-                    )
-                    if state_data.get("group_number", 1) != "all"
-                    else None,
+                    ),
+                    reply_markup=reply_markup,
                 )
             logger.info(
                 f"Keyboard sent to user_id={user_id}, model_name={model_name}",
@@ -182,14 +170,5 @@ async def sendImageBlock(
                 )
             except:
                 pass
-
-        # Если это тестовая генерация, то удаляем изображения из папки temp/test/ и сами папки
-        if is_test_generation and not settings.MOCK_IMAGES_MODE:
-            try:
-                file_path = f"{constants.TEMP_FOLDER_PATH}/test_{user_id}"
-                shutil.rmtree(file_path)
-            except Exception as e:
-                logger.error(f"Ошибка при удалении временных файлов: {e}")
-
     except Exception as e:
         raise Exception(f"Произошла ошибка в функции sendImageBlock: {e}")

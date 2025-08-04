@@ -50,7 +50,6 @@ async def base64_to_image(
     folder_name: str,
     index: int,
     user_id: int,
-    is_test_generation: bool,
 ) -> str:
     """
     Преобразует изображение из base64 в PIL Image.
@@ -60,7 +59,6 @@ async def base64_to_image(
         - folder_name: имя папки для сохранения изображения на Google Drive
         - index: индекс выбранного изображения (выбирается пользователем с помощью клавиатуры)
         - user_id: ID пользователя
-        - is_test_generation: флаг, указывающий, что это тестовая генерация
 
     Returns:
         - file_path: абсолютный путь к сохраненному изображению
@@ -100,16 +98,12 @@ async def base64_to_image(
             image_bytes,
         )
 
-        # Если папка не указана, то значит это тестовая генерация
-        if is_test_generation:
-            folder_name = "test"
-
         save_dir = f"{constants.TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index}.jpg"
 
         logger.info(
-            f"[base64_to_image] Сохраняем файл: {file_path} | folder_name={folder_name}, index={index}, user_id={user_id}, is_test_generation={is_test_generation}"
+            f"[base64_to_image] Сохраняем файл: {file_path} | folder_name={folder_name}, index={index}, user_id={user_id}"
         )
 
         # Используем асинхронное сохранение, чтобы не блокировать event loop

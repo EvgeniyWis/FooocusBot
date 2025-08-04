@@ -17,7 +17,6 @@ async def generateImageBlock(
     user_id: int,
     model_name: str,
     variable_prompt: str,
-    is_test_generation: bool = False,
     checkOtherJobs: bool = True,
     chat_id: int = None,
 ):
@@ -67,7 +66,6 @@ async def generateImageBlock(
         user_id,
         state,
         message_id,
-        is_test_generation,
         checkOtherJobs,
         chat_id=chat_id,
     )

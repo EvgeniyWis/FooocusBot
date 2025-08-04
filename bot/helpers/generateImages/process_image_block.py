@@ -24,7 +24,6 @@ async def process_image_block(
     user_id: int,
     state: FSMContext,
     message_id: int,
-    is_test_generation: bool,
     checkOtherJobs: bool,
     chat_id: int,
 ) -> bool:
@@ -37,7 +36,6 @@ async def process_image_block(
         user_id (int): id пользователя
         state (FSMContext): контекст состояния
         message (types.Message): сообщение
-        is_test_generation (bool): флаг, указывающий на тестовую генерацию
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
         chat_id (int): id чата
     """
@@ -56,7 +54,6 @@ async def process_image_block(
             setting_number=setting_number,
             user_id=user_id,
             message_id=message_id,
-            is_test_generation=is_test_generation,
             check_other_jobs=checkOtherJobs,
             chat_id=chat_id,
         )
@@ -76,7 +73,6 @@ async def process_image_block(
             user_id,
             message_id,
             state,
-            is_test_generation,
             checkOtherJobs,
             500,
         )
@@ -114,7 +110,6 @@ async def process_image_block(
                     model_name,
                     i + 1,
                     user_id,
-                    is_test_generation,
                 )
                 media_group.append(
                     types.InputMediaPhoto(
@@ -146,7 +141,6 @@ async def process_image_block(
             media_group,
             model_name,
             group_number,
-            is_test_generation,
             user_id,
             generation_id=job_id,
         )

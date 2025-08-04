@@ -64,29 +64,12 @@ async def choose_generations_type(
     generations_type = call.data.split("|")[1]
     await state.update_data(generations_type=generations_type)
 
-    if generations_type == "work":
-        await editMessageOrAnswer(
-            call,
-            "Выберите режим генерации:\n\n"
-            f"🖼 Мультивыбор - можно выбрать несколько фотографий одновременно, присылается {MULTI_IMAGE_NUMBER} на выбор\n"
-            "✅ Одиночный - можно выбрать только одну генерацию, присылается 4 на выбор",
-            reply_markup=start_generation_keyboards.generationModeKeyboard(),
-        )
-        return
-
-    try:
-        prompt_exist = bool(call.data.split("|")[2])
-    except:
-        prompt_exist = False
-
-    await state.update_data(prompt_exist=prompt_exist)
-
     await editMessageOrAnswer(
         call,
-        text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=start_generation_keyboards.selectGroupKeyboard(
-            is_test_generation=generations_type == "test",
-        ),
+        "Выберите режим генерации:\n\n"
+        f"🖼 Мультивыбор - можно выбрать несколько фотографий одновременно, присылается {MULTI_IMAGE_NUMBER} на выбор\n"
+        "✅ Одиночный - можно выбрать только одну генерацию, присылается 4 на выбор",
+        reply_markup=start_generation_keyboards.generationModeKeyboard(),
     )
 
 
@@ -100,9 +83,7 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
     await editMessageOrAnswer(
         call,
         text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=start_generation_keyboards.selectGroupKeyboard(
-            is_test_generation=False,
-        ),
+        reply_markup=start_generation_keyboards.selectGroupKeyboard(),
     )
 
 
@@ -117,7 +98,6 @@ async def choose_group(call: types.CallbackQuery, state: FSMContext):
     # Обновляем только важные значения в стейте после очистки
     initial_state = {
         "multi_select_mode": state_data.get("multi_select_mode", False),
-        "prompt_exist": state_data.get("prompt_exist", False),
         "generations_type": state_data.get("generations_type", ""),
     }
     await state.update_data(**initial_state)
@@ -136,45 +116,13 @@ async def choose_group(call: types.CallbackQuery, state: FSMContext):
     # Если выбрана другая группа, то продолжаем генерацию
     group_number = call.data.split("|")[1]
     await state.update_data(group_number=group_number)
-    prompt_exist = state_data.get("prompt_exist", False)
-    generations_type = state_data.get("generations_type", "")
     await state.update_data(specific_model=False)
 
-    # Если выбран тестовый режим, то продолжаем генерацию в тестовом режиме
-    if generations_type == "test":
-        if prompt_exist:
-            prompt = state_data.get("prompt_for_images", "")
-            user_id = call.from_user.id
-            is_test_generation = generations_type == "test"
-            group_number = group_number
-
-            # Удаляем сообщение с выбором группы
-            await bot.delete_message(user_id, call.message.message_id)
-
-            await generateImagesInHandler(
-                prompt,
-                call.message,
-                state,
-                user_id,
-                is_test_generation,
-                group_number,
-            )
-
-            await state.update_data(prompt_exist=False)
-        else:
-            await editMessageOrAnswer(
-                call,
-                text.GET_GROUPS_SUCCESS_TEXT,
-            )
-            await state.set_state(StartGenerationState.write_prompt_for_images)
-
-    # Если выбран рабочий режим, то продолжаем генерацию в рабочем режиме
-    elif generations_type == "work":
-        await editMessageOrAnswer(
-            call,
-            text.CHOOSE_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
-            reply_markup=start_generation_keyboards.writePromptTypeKeyboard(),
-        )
+    await editMessageOrAnswer(
+        call,
+        text.CHOOSE_WRITE_PROMPT_TYPE_SUCCESS_TEXT,
+        reply_markup=start_generation_keyboards.writePromptTypeKeyboard(),
+    )
 
 
 # Обработка выбора режима написания промпта
@@ -316,7 +264,6 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
             message=message,
             state=state,
             user_id=user_id,
-            is_test_generation=False,
             group_number=group_number,
             with_randomizer=False,
         )
@@ -356,7 +303,6 @@ async def write_prompt(message: types.Message, state: FSMContext):
     prompt = message.text
     user_id = message.from_user.id
     state_data = await state.get_data()
-    is_test_generation = state_data.get("generations_type", "") == "test"
     await state.update_data(prompt_for_images=prompt)
 
     await state.set_state(None)
@@ -371,7 +317,6 @@ async def write_prompt(message: types.Message, state: FSMContext):
             message,
             state,
             user_id,
-            is_test_generation,
             group_number,
         )
     else:
@@ -384,7 +329,6 @@ async def write_prompt(message: types.Message, state: FSMContext):
             message,
             state,
             user_id,
-            is_test_generation,
             "individual",
         )
 
@@ -421,7 +365,6 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 model_name,
                 call,
                 state,
-                group_number,
             )
 
         # Если индекс изображения равен "prompt_regen", то перегенерируем изображение с новым промптом
@@ -734,7 +677,6 @@ async def write_model_for_generation(
         message=message,
         state=state,
         user_id=message.from_user.id,
-        is_test_generation=False,
         group_number="individual",
     )
 
@@ -754,7 +696,6 @@ async def write_new_prompt_for_regenerate_image(
         return
 
     state_data = await state.get_data()
-    is_test_generation = state_data.get("generations_type", "") == "test"
     model_name = state_data.get("model_name_for_regenerate_image", "")
     user_id = message.from_user.id
 
@@ -810,7 +751,6 @@ async def write_new_prompt_for_regenerate_image(
         user_id,
         model_name,
         prompt,
-        is_test_generation,
         False,
         chat_id=message.chat.id,
     )
