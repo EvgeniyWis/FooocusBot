@@ -87,5 +87,4 @@ async def check_upscale_status(
         model_name,
         image_index,
         user_id,
-        False,
     )
