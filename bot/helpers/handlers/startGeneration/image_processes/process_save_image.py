@@ -152,8 +152,17 @@ async def process_save_image(
         else text.SAVE_IMAGES_SUCCESS_TEXT
     )
 
+    # Сначала пытаемся отправить локальный файл, если он доступен
+    photo_source = None
+    if result_path and os.path.exists(result_path):
+        photo_source = result_path
+        logger.info(f"Используем локальный файл для отправки: {result_path}")
+    else:
+        photo_source = direct_url
+        logger.info(f"Используем URL для отправки: {direct_url}")
+
     message_with_saved_image = await safe_send_photo(
-        photo=direct_url,
+        photo=photo_source,
         message=call,
         caption=message_text.format(
             link,
@@ -168,6 +177,37 @@ async def process_save_image(
         ),
     )
 
+    # Проверяем, что сообщение было отправлено успешно
+    if message_with_saved_image is None:
+        logger.error(f"Не удалось отправить фото с источником: {photo_source}")
+        
+        # Если использовали локальный файл, попробуем URL
+        if photo_source == result_path and direct_url != result_path:
+            logger.info("Пробуем отправить через URL как альтернативу")
+            message_with_saved_image = await safe_send_photo(
+                photo=direct_url,
+                message=call,
+                caption=message_text.format(
+                    link,
+                    model_name,
+                    parent_folder["webViewLink"],
+                    model_name_index,
+                ),
+                reply_markup=video_generation_keyboards.generateVideoKeyboard(
+                    model_name,
+                    image_index=image_index,
+                    with_magnific_upscale=kb_with_magnific_upscale,
+                ),
+            )
+        
+        # Если все еще не удалось, отправляем текстовое сообщение
+        if message_with_saved_image is None:
+            await editMessageOrAnswer(
+                call,
+                f"Изображение сохранено, но не удалось отправить фото.\nСсылка: {link}",
+            )
+            return direct_url
+
     data_for_update = {
         "model_name": model_name,
         "image_index": image_index,
@@ -179,7 +219,6 @@ async def process_save_image(
         data_for_update,
         unique_keys=("model_name", "image_index"),
     )
-
     # Удаляем сообщение о сохранении изображения
     try:
         await saving_progress_message.delete()
