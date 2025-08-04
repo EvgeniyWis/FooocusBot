@@ -3,12 +3,13 @@ import traceback
 from aiogram import types
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray.getModelNameByIndex import (
-    getModelNameByIndex,
+from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
+    get_model_name_by_index,
 )
 from bot.helpers.handlers.videoGeneration import (
     check_video_path,
 )
+from bot.InstanceBot import bot
 from bot.keyboards import video_generation_keyboards
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
@@ -38,7 +39,7 @@ async def process_video(
     Returns:
         str: Путь к сгенерированному видео.
     """
-    model_name = getModelNameByIndex(model_index)
+    model_name = get_model_name_by_index(model_index)
     generate_video_from_image_progress_message = await safe_send_message(
         text.GENERATE_VIDEO_PROGRESS_TEXT.format(model_name, model_index),
         message,
@@ -50,7 +51,7 @@ async def process_video(
             image_index=None,
             image_url=None,
             temp_path=temp_paths_for_video_generation[image_index - 1],
-            model_name=None,
+            model_name=model_name,
         )
 
         await generate_video_from_image_progress_message.delete()
@@ -59,7 +60,8 @@ async def process_video(
             return
 
         video = types.FSInputFile(video_path)
-        await message.answer_video(
+        await bot.send_video(
+            chat_id=message.chat.id,
             video=video,
             caption=text.GENERATE_VIDEO_SUCCESS_TEXT.format(model_name, model_index),
             reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(

@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     KLING_API_KEY: str
     BOT_API_TOKEN: str
     PUBLIC_ILOVEAPI_API_KEY: str
+    SECRET_ILOVEAPI_API_KEY: str
     FREEPIK_API_KEY: str
 
     # user_id пользователей / администраторов

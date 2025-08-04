@@ -1,7 +1,7 @@
 from aiogoogle import Aiogoogle
 
-from bot.helpers.generateImages.dataArray.getModelNameIndex import (
-    getModelNameIndex,
+from bot.helpers.generateImages.dataArray.get_model_index_by_model_name import (
+    get_model_index_by_model_name,
 )
 from bot.utils.googleDrive.auth import client_creds, user_creds
 
@@ -65,7 +65,7 @@ async def getAllFolders(model_names: list[str] = None):
         # Создаем список кортежей (индекс, имя, ссылка) для сортировки
         model_data = []
         for model_name, link in models_info.items():
-            model_index = getModelNameIndex(model_name)
+            model_index = get_model_index_by_model_name(model_name)
             if model_index:
                 model_data.append((model_index, model_name, link))
 

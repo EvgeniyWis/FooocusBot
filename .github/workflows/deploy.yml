@@ -1,4 +1,4 @@
-name: CI/CD for Fooocus Bots (all settings)
+name: CI/CD for Fooocus Bots
 
 on:
   push:

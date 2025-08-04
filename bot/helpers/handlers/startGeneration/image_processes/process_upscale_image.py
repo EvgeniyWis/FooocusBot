@@ -2,14 +2,13 @@ import os
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
+    get_model_index_by_model_name,
     getDataByModelName,
-    getModelNameIndex,
-    getSettingNumberByModelName,
 )
 from bot.helpers.generateImages.upscale import (
     second_upscale_image,
@@ -21,7 +20,7 @@ from bot.utils.handlers import (
     deleteDataFromStateArray,
 )
 from bot.utils.handlers.messages import editMessageOrAnswer
-from bot.utils.images import image_to_base64
+from bot.utils.images import image_to_base64, is_valid_image
 
 
 async def process_upscale_image(
@@ -45,7 +44,7 @@ async def process_upscale_image(
     user_id = call.from_user.id
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     image_path = (
         TEMP_FOLDER_PATH / f"{model_name}_{user_id}" / f"{image_index}.jpg"
@@ -93,14 +92,33 @@ async def process_upscale_image(
         )
         return None
 
-    image = Image.open(image_path)
-    image_base64 = image_to_base64(image)
+    try:
+        image = Image.open(image_path)
+        
+        # Проверяем валидность изображения перед обработкой
+        if not is_valid_image(image):
+            logger.error(
+                f"[process_{log_prefix}_image] Изображение повреждено или недопустимо: {image_path}"
+            )
+            await editMessageOrAnswer(
+                call,
+                f"❌ Изображение повреждено или имеет недопустимый формат! (model={model_name}, image_index={image_index})",
+            )
+            return None
+            
+        image_base64 = image_to_base64(image)
+    except (OSError, ValueError, UnidentifiedImageError) as e:
+        logger.error(
+            f"[process_{log_prefix}_image] Ошибка при обработке изображения {image_path}: {e}"
+        )
+        await editMessageOrAnswer(
+            call,
+            f"❌ Ошибка при обработке изображения! Возможно, файл поврежден. (model={model_name}, image_index={image_index})",
+        )
+        return None
 
     # Получаем базовую модель
     base_model = data["json"]["input"]["base_model_name"]
-
-    # Получаем номер настройки
-    setting_number = getSettingNumberByModelName(model_name)
 
     # Делаем upscale изображения
     if is_second:
@@ -115,7 +133,6 @@ async def process_upscale_image(
         await upscale_image(
             image_base64,
             base_model,
-            setting_number,
             state,
             user_id,
             model_name,

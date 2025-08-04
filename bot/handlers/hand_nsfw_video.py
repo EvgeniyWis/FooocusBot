@@ -12,7 +12,7 @@ from bot.helpers.handlers.videoGeneration import (
     process_write_prompt,
     saveVideo,
 )
-from bot.InstanceBot import bot, router
+from bot.InstanceBot import bot, nsfw_video_router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
@@ -429,25 +429,24 @@ async def handle_video_save_button(
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    nsfw_video_router.callback_query.register(
         quick_generate_nsfw_video,
         lambda call: call.data.startswith("generate_comfyui_video"),
     )
-    router.message.register(
+    nsfw_video_router.message.register(
         handle_prompt_for_nsfw_generation,
         StateFilter(StartGenerationState.write_prompt_for_nsfw_generation),
     )
-    router.callback_query.register(
+    nsfw_video_router.callback_query.register(
         handle_ask_video_length_choice,
         lambda call: call.data.startswith("video_length_choice|"),
         StateFilter(StartGenerationState.ask_video_length_input),
     )
-    router.message.register(
+    nsfw_video_router.message.register(
         handle_ask_video_length_input,
         StateFilter(StartGenerationState.ask_video_length_input),
     )
-
-    router.callback_query.register(
+    nsfw_video_router.callback_query.register(
         handle_video_save_button,
         lambda call: call.data.startswith("video_correctness|correct|nsfw"),
     )

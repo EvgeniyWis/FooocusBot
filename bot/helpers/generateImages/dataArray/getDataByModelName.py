@@ -4,15 +4,15 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 )
 
 
-async def getDataByModelName(
-    model_name: str,
-) -> dict:  # Получаем все настройки
-    all_settings = getAllDataArrays()
-    # Ищем, в какой настройке находится модель с таким названием
-    for setting in all_settings:
-        for dataArray in setting:
-            if dataArray["model_name"] == model_name:
-                return dataArray
+async def getDataByModelName(model_name: str) -> dict:
+    # Получаем все группы
+    all_data_arrays = getAllDataArrays()
+
+    # Ищем, в какой группе находится модель с таким названием
+    for _, dataArray in enumerate(all_data_arrays):
+        for data in dataArray:
+            if data["model_name"] == model_name:
+                return data
 
     # Если модель не найдена, то возвращаем пустой словарь
     return {}

@@ -5,11 +5,9 @@ from bot.services.iloveapi.adapters.task.uploader import Uploader
 from bot.services.iloveapi.client.api_client import ILoveAPI
 from bot.services.iloveapi.client.interfaces import (
     ResizerProtocol,
-    UpscalerProtocol,
 )
 from bot.services.iloveapi.facade.task_facade import TaskFacade
 from bot.services.iloveapi.services.resizer import ResizeImageService
-from bot.services.iloveapi.services.upscaler import UpscaleImageService
 from bot.settings import settings
 
 
@@ -24,7 +22,3 @@ def create_task_facade() -> TaskFacade:
 def create_image_resizer() -> ResizerProtocol:
     task_facade = create_task_facade()
     return ResizeImageService(task_facade)
-
-def create_image_upscaler() -> UpscalerProtocol:
-    task_facade = create_task_facade()
-    return UpscaleImageService(task_facade)

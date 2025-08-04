@@ -1,18 +1,19 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.constants import MULTI_IMAGE_NUMBER
+from bot.helpers.generateImages.dataArray.getAllDataArrays import (
+    getAllDataArrays,
+)
 from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
 # Инлайн-клавиатура для выбора количества генераций
 def generationsTypeKeyboard(
     with_work_generation: bool = True,
-    with_test_generation: bool = True,
     with_video_from_image_generation: bool = True,
 ):
     inline_keyboard = getGenerationsTypeButtons(
         "generations_type",
-        with_test_generation,
         with_work_generation,
     )
 
@@ -34,7 +35,7 @@ def generationsTypeKeyboard(
 
 def selectImageKeyboard(
     model_name: str,
-    setting_number: str,
+    group_number: str,
     image_number: int,
     generation_id: str,
 ):
@@ -45,11 +46,11 @@ def selectImageKeyboard(
             [
                 InlineKeyboardButton(
                     text=f"{i}",
-                    callback_data=f"select_image|{model_name}|{setting_number}|{i}|{generation_id[:8]}",
+                    callback_data=f"select_image|{model_name}|{group_number}|{i}|{generation_id[:8]}",
                 ),
                 InlineKeyboardButton(
                     text=f"{i + 1}",
-                    callback_data=f"select_image|{model_name}|{setting_number}|{i + 1}|{generation_id[:8]}",
+                    callback_data=f"select_image|{model_name}|{group_number}|{i + 1}|{generation_id[:8]}",
                 ),
             ],
         )
@@ -58,7 +59,7 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate|{generation_id[:8]}",
+                callback_data=f"select_image|{model_name}|{group_number}|regenerate|{generation_id[:8]}",
             ),
         ]
     )
@@ -66,7 +67,7 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt|{generation_id[:8]}",
+                callback_data=f"select_image|{model_name}|{group_number}|prompt_regen|{generation_id[:8]}",
             ),
         ]
     )
@@ -74,16 +75,17 @@ def selectImageKeyboard(
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
-# Инлайн-клавиатура для выбора настройки
-def selectSettingKeyboard(is_test_generation: bool = False):
+# Инлайн-клавиатура для выбора группы
+def selectGroupKeyboard():
     inline_keyboard = []
+    dataArrays = getAllDataArrays()
 
-    for i in range(1, 5):
+    for i in range(1, len(dataArrays)):
         inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    text=f"Настройка {i}",
-                    callback_data=f"select_setting|{i}",
+                    text=f"Группа {i}",
+                    callback_data=f"select_group|{i}",
                 ),
             ],
         )
@@ -91,22 +93,21 @@ def selectSettingKeyboard(is_test_generation: bool = False):
     inline_keyboard.append(
         [
             InlineKeyboardButton(
-                text="Все настройки",
-                callback_data="select_setting|all",
+                text="Все группы",
+                callback_data="select_group|all",
             ),
         ],
     )
 
     # Генерация конкретной модели
-    if not is_test_generation:
-        inline_keyboard.append(
-            [
-                InlineKeyboardButton(
-                    text="🔄 Индивидуальная генерация",
-                    callback_data="select_setting|specific_model",
-                ),
-            ],
-        )
+    inline_keyboard.append(
+        [
+            InlineKeyboardButton(
+                text="🔄 Индивидуальная генерация",
+                callback_data="select_group|specific_model",
+            ),
+        ],
+    )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
@@ -143,34 +144,6 @@ def confirmWriteUniquePromptForNextModelKeyboard():
                 InlineKeyboardButton(
                     text="✍️ Написать промпт",
                     callback_data="confirm_write_unique_prompt_for_next_model",
-                ),
-            ],
-        ],
-    )
-
-    return kb
-
-
-# Клавиатура для тестирования с другими настройками
-def testGenerationImagesKeyboard(setting_number: str):
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="🔄 Сгенерировать с другими настройками",
-                    callback_data="generations_type|test|prompt_exist",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="✍️ Изменить промпт",
-                    callback_data=f"select_setting|{setting_number}",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="◀️ Назад",
-                    callback_data="generations_type|test",
                 ),
             ],
         ],
@@ -224,7 +197,7 @@ def generationModeKeyboard():
 # Инлайн-клавиатура для мультивыборной генерации изображений
 def selectMultiImageKeyboard(
     model_name: str,
-    setting_number: str,
+    group_number: str,
     image_number: int,
     selected_indexes: list[int],
     generation_id: str,
@@ -242,7 +215,7 @@ def selectMultiImageKeyboard(
             row.append(
                 InlineKeyboardButton(
                     text=text,
-                    callback_data=f"select_multi_image|{model_name}|{setting_number}|{idx}",
+                    callback_data=f"select_multi_image|{model_name}|{group_number}|{idx}",
                 ),
             )
         if row:
@@ -253,7 +226,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="Готово",
-                callback_data=f"multi_image_done|{model_name}|{setting_number}|{short_generation_id}",
+                callback_data=f"multi_image_done|{model_name}|{group_number}|{short_generation_id}",
             ),
         ],
     )
@@ -261,7 +234,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate",
+                callback_data=f"select_image|{model_name}|{group_number}|regenerate",
             ),
         ],
     )
@@ -269,7 +242,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{setting_number}|regenerate_with_new_prompt",
+                callback_data=f"select_image|{model_name}|{group_number}|prompt_regen",
             ),
         ],
     )

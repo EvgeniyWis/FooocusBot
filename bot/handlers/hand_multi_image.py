@@ -10,7 +10,7 @@ from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     process_image,
 )
-from bot.InstanceBot import router
+from bot.InstanceBot import multi_image_router
 from bot.logger import logger
 
 
@@ -18,7 +18,7 @@ async def select_multi_image(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
-    _, model_name, setting_number, image_index = call.data.split("|")
+    _, model_name, group_number, image_index = call.data.split("|")
     image_index = int(image_index)
     message_id = call.message.message_id
     state_data = await state.get_data()
@@ -64,20 +64,23 @@ async def select_multi_image(
         selectMultiImageKeyboard,
     )
 
+    await call.answer()
     kb = selectMultiImageKeyboard(
         model_name,
-        setting_number,
+        group_number,
         MULTI_IMAGE_NUMBER,
         selected_indexes,
         generation_id,
     )
     await call.message.edit_reply_markup(reply_markup=kb)
-    await call.answer()
 
 
 async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
+    # Быстро отвечаем на callback query чтобы избежать timeout
+    await call.answer()
+
     state_data = await state.get_data()
-    _, model_name, setting_number, generation_id = call.data.split("|")
+    _, model_name, group_number, generation_id = call.data.split("|")
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
@@ -198,12 +201,11 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    multi_image_router.callback_query.register(
         select_multi_image,
         lambda call: call.data.startswith("select_multi_image"),
     )
-
-    router.callback_query.register(
+    multi_image_router.callback_query.register(
         multi_image_done,
         lambda call: call.data.startswith("multi_image_done"),
     )

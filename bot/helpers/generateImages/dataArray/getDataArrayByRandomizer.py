@@ -1,24 +1,21 @@
-import asyncio
-
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
-from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
-    getDataArrayBySettingNumber,
+from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
+    get_data_array_by_group_number,
+)
+from bot.helpers.generateImages.dataArray.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
 )
 from bot.helpers.generateImages.dataArray.random_choice_variables_for_images import (
     random_choice_variables_for_images,
 )
-from bot.helpers.generateImages.get_data_array_by_model_indexes import (
-    get_data_array_by_model_indexes,
-)
-from bot.utils.handlers import appendDataToStateArray
 
 
 # Функция для применения переменных рандомайзера к промптам массива данных
 async def getDataArrayByRandomizer(
     state: FSMContext,
-    setting_number: int | str,
+    group_number: int | str,
     model_indexes_for_generation: list[int] = None,
 ):
     # Получаем массив данных
@@ -32,12 +29,12 @@ async def getDataArrayByRandomizer(
 
     # Получаем массив данных
     if not model_indexes_for_generation:
-        dataArray = getDataArrayBySettingNumber(setting_number)
+        dataArray = get_data_array_by_group_number(group_number)
     else:
         dataArray = await get_data_array_by_model_indexes(model_indexes_for_generation)
 
     logger.info(
-        f"Массив данных до применения переменных рандомайзера: {dataArray} для настройки {setting_number}",
+        f"Массив данных до применения переменных рандомайзера: {dataArray} для группы {group_number}",
     )
 
     generators = {}

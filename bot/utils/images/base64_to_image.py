@@ -5,7 +5,7 @@ import io
 import os
 from concurrent.futures import ProcessPoolExecutor
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 import bot.constants as constants
 from bot.logger import logger
@@ -14,16 +14,24 @@ executor = ProcessPoolExecutor()
 
 
 def verify_and_reload_image(image_bytes):
-    image = Image.open(io.BytesIO(image_bytes))
-    image.verify()
-    image = Image.open(io.BytesIO(image_bytes))
-    return image
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        image.verify()
+        image = Image.open(io.BytesIO(image_bytes))
+        return image
+    except (OSError, UnidentifiedImageError, ValueError) as e:
+        logger.error(f"[verify_and_reload_image] Ошибка при проверке изображения: {e}")
+        raise ValueError(f"Не удалось проверить изображение: {e}")
 
 
 def save_image_to_file(image_bytes, file_path):
-    img = Image.open(io.BytesIO(image_bytes))
-    img.save(file_path, format="PNG")
-    img.close()
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        img.save(file_path, format="PNG")
+        img.close()
+    except (OSError, UnidentifiedImageError, ValueError) as e:
+        logger.error(f"[save_image_to_file] Ошибка при сохранении изображения {file_path}: {e}")
+        raise ValueError(f"Не удалось сохранить изображение: {e}")
 
 
 async def save_image_to_file_async(image_bytes, file_path):
@@ -42,7 +50,6 @@ async def base64_to_image(
     folder_name: str,
     index: int,
     user_id: int,
-    is_test_generation: bool,
 ) -> str:
     """
     Преобразует изображение из base64 в PIL Image.
@@ -52,7 +59,6 @@ async def base64_to_image(
         - folder_name: имя папки для сохранения изображения на Google Drive
         - index: индекс выбранного изображения (выбирается пользователем с помощью клавиатуры)
         - user_id: ID пользователя
-        - is_test_generation: флаг, указывающий, что это тестовая генерация
 
     Returns:
         - file_path: абсолютный путь к сохраненному изображению
@@ -60,6 +66,9 @@ async def base64_to_image(
 
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
+
+    # Инициализируем file_path значением None для использования в except блоке
+    file_path = None
 
     # Удаляем префикс Data URL если он присутствует
     if image_data.startswith("data:image/"):
@@ -76,6 +85,8 @@ async def base64_to_image(
         if not image_bytes.startswith(
             b"\x89PNG\r\n\x1a\n",
         ) and not image_bytes.startswith(b"\xff\xd8"):
+            logger.error(f"Полученные данные не являются изображением PNG или JPEG. Первые 20 байт: {image_bytes[:20]}")
+            logger.error(f"Размер данных: {len(image_bytes)} байт")
             raise ValueError(
                 "Полученные данные не являются изображением PNG или JPEG",
             )
@@ -87,16 +98,12 @@ async def base64_to_image(
             image_bytes,
         )
 
-        # Если папка не указана, то значит это тестовая генерация
-        if is_test_generation:
-            folder_name = "test"
-
         save_dir = f"{constants.TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index}.jpg"
 
         logger.info(
-            f"[base64_to_image] Сохраняем файл: {file_path} | folder_name={folder_name}, index={index}, user_id={user_id}, is_test_generation={is_test_generation}"
+            f"[base64_to_image] Сохраняем файл: {file_path} | folder_name={folder_name}, index={index}, user_id={user_id}"
         )
 
         # Используем асинхронное сохранение, чтобы не блокировать event loop
