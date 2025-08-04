@@ -66,8 +66,8 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
     try:
         resize_result_response = await resize_service.resize_image_cloud_file(
             cloud_file=image_url,
-            width=1280,
-            height=720,
+            width=720,
+            height=1280,
         )
         resize_result = resize_result_response.content
     except Exception as e:
