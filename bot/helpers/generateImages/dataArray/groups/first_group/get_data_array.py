@@ -120,7 +120,7 @@ def first_group_get_data_array():
             video_folder_id="18BQ8yxwk9PhZbeQMUNo2-xQjb-kO_La8",
             nsfw_video_folder_id="1m1TxycO1m2eYADqUIv7LILlvXa33JVe7",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -160,7 +160,7 @@ def first_group_get_data_array():
             video_folder_id="18BQ8yxwk9PhZbeQMUNo2-xQjb-kO_La8",
             nsfw_video_folder_id="1m1TxycO1m2eYADqUIv7LILlvXa33JVe7",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -190,7 +190,7 @@ def first_group_get_data_array():
             video_folder_id="17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -204,23 +204,13 @@ def first_group_get_data_array():
             loras_weights=[1, 0.7, 3.70, 1.35, -2.40, -1.50],
         ),
         setting2_generate_data(
-            model_name="arialennix",
-            model_index=4,
-            picture_folder_id="1YpXc8m9btjYfoHD0fDbji0FpFrpruBSg",
-            video_folder_id="17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
-            nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
-            prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
-        ),
-        setting2_generate_data(
             model_name="kaiastell",
             model_index=40,
             picture_folder_id="1YpXc8m9btjYfoHD0fDbji0FpFrpruBSg",
             video_folder_id="17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -230,7 +220,7 @@ def first_group_get_data_array():
             video_folder_id="17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, red hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -250,7 +240,7 @@ def first_group_get_data_array():
             video_folder_id="17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -260,7 +250,7 @@ def first_group_get_data_array():
             video_folder_id="17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
@@ -310,7 +300,7 @@ def first_group_get_data_array():
             video_folder_id="17u0_0ZiKmMDO3kn7m-SKPFoWBOH59v2I",
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
         ),
     ]
