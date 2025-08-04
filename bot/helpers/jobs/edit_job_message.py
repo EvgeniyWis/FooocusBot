@@ -1,9 +1,12 @@
 from aiogram.fsm.context import FSMContext
 
-from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
-from bot.InstanceBot import bot
 from bot.helpers import text
-from bot.helpers.jobs.rate_limiter_for_edit_job_message import safe_bot_edit_job_message
+from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
+from bot.helpers.jobs.rate_limiter_for_edit_job_message import (
+    safe_bot_edit_job_message,
+)
+from bot.InstanceBot import bot
+from bot.logger import logger
 
 
 async def edit_job_message(
@@ -86,8 +89,8 @@ async def edit_job_message(
                     left_images_count,
                 ),
             )
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Ошибка при редактировании сообщения о процессе и статистике генерации изображений: {e}")
     else:
         # Добавляем в стейт то, сколько готовых изображений
         await state.update_data(total_images_count=1)
