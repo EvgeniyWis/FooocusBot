@@ -201,7 +201,7 @@ async def process_faceswap_image(
                 # Копирование больше не требуется, так как файл уже в нужном месте
                 result_path = await retryOperation(
                     facefusion_swap,
-                    5,
+                    3,
                     2,
                     faceswap_source_path,
                     faceswap_target_path,
