@@ -15,13 +15,30 @@ async def httpx_post(
     files: dict = None,
     timeout: int = 60,
     with_response_text_logging: bool = True,
+    is_long_operation: bool = False,
 ) -> dict:
     response = None
     response_json = None
 
     try:
+        # Увеличиваем таймауты для длительных операций (например, upscale)
+        if is_long_operation:
+            timeout_config = httpx.Timeout(
+                connect=60,   # таймаут на подключение
+                read=600,     # таймаут на чтение (10 минут)
+                write=60,     # таймаут на запись
+                pool=60,      # таймаут на получение соединения из пула
+            )
+        else:
+            timeout_config = httpx.Timeout(
+                connect=30,   # таймаут на подключение
+                read=120,     # таймаут на чтение
+                write=30,     # таймаут на запись
+                pool=30,      # таймаут на получение соединения из пула
+            )
+
         async with httpx.AsyncClient(
-            timeout=httpx.Timeout(timeout),
+            timeout=timeout_config,
             follow_redirects=True,
         ) as client:
             response = await client.post(
@@ -30,12 +47,7 @@ async def httpx_post(
                 data=data,
                 json=json,
                 files=files,
-                timeout=httpx.Timeout(
-                    connect=30,  # таймаут на подключение
-                    read=120,  # таймаут на чтение
-                    write=30,  # таймаут на запись
-                    pool=30,  # таймаут на получение соединения из пула
-                ),
+                timeout=timeout_config,
             )
 
             if with_response_text_logging:

@@ -22,6 +22,7 @@ class ILoveAPI(BaseAPIClient):
         data: dict = None,
         files: dict = None,
         with_base_url: bool = True,
+        is_long_operation: bool = False,
     ) -> dict:
         """
         Выполняет POST-запрос к ILoveAPI с автоматическим добавлением токена.
@@ -30,6 +31,7 @@ class ILoveAPI(BaseAPIClient):
             url (str): URL запроса.
             json (dict, optional): JSON-данные для отправки.
             files (dict, optional): Файлы для отправки.
+            is_long_operation (bool): Флаг для длительных операций (например, upscale).
 
         Returns:
             dict: Ответ от сервера.
@@ -39,7 +41,15 @@ class ILoveAPI(BaseAPIClient):
             raise RuntimeError("Не удалось получить токен для ILoveAPI")
 
         headers = {"Authorization": f"Bearer {token}"}
-        resp = await super().post(url, json=json, data=data, files=files, headers=headers, with_base_url=with_base_url)
+        resp = await super().post(
+            url, 
+            json=json, 
+            data=data, 
+            files=files, 
+            headers=headers, 
+            with_base_url=with_base_url,
+            is_long_operation=is_long_operation
+        )
         return resp
 
     async def get(
@@ -47,6 +57,7 @@ class ILoveAPI(BaseAPIClient):
         url: str,
         with_base_url: bool = True,
         extra_headers: dict = None,
+        is_long_operation: bool = False,
     ) -> dict:
         token = await self.auth_service.get_token()
         if not token:
@@ -57,5 +68,10 @@ class ILoveAPI(BaseAPIClient):
         if extra_headers:
             headers.update(extra_headers)
 
-        resp = await super().get(url, headers=headers, with_base_url=with_base_url)
+        resp = await super().get(
+            url, 
+            headers=headers, 
+            with_base_url=with_base_url,
+            is_long_operation=is_long_operation
+        )
         return resp

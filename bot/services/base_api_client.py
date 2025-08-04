@@ -17,15 +17,32 @@ class BaseAPIClient:
         files: dict = None,
         headers: dict = None,
         with_base_url: bool = True,
+        is_long_operation: bool = False,
     ) -> dict:
         url = f"{self.base_url}{path}" if with_base_url else path
         logger.info(f"Отправка POST запроса на {url}")
-        resp = await httpx_post(url, json=json, data=data,
-        files=files, headers=headers)
+        resp = await httpx_post(
+            url, 
+            json=json, 
+            data=data,
+            files=files, 
+            headers=headers,
+            is_long_operation=is_long_operation
+        )
         return resp
 
-    async def get(self, path: str, headers: dict = None, with_base_url: bool = True) -> dict:
+    async def get(
+        self, 
+        path: str, 
+        headers: dict = None, 
+        with_base_url: bool = True,
+        is_long_operation: bool = False,
+    ) -> dict:
         url = f"{self.base_url}{path}" if with_base_url else path
         logger.info(f"Отправка GET запроса на {url}")
-        resp = await httpx_get(url, headers=headers)
+        resp = await httpx_get(
+            url, 
+            headers=headers,
+            is_long_operation=is_long_operation
+        )
         return resp
