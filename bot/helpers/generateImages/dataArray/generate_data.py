@@ -8,7 +8,6 @@ def generate_data(
     setting_number: int | str,
     picture_folder_id: str,
     video_folder_id: str,
-    nsfw_video_folder_id: str,
     prompt: str,
     loras: list[dict],
     base_config_model_name: str,
@@ -56,14 +55,13 @@ def generate_data(
                 "base_model_name": base_config_model_name,
                 "style_selections": [],
                 "guidance_scale": guidance_scale,
-                "aspect_ratios_selection": "1000*1000",
+                "aspect_ratios_selection": "720*1280",
             },
         },
         "model_name": model_name,
         "model_index": model_index,
         "picture_folder_id": picture_folder_id,
         "video_folder_id": video_folder_id,
-        "nsfw_video_folder_id": nsfw_video_folder_id,
         "setting_number": setting_number,
     }
     return data
