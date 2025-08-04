@@ -97,10 +97,10 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
         magnific_result_url = await magnific_service.upscale_image(
             image=resize_result_base64,
             optimized_for="standard",
-            creativity=-3,
-            hdr=-8,
-            resemblance=-4,
-            fractality=5,
+            creativity=-8,
+            hdr=8,
+            resemblance=-10,
+            fractality=6,
             engine="magnific_sharpy",
             scale_factor="2x",
         )
