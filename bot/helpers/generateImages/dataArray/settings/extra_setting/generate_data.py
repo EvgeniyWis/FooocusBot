@@ -20,17 +20,17 @@ def extra_setting_generate_data(
     loras = extra_setting_generate_loras(loras_weights)
     base_config_model_name = "CyberRealistic_Pony.safetensors"
     data = generate_data(
-        model_name,
-        model_index,
-        "extra",
-        picture_folder_id,
-        video_folder_id,
-        nsfw_video_folder_id,
-        prompt,
-        loras,
-        base_config_model_name,
-        image_number,
-        negative_prompt,
+        model_name=model_name,
+        model_index=model_index,
+        setting_number="extra",
+        picture_folder_id=picture_folder_id,
+        video_folder_id=video_folder_id,
+        nsfw_video_folder_id=nsfw_video_folder_id,
+        prompt=prompt,
+        loras=loras,
+        base_config_model_name=base_config_model_name,
+        image_number=image_number,
+        negative_prompt=negative_prompt,
         guidance_scale=3,
     )
     return data
