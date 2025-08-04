@@ -1,7 +1,7 @@
 from bot.helpers.generateImages.dataArray.generate_loras import generate_loras
 
 
-# Функция для генерации массива лор для настройки 3
+# Функция для генерации массива лор для группы 3
 def setting3_generate_loras(weights: list[int]):
     loras = [
         "Nipple_Size_Slider.safetensors",

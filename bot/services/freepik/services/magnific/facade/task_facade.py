@@ -64,7 +64,7 @@ class TaskFacade(BaseService, MagnificTaskFacadeProtocol):
         Upscale изображение с помощью Magnific.
         Args:
             image (str): Base64-encoded изображение.
-            Настройки апскейла:
+            группы апскейла:
             optimized_for (str): Оптимизация для.
             creativity (int): Креативность.
             hdr (int): HDR.

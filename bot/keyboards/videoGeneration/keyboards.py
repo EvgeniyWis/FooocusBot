@@ -33,10 +33,9 @@ def generateVideoKeyboard(model_name: str, image_index: int, with_magnific_upsca
 
 
 # Инлайн-клавиатура для выбора типа генерации видео
-def generatedVideoKeyboard(prefix: str, with_test_generation: bool = True):
+def generatedVideoKeyboard(prefix: str):
     inline_keyboard = getGenerationsTypeButtons(
         prefix,
-        with_test_generation=with_test_generation,
     )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -59,7 +58,6 @@ def videoGenerationTypeKeyboard(
             *getGenerationsTypeButtons(
                 prefix=prefix,
                 with_work_generation=False,
-                with_test_generation=False,
                 rewrite_prompt=True,
             ),
         ],
@@ -135,6 +133,42 @@ def img2video_done_send_images_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="✅ Готово", callback_data="img2video|done_send_images")],
+        ],
+    )
+    return keyboard
+
+
+# Инлайн-клавиатура для выбора типа ввода промпта в img2video
+def choose_prompt_type_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📝 Один промпт для всех",
+                    callback_data="img2video|prompt_type|one",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🔤 Уникальный промпт для каждого",
+                    callback_data="img2video|prompt_type|multi",
+                ),
+            ],
+        ],
+    )
+    return keyboard
+
+
+# Инлайн-клавиатура для завершения ввода промптов в img2video
+def img2video_done_typing_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Готово",
+                    callback_data="img2video|finish_prompt",
+                ),
+            ],
         ],
     )
     return keyboard

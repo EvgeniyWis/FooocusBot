@@ -2,7 +2,7 @@
 from aiogram import types
 
 from bot import constants
-from bot.helpers.generateImages.dataArray import getModelNameIndex
+from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
 from bot.keyboards import video_generation_keyboards
 from bot.settings import settings
 from bot.utils import retryOperation, text
@@ -27,28 +27,20 @@ async def send_error_message(message: types.Message, image_index: int | None, mo
         None
     """
 
-    model_name_index = getModelNameIndex(model_name) if model_name else None
+    model_name_index = get_model_index_by_model_name(model_name)
 
-    if model_name:
-        await safe_send_message(
-            text.GENERATE_VIDEO_ERROR_TEXT.format(
-                model_name,
-                model_name_index,
-                e,
-            ),
-            message,
-            reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
-                model_name,
-                image_index
-            ),
-        )
-    else:
-        await safe_send_message(
-            text.GENERATE_VIDEO_ERROR_TEXT_WITHOUT_MODEL.format(
-                e,
-            ),
-            message,
-        )
+    await safe_send_message(
+        text.GENERATE_VIDEO_ERROR_TEXT.format(
+            model_name,
+            model_name_index,
+            e,
+        ),
+        message,
+        reply_markup=video_generation_keyboards.videoGenerationTypeKeyboard(
+            model_name,
+            image_index
+        ),
+    )
 
 
 async def check_video_path(

@@ -2,6 +2,10 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.domain.entities.task import TaskImageBlockDTO
+from bot.helpers.generateImages.dataArray import (
+    get_group_number_by_model_name,
+    get_setting_number_by_model_name,
+)
 from bot.helpers.generateImages.getReferenceImage import getReferenceImage
 from bot.helpers.jobs.check_job_status import (
     check_job_status,
@@ -17,11 +21,9 @@ from bot.utils.images.base64_to_image import base64_to_image
 async def process_image_block(
     job_id: str,
     model_name: str,
-    setting_number: int | str,
     user_id: int,
     state: FSMContext,
     message_id: int,
-    is_test_generation: bool,
     checkOtherJobs: bool,
     chat_id: int,
 ) -> bool:
@@ -31,14 +33,18 @@ async def process_image_block(
     Attributes:
         job_id (str): id работы
         model_name (str): название модели
-        setting_number (int): номер настройки
         user_id (int): id пользователя
         state (FSMContext): контекст состояния
         message (types.Message): сообщение
-        is_test_generation (bool): флаг, указывающий на тестовую генерацию
         checkOtherJobs (bool): флаг, указывающий на проверку других работ
         chat_id (int): id чата
     """
+
+    # Получаем номер настройки по имени модели
+    setting_number = get_setting_number_by_model_name(model_name)
+
+    # Получаем номер группы по имени модели
+    group_number = get_group_number_by_model_name(model_name)
 
     if not settings.MOCK_IMAGES_MODE:
         redis_storage = get_redis_storage()
@@ -48,7 +54,6 @@ async def process_image_block(
             setting_number=setting_number,
             user_id=user_id,
             message_id=message_id,
-            is_test_generation=is_test_generation,
             check_other_jobs=checkOtherJobs,
             chat_id=chat_id,
         )
@@ -60,14 +65,14 @@ async def process_image_block(
         # Проверяем статус работы
         response_json = await retryOperation(
             check_job_status,
-            3,
+            5,
             2,
             job_id,
             setting_number,
+            group_number,
             user_id,
             message_id,
             state,
-            is_test_generation,
             checkOtherJobs,
             500,
         )
@@ -105,7 +110,6 @@ async def process_image_block(
                     model_name,
                     i + 1,
                     user_id,
-                    is_test_generation,
                 )
                 media_group.append(
                     types.InputMediaPhoto(
@@ -136,8 +140,7 @@ async def process_image_block(
             state,
             media_group,
             model_name,
-            setting_number,
-            is_test_generation,
+            group_number,
             user_id,
             generation_id=job_id,
         )

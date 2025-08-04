@@ -78,17 +78,3 @@ class ResizerProtocol(Protocol):
 
     async def resize_image_cloud_file(self, cloud_file: str, width: int, height: int | str) -> httpx.Response:
         ...
-
-class UpscalerProtocol(Protocol):
-    """
-    Протокол ускользателя изображений для ILoveAPI.
-    Пример:
-        class MyUpscaler:
-            async def upscale_image(self, file: str, multiplier: int) -> httpx.Response:
-                ...
-    """
-    async def upscale_image_file(self, file: str, multiplier: int) -> httpx.Response:
-        ...
-
-    async def upscale_image_cloud_file(self, cloud_file: str, multiplier: int) -> httpx.Response:
-        ...

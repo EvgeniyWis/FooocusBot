@@ -1,13 +1,14 @@
 from bot.helpers.generateImages.dataArray.generate_data import generate_data
-from bot.helpers.generateImages.dataArray.setting_3.generate_loras import (
-    setting3_generate_loras,
+from bot.helpers.generateImages.dataArray.settings.extra_setting.generate_loras import (
+    extra_setting_generate_loras,
 )
 from bot.settings import settings
 
 
-# Функция для генерации данных для запроса настройки 3
-def setting3_generate_data(
+# Функция для генерации данных для запроса по экстра-настройке
+def extra_setting_generate_data(
     model_name: str,
+    model_index: int,
     picture_folder_id: str,
     video_folder_id: str,
     nsfw_video_folder_id: str,
@@ -16,10 +17,12 @@ def setting3_generate_data(
     image_number: int = 4,
     negative_prompt: str = settings.COMMON_NEGATIVE_PROMPT,
 ):
-    loras = setting3_generate_loras(loras_weights)
-    base_config_model_name = "CyberIllustrious_CyberRealistic.safetensors"
+    loras = extra_setting_generate_loras(loras_weights)
+    base_config_model_name = "CyberRealistic_Pony.safetensors"
     data = generate_data(
         model_name,
+        model_index,
+        "extra",
         picture_folder_id,
         video_folder_id,
         nsfw_video_folder_id,
@@ -28,5 +31,6 @@ def setting3_generate_data(
         base_config_model_name,
         image_number,
         negative_prompt,
+        guidance_scale=3,
     )
     return data

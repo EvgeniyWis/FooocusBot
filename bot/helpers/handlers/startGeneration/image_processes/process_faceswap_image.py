@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 from PIL import Image
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import getModelNameIndex
+from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
 from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
 from bot.utils import retryOperation
@@ -40,7 +40,7 @@ async def process_faceswap_image(
     user_id = call.from_user.id
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     # Меняем текст на сообщении об очереди на замену лица
     await send_progress_message(
@@ -117,7 +117,7 @@ async def process_faceswap_image(
         # Проверяем таймаут
         current_time = datetime.now()
         elapsed_time = (current_time - start_time).total_seconds()
-        if elapsed_time > 1200:  # 20 минут = 1200 секунд
+        if elapsed_time > 1800:  # 30 минут = 1800 секунд
             error_message = f"Время ожидания замены лица для модели {model_name} истекло!"
             logger.error(
                 error_message,

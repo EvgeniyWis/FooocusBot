@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
-from bot.helpers.generateImages.dataArray import getModelNameIndex
+from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
 from bot.logger import logger
 from bot.states import StartGenerationState
 from bot.utils.handlers import appendDataToStateArray
@@ -32,7 +32,7 @@ async def process_write_prompt(
         None
     """
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = get_model_index_by_model_name(model_name)
 
     await state.update_data(model_name_for_video_generation=model_name)
     await state.update_data(image_index_for_video_generation=image_index)
@@ -91,6 +91,12 @@ async def process_write_prompt(
                 data_for_update,
                 unique_keys=("model_name"),
             )
+
+    # Проверяем, добавилось ли имя модели в стейт
+    state_data = await state.get_data()
+    model_name_for_video_generation = state_data.get("model_name_for_video_generation", "")
+    if model_name_for_video_generation != model_name:
+        await state.update_data(model_name_for_video_generation=model_name)
 
     # Переключаем стейт
     if is_quick_generation:

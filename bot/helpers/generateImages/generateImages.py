@@ -6,24 +6,23 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from logger import logger
 
+from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
+    get_data_array_by_group_number,
+)
+from bot.helpers.generateImages.dataArray.get_data_array_by_model_indexes import (
+    get_data_array_by_model_indexes,
+)
 from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
     getDataArrayByRandomizer,
-)
-from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
-    getDataArrayBySettingNumber,
-)
-from bot.helpers.generateImages.get_data_array_by_model_indexes import (
-    get_data_array_by_model_indexes,
 )
 
 
 async def generateImages(
-    setting_number: int | str,
+    group_number: int | str,
     prompt_for_current_model: dict[str, Any],
     message: types.Message,
     state: FSMContext,
     user_id: int,
-    is_test_generation: bool,
     with_randomizer: bool = False,
     model_indexes_for_generation: list[str] = None,
 ):
@@ -43,23 +42,23 @@ async def generateImages(
                 base_model_indexes,
             )
         else:
-            dataArrayBase = getDataArrayBySettingNumber(setting_number)
+            dataArrayBase = get_data_array_by_group_number(group_number)
     else:
         dataArrayBase = await getDataArrayByRandomizer(
             state,
-            setting_number,
+            group_number,
             base_model_indexes,
         )
 
+    total_jobs_count = len(model_indexes_for_generation) if len(model_indexes_for_generation) > 0 else len(dataArrayBase)
+
     logger.info(
-        f"Генерация изображений с помощью API для настройки {setting_number}. Длина массива: {len(model_indexes_for_generation)}. Переменный промпт: {prompt_for_current_model}",
+        f"Генерация изображений с помощью API для группы {group_number}. Длина массива: {total_jobs_count}. Переменный промпт: {prompt_for_current_model}",
     )
 
     await state.update_data(
         jobs={},
-        total_jobs_count=len(model_indexes_for_generation)
-        if len(model_indexes_for_generation) > 0
-        else len(dataArrayBase),
+        total_jobs_count=total_jobs_count,
     )
     images = []
     generation_id_to_full_model_key = {}
@@ -93,9 +92,8 @@ async def generateImages(
                 message.message_id,
                 state,
                 user_id,
-                setting_number,
+                data["model_name"],
                 prompt_for_model,
-                is_test_generation,
                 chat_id=message.chat.id,
             )
 

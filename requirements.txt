@@ -9,3 +9,4 @@ pydantic-settings==2.9.1
 pydantic==2.9.2
 pytz==2025.2
 runpod==1.7.1
+iloveapi==1.0.0

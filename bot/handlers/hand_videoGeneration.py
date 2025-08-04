@@ -6,6 +6,9 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
+from bot.helpers.generateImages.dataArray import (
+    get_model_name_by_index,
+)
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.videoGeneration import (
     get_video_path_from_state,
@@ -13,13 +16,14 @@ from bot.helpers.handlers.videoGeneration import (
     process_write_prompt,
     saveVideo,
 )
-from bot.InstanceBot import router
+from bot.InstanceBot import video_generation_router
 from bot.logger import logger
 from bot.settings import settings
 from bot.states import StartGenerationState
 from bot.utils.handlers import (
     getDataInDictsArray,
 )
+from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
 from bot.utils.handlers.messages import (
     editMessageOrAnswer,
 )
@@ -56,6 +60,12 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
         except Exception as e:
             logger.error(f"Ошибка при удалении видео из папки temp: {e}")
 
+    # Проверяем, добавилось ли имя модели в стейт
+    state_data = await state.get_data()
+    model_name_for_video_generation = state_data.get("model_name_for_video_generation", "")
+    if model_name_for_video_generation != model_name:
+        await state.update_data(model_name_for_video_generation=model_name)
+
     await process_write_prompt(
         call,
         state,
@@ -74,6 +84,9 @@ async def handle_rewrite_prompt_button(
     state_data = await state.get_data()
     current_prompt = state_data.get("prompt_for_video", "")
 
+    # Сохраняем model_name, чтобы потом знать куда применить
+    await state.update_data(model_name_for_video_generation=model_name)
+
     # Обновляем сообщение
     await editMessageOrAnswer(
         call,
@@ -81,8 +94,11 @@ async def handle_rewrite_prompt_button(
         reply_markup=None,
     )
 
-    # Сохраняем model_name, чтобы потом знать куда применить
-    await state.update_data(model_name_for_video_generation=model_name)
+    # Проверяем, добавилось ли имя модели в стейт
+    state_data = await state.get_data()
+    model_name_for_video_generation = state_data.get("model_name_for_video_generation", "")
+    if model_name_for_video_generation != model_name:
+        await state.update_data(model_name_for_video_generation=model_name)
 
     # Ставим стейт для обработки ввода
     await state.set_state(StartGenerationState.write_prompt_for_quick_video_generation)
@@ -117,11 +133,26 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             raise Exception(error_message)
 
     else:
-        img2video_temp_paths_for_with_model_names = state_data.get(
-            "img2video_temp_paths_for_with_model_names", {}
-        )
-
-        temp_path = img2video_temp_paths_for_with_model_names.get(model_name, None)
+        # Сначала проверяем данные из режима уникальных промптов
+        img2video_data = state_data.get("img2video_data", [])
+        temp_path = None
+        
+        if img2video_data:
+            # Ищем путь к изображению для данной модели
+            for data in img2video_data:
+                if get_model_name_by_index(data['model_index']) == model_name:
+                    # Получаем путь к изображению из temp_paths_for_video_generation по индексу
+                    temp_paths_for_video_generation = state_data.get("temp_paths_for_video_generation", [])
+                    if data['image_index'] <= len(temp_paths_for_video_generation):
+                        temp_path = temp_paths_for_video_generation[data['image_index'] - 1]
+                    break
+        
+        # Если не найдено в img2video_data, ищем в старом формате
+        if not temp_path:
+            img2video_temp_paths_for_with_model_names = state_data.get(
+                "img2video_temp_paths_for_with_model_names", {}
+            )
+            temp_path = img2video_temp_paths_for_with_model_names.get(model_name, None)
 
         if not temp_path:
             await safe_send_message(
@@ -268,16 +299,16 @@ async def write_prompt_for_video_generation_by_one_prompt(message: types.Message
 
 # Добавление обработчиков
 def hand_add():
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         quick_generate_video,
         lambda call: call.data.startswith("quick_video_generation"),
     )
 
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         handle_rewrite_prompt_button,
         lambda call: call.data.startswith("rewrite_prompt|"),
     )
-    router.message.register(
+    video_generation_router.message.register(
         write_prompt_for_video,
         StateFilter(
             StartGenerationState.write_prompt_for_video,
@@ -285,17 +316,17 @@ def hand_add():
         ),
     )
 
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         handle_video_save_button,
         lambda call: call.data.startswith("video_correctness|correct"),
     )
 
-    router.callback_query.register(
+    video_generation_router.callback_query.register(
         handle_generate_video_by_one_prompt,
         lambda call: call.data.startswith("generate_video_by_one_prompt"),
     )
 
-    router.message.register(
+    video_generation_router.message.register(
         write_prompt_for_video_generation_by_one_prompt,
         StateFilter(StartGenerationState.write_prompt_for_video_generation_by_one_prompt),
     )

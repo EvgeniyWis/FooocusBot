@@ -1,7 +1,7 @@
 from bot.helpers.generateImages.dataArray.generate_loras import generate_loras
 
 
-# Функция для генерации массива лор для настройки 2
+# Функция для генерации массива лор для группы 2
 def setting2_generate_loras(weights: list[int]):
     loras = [
         "Crazy_Girlfriend_Mix.safetensors",

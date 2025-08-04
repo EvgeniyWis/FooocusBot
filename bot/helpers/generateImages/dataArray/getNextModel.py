@@ -1,23 +1,23 @@
 from aiogram.fsm.context import FSMContext
 
-from bot.logger import logger
+from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
+    get_data_array_by_group_number,
+)
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )
-from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
-    getDataArrayBySettingNumber,
-)
+from bot.logger import logger
 
 
-# Функция для получения следующей модели в настройке
-async def getNextModelInSetting(
+# Функция для получения следующей модели в группе
+async def get_next_model_in_group(
     current_model: str,
-    dataArrayBySettingNumber: list[dict],
+    dataArrayByGroupNumber: list[dict],
 ):
-    for index, dataArray in enumerate(dataArrayBySettingNumber):
+    for index, dataArray in enumerate(dataArrayByGroupNumber):
         if current_model == dataArray["model_name"]:
             try:
-                return dataArrayBySettingNumber[index + 1]["model_name"]
+                return dataArrayByGroupNumber[index + 1]["model_name"]
             except Exception:
                 return False
 
@@ -25,56 +25,56 @@ async def getNextModelInSetting(
 # Функция для получения следующей модели
 async def getNextModel(
     current_model: str,
-    setting_number: str,
+    group_number: str,
     state: FSMContext,
 ):
-    if setting_number == "all":
-        # Получаем все настройки
+    if group_number == "all":
+        # Получаем все группы
         dataArrays = getAllDataArrays()
 
-        # Получаем текущую настройку
+        # Получаем текущую группу
         state_data = await state.get_data()
-        current_setting_number = state_data[
-            "current_setting_number_for_unique_prompt"
+        current_group_number = state_data[
+            "current_group_number_for_unique_prompt"
         ]
 
-        dataArrayBySettingNumber = dataArrays[current_setting_number - 1]
+        dataArrayByGroupNumber = dataArrays[current_group_number - 1]
 
-        current_model_is_last_in_setting = (
-            current_model == dataArrayBySettingNumber[-1]["model_name"]
+        current_model_is_last_in_group = (
+            current_model == dataArrayByGroupNumber[-1]["model_name"]
         )
 
         logger.info(
-            f"Текущая настройка: {current_setting_number}. Является ли модель {current_model} последней в настройке: {current_model_is_last_in_setting}",
+            f"Текущая группа: {current_group_number}. Является ли модель {current_model} последней в группе: {current_model_is_last_in_group}",
         )
 
-        # Если текущая модель является последней в настройке, то получаем первую модель в следующей настройке
-        if current_model_is_last_in_setting:
-            if current_setting_number == len(
+        # Если текущая модель является последней в группе, то получаем первую модель в следующей группе
+        if current_model_is_last_in_group:
+            if current_group_number == len(
                 dataArrays,
-            ):  # Если текущая настройка является последней, то False
+            ):  # Если текущая группа является последней, то False
                 return False
-            else:  # Если текущая настройка не является последней, то получаем первую модель в следующей настройке
-                next_setting_number = int(current_setting_number) + 1
+            else:  # Если текущая группа не является последней, то получаем первую модель в следующей группе
+                next_group_number = int(current_group_number) + 1
                 await state.update_data(
-                    current_setting_number_for_unique_prompt=next_setting_number,
+                    current_group_number_for_unique_prompt=next_group_number,
                 )
-                dataArraysByNextSettingNumber = getDataArrayBySettingNumber(
-                    next_setting_number,
+                dataArraysByNextGroupNumber = get_data_array_by_group_number(
+                    next_group_number,
                 )
-                return dataArraysByNextSettingNumber[0]["model_name"]
-        else:  # Если текущая модель не является последней в настройке, то получаем следующую модель в настройке
-            return await getNextModelInSetting(
+                return dataArraysByNextGroupNumber[0]["model_name"]
+        else:  # Если текущая модель не является последней в группе, то получаем следующую модель в группе
+            return await get_next_model_in_group(
                 current_model,
-                dataArrayBySettingNumber,
+                dataArrayByGroupNumber,
             )
     else:
-        # Получаем данные по номеру настройки
-        dataArrayBySettingNumber = getDataArrayBySettingNumber(
-            int(setting_number),
+        # Получаем данные по номеру группы
+        dataArrayByGroupNumber = get_data_array_by_group_number(
+            int(group_number),
         )
 
-        return await getNextModelInSetting(
+        return await get_next_model_in_group(
             current_model,
-            dataArrayBySettingNumber,
+            dataArrayByGroupNumber,
         )

@@ -1,18 +1,19 @@
 from bot.helpers.generateImages.dataArray.generate_loras import generate_loras
 
 
-# Функция для генерации массива лор для настройки 1
-def setting1_generate_loras(weights: list[int]):
+# Функция для генерации массива лор для группы 4
+def setting4_generate_loras(weights: list[int]):
     loras = [
         "Pony_Realism_Slider.safetensors",
         "Breast_Size_Slider.safetensors",
-        "Nipple_Size_Slider.safetensors",
         "Body_Weight_Slider.safetensors",
         "Breast_Enlargement_Slider.safetensors",
-        "Crazy_Girlfriend_Mix.safetensors",
-        "Big_Natural_Breasts.safetensors",
         "Hour_Glass_Body_By_Stable_Yogi.safetensors",
-        "lighting_darkness_slider.safetensors",
+        "Real_Beauty.safetensors",
+        "Nipple_Size_Slider.safetensors",
+        "Brightness_slider.safetensors",
+        "Skin_Color_Slider.safetensors",
+        "Big_Natural_Breasts.safetensors",
     ]
 
     return generate_loras(weights, loras)
