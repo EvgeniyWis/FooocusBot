@@ -71,4 +71,4 @@ async def generateImageBlock(
         chat_id=chat_id,
     )
 
-    return result
+    return result, job_id

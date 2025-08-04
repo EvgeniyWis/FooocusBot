@@ -1,3 +1,5 @@
+import re
+
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
@@ -12,6 +14,12 @@ from bot.utils.handlers import getDataInDictsArray
 from bot.utils.handlers.messages.editMessageOrAnswer import editMessageOrAnswer
 
 
+async def get_normal_model(model_name: str) -> str:
+    split_model_name = model_name.split("+")[0]
+    re_model_name = re.sub(r"_\d+$", "", split_model_name)
+    return re_model_name
+
+
 # Функция для перегенерации изображения
 async def regenerateImage(
     model_name: str,
@@ -23,34 +31,44 @@ async def regenerateImage(
     is_test_generation = state_data.get("generations_type", "") == "test"
 
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = getModelNameIndex(await get_normal_model(model_name))
 
-    # Получаем id пользователя
     user_id = call.from_user.id
 
     # Отправляем сообщение о перегенерации изображения
     regenerate_message = await editMessageOrAnswer(
-        call, text.REGENERATE_IMAGE_TEXT.format(model_name, model_name_index)
+        call,
+        text.REGENERATE_IMAGE_TEXT.format(
+            await get_normal_model(model_name),
+            model_name_index,
+        ),
     )
 
     # Получаем промпт для перегенерации изображения в зависимости от режима генерации
     randomizer_prompts = state_data.get("randomizer_prompts", [])
     randomizer_prompt = await getDataInDictsArray(
-        randomizer_prompts, model_name
+        randomizer_prompts,
+        model_name,
     )
 
     prompt_for_images = state_data.get("prompt_for_images", None)
 
     prompts_for_regenerated_models = state_data.get(
-        "prompts_for_regenerated_models", []
+        "prompts_for_regenerated_models",
+        [],
     )
     prompt_for_regenerate_image = await getDataInDictsArray(
-        prompts_for_regenerated_models, model_name
+        prompts_for_regenerated_models,
+        model_name,
     )
 
     prompts_for_models = state_data.get("model_prompts_for_generation", [])
+    logger.info(
+        f"Промпты для перегенерации изображения: {prompts_for_models}",
+    )
     prompt_for_model = await getDataInDictsArray(
-        prompts_for_models, model_name
+        prompts_for_models,
+        model_name,
     )
 
     logger.info(
@@ -59,40 +77,37 @@ async def regenerateImage(
         randomizer_prompt: {randomizer_prompt}
         prompt_for_images: {prompt_for_images}
         prompt_for_model: {prompt_for_model}
-        """
+        """,
     )
 
     if prompt_for_regenerate_image:
         prompt = prompt_for_regenerate_image
 
         logger.info(f"Промпт для перегенерации изображения: {prompt}")
-
     elif randomizer_prompt:
         prompt = randomizer_prompt
         logger.info(
-            f"Промпт для перегенерации изображения, полученный из рандомайзера: {prompt}"
+            f"Промпт для перегенерации изображения, полученный из рандомайзера: {prompt}",
         )
-
     elif prompt_for_images:
         prompt = prompt_for_images
         logger.info(
-            f"Промпт для перегенерации изображения, полученный из стейта: {prompt}"
+            f"Промпт для перегенерации изображения, полученный из стейта: {prompt}",
         )
-
     elif prompt_for_model:
         prompt = prompt_for_model
         logger.info(
-            f"Промпт для перегенерации изображения, полученный из уникальных промптов для моделей: {prompt}"
+            f"Промпт для перегенерации изображения, полученный из уникальных промптов для моделей: {prompt}",
         )
-
     else:
         raise Exception("Промпт для перегенерации изображения не найден")
 
+    normal_model_name = await get_normal_model(model_name)
     # Получаем данные генерации по названию модели
-    data = await getDataByModelName(model_name)
+    data = await getDataByModelName(normal_model_name)
 
     try:
-        result = await generateImageBlock(
+        result, _ = await generateImageBlock(
             data,
             call.message.message_id,
             state,
@@ -109,10 +124,17 @@ async def regenerateImage(
     except Exception as e:
         logger.error(f"Ошибка при перегенерации изображения: {e}")
         await editMessageOrAnswer(
-            call, text.REGENERATE_IMAGE_ERROR_TEXT.format(model_name, model_name_index, e)
+            call,
+            text.REGENERATE_IMAGE_ERROR_TEXT.format(
+                model_name,
+                model_name_index,
+                e,
+            ),
         )
     finally:
         try:
             await regenerate_message.delete()
         except Exception as e:
-            logger.error(f"Ошибка при удалении сообщения о перегенерации изображения: {e}")
+            logger.error(
+                f"Ошибка при удалении сообщения о перегенерации изображения: {e}",
+            )
