@@ -5,6 +5,7 @@ from collections import defaultdict
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
+from helpers.handlers.startGeneration.regenerateImage import get_normal_model
 from keyboards.startGeneration.keyboards import done_typing_keyboard
 from pydantic import ValidationError
 from utils.handlers.messages import safe_edit_message
@@ -379,6 +380,29 @@ async def write_prompt(message: types.Message, state: FSMContext):
         )
 
 
+async def get_model_name_with_generation_id(
+    state: FSMContext,
+    generation_id: str,
+) -> str:
+    state_data = await state.get_data()
+    mapping: dict = state_data.get(
+        "generation_id_to_full_model_key",
+        {},
+    )
+    logger.info(
+        f"Ищем model_name по generation_id: generation_id={generation_id}",
+    )
+    logger.info(f"generation_id_to_full_model_key: {mapping}")
+
+    model_name: str | None = None
+    for full_job_id, model_key in mapping.items():
+        if full_job_id.startswith(generation_id):
+            model_name = model_key
+            break
+
+    return model_name
+
+
 # Обработка выбора изображения
 async def select_image(call: types.CallbackQuery, state: FSMContext):
     # Отправляем сообщение о выборе изображения
@@ -405,25 +429,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     )
     try:
         if image_index == "regenerate":
-            state_data = await state.get_data()
-            mapping: dict = state_data.get(
-                "generation_id_to_full_model_key",
-                {},
+            model_name_for_regenerate = (
+                await get_model_name_with_generation_id(
+                    state,
+                    generation_id_prefix,
+                )
             )
-            logger.info(
-                f"Ищем ключ для regenerate: generation_id_prefix={generation_id_prefix}",
-            )
-            logger.info(f"generation_id_to_full_model_key: {mapping}")
 
-            model_name = None
-            for full_job_id, model_key in mapping.items():
-                if full_job_id.startswith(generation_id_prefix):
-                    model_name = model_key
-                    break
-
-            if not model_name:
+            if not model_name_for_regenerate:
                 logger.warning(
-                    f"[regenerate] Не найден model_name для generation_id_prefix={generation_id_prefix}",
+                    f"[regenerate] Не найден model_name_for_regenerate для generation_id_prefix={generation_id_prefix}",
                 )
                 return await editMessageOrAnswer(
                     call,
@@ -431,7 +446,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 )
 
             return await regenerateImage(
-                model_name,
+                model_name_for_regenerate,
                 call,
                 state,
                 setting_number,
@@ -439,17 +454,32 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
 
         # Если индекс изображения равен "regenerate_with_new_prompt", то перегенерируем изображение с новым промптом
         elif image_index == "regenerate_with_new_prompt":
-            # Устанавливаем стейт для ввода нового промпта
-            await state.update_data(model_name_for_regenerate_image=model_name)
+            model_name_for_regenerate = (
+                await get_model_name_with_generation_id(
+                    state,
+                    generation_id_prefix,
+                )
+            )
+
+            if not model_name_for_regenerate:
+                logger.warning(
+                    f"[regenerate_with_new_prompt] Не найден model_name_for_regenerate для generation_id_prefix={generation_id_prefix}",
+                )
+                return await editMessageOrAnswer(
+                    call,
+                    "❌ Не удалось определить модель для перегенерации по новому промпту.",
+                )
+
             await state.update_data(
+                model_name_for_regenerate_image=model_name_for_regenerate,
                 setting_number_for_regenerate_image=setting_number,
+                generation_id_for_regenerate=generation_id_prefix,
             )
 
             await state.set_state(
                 StartGenerationState.write_new_prompt_for_regenerate_image,
             )
 
-            # Просим ввести новый промпт
             write_new_prompt_for_regenerate_message = (
                 await editMessageOrAnswer(call, text.WRITE_NEW_PROMPT_TEXT)
             )
@@ -748,7 +778,6 @@ async def write_new_prompt_for_regenerate_image(
 
     state_data = await state.get_data()
     is_test_generation = state_data.get("generations_type", "") == "test"
-    model_name = state_data.get("model_name_for_regenerate_image", "")
     setting_number = state_data.get("setting_number_for_regenerate_image", 1)
     user_id = message.from_user.id
 
@@ -769,7 +798,13 @@ async def write_new_prompt_for_regenerate_image(
                 f"новому промпту {write_new_prompt_message_id} - {e}",
             )
 
-    # Записываем новый промпт в стейт для этой модели
+    model_name = state_data.get("model_name_for_regenerate_image", "")
+    generation_id = state_data.get("generation_id_for_regenerate", "")
+
+    if not generation_id:
+        logger.warning("Нет generation_id_for_regenerate в state!")
+        return
+
     data_for_update = {f"{model_name}": prompt}
     await appendDataToStateArray(
         state,
@@ -778,14 +813,16 @@ async def write_new_prompt_for_regenerate_image(
         unique_keys=("model_name"),
     )
 
+    normal_model_name = await get_normal_model(model_name)
+
     # Получаем индекс модели
-    model_name_index = getModelNameIndex(model_name)
+    model_name_index = getModelNameIndex(normal_model_name)
 
     # Отправляем сообщение о перегенерации изображения
     modified_prompt = prompt[:30] + "..." if len(prompt) > 30 else prompt
     regenerate_progress_message = await safe_send_message(
         text=text.REGENERATE_IMAGE_WITH_NEW_PROMPT_TEXT.format(
-            model_name,
+            normal_model_name,
             model_name_index,
             modified_prompt,
         ),
@@ -795,7 +832,7 @@ async def write_new_prompt_for_regenerate_image(
     await state.set_state(None)
 
     # Получаем данные генерации по названию модели
-    data = await getDataByModelName(model_name)
+    data = await getDataByModelName(normal_model_name)
 
     await generateImageBlock(
         data,

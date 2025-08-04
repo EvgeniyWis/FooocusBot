@@ -53,6 +53,14 @@ async def generateImageBlock(
         user_id,
         "image_generation",
     )
+    state_data = await state.get_data()
+    generation_map = state_data.get("generation_id_to_full_model_key", {})
+    generation_map[job_id] = f"{model_name}_{setting_number}"
+    await state.update_data(generation_id_to_full_model_key=generation_map)
+
+    logger.info(
+        f"[generateImageBlock] Сохранили: {job_id} -> {model_name}_{setting_number}",
+    )
 
     # Обрабатываем работу
     from helpers.generateImages.process_image_block import (
