@@ -20,7 +20,6 @@ async def check_job_status(
     user_id: int,
     message_id: int,
     state: FSMContext = None,
-    is_test_generation: bool = False,
     checkOtherJobs: bool = True,
     timeout: int = 600 * 100,
 ):
@@ -33,7 +32,6 @@ async def check_job_status(
         user_id (int): ID пользователя
         message_id (int): ID сообщения
         state (FSMContext): Контекст состояния
-        is_test_generation (bool): Флаг тестовой генерации
         checkOtherJobs (bool): Флаг проверки других работ, должны ли они проверяться
     """
 
@@ -73,7 +71,7 @@ async def check_job_status(
                 await asyncio.sleep(10)
                 continue
 
-            if state and not is_test_generation and checkOtherJobs:
+            if state and checkOtherJobs:
                 await edit_job_message(
                     job_id,
                     message_id,

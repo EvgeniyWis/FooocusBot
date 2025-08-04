@@ -33,10 +33,9 @@ def generateVideoKeyboard(model_name: str, image_index: int, with_magnific_upsca
 
 
 # Инлайн-клавиатура для выбора типа генерации видео
-def generatedVideoKeyboard(prefix: str, with_test_generation: bool = True):
+def generatedVideoKeyboard(prefix: str):
     inline_keyboard = getGenerationsTypeButtons(
         prefix,
-        with_test_generation=with_test_generation,
     )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
@@ -59,7 +58,6 @@ def videoGenerationTypeKeyboard(
             *getGenerationsTypeButtons(
                 prefix=prefix,
                 with_work_generation=False,
-                with_test_generation=False,
                 rewrite_prompt=True,
             ),
         ],

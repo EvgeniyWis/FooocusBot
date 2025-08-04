@@ -10,12 +10,10 @@ from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 # Инлайн-клавиатура для выбора количества генераций
 def generationsTypeKeyboard(
     with_work_generation: bool = True,
-    with_test_generation: bool = True,
     with_video_from_image_generation: bool = True,
 ):
     inline_keyboard = getGenerationsTypeButtons(
         "generations_type",
-        with_test_generation,
         with_work_generation,
     )
 
@@ -78,7 +76,7 @@ def selectImageKeyboard(
 
 
 # Инлайн-клавиатура для выбора группы
-def selectGroupKeyboard(is_test_generation: bool = False):
+def selectGroupKeyboard():
     inline_keyboard = []
     dataArrays = getAllDataArrays()
 
@@ -102,15 +100,14 @@ def selectGroupKeyboard(is_test_generation: bool = False):
     )
 
     # Генерация конкретной модели
-    if not is_test_generation:
-        inline_keyboard.append(
-            [
-                InlineKeyboardButton(
-                    text="🔄 Индивидуальная генерация",
-                    callback_data="select_group|specific_model",
-                ),
-            ],
-        )
+    inline_keyboard.append(
+        [
+            InlineKeyboardButton(
+                text="🔄 Индивидуальная генерация",
+                callback_data="select_group|specific_model",
+            ),
+        ],
+    )
 
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
@@ -147,34 +144,6 @@ def confirmWriteUniquePromptForNextModelKeyboard():
                 InlineKeyboardButton(
                     text="✍️ Написать промпт",
                     callback_data="confirm_write_unique_prompt_for_next_model",
-                ),
-            ],
-        ],
-    )
-
-    return kb
-
-
-# Клавиатура для тестирования
-def testGenerationImagesKeyboard(group_number: str):
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="🔄 Сгенерировать с другой группой",
-                    callback_data="generations_type|test|prompt_exist",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="✍️ Изменить промпт",
-                    callback_data=f"select_group|{group_number}",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="◀️ Назад",
-                    callback_data="generations_type|test",
                 ),
             ],
         ],

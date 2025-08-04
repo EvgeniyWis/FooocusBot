@@ -37,7 +37,6 @@ async def generateImagesInHandler(
     message: types.Message,
     state: FSMContext,
     user_id: int,
-    is_test_generation: bool,
     group_number: str,
     with_randomizer: bool = False,
 ):
@@ -71,93 +70,61 @@ async def generateImagesInHandler(
             f"Получен список моделей для индивидуальной генерации: {model_indexes_for_generation}",
         )
 
-        if is_test_generation:
-            if group_number == "all":
-                result = await generate_images_by_all_groups(
-                    message_for_edit,
-                    state,
-                    user_id,
-                    is_test_generation,
-                    prompt,
-                )
-            else:
-                await safe_edit_message(
-                    message_for_edit,
-                    text.GET_PROMPT_SUCCESS_TEXT,
-                )
-                dataArray = get_data_array_by_group_number(group_number)
-                data = dataArray[0]
-                result = [
-                    await generateImageBlock(
-                        data,
-                        message_for_edit.message_id,
-                        state,
-                        user_id,
-                        data["model_name"],
-                        prompt if isinstance(prompt, str) else "",  # fallback
-                        is_test_generation,
-                        chat_id=message.chat.id,
-                    ),
-                ]
+        if group_number == "all":
+            result = await generate_images_by_all_groups(
+                message_for_edit,
+                state,
+                user_id,
+                prompt if isinstance(prompt, str) else "",
+                with_randomizer,
+            )
         else:
-            if group_number == "all":
-                result = await generate_images_by_all_groups(
-                    message_for_edit,
-                    state,
-                    user_id,
-                    is_test_generation,
-                    prompt if isinstance(prompt, str) else "",
-                    with_randomizer,
+            await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
+            await message_for_edit.pin()
+
+            if isinstance(prompt, dict):
+                model_indexes_for_generation = list(prompt.keys())
+
+                result = await generateImages(
+                    group_number="individual",
+                    prompt_for_current_model=prompt,
+                    message=message_for_edit,
+                    state=state,
+                    user_id=user_id,
+                    with_randomizer=False,
+                    model_indexes_for_generation=model_indexes_for_generation,
                 )
             else:
-                await message_for_edit.edit_text(text.GET_PROMPT_SUCCESS_TEXT)
-                await message_for_edit.pin()
+                # Формируем словарь model_name -> prompt
+                prompt_for_current_model = {}
 
-                if isinstance(prompt, dict):
-                    model_indexes_for_generation = list(prompt.keys())
-
-                    result = await generateImages(
-                        group_number="individual",
-                        prompt_for_current_model=prompt,
-                        message=message_for_edit,
-                        state=state,
-                        user_id=user_id,
-                        is_test_generation=is_test_generation,
-                        with_randomizer=False,
-                        model_indexes_for_generation=model_indexes_for_generation,
-                    )
+                if group_number != "individual":
+                    dataArray = get_data_array_by_group_number(group_number)
                 else:
-                    # Формируем словарь model_name -> prompt
-                    prompt_for_current_model = {}
-
-                    if group_number != "individual":
-                        dataArray = get_data_array_by_group_number(group_number)
-                    else:
-                        dataArray = await get_data_array_by_model_indexes(
-                            model_indexes_for_generation,
-                        )
-
-                    logger.info(f"[generateImagesInHandler] dataArray: {dataArray}")
-
-                    for data in dataArray:
-                        if group_number != "individual":
-                            model_index = get_model_index_in_group(data["model_index"], group_number)
-                        else:
-                            model_index = get_model_index_by_model_name(data["model_name"])
-                        prompt_for_current_model[str(model_index)] = prompt
-
-                    result = await generateImages(
-                        group_number=group_number,
-                        prompt_for_current_model=prompt_for_current_model,
-                        message=message_for_edit,
-                        state=state,
-                        user_id=user_id,
-                        is_test_generation=is_test_generation,
-                        with_randomizer=with_randomizer,
-                        model_indexes_for_generation=model_indexes_for_generation,
+                    dataArray = await get_data_array_by_model_indexes(
+                        model_indexes_for_generation,
                     )
 
-                await message_for_edit.unpin()
+                logger.info(f"[generateImagesInHandler] dataArray: {dataArray}")
+
+                for data in dataArray:
+                    if group_number != "individual":
+                        model_index = get_model_index_in_group(data["model_index"], group_number)
+                    else:
+                        model_index = get_model_index_by_model_name(data["model_name"])
+                    prompt_for_current_model[str(model_index)] = prompt
+
+                result = await generateImages(
+                    group_number=group_number,
+                    prompt_for_current_model=prompt_for_current_model,
+                    message=message_for_edit,
+                    state=state,
+                    user_id=user_id,
+                    with_randomizer=with_randomizer,
+                    model_indexes_for_generation=model_indexes_for_generation,
+                )
+
+            await message_for_edit.unpin()
 
         state_data = await state.get_data()
         stop_generation = state_data.get("stop_generation", False)
@@ -179,7 +146,6 @@ async def generateImagesInHandler(
                 message,
                 reply_markup=start_generation_keyboards.generationsTypeKeyboard(
                     with_video_from_image_generation=False,
-                    with_test_generation=False,
                 ),
             )
 

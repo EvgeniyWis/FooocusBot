@@ -3,8 +3,8 @@ from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getDataByModelName,
     get_model_index_by_model_name,
+    getDataByModelName,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
 from bot.logger import logger
@@ -17,10 +17,8 @@ async def regenerateImage(
     model_name: str,
     call: types.CallbackQuery,
     state: FSMContext,
-    group_number: str,
 ):
     state_data = await state.get_data()
-    is_test_generation = state_data.get("generations_type", "") == "test"
 
     # Получаем индекс модели
     model_name_index = get_model_index_by_model_name(model_name)
@@ -99,7 +97,6 @@ async def regenerateImage(
             user_id,
             model_name,
             prompt,
-            is_test_generation,
             False,
             chat_id=call.message.chat.id,
         )
