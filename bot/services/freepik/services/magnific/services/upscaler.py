@@ -23,13 +23,13 @@ class UpscalerService(BaseService, UpscalerProtocol, ValidationMixin):
     async def upscale(
         self,
         image: str,
-        optimized_for: str = "standard",
-        creativity: int = -8,
-        hdr: int = 8,
-        resemblance: int = -10,
-        fractality: int = 6,
-        engine: str = "magnific_sharpy",
-        scale_factor: str = "2x",
+        optimized_for: str,
+        creativity: int,
+        hdr: int,
+        resemblance: int,
+        fractality: int,
+        engine: str,
+        scale_factor: str,
     ) -> MagnificTaskResponse:
         """
         Upscale изображение с помощью Magnific.

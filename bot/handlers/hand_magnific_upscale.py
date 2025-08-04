@@ -96,6 +96,13 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
     try:
         magnific_result_url = await magnific_service.upscale_image(
             image=resize_result_base64,
+            optimized_for="standard",
+            creativity=-3,
+            hdr=-8,
+            resemblance=-4,
+            fractality=5,
+            engine="magnific_sharpy",
+            scale_factor="2x",
         )
     except Exception as e:
         await message_for_edit.delete()
