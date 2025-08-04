@@ -1,22 +1,31 @@
-
-import asyncio
+import os
 
 import httpx
 from aiogram.fsm.context import FSMContext
 from iloveapi import ILoveApi
 
 from bot.logger import logger
-from bot.services.iloveapi.client.api_client import ILoveAPI as CustomILoveAPI
 from bot.settings import settings
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.retryOperation import retryOperation
 
 
-async def _process_upscale_task(temp_image_path: str, client: ILoveApi):
+async def _process_upscale_task(temp_image_path: str):
     """
     Внутренняя функция для обработки задачи upscale с повторными попытками
     """
-    import os
+
+    # Создаем клиент с увеличенными таймаутами
+    client = ILoveApi(
+        public_key=settings.PUBLIC_ILOVEAPI_API_KEY,
+        secret_key=settings.SECRET_ILOVEAPI_API_KEY,
+        timeout=httpx.Timeout(
+            connect=120.0,
+            read=1800.0,
+            write=120.0,
+            pool=120.0,
+        ),
+    )
     
     # Проверяем существование файла
     if not os.path.exists(temp_image_path):
@@ -81,43 +90,17 @@ async def second_upscale_image(
     # Запускаем задачу
     try:
         logger.info("Создаю клиент ILoveApi с увеличенными таймаутами")
-        
-        # Создаем клиент с увеличенными таймаутами
-        client = ILoveApi(
-            public_key=settings.PUBLIC_ILOVEAPI_API_KEY,
-            secret_key=settings.SECRET_ILOVEAPI_API_KEY,
-        )
-        
-        # Правильно устанавливаем таймауты для HTTP клиента
-        # ILoveApi использует httpx клиент внутри
-        if hasattr(client, 'client') and hasattr(client.client, '_client'):
-            # Устанавливаем таймауты для внутреннего httpx клиента
-            client.client._client.timeout = httpx.Timeout(
-                connect=120.0,  # таймаут подключения (2 минуты)
-                read=1800.0,    # таймаут чтения (30 минут для upscale)
-                write=120.0,    # таймаут записи (2 минуты)
-                pool=120.0      # таймаут пула соединений (2 минуты)
-            )
-        elif hasattr(client, 'client'):
-            # Альтернативный способ установки таймаутов
-            client.client.timeout = httpx.Timeout(
-                connect=120.0,
-                read=1800.0,
-                write=120.0,
-                pool=120.0
-            )
-        
+
         # Используем функцию повторных попыток с увеличенными таймаутами
         await retryOperation(
             _process_upscale_task,
-            5,  # max_attempts (увеличиваем количество попыток)
+            3,  # max_attempts (увеличиваем количество попыток)
             30.0,  # delay (увеличиваем задержку между попытками до 30 секунд)
             temp_image_path,
-            client
         )
-        
+
         logger.info(f"Второй upscale успешно завершен для: {temp_image_path}")
-        
+
     except httpx.ReadTimeout as e:
         error_text = f"Таймаут при увеличении качества изображения: {e}"
         logger.error(error_text)
@@ -125,7 +108,7 @@ async def second_upscale_image(
         data_for_update = {
             "model_name": model_name,
             "image_index": image_index,
-            "error_type": "timeout"
+            "error_type": "timeout",
         }
         await appendDataToStateArray(
             state,
@@ -140,7 +123,7 @@ async def second_upscale_image(
         data_for_update = {
             "model_name": model_name,
             "image_index": image_index,
-            "error_type": "connect_timeout"
+            "error_type": "connect_timeout",
         }
         await appendDataToStateArray(
             state,
@@ -155,7 +138,7 @@ async def second_upscale_image(
         data_for_update = {
             "model_name": model_name,
             "image_index": image_index,
-            "error_type": "general"
+            "error_type": "general",
         }
         await appendDataToStateArray(
             state,
