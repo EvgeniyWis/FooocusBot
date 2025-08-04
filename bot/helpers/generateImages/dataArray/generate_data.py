@@ -8,6 +8,7 @@ def generate_data(
     setting_number: int | str,
     picture_folder_id: str,
     video_folder_id: str,
+    nsfw_video_folder_id: str,
     prompt: str,
     loras: list[dict],
     base_config_model_name: str,
@@ -62,6 +63,7 @@ def generate_data(
         "model_index": model_index,
         "picture_folder_id": picture_folder_id,
         "video_folder_id": video_folder_id,
+        "nsfw_video_folder_id": nsfw_video_folder_id,
         "setting_number": setting_number,
     }
     return data

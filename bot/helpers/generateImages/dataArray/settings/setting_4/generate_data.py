@@ -20,16 +20,16 @@ def setting4_generate_data(
     loras = setting4_generate_loras(loras_weights)
     base_config_model_name = "CyberIllustrious_CyberRealistic.safetensors"
     data = generate_data(
-        model_name,
-        model_index,
-        4,
-        picture_folder_id,
-        video_folder_id,
-        nsfw_video_folder_id,
-        prompt,
-        loras,
-        base_config_model_name,
-        image_number,
-        negative_prompt,
+        model_name=model_name,
+        model_index=model_index,
+        setting_number=4,
+        picture_folder_id=picture_folder_id,
+        video_folder_id=video_folder_id,
+        nsfw_video_folder_id=nsfw_video_folder_id,
+        prompt=prompt,
+        loras=loras,
+        base_config_model_name=base_config_model_name,
+        image_number=image_number,
+        negative_prompt=negative_prompt,
     )
     return data
