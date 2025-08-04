@@ -12,9 +12,6 @@ from bot.helpers.generateImages.dataArray.getDataArrayByRandomizer import (
 from bot.helpers.generateImages.dataArray.getDataArrayBySettingNumber import (
     getDataArrayBySettingNumber,
 )
-from bot.helpers.generateImages.dataArray.getModelNameIndex import (
-    getModelNameIndex,
-)
 from bot.helpers.generateImages.get_data_array_by_model_indexes import (
     get_data_array_by_model_indexes,
 )
@@ -60,9 +57,12 @@ async def generateImages(
 
     await state.update_data(
         jobs={},
-        total_jobs_count=len(model_indexes_for_generation) if len(model_indexes_for_generation) > 0 else len(dataArrayBase),
+        total_jobs_count=len(model_indexes_for_generation)
+        if len(model_indexes_for_generation) > 0
+        else len(dataArrayBase),
     )
     images = []
+    generation_id_to_full_model_key = {}
 
     async def process_image(key: str):
         try:
@@ -73,7 +73,9 @@ async def generateImages(
                 try:
                     pos = base_model_indexes.index(base_index)
                 except ValueError:
-                    raise Exception(f"Модель с индексом {base_index} не найдена")
+                    raise Exception(
+                        f"Модель с индексом {base_index} не найдена",
+                    )
             else:
                 pos = int(base_index) - 1
 
@@ -81,9 +83,12 @@ async def generateImages(
 
             prompt_for_model = prompt_for_current_model.get(key, "")
 
-            logger.info(f"Генерация изображения для модели {data['model_name']} с промптом {prompt_for_model}")
+            logger.info(
+                f"Генерация изображения для модели {data['model_name']} с промптом {prompt_for_model}",
+            )
 
-            image = await generateImageBlock(
+            # Здесь распаковываем кортеж, который возвращает generateImageBlock
+            result, job_id = await generateImageBlock(
                 data,
                 message.message_id,
                 state,
@@ -93,17 +98,42 @@ async def generateImages(
                 is_test_generation,
                 chat_id=message.chat.id,
             )
-            images.append(image)
-            return image, None
+
+            images.append(result)  # Добавляем в общий список только результат
+
+            if job_id:
+                full_model_key = f"{data['model_name']}_{key}"
+
+                # обновляем текущую мапу
+                state_data = await state.get_data()
+                generation_map = state_data.get(
+                    "generation_id_to_full_model_key",
+                    {},
+                )
+                generation_map[job_id] = full_model_key
+
+                await state.update_data(
+                    generation_id_to_full_model_key=generation_map,
+                )
+
+                logger.info(
+                    f"[generateImages] Сохранили: {job_id} -> {full_model_key}",
+                )
+
+            return (
+                result,
+                job_id,
+            )  # Возвращаем и результат, и job_id, если надо
         except Exception as e:
             traceback.print_exc()
             raise e
 
     tasks = []
 
-    # Если индексы не переданы, то получаем их из массива данных
     if not model_indexes_for_generation:
-        model_indexes_for_generation = [str(index) for index, _ in enumerate(dataArrayBase)]
+        model_indexes_for_generation = [
+            str(index) for index, _ in enumerate(dataArrayBase)
+        ]
 
     for key in model_indexes_for_generation:
         state_data = await state.get_data()
@@ -112,10 +142,15 @@ async def generateImages(
             logger.info("Генерация остановлена пользователем")
             break
 
-        logger.info(f"Создание задачи для генерации изображения для модели {key}")
+        logger.info(
+            f"Создание задачи для генерации изображения для модели {key}",
+        )
         tasks.append(asyncio.create_task(process_image(key)))
         await asyncio.sleep(0.1)
 
     results = await asyncio.gather(*tasks)
-    images = [res[0] for res in results]
+    images = [
+        res[0] for res in results
+    ]  # берем первый элемент — результат генерации
+
     return images

@@ -51,7 +51,10 @@ async def httpx_post(
                     raise Exception(PAYMENT_RUNPOD_ERROR_TEXT)
 
                 response_json = response.json()
-                if "error" in response_json and "message" in response_json["error"]:
+                if (
+                    "error" in response_json
+                    and "message" in response_json["error"]
+                ):
                     error_message = response_json["error"]["message"]
                 elif "message" in response_json:
                     error_message = response_json["message"]
@@ -64,7 +67,7 @@ async def httpx_post(
 
             try:
                 response_json = response.json()
-    
+
                 if with_response_text_logging:
                     logger.info(f"Ответ от сервера: {response_json}")
             except ValueError as e:
@@ -82,7 +85,9 @@ async def httpx_post(
         await asyncio.sleep(10)
         raise
     except httpx.RequestError as e:
-        logger.error(f"Ошибка при выполнении запроса: {str(e)} Ответ: {response}")
+        logger.error(
+            f"Ошибка при выполнении запроса: {str(e)} Ответ: {response}",
+        )
         await asyncio.sleep(10)
         raise
 

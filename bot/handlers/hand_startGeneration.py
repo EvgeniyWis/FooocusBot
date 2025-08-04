@@ -403,10 +403,33 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         call.message.chat.id,
         generation_id=generation_id_prefix,
     )
-
     try:
-        # Если индекс изображения равен "regenerate", то перегенерируем изображение
         if image_index == "regenerate":
+            state_data = await state.get_data()
+            mapping: dict = state_data.get(
+                "generation_id_to_full_model_key",
+                {},
+            )
+            logger.info(
+                f"Ищем ключ для regenerate: generation_id_prefix={generation_id_prefix}",
+            )
+            logger.info(f"generation_id_to_full_model_key: {mapping}")
+
+            model_name = None
+            for full_job_id, model_key in mapping.items():
+                if full_job_id.startswith(generation_id_prefix):
+                    model_name = model_key
+                    break
+
+            if not model_name:
+                logger.warning(
+                    f"[regenerate] Не найден model_name для generation_id_prefix={generation_id_prefix}",
+                )
+                return await editMessageOrAnswer(
+                    call,
+                    "❌ Не удалось определить модель для перегенерации.",
+                )
+
             return await regenerateImage(
                 model_name,
                 call,
@@ -659,17 +682,13 @@ def make_unique_model_keys(model_indexes: list[str]) -> list[str]:
 async def write_model_for_generation(
     message: types.Message,
     state: FSMContext,
-    text_input: str = None,
+    text_input: str | None = None,
 ):
     text_input = text_input or message.text.strip()
-
     matches = PROMPT_BY_INDEX_PATTERN.findall(text_input)
 
     if not matches:
-        await safe_send_message(
-            text=text.WRONG_FORMAT_TEXT,
-            message=message,
-        )
+        await safe_send_message(text=text.WRONG_FORMAT_TEXT, message=message)
         return
 
     prompt_counter = defaultdict(int)
@@ -695,10 +714,7 @@ async def write_model_for_generation(
         for key, prompt in model_prompts.items()
     }
 
-    await state.update_data(model_prompts_for_generation=data_for_update)
-
     logger.info(f"Обновляем промпты в состоянии: {data_for_update}")
-
     await state.update_data(model_prompts_for_generation=data_for_update)
 
     message_to_del = await safe_send_message(

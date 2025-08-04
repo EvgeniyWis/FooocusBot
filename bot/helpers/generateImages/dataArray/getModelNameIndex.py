@@ -5,7 +5,7 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 
 def getModelNameIndex(model_name: str):
     # Убираем +N, если он есть (например: "1+1" → "1")
-    model_name = model_name.split("+")[0]
+    model_name = model_name.split("+")[0]  # fallback
 
     # Получаем все настройки
     all_settings = getAllDataArrays()
