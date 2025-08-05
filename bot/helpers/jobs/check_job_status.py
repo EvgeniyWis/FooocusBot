@@ -64,6 +64,7 @@ async def check_job_status(
                 httpx.ConnectError,
                 httpx.ConnectTimeout,
                 httpx.ReadTimeout,
+                httpx.RemoteProtocolError,
             ) as e:
                 logger.error(
                     f"Ошибка соединения при получении статуса работы: {e}",

@@ -28,7 +28,8 @@ async def retryOperation(operation, max_attempts, delay, *args):
             
         except (FileNotFoundError, ValueError, TypeError, RuntimeError, socket.gaierror, 
                 http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, 
-                OSError, httpx.ReadTimeout, httpx.ConnectTimeout, httpx.TimeoutException) as e:
+                OSError, httpx.ReadTimeout, httpx.ConnectTimeout, httpx.TimeoutException,
+                httpx.RemoteProtocolError, httpx.ConnectError) as e:
             
             traceback.print_exc()
             
