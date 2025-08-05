@@ -184,7 +184,7 @@ def second_group_get_data_array():
             video_folder_id="1BOA9b-TPtuFMlJ6Izi9TntHtvnX4NfYo",
             nsfw_video_folder_id="1MKN5dp4IXt-OG2qP-vMrIsE0ZSkDGxLf",
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK 
-            1girl, 18, sorority girl, black hair, medium-large natural breasts, extra tan skin, blue eyes, smirk""",
+            1girl, 18, sorority girl, white hair, medium-large natural breasts, extra tan skin, blue eyes, smirk""",
             loras_weights=[2, 3.10, -1.70, 1.30, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
         ),
     ]
