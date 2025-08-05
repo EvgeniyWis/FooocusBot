@@ -120,13 +120,18 @@ async def process_image(
                 settings.SECOND_UPSCALE_MODE
                 and process_image_step == ProcessImageStep.SECOND_UPSCALE
             ):
-                await process_upscale_image(
-                    call=call,
-                    state=state,
-                    image_index=image_index,
-                    model_name=model_name,
-                    is_second=True,
-                )
+                try:
+                    await process_upscale_image(
+                        call=call,
+                        state=state,
+                        image_index=image_index,
+                        model_name=model_name,
+                        is_second=True,
+                    )
+                except Exception as e:
+                    logger.warning(
+                        f"[process_image] Second upscale failed for ({model_name}, {image_index}): {e}. Continuing to next step."
+                    )
 
             process_image_step = await update_process_image_step(
                 state,
