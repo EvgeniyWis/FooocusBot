@@ -2,12 +2,14 @@ import os
 
 import httpx
 from aiogram.fsm.context import FSMContext
-from iloveapi import ILoveApi
 
 from bot.logger import logger
-from bot.settings import settings
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.retryOperation import retryOperation
+
+from .client_factory import create_client_with_retry
+from .downloader import download_with_retry
+from .task_processor import process_task_with_retry
 
 
 async def _process_upscale_task(temp_image_path: str):
@@ -15,18 +17,6 @@ async def _process_upscale_task(temp_image_path: str):
     Внутренняя функция для обработки задачи upscale с повторными попытками
     """
 
-    # Создаем клиент с увеличенными таймаутами
-    client = ILoveApi(
-        public_key=settings.PUBLIC_ILOVEAPI_API_KEY,
-        secret_key=settings.SECRET_ILOVEAPI_API_KEY,
-        timeout=httpx.Timeout(
-            connect=120.0,
-            read=1800.0,
-            write=120.0,
-            pool=120.0,
-        ),
-    )
-    
     # Проверяем существование файла
     if not os.path.exists(temp_image_path):
         raise FileNotFoundError(f"Файл для upscale не найден: {temp_image_path}")
@@ -37,22 +27,22 @@ async def _process_upscale_task(temp_image_path: str):
         raise ValueError(f"Файл пустой: {temp_image_path}")
     
     logger.info(f"Создаю задачу upscaleimage для файла размером {file_size} байт")
-    task = client.create_task("upscaleimage")
     
-    logger.info(f"Обрабатываю файл: {temp_image_path} с множителем 4")
     try:
-        task.process_files(temp_image_path, multiplier=4)
-        logger.info("Файл успешно отправлен на обработку")
+        # Создаем клиент с повторными попытками
+        client = create_client_with_retry()
+        
+        # Обрабатываем задачу с повторными попытками
+        task = process_task_with_retry(client, temp_image_path, multiplier=4)
+        
+        # Скачиваем результат с повторными попытками
+        if download_with_retry(task, temp_image_path):
+            logger.info("Задача успешно выполнена!")
+        else:
+            raise Exception("Не удалось скачать файл ни одним способом")
+        
     except Exception as e:
-        logger.error(f"Ошибка при отправке файла на обработку: {e}")
-        raise
-    
-    logger.info("Загружаю обработанный файл")
-    try:
-        task.download(temp_image_path)
-        logger.info("Файл успешно загружен")
-    except Exception as e:
-        logger.error(f"Ошибка при загрузке обработанного файла: {e}")
+        logger.error(f"Критическая ошибка при обработке upscale: {e}")
         raise
     
     # Проверяем, что файл был обновлен
@@ -145,4 +135,4 @@ async def second_upscale_image(
             "second_upscale_errors",
             data_for_update,
         )
-        raise e
+        raise e 
