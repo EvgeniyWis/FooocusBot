@@ -41,7 +41,7 @@ def first_group_get_data_array():
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic body, brown hair, blue eyes, tanned skin, ponytail.
             Style: realistic photography, Canon DSLR, natural daylight.""",
-            loras_weights=[2, 1.60, -0.90, -1.70, 2.80, 1.00, 2.65, 0.80],
+            loras_weights=[2, 1.60, -0.90, -1.70, 2.50, 1.00, 2.65, 0.80],
         ),
         setting1_generate_data(
             model_name="naomiruelle",
@@ -231,7 +231,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
+            loras_weights=[1, 0.7, 2.2, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
             model_name="janiceblair.xo",
