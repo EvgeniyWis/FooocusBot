@@ -39,7 +39,7 @@ def first_group_get_data_array():
             video_folder_id="1Hcw9aO89wyw4dco86kt5RRCC-Ue8Rebo",
             nsfw_video_folder_id="1SNri9MEsRnJz9NF3YdJdub6h2X0efssM",
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK
-            1girl, 18 years old, athletic body, brown hair, blue eyes, tan skin, ponytail.
+            1girl, 18 years old, athletic body, brown hair, blue eyes, fair skin, ponytail.
             Style: realistic photography, Canon DSLR, natural daylight.""",
             loras_weights=[2, 1.60, -0.90, -1.70, 2.50, 1.00, 2.65, 0.80],
         ),
