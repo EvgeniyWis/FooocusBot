@@ -14,7 +14,7 @@ def extra_group_get_data_array():
             video_folder_id="1eROCCB950JjAeG7nDsSJuvg80J2E0Z1z",
             nsfw_video_folder_id="1550MJr1dQw6Y7KoQMcaq_xgTf0uL2YqA",
             prompt="",
-            loras_weights=[0.55, 2.5, -0.3, 0.75, 1.2, 2.25, 0.05, 0.65],
+            loras_weights=[0.55, 2.1, -0.3, 0.75, 1.2, 2.25, 0.05, 0.65],
             negative_prompt="score_6, score_5, score_4, score_3, score_2, score_1, low quality, worst quality, low resolution, jpeg artifacts, blurry, out of focus, distorted, deformed, noisy image, compression artifacts, oversaturated, undersaturated, grainy, pixelated, bad lighting, poorly drawn, bad anatomy, (((penis))), (((dick))), inaccurate anatomy, extra limbs, extra arms, extra legs, missing limbs, fused limbs, mutated hands, malformed fingers, long neck, short neck, cloned face, disfigured, gross proportions, unnatural body, ugly, blurry eyes, cross-eyed, lazy eye, wrong hands, unnatural hands, extra fingers, missing fingers, fused fingers, multiple heads, low detail, lack of detail, poorly rendered, unrealistic skin, smudged skin texture, bad proportions, bad perspective, wrong shadows, out of frame, watermark, text, signature, logo, cropped head, cropped limbs, tattoo, tattooed skin, writing on skin,  mosaic blur, text overlay, bad face, wrong face, out of context,"
         ),
     ]
