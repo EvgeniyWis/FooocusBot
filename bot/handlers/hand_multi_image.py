@@ -72,7 +72,18 @@ async def select_multi_image(
         selected_indexes,
         generation_id,
     )
-    await call.message.edit_reply_markup(reply_markup=kb)
+    # Проверяем, отличается ли новая разметка от текущей
+    current_markup = call.message.reply_markup
+    markup_changed = False
+    if (current_markup is None and kb is not None) or (current_markup is not None and kb is None):
+        markup_changed = True
+    elif current_markup is not None and kb is not None:
+        try:
+            markup_changed = current_markup.model_dump() != kb.model_dump()
+        except Exception:
+            markup_changed = current_markup != kb
+    if markup_changed:
+        await call.message.edit_reply_markup(reply_markup=kb)
 
 
 async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
