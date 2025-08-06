@@ -4,7 +4,6 @@ import base64
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.factory.image_service_factory import create_image_resizer
 from bot.factory.magnific_task_factory import get_magnific_task_factory
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes.process_save_image import (
@@ -59,74 +58,55 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
 
     logger.info(f"URL изображения для Magnific Upscaler: {image_url}")
 
-    # Получаем сервис ILoveAPI для уменьшения разрешения изображения
-    resize_service = create_image_resizer()
-
-    # Запускаем задачу
-    try:
-        resize_result_response = await resize_service.resize_image_cloud_file(
-            cloud_file=image_url,
-            width=720,
-            height=1280,
-        )
-        resize_result = resize_result_response.content
-    except Exception as e:
-        await message_for_edit.delete()
-        error_text = f"Ошибка при уменьшении разрешения изображения: {e}"
-        logger.error(error_text)
-        await safe_send_message(
-            error_text,
-            call.message,
-        )
-        raise e
-
+    # Уменьшаем разрешение изображения
+    # TODO:
     # Изменяем сообщение
-    await safe_edit_message(
-        message_for_edit,
-        text.MAGNIFIC_UPSCALE_TEXT,
-    )
+    # await safe_edit_message(
+    #     message_for_edit,
+    #     text.MAGNIFIC_UPSCALE_TEXT,
+    # )
 
-    # Получаем сервис Magnific
-    magnific_service = get_magnific_task_factory()
+    # # Получаем сервис Magnific
+    # magnific_service = get_magnific_task_factory()
 
-    # Преобразуем в base64
-    resize_result_base64 = base64.b64encode(resize_result).decode("utf-8")
+    # # Преобразуем в base64
+    # resize_result_base64 = base64.b64encode(resize_result).decode("utf-8")
 
-    # Запускаем upscale
-    try:
-        magnific_result_url = await magnific_service.upscale_image(
-            image=resize_result_base64,
-            optimized_for="standard",
-            creativity=-8,
-            hdr=8,
-            resemblance=-10,
-            fractality=6,
-            engine="magnific_sharpy",
-            scale_factor="2x",
-        )
-    except Exception as e:
-        await message_for_edit.delete()
-        error_text = f"Ошибка при Magnific Upscale изображения: {e}"
-        logger.error(error_text)
-        await safe_send_message(
-            error_text,
-            call.message,
-        )
-        raise e
+    # # Запускаем upscale
+    # try:
+    #     magnific_result_url = await magnific_service.upscale_image(
+    #         image=resize_result_base64,
+    #         optimized_for="standard",
+    #         creativity=-8,
+    #         hdr=8,
+    #         resemblance=-10,
+    #         fractality=6,
+    #         engine="magnific_sharpy",
+    #         scale_factor="2x",
+    #     )
+    # except Exception as e:
+    #     await message_for_edit.delete()
+    #     error_text = f"Ошибка при Magnific Upscale изображения: {e}"
+    #     logger.error(error_text)
+    #     await safe_send_message(
+    #         error_text,
+    #         call.message,
+    #     )
+    #     raise e
 
-    # Удаляем сообщение о начале upscale
-    await message_for_edit.delete()
+    # # Удаляем сообщение о начале upscale
+    # await message_for_edit.delete()
 
-    # Сохраняем результат
-    await process_save_image(
-        call,
-        state,
-        model_name,
-        image_index,
-        result_url=magnific_result_url,
-        name_postfix="magnific_upscale",
-        kb_with_magnific_upscale=False,
-    )
+    # # Сохраняем результат
+    # await process_save_image(
+    #     call,
+    #     state,
+    #     model_name,
+    #     image_index,
+    #     result_url=magnific_result_url,
+    #     name_postfix="magnific_upscale",
+    #     kb_with_magnific_upscale=False,
+    # )
 
 
 # Добавление обработчиков
