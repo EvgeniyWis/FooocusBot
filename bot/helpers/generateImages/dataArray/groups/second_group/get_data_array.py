@@ -24,17 +24,18 @@ def second_group_get_data_array():
             1girl, Latina, 18 years old, black hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 3.80, 0.1, -3.00, -1.50],
         ),
-        setting2_generate_data(
+        # setting_3 модели
+        setting3_generate_data(
             model_name="carolinehazel.xo",
             model_index=51,
             picture_folder_id="1Hdp3VL2CMzeob7qX5UVsbCn5he5-t6az",
             video_folder_id="1lxWDRkM5oA6_ugRHvQFUntysIUd9KGQy",
             nsfw_video_folder_id="1lTb92NPF7sHOsYmRaDVflv7N2r1IVj3d",
-            prompt="photorealistic portrait, 18 years old, ash-blonde hair, big breasts, slim waist, tan skin, smirk, high quality.",
-            loras_weights=[-1.50, 1.30, 0.7, 3.20, 0.45, -1.00],
+            prompt="""score_9, score_8_up, score_7_up, source_photo, source_real, hyper-realistic, photorealism, high detailed, high quality, masterpiece, photography, photorealistic, 8k detail, detailed background, ultra-detailed, vibrant colors, bright lighting, skin detail, BREAK
+
+            real_beauty, igbaddie, 1girl, 18 years old, sorority girl, volumnous ash-blonde hair, long hair, huge breasts, erect breasts, upright breasts, slim waist, big bubble butt, huge ass, hourglass body type, toned legs, tan skin, skinny, cute, big lips, thin lips, smirk, bright-blue eyes, sharp facial features, sharp cheekbones.""",
+            loras_weights=[-1.50, 1.30, 1.3, 3, 0.25, -1.70],
         ),
-        
-        # setting_3 модели
         setting3_generate_data(
             model_name="dasharomanova.xo",
             model_index=59,
