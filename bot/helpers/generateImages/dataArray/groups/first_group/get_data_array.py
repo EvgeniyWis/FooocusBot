@@ -104,7 +104,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="1vOfFUGtvfMXWAKH_f_nHIo3WdBwh1M3h",
             prompt="""photorealistic, high quality, BREAK
             1girl, 18 years old, brown hair, tan skin, green eyes""",
-            loras_weights=[1, 0.7, 1.9, 0, -0.15, -1.5],
+            loras_weights=[1, 0.7, 3, 1.7, -0.15, -1.5],
         ),
         setting2_generate_data(
             model_name="gracelowell.xo",
@@ -292,7 +292,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="1nDN6TK65CSAO2mjtH1NzuzfaeKoYCMle",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 2, 1, -1.05, -1.5],
+            loras_weights=[1, 0.7, 1.5, 0.5, -1.05, -1.5],
         ),
         setting2_generate_data(
             model_name="kellymavrix",
