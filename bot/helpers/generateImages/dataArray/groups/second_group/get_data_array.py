@@ -1,7 +1,4 @@
 # Функция для генерации массива данных для запроса для второй группы
-from bot.helpers.generateImages.dataArray.settings.setting_1.generate_data import (
-    setting1_generate_data,
-)
 from bot.helpers.generateImages.dataArray.settings.setting_2.generate_data import (
     setting2_generate_data,
 )
@@ -45,7 +42,7 @@ def second_group_get_data_array():
             video_folder_id="19YGecBXjT0-Zs9lWgw_AV7DFTp9phAFG",
             nsfw_video_folder_id="1movOYETVPHNZkrzadfva4REhsVJ5-mkt",
             prompt="photorealistic portrait, 18 years old, platinum-blonde hair with black curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
-            loras_weights=[-1.50, 1.30, 0.7, 2.90, 1.60, -0.85],
+            loras_weights=[-1.50, 1.30, 0.75, 3, 1.60, -0.85],
         ),
         setting3_generate_data(
             model_name="zlatapavlova.xo",
@@ -96,6 +93,16 @@ def second_group_get_data_array():
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1woman, milf, black hair, medium-large natural breasts, tan skin, green eyes""",
             loras_weights=[2, 4.30, -1.70, 1.00, 1.00, 1.70, -0.70, 0.35],
+        ),
+        setting4_generate_data(
+            model_name="evelynlaine.xo.xo",
+            model_index=80,
+            picture_folder_id="1RRN7ED5wdYaKaCNJlGMqAAqUgjAFmkh6",
+            video_folder_id="1ZQoPo0PmGYdqAPzmsaM_PO1WIdsCSzRh",
+            nsfw_video_folder_id="10dyGFZHQ22QM-Z3dNhSB_KEdJvVH5aSB",
+            prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK 
+            1girl, 18, sorority girl, platinum-blonde hair, medium-large natural breasts, tan skin, green eyes""",
+            loras_weights=[2, 3.00, -2.00, 1.80, 2.00, 1.70, -0.70, 0.75],
         ),
         setting4_generate_data(
             model_name="abrilberries",
@@ -180,9 +187,9 @@ def second_group_get_data_array():
         setting4_generate_data(
             model_name="jessie_valemont",
             model_index=98,
-            picture_folder_id="1mxmGqspHnlGaltzsJbdOeWek8K4U6ncz",
-            video_folder_id="1BOA9b-TPtuFMlJ6Izi9TntHtvnX4NfYo",
-            nsfw_video_folder_id="1MKN5dp4IXt-OG2qP-vMrIsE0ZSkDGxLf",
+            picture_folder_id="1gu_1ckP6nfPFQaNKbDJXXotcDHFf4UWl",
+            video_folder_id="1AKsI6PDvox_vE_R6FK63fO08Xi93j4mT",
+            nsfw_video_folder_id="1BzkfzG1JviFkK714lD5OdOrVsgMExyJA",
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, white hair, medium-large natural breasts, extra tan skin, blue eyes, smirk""",
             loras_weights=[2, 3.10, -1.70, 1.30, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
