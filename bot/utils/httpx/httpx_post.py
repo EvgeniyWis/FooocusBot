@@ -62,18 +62,27 @@ async def httpx_post(
                 if response.status_code == 402 and "runpod" in url.lower():
                     raise Exception(PAYMENT_RUNPOD_ERROR_TEXT)
 
-                response_json = response.json()
-                if (
-                    "error" in response_json
-                    and "message" in response_json["error"]
-                ):
-                    error_message = response_json["error"]["message"]
-                elif "message" in response_json:
-                    error_message = response_json["message"]
-                elif "result" in response_json:
-                    error_message = response_json["result"]
-                else:
-                    error_message = "Описание отсутствует"
+                try:
+                    response_json = response.json()
+                    logger.error(f"Ошибка API. Статус: {response.status_code}, Ответ: {response_json}")
+                    
+                    if (
+                        "error" in response_json
+                        and "message" in response_json["error"]
+                    ):
+                        error_message = response_json["error"]["message"]
+                    elif "message" in response_json:
+                        error_message = response_json["message"]
+                    elif "result" in response_json:
+                        error_message = response_json["result"]
+                    elif "error" in response_json:
+                        error_message = str(response_json["error"])
+                    else:
+                        error_message = f"HTTP {response.status_code}: {response.text[:200]}"
+                except ValueError:
+                    # Если ответ не является JSON
+                    error_message = f"HTTP {response.status_code}: {response.text[:200]}"
+                    logger.error(f"Невалидный JSON ответ. Статус: {response.status_code}, Тело: {response.text}")
 
                 raise Exception(error_message)
 
