@@ -45,7 +45,7 @@ def second_group_get_data_array():
             video_folder_id="19YGecBXjT0-Zs9lWgw_AV7DFTp9phAFG",
             nsfw_video_folder_id="1movOYETVPHNZkrzadfva4REhsVJ5-mkt",
             prompt="photorealistic portrait, 18 years old, platinum-blonde hair with black curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
-            loras_weights=[-1.50, 1.30, 0.7, 2.90, 1.60, -0.85],
+            loras_weights=[-1.50, 1.30, 0.75, 3, 1.60, -0.85],
         ),
         setting3_generate_data(
             model_name="zlatapavlova.xo",
