@@ -1,75 +1,75 @@
-# Архитектура интеграции с ILoveAPI
+# ILoveAPI Service
 
-## Основные компоненты
+Сервис для работы с ILoveAPI - внешним сервисом для обработки изображений.
 
-- **ILoveAPI (api_client.py):** HTTP-клиент для работы с API, инкапсулирует аутентификацию.
-- **ILoveAPIAuth (auth.py):** Сервис для получения и хранения токена.
-- **Протоколы (interfaces.py):** Описывают интерфейсы для загрузчика, скачивателя, процессора и стартера задач.
-- **Сервисы (uploader.py, downloader.py, processer.py, starter.py):** Реализации соответствующих протоколов, используют ILoveAPI для общения с API.
-- **ILoveAPITaskFacade (task_service.py):** Фасад для работы с задачами: объединяет стартер, загрузчик, процессор и скачиватель, реализует бизнес-логику.
-- **validation.py:** Валидация и логирование шагов задач.
-- **get_iloveapi_task_factory.py (factory):** Фабрика для создания экземпляра фасада и всех зависимостей (без синглтона, поддерживает DI).
-- **types.py:** Строгие типы (TypedDict) для всех структур данных.
+## Структура
 
-## Принципы архитектуры
+```
+services/iloveapi/
+├── __init__.py              # Основные экспорты
+├── client/
+│   ├── __init__.py
+│   └── api_client.py        # Основной клиент для работы с API
+├── services/
+│   ├── __init__.py
+│   ├── upscaler.py          # Сервис для апскейла изображений
+│   └── task_service.py      # Сервис для работы с задачами
+├── utils/
+│   ├── __init__.py
+│   └── retry.py             # Утилиты для повторных попыток
+└── types/
+    └── __init__.py          # Типы данных
+```
 
-- **Явное разделение ответственности:** Каждый сервис отвечает только за свою часть.
-- **Dependency Injection:** Все зависимости передаются явно через параметры фабрики, что облегчает тестирование и расширение.
-- **Строгая типизация:** Используются TypedDict для всех структур данных между слоями.
-- **Фасад:** ILoveAPITaskFacade скрывает детали взаимодействия с API.
-- **Протоколы:** Позволяют легко подменять реализации для тестирования или расширения.
+## Использование
 
-## Пример использования
+### Базовое использование
 
 ```python
-from bot.factory.get_iloveapi_task_factory import get_iloveapi_task_factory
+from bot.services.iloveapi import ILoveApiUpscaler
 
-# Получить сервис (можно передать свои реализации для тестов)
-iloveapi_service = get_iloveapi_task_factory()
+# Создание сервиса
+upscaler = ILoveApiUpscaler()
 
-# Запустить задачу изменения размера изображения
-result = await iloveapi_service.resize_image(
-    file=image_url,
-    width=720,
-    height=1280,
+# Апскейл изображения
+result = await upscaler.upscale_image(
+    temp_image_path="path/to/image.jpg",
+    model_name="model_name",
+    image_index=1,
+    user_id=123,
+    state=fsm_context
 )
 ```
 
-## Как расширять и тестировать
-
-- Для подмены зависимостей (например, для тестов) используйте параметры фабрики:
+### Прямая работа с клиентом
 
 ```python
-mock_uploader = MyMockUploader()
-iloveapi_service = get_iloveapi_task_factory(uploader=mock_uploader)
+from bot.services.iloveapi import ILoveApiClient, ILoveApiTaskService
+
+# Создание клиента
+client = ILoveApiClient()
+
+# Создание сервиса задач
+task_service = ILoveApiTaskService(client)
+
+# Обработка задачи
+task = task_service.process_task_with_retry(
+    file_path="path/to/file.jpg",
+    task_type="upscaleimage",
+    multiplier=4
+)
 ```
 
-- Для новых типов задач добавьте TypedDict в types.py и расширьте соответствующие сервисы.
+## Особенности
 
-## Диаграмма архитектуры
+- **Автоматические повторные попытки**: При ошибках 401 и других проблемах
+- **Увеличенные таймауты**: Для работы с большими файлами
+- **Альтернативные методы скачивания**: При проблемах с основным API
+- **Логирование**: Подробное логирование всех операций
+- **Обработка ошибок**: Детальная обработка различных типов ошибок
 
-```mermaid
-flowchart TD
-    subgraph "Фасад"
-        A[ILoveAPITaskFacade]
-    end
-    subgraph "Сервисы"
-        B[ILoveAPIStarter]
-        C[ILoveAPIUploader]
-        D[ILoveAPIProcessor]
-        E[ILoveAPIDownloader]
-    end
-    subgraph "Клиент"
-        F[ILoveAPI]
-        G[ILoveAPIAuth]
-    end
-    A --> B
-    A --> C
-    A --> D
-    A --> E
-    B --> F
-    C --> F
-    D --> F
-    E --> F
-    F --> G
-``` 
+## Настройки
+
+Сервис использует настройки из `bot.settings`:
+- `PUBLIC_ILOVEAPI_API_KEY` - публичный ключ API
+- `SECRET_ILOVEAPI_API_KEY` - секретный ключ API 

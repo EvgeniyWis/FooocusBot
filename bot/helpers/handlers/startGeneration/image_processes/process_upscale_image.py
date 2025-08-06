@@ -10,8 +10,10 @@ from bot.helpers.generateImages.dataArray import (
     get_model_index_by_model_name,
     getDataByModelName,
 )
-from bot.helpers.generateImages.second_upscale import second_upscale_image
-from bot.helpers.generateImages.upscale import upscale_image
+from bot.helpers.generateImages.upscale import (
+    second_upscale_image,
+    upscale_image,
+)
 from bot.helpers.handlers.messages import send_progress_message
 from bot.logger import logger
 from bot.utils.handlers import (

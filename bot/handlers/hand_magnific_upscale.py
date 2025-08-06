@@ -1,10 +1,10 @@
 
-import base64
+
+import os
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.factory.image_service_factory import create_image_resizer
 from bot.factory.magnific_task_factory import get_magnific_task_factory
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes.process_save_image import (
@@ -12,6 +12,14 @@ from bot.helpers.handlers.startGeneration.image_processes.process_save_image imp
 )
 from bot.InstanceBot import magnific_upscale_router
 from bot.logger import logger
+from bot.utils.file_validation import (
+    FileValidationError,
+    validate_image_for_magnific,
+)
+from bot.utils.googleDrive.files import downloadFromGoogleDrive
+from bot.utils.googleDrive.files.getGoogleDriveFileID import (
+    getGoogleDriveFileID,
+)
 from bot.utils.handlers.getDataInDictsArray import getDataInDictsArray
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
     safe_edit_message,
@@ -19,6 +27,7 @@ from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
+from bot.utils.images.resize_image import resize_image
 
 
 # Обработка нажатия на кнопку "🪄 Использовать Magnific Upscaler"
@@ -59,27 +68,25 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
 
     logger.info(f"URL изображения для Magnific Upscaler: {image_url}")
 
-    # Получаем сервис ILoveAPI для уменьшения разрешения изображения
-    resize_service = create_image_resizer()
+    # Скачиваем изображение по url
+    image_id = getGoogleDriveFileID(image_url)
+    image_path = await downloadFromGoogleDrive(image_id)
+    
+    # Уменьшаем разрешение изображения
+    await resize_image(image_path, 720, 1280)
 
-    # Запускаем задачу
-    try:
-        resize_result_response = await resize_service.resize_image_cloud_file(
-            cloud_file=image_url,
-            width=720,
-            height=1280,
-        )
-        resize_result = resize_result_response.content
-    except Exception as e:
-        await message_for_edit.delete()
-        error_text = f"Ошибка при уменьшении разрешения изображения: {e}"
+    logger.info(f"Изображение успешно уменьшено до размера 720x1280: {image_path}")
+    
+    # Проверяем, что файл существует
+    if not os.path.exists(image_path):
+        error_text = f"❌ Файл не найден после изменения размера: {image_path}"
         logger.error(error_text)
-        await safe_send_message(
-            error_text,
-            call.message,
+        await safe_edit_message(
+            message_for_edit,
+            error_text
         )
-        raise e
-
+        return
+    
     # Изменяем сообщение
     await safe_edit_message(
         message_for_edit,
@@ -89,8 +96,16 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
     # Получаем сервис Magnific
     magnific_service = get_magnific_task_factory()
 
-    # Преобразуем в base64
-    resize_result_base64 = base64.b64encode(resize_result).decode("utf-8")
+    # Валидируем файл и получаем base64 строку
+    try:
+        width, height, resize_result_base64 = validate_image_for_magnific(image_path)
+        logger.info(f"Файл успешно валидирован: {width}x{height}")
+    except FileValidationError as e:
+        await safe_edit_message(
+            message_for_edit,
+            f"❌ Ошибка валидации файла: {e}"
+        )
+        return
 
     # Запускаем upscale
     try:
@@ -105,14 +120,19 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
             scale_factor="2x",
         )
     except Exception as e:
-        await message_for_edit.delete()
+        # Безопасно удаляем сообщение
+        try:
+            await message_for_edit.delete()
+        except Exception as delete_error:
+            logger.warning(f"Не удалось удалить сообщение: {delete_error}")
+        
         error_text = f"Ошибка при Magnific Upscale изображения: {e}"
         logger.error(error_text)
         await safe_send_message(
             error_text,
             call.message,
         )
-        raise e
+        return  # Возвращаемся вместо raise, чтобы избежать повторной обработки ошибки
 
     # Удаляем сообщение о начале upscale
     await message_for_edit.delete()
@@ -127,6 +147,12 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
         name_postfix="magnific_upscale",
         kb_with_magnific_upscale=False,
     )
+
+    # Удаляем временный файл
+    try:
+        os.remove(image_path)
+    except Exception as e:
+        logger.error(f"Ошибка при удалении временного файла: {e}")
 
 
 # Добавление обработчиков

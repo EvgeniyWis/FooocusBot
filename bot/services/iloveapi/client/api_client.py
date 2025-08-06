@@ -1,77 +1,58 @@
-from bot.services.base_api_client import BaseAPIClient
-from bot.services.iloveapi.auth.auth import ILoveAPIAuth
+import random
+import time
+from typing import Optional
+
+import httpx
+
+from bot.logger import logger
+from bot.settings import settings
+from iloveapi import ILoveApi
 
 
-class ILoveAPI(BaseAPIClient):
-    """
-    Клиент для работы с ILoveAPI. Управляет аутентификацией и отправкой запросов.
-    """
-    def __init__(self, base_url: str, public_key: str) -> None:
-        """
-        Args:
-            base_url (str): Базовый URL API.
-            public_key (str): Публичный ключ для аутентификации.
-        """
-        super().__init__(base_url)
-        self.auth_service: ILoveAPIAuth = ILoveAPIAuth(base_url, public_key)
-
-    async def post(
-        self,
-        url: str,
-        json: dict = None,
-        data: dict = None,
-        files: dict = None,
-        with_base_url: bool = True,
-        is_long_operation: bool = False,
-    ) -> dict:
-        """
-        Выполняет POST-запрос к ILoveAPI с автоматическим добавлением токена.
-
-        Args:
-            url (str): URL запроса.
-            json (dict, optional): JSON-данные для отправки.
-            files (dict, optional): Файлы для отправки.
-            is_long_operation (bool): Флаг для длительных операций (например, upscale).
-
-        Returns:
-            dict: Ответ от сервера.
-        """
-        token = await self.auth_service.get_token()
-        if not token:
-            raise RuntimeError("Не удалось получить токен для ILoveAPI")
-
-        headers = {"Authorization": f"Bearer {token}"}
-        resp = await super().post(
-            url, 
-            json=json, 
-            data=data, 
-            files=files, 
-            headers=headers, 
-            with_base_url=with_base_url,
-            is_long_operation=is_long_operation
-        )
-        return resp
-
-    async def get(
-        self,
-        url: str,
-        with_base_url: bool = True,
-        extra_headers: dict = None,
-        is_long_operation: bool = False,
-    ) -> dict:
-        token = await self.auth_service.get_token()
-        if not token:
-            raise RuntimeError("Не удалось получить токен для ILoveAPI")
-
-        headers = {"Authorization": f"Bearer {token}"}
-
-        if extra_headers:
-            headers.update(extra_headers)
-
-        resp = await super().get(
-            url, 
-            headers=headers, 
-            with_base_url=with_base_url,
-            is_long_operation=is_long_operation
-        )
-        return resp
+class ILoveApiClient:
+    """Клиент для работы с ILoveAPI"""
+    
+    def __init__(self, max_retries: int = 10):
+        self.max_retries = max_retries
+        self._client: Optional[ILoveApi] = None
+    
+    def create_client_with_retry(self) -> ILoveApi:
+        """Создает клиент с механизмом повторных попыток"""
+        for attempt in range(self.max_retries):
+            try:
+                # Проверяем наличие API ключей
+                if not settings.PUBLIC_ILOVEAPI_API_KEY or not settings.SECRET_ILOVEAPI_API_KEY:
+                    raise ValueError("Отсутствуют API ключи для ILoveAPI")
+                
+                logger.info("Создаем клиент ILoveAPI...")
+                
+                # Создаем клиент с увеличенными таймаутами
+                client = ILoveApi(
+                    public_key=settings.PUBLIC_ILOVEAPI_API_KEY,
+                    secret_key=settings.SECRET_ILOVEAPI_API_KEY,
+                    timeout=httpx.Timeout(
+                        connect=120.0,
+                        read=1800.0,
+                        write=120.0,
+                        pool=120.0,
+                    ),
+                )
+                self._client = client
+                logger.info("Клиент ILoveAPI успешно создан")
+                return client
+            except Exception as e:
+                if attempt == self.max_retries - 1:
+                    raise e
+                logger.warning(f"Попытка {attempt + 1} создания клиента не удалась: {e}")
+                time.sleep(2 ** attempt + random.uniform(0, 1))
+    
+    @property
+    def client(self) -> ILoveApi:
+        """Получает клиент, создавая его при необходимости"""
+        if self._client is None:
+            self._client = self.create_client_with_retry()
+        return self._client
+    
+    def reset_client(self):
+        """Сбрасывает клиент для пересоздания"""
+        self._client = None 
