@@ -96,7 +96,7 @@ def second_group_get_data_array():
         ),
         setting4_generate_data(
             model_name="evelynlaine.xo.xo",
-            model_index=80,
+            model_index=79,
             picture_folder_id="1RRN7ED5wdYaKaCNJlGMqAAqUgjAFmkh6",
             video_folder_id="1ZQoPo0PmGYdqAPzmsaM_PO1WIdsCSzRh",
             nsfw_video_folder_id="10dyGFZHQ22QM-Z3dNhSB_KEdJvVH5aSB",
