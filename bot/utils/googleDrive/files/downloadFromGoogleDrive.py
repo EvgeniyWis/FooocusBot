@@ -1,4 +1,5 @@
 import os
+
 import aiofiles
 
 import bot.constants as constants
@@ -7,14 +8,14 @@ from bot.utils.httpx import httpx_get
 
 
 # Скачивание файла из Google Drive
-async def downloadFromGoogleDrive(url: str, file_id: str) -> str | None:
+async def downloadFromGoogleDrive(file_id: str) -> str | None:
     try:
         url = f"https://drive.google.com/uc?export=download&id={file_id}"
         logger.info(f"Попытка скачать файл с URL: {url}")
 
         response = await httpx_get(url)
 
-        if response:
+        if response and hasattr(response, 'content'):
             os.makedirs(constants.FACEFUSION_RESULTS_DIR, exist_ok=True)
             file_path = os.path.join(
                 constants.FACEFUSION_RESULTS_DIR, f"{file_id}.jpg"
