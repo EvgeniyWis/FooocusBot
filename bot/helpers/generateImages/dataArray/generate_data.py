@@ -56,7 +56,7 @@ def generate_data(
                 "base_model_name": base_config_model_name,
                 "style_selections": [],
                 "guidance_scale": guidance_scale,
-                "aspect_ratios_selection": "720*1280",
+                "aspect_ratios_selection": "1280*720",
             },
         },
         "model_name": model_name,
