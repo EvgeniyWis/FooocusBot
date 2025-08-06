@@ -1,7 +1,4 @@
 # Функция для генерации массива данных для запроса для второй группы
-from bot.helpers.generateImages.dataArray.settings.setting_1.generate_data import (
-    setting1_generate_data,
-)
 from bot.helpers.generateImages.dataArray.settings.setting_2.generate_data import (
     setting2_generate_data,
 )
@@ -96,6 +93,16 @@ def second_group_get_data_array():
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1woman, milf, black hair, medium-large natural breasts, tan skin, green eyes""",
             loras_weights=[2, 4.30, -1.70, 1.00, 1.00, 1.70, -0.70, 0.35],
+        ),
+        setting4_generate_data(
+            model_name="evelynlaine.xo.xo",
+            model_index=80,
+            picture_folder_id="1RRN7ED5wdYaKaCNJlGMqAAqUgjAFmkh6",
+            video_folder_id="1ZQoPo0PmGYdqAPzmsaM_PO1WIdsCSzRh",
+            nsfw_video_folder_id="10dyGFZHQ22QM-Z3dNhSB_KEdJvVH5aSB",
+            prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK 
+            1girl, 18, sorority girl, platinum-blonde hair, medium-large natural breasts, tan skin, green eyes""",
+            loras_weights=[2, 3.00, -2.00, 1.80, 2.00, 1.70, -0.70, 0.75],
         ),
         setting4_generate_data(
             model_name="abrilberries",

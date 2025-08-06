@@ -44,6 +44,17 @@ def first_group_get_data_array():
             loras_weights=[2, 1.60, -0.90, -1.70, 2.50, 1.00, 2.65, 0.80],
         ),
         setting1_generate_data(
+            model_name="adelinedior",
+            model_index=22,
+            picture_folder_id="1wOcyvh3JVmv60SE2EjmfdpRQ3LWXcxHA",
+            video_folder_id="1z-DL3bUbBQckmyWkNUfTj6oHQwuaSvFT",
+            nsfw_video_folder_id="1rKyWYuG0P4ScPFYp7pY41MAov8R62TKo",
+            prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK
+            1girl, 18 years old, athletic body, blonde hair, blue eyes, tanned skin.
+            Style: Instagram photo style, Canon DSLR, bright sunlight.""",
+            loras_weights=[2, 1.75, -0.90, -1.70, 0.10, 1.00, 0.10, 1.00],
+        ),
+        setting1_generate_data(
             model_name="naomiruelle",
             model_index=23,
             picture_folder_id="1ye6AlCgZG_TkvRwCXxArM2rDI1x6kF20",
