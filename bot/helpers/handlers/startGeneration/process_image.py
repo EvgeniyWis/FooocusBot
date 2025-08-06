@@ -21,6 +21,7 @@ from bot.logger import logger
 from bot.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils import retryOperation
+from bot.utils.error_notifier import send_error_to_developers_with_callback
 from bot.utils.handlers import (
     appendDataToStateArray,
     getDataInDictsArray,
@@ -129,8 +130,11 @@ async def process_image(
                         is_second=True,
                     )
                 except Exception as e:
-                    logger.warning(
-                        f"[process_image] Second upscale failed for ({model_name}, {image_index}): {e}. Continuing to next step."
+                    # Отправляем ошибку разработчикам, но продолжаем обработку для пользователя
+                    await send_error_to_developers_with_callback(
+                        e, 
+                        f"Second upscale failed for ({model_name}, {image_index})", 
+                        call
                     )
 
             process_image_step = await update_process_image_step(
