@@ -182,6 +182,11 @@ async def process_save_image(
         logger.error(f"Не удалось отправить фото с источником: {photo_source}")
         
         # Если использовали локальный файл, попробуем URL
+        reply_markup = video_generation_keyboards.generateVideoKeyboard(
+            model_name,
+            image_index=image_index,
+            with_magnific_upscale=kb_with_magnific_upscale,
+        )
         if photo_source == result_path and direct_url != result_path:
             logger.info("Пробуем отправить через URL как альтернативу")
             message_with_saved_image = await safe_send_photo(
@@ -193,11 +198,7 @@ async def process_save_image(
                     parent_folder["webViewLink"],
                     model_name_index,
                 ),
-                reply_markup=video_generation_keyboards.generateVideoKeyboard(
-                    model_name,
-                    image_index=image_index,
-                    with_magnific_upscale=kb_with_magnific_upscale,
-                ),
+                reply_markup=reply_markup,
             )
         
         # Если все еще не удалось, отправляем текстовое сообщение
@@ -205,6 +206,7 @@ async def process_save_image(
             await editMessageOrAnswer(
                 call,
                 f"Изображение сохранено, но не удалось отправить фото.\nСсылка: {link}",
+                reply_markup=reply_markup,
             )
             return direct_url
 

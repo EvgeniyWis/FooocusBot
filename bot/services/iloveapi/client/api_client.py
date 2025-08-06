@@ -20,6 +20,12 @@ class ILoveApiClient:
         """Создает клиент с механизмом повторных попыток"""
         for attempt in range(self.max_retries):
             try:
+                # Проверяем наличие API ключей
+                if not settings.PUBLIC_ILOVEAPI_API_KEY or not settings.SECRET_ILOVEAPI_API_KEY:
+                    raise ValueError("Отсутствуют API ключи для ILoveAPI")
+                
+                logger.info("Создаем клиент ILoveAPI...")
+                
                 # Создаем клиент с увеличенными таймаутами
                 client = ILoveApi(
                     public_key=settings.PUBLIC_ILOVEAPI_API_KEY,
@@ -32,6 +38,7 @@ class ILoveApiClient:
                     ),
                 )
                 self._client = client
+                logger.info("Клиент ILoveAPI успешно создан")
                 return client
             except Exception as e:
                 if attempt == self.max_retries - 1:

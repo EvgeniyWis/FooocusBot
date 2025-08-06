@@ -47,7 +47,7 @@ async def start_generate_video(
             return None
 
         # Скачиваем изображение
-        image_path = await downloadFromGoogleDrive(image_url, image_id)
+        image_path = await downloadFromGoogleDrive(image_id)
         if not image_path:
             logger.error("Не удалось скачать изображение")
             return None

@@ -2,10 +2,10 @@ import os
 from typing import Any
 
 from bot.logger import logger
-
-from ..client.api_client import ILoveApiClient
-from ..services.task_service import ILoveApiTaskService
-from ..utils.retry import download_with_retry
+from bot.services.iloveapi.client.api_client import ILoveApiClient
+from bot.services.iloveapi.services.task_service import ILoveApiTaskService
+from bot.services.iloveapi.utils.file_validator import APIFileValidator
+from bot.services.iloveapi.utils.retry import download_with_retry
 
 
 class ILoveApiUpscaler:
@@ -14,41 +14,32 @@ class ILoveApiUpscaler:
     def __init__(self):
         self.client = ILoveApiClient()
         self.task_service = ILoveApiTaskService(self.client)
+        self.validator = APIFileValidator()
     
     async def process_upscale_task(self, temp_image_path: str, multiplier: int) -> Any:
         """
         Внутренняя функция для обработки задачи upscale с повторными попытками
         """
-        # Проверяем существование файла
-        if not os.path.exists(temp_image_path):
-            raise FileNotFoundError(f"Файл для upscale не найден: {temp_image_path}")
-        
-        # Проверяем размер файла
-        file_size = os.path.getsize(temp_image_path)
-        if file_size == 0:
-            raise ValueError(f"Файл пустой: {temp_image_path}")
-        
-        logger.info(f"Создаю задачу upscaleimage для файла размером {file_size} байт")
-        
         try:
+            # Валидируем исходный файл
+            if not self.validator.validate_source_file(temp_image_path):
+                raise Exception("Исходный файл не прошел валидацию")
+            
             # Обрабатываем задачу с повторными попытками
             task = self.task_service.process_task_with_retry(temp_image_path, "upscaleimage", multiplier=multiplier)
             
             # Скачиваем результат с повторными попытками
-            if download_with_retry(task, temp_image_path, self.client, self.task_service):
+            if download_with_retry(task, temp_image_path):
                 logger.info("Задача успешно выполнена!")
+                
+                # Валидируем скачанный файл
+                if not self.validator.validate_downloaded_file(temp_image_path):
+                    raise Exception("Скачанный файл не прошел валидацию - возможно, API вернул поврежденный файл")
             else:
                 raise Exception("Не удалось скачать файл ни одним способом")
             
         except Exception as e:
             logger.error(f"Критическая ошибка при обработке upscale: {e}")
             raise
-        
-        # Проверяем, что файл был обновлен
-        if not os.path.exists(temp_image_path):
-            raise FileNotFoundError(f"Обработанный файл не найден после загрузки: {temp_image_path}")
-        
-        new_file_size = os.path.getsize(temp_image_path)
-        logger.info(f"Файл успешно обработан. Новый размер: {new_file_size} байт")
         
         return task

@@ -32,9 +32,6 @@ async def second_upscale_image(
 
     # Создаем экземпляр сервиса апскейла
     upscaler = ILoveApiUpscaler()
-    
-    # Выполняем апскейл
-    logger.info(f"Начинаю апскейл изображения: {temp_image_path}, модель: {model_name}, индекс: {image_index}, пользователь: {user_id}")
 
     # Запускаем задачу
     try:
@@ -50,37 +47,6 @@ async def second_upscale_image(
         )
 
         logger.info(f"Апскейл успешно завершен для: {temp_image_path}")
-
-    except httpx.ReadTimeout as e:
-        error_text = f"Таймаут при увеличении качества изображения: {e}"
-        logger.error(error_text)
-        logger.error(f"Детали ошибки - путь: {temp_image_path}, модель: {model_name}, индекс: {image_index}, пользователь: {user_id}")
-        data_for_update = {
-            "model_name": model_name,
-            "image_index": image_index,
-            "error_type": "timeout",
-        }
-        await appendDataToStateArray(
-            state,
-            "upscale_errors",
-            data_for_update,
-        )
-        raise e
-    except httpx.ConnectTimeout as e:
-        error_text = f"Таймаут подключения при увеличении качества изображения: {e}"
-        logger.error(error_text)
-        logger.error(f"Детали ошибки - путь: {temp_image_path}, модель: {model_name}, индекс: {image_index}, пользователь: {user_id}")
-        data_for_update = {
-            "model_name": model_name,
-            "image_index": image_index,
-            "error_type": "connect_timeout",
-        }
-        await appendDataToStateArray(
-            state,
-            "upscale_errors",
-            data_for_update,
-        )
-        raise e
     except Exception as e:
         error_text = f"Ошибка при увеличении качества изображения: {e}"
         logger.error(error_text)
@@ -88,11 +54,10 @@ async def second_upscale_image(
         data_for_update = {
             "model_name": model_name,
             "image_index": image_index,
-            "error_type": "general",
         }
         await appendDataToStateArray(
             state,
-            "upscale_errors",
+            "second_upscale_errors",
             data_for_update,
         )
         raise e

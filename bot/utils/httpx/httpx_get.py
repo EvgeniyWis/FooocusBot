@@ -38,12 +38,18 @@ async def httpx_get(
             if response.status_code == 200:
                 if stream:
                     return response
-                try:
-                    response_json = response.json()
-                    logger.info(f"Ответ от сервера: {response_json}")
-                    return response_json
-                except ValueError as e:
-                    logger.error(f"Ошибка при парсинге ответа от сервера: {e}")
+                # Проверяем Content-Type для определения типа ответа
+                content_type = response.headers.get('content-type', '')
+                if 'application/json' in content_type or 'text/' in content_type:
+                    try:
+                        response_json = response.json()
+                        logger.info(f"Ответ от сервера: {response_json}")
+                        return response_json
+                    except ValueError as e:
+                        logger.error(f"Ошибка при парсинге ответа от сервера: {e}")
+                        return response
+                else:
+                    # Для бинарных данных (изображения, файлы) возвращаем response
                     return response
 
             response_json = response.json()
