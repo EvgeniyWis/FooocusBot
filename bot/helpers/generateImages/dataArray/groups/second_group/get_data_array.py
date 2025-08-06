@@ -180,9 +180,9 @@ def second_group_get_data_array():
         setting4_generate_data(
             model_name="jessie_valemont",
             model_index=98,
-            picture_folder_id="1mxmGqspHnlGaltzsJbdOeWek8K4U6ncz",
-            video_folder_id="1BOA9b-TPtuFMlJ6Izi9TntHtvnX4NfYo",
-            nsfw_video_folder_id="1MKN5dp4IXt-OG2qP-vMrIsE0ZSkDGxLf",
+            picture_folder_id="1gu_1ckP6nfPFQaNKbDJXXotcDHFf4UWl",
+            video_folder_id="1AKsI6PDvox_vE_R6FK63fO08Xi93j4mT",
+            nsfw_video_folder_id="1BzkfzG1JviFkK714lD5OdOrVsgMExyJA",
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK 
             1girl, 18, sorority girl, white hair, medium-large natural breasts, extra tan skin, blue eyes, smirk""",
             loras_weights=[2, 3.10, -1.70, 1.30, 1.00, 1.70, -0.70, 0.35, 0, 1.55],
