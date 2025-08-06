@@ -91,8 +91,8 @@ def first_group_get_data_array():
             picture_folder_id="15gfR1qOglE1kWWu5oc1XpbzoHkj4idXi",
             video_folder_id="1BlPotHzWPwiEzE9BKQPh8vSy4vzWVVB0",
             nsfw_video_folder_id="1vOfFUGtvfMXWAKH_f_nHIo3WdBwh1M3h",
-            prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, brown hair, huge breasts, slim waist, tan skin, plump lips, smirk, green eyes""",
+            prompt="""photorealistic, high quality, BREAK
+            1girl, 18 years old, brown hair, tan skin, green eyes""",
             loras_weights=[1, 0.7, 1.9, 0, -0.15, -1.5],
         ),
         setting2_generate_data(
@@ -281,7 +281,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="16rm09bVW2eBM_3_JNne1K6wkIxku-LJp",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 2.5, 1, -1.05, -1.5],
+            loras_weights=[1, 0.7, 2, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
             model_name="kellymavrix",
