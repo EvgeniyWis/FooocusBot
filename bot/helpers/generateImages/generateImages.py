@@ -61,7 +61,6 @@ async def generateImages(
         total_jobs_count=total_jobs_count,
     )
     images = []
-    generation_id_to_full_model_key = {}
 
     async def process_image(key: str):
         try:
@@ -94,6 +93,7 @@ async def generateImages(
                 user_id,
                 prompt_for_model,
                 chat_id=message.chat.id,
+                model_key=key,
             )
 
             images.append(result)  # Добавляем в общий список только результат
@@ -103,14 +103,14 @@ async def generateImages(
 
                 # обновляем текущую мапу
                 state_data = await state.get_data()
-                generation_map = state_data.get(
-                    "generation_id_to_full_model_key",
+                job_map = state_data.get(
+                    "job_id_to_full_model_key",
                     {},
                 )
-                generation_map[job_id] = full_model_key
+                job_map[job_id] = full_model_key
 
                 await state.update_data(
-                    generation_id_to_full_model_key=generation_map,
+                    job_id_to_full_model_key=job_map,
                 )
 
                 logger.info(

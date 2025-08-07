@@ -146,6 +146,7 @@ async def start_magnific_upscale(call: types.CallbackQuery, state: FSMContext):
         result_url=magnific_result_url,
         name_postfix="magnific_upscale",
         kb_with_magnific_upscale=False,
+        model_key=None,
     )
 
     # Удаляем временный файл

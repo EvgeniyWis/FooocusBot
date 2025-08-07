@@ -10,7 +10,7 @@ async def deleteMessageFromState(
     chat_id: int,
     delete_keyboard_message: bool = False,
     image_index: int = None,
-    generation_id: str = None,
+    job_id: str = None,
 ):
     from bot.InstanceBot import bot
 
@@ -21,7 +21,7 @@ async def deleteMessageFromState(
         f"[deleteMessageFromState] data_list: {data_list}, state_data: {state_data}",
     )
     logger.info(
-        f"[deleteMessageFromState] model_name: {model_name}, image_index: {image_index}, generation_id: {generation_id}",
+        f"[deleteMessageFromState] model_name: {model_name}, image_index: {image_index}, job_id: {job_id}",
     )
 
     messages_to_delete = []
@@ -30,10 +30,10 @@ async def deleteMessageFromState(
             continue
         if item.get("type") not in (None, "media"):
             continue
-        if generation_id is not None and not item.get(
-            "generation_id",
+        if job_id is not None and not item.get(
+            "job_id",
             "",
-        ).startswith(generation_id):
+        ).startswith(job_id):
             continue
         if image_index is not None and item.get("image_index") != image_index:
             continue
@@ -56,10 +56,10 @@ async def deleteMessageFromState(
                 continue
             if item.get("type") != "keyboard":
                 continue
-            if generation_id is not None and not item.get(
-                "generation_id",
+            if job_id is not None and not item.get(
+                "job_id",
                 "",
-            ).startswith(generation_id):
+            ).startswith(job_id):
                 continue
             select_message_id = item.get("message_id")
             try:
@@ -80,10 +80,10 @@ async def deleteMessageFromState(
         if item.get("type") not in (None, "media", "keyboard"):
             filtered_data_list.append(item)
             continue
-        if generation_id is not None and not item.get(
-            "generation_id",
+        if job_id is not None and not item.get(
+            "job_id",
             "",
-        ).startswith(generation_id):
+        ).startswith(job_id):
             filtered_data_list.append(item)
             continue
         if image_index is not None and item.get("image_index") != image_index:

@@ -28,7 +28,8 @@ async def sendImageBlock(
     model_name: str,
     group_number: str,
     user_id: int,
-    generation_id: str,
+    job_id: str,
+    model_key: str = None,
 ):
     try:
         # Ограничиваем media_group до 10 элементов (Telegram лимит)
@@ -61,19 +62,18 @@ async def sendImageBlock(
             f"Slept 0.7s before sending keyboard to user_id={user_id}, model_name={model_name}",
         )
 
-        for idx, media in enumerate(media_group_message):
-            data_for_update = {
-                "model_name": model_name,
-                "generation_id": generation_id,
-                "image_index": idx + 1,
-                "message_id": media.message_id,
-                "type": "media",
-            }
+        for i, message in enumerate(media_group_message):
             await appendDataToStateArray(
                 state,
                 "imageGeneration_mediagroup_messages_ids",
-                data_for_update,
-                unique_keys=("model_name", "image_index", "generation_id"),
+                {
+                    "model_name": model_name,
+                    "image_index": i,
+                    "job_id": job_id,
+                    "message_id": message.message_id,
+                    "type": "media",
+                },
+                unique_keys=("model_name", "image_index", "job_id"),
             )
 
     except Exception as e:
@@ -121,7 +121,8 @@ async def sendImageBlock(
                         group_number,
                         MULTI_IMAGE_NUMBER,
                         selected_indexes,
-                        generation_id,
+                        job_id,
+                        model_key=model_key,
                     )
                 )
                 select_message = await bot.send_message(
@@ -137,18 +138,19 @@ async def sendImageBlock(
                     "imageGeneration_mediagroup_messages_ids",
                     {
                         "model_name": model_name,
-                        "generation_id": generation_id,
+                        "job_id": job_id,
                         "message_id": select_message.message_id,
                         "type": "keyboard",
                     },
-                    unique_keys=("model_name", "generation_id", "type"),
+                    unique_keys=("model_name", "job_id", "type"),
                 )
             else:
                 reply_markup = start_generation_keyboards.selectImageKeyboard(
                     model_name,
                     group_number,
                     model_data["json"]["input"]["image_number"],
-                    generation_id,
+                    job_id,
+                    model_key=model_key,
                 )
                 await bot.send_message(
                     chat_id=user_id,

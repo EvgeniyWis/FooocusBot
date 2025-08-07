@@ -47,18 +47,16 @@ async def save_image_to_file_async(image_bytes, file_path):
 
 async def base64_to_image(
     image_data: str,
-    folder_name: str,
+    job_id: str,
     index: int,
-    user_id: int,
 ) -> str:
     """
-    Преобразует изображение из base64 в PIL Image.
+    Преобразует изображение из base64 в PIL Image и сохраняет по пути, основанному на job_id.
 
     Args:
         - image_data: строка base64, содержащая изображение
-        - folder_name: имя папки для сохранения изображения на Google Drive
+        - job_id: уникальный идентификатор генерации (job_id)
         - index: индекс выбранного изображения (выбирается пользователем с помощью клавиатуры)
-        - user_id: ID пользователя
 
     Returns:
         - file_path: абсолютный путь к сохраненному изображению
@@ -67,7 +65,6 @@ async def base64_to_image(
     if not image_data:
         raise ValueError("Нет данных изображения для декодирования")
 
-    # Инициализируем file_path значением None для использования в except блоке
     file_path = None
 
     # Удаляем префикс Data URL если он присутствует
@@ -98,12 +95,12 @@ async def base64_to_image(
             image_bytes,
         )
 
-        save_dir = f"{constants.TEMP_FOLDER_PATH}/{folder_name}_{user_id}"
+        save_dir = f"{constants.TEMP_FOLDER_PATH}/{job_id}"
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index}.jpg"
 
         logger.info(
-            f"[base64_to_image] Сохраняем файл: {file_path} | folder_name={folder_name}, index={index}, user_id={user_id}"
+            f"[base64_to_image] Сохраняем файл: {file_path} | job_id={job_id}, index={index}"
         )
 
         # Используем асинхронное сохранение, чтобы не блокировать event loop

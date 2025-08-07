@@ -37,20 +37,24 @@ def selectImageKeyboard(
     model_name: str,
     group_number: str,
     image_number: int,
-    generation_id: str,
+    job_id: str,
+    model_key: str = None,
 ):
     inline_keyboard = []
+
+    # Формируем полный ключ модели для callback data
+    full_model_key = f"{model_name}_{model_key}" if model_key else model_name
 
     for i in range(1, image_number + 1, 2):
         inline_keyboard.append(
             [
                 InlineKeyboardButton(
                     text=f"{i}",
-                    callback_data=f"select_image|{model_name}|{group_number}|{i}|{generation_id[:8]}",
+                    callback_data=f"select_image|{full_model_key}|{group_number}|{i}|{job_id[:8]}",
                 ),
                 InlineKeyboardButton(
                     text=f"{i + 1}",
-                    callback_data=f"select_image|{model_name}|{group_number}|{i + 1}|{generation_id[:8]}",
+                    callback_data=f"select_image|{full_model_key}|{group_number}|{i + 1}|{job_id[:8]}",
                 ),
             ],
         )
@@ -59,7 +63,7 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
-                callback_data=f"select_image|{model_name}|{group_number}|regenerate|{generation_id[:8]}",
+                callback_data=f"select_image|{full_model_key}|{group_number}|regenerate|{job_id[:8]}",
             ),
         ]
     )
@@ -67,7 +71,7 @@ def selectImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{group_number}|prompt_regen|{generation_id[:8]}",
+                callback_data=f"select_image|{full_model_key}|{group_number}|prompt_regen|{job_id[:8]}",
             ),
         ]
     )
@@ -200,8 +204,12 @@ def selectMultiImageKeyboard(
     group_number: str,
     image_number: int,
     selected_indexes: list[int],
-    generation_id: str,
+    job_id: str,
+    model_key: str = None,
 ):
+    # Формируем полный ключ модели для callback data
+    full_model_key = f"{model_name}_{model_key}" if model_key else model_name
+    
     # Первое изображение (index=0) - референсное, поэтому показываем кнопки с 1 по 9
     inline_keyboard = []
     for i in range(1, min(image_number, MULTI_IMAGE_NUMBER) + 1, 2):
@@ -215,18 +223,18 @@ def selectMultiImageKeyboard(
             row.append(
                 InlineKeyboardButton(
                     text=text,
-                    callback_data=f"select_multi_image|{model_name}|{group_number}|{idx}",
+                    callback_data=f"select_multi_image|{full_model_key}|{group_number}|{idx}",
                 ),
             )
         if row:
             inline_keyboard.append(row)
 
-    short_generation_id = generation_id[:8]
+    short_job_id = job_id[:8]
     inline_keyboard.append(
         [
             InlineKeyboardButton(
                 text="Готово",
-                callback_data=f"multi_image_done|{model_name}|{group_number}|{short_generation_id}",
+                callback_data=f"multi_image_done|{full_model_key}|{group_number}|{short_job_id}",
             ),
         ],
     )
@@ -234,7 +242,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать",
-                callback_data=f"select_image|{model_name}|{group_number}|regenerate|{short_generation_id}",
+                callback_data=f"select_image|{full_model_key}|{group_number}|regenerate|{short_job_id}",
             ),
         ],
     )
@@ -242,7 +250,7 @@ def selectMultiImageKeyboard(
         [
             InlineKeyboardButton(
                 text="🔄 Перегенерировать с новым промптом",
-                callback_data=f"select_image|{model_name}|{group_number}|prompt_regen|{short_generation_id}",
+                callback_data=f"select_image|{full_model_key}|{group_number}|prompt_regen|{short_job_id}",
             ),
         ],
     )

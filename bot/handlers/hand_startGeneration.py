@@ -338,23 +338,23 @@ async def write_prompt(message: types.Message, state: FSMContext):
         )
 
 
-async def get_model_name_with_generation_id(
+async def get_model_name_with_job_id(
     state: FSMContext,
-    generation_id: str,
+    job_id: str,
 ) -> str:
     state_data = await state.get_data()
     mapping: dict = state_data.get(
-        "generation_id_to_full_model_key",
+        "job_id_to_full_model_key",
         {},
     )
     logger.info(
-        f"Ищем model_name по generation_id: generation_id={generation_id}",
+        f"Ищем model_name по job_id: job_id={job_id}",
     )
-    logger.info(f"generation_id_to_full_model_key: {mapping}")
+    logger.info(f"job_id_to_full_model_key: {mapping}")
 
     model_name: str | None = None
     for full_job_id, model_key in mapping.items():
-        if full_job_id.startswith(generation_id):
+        if full_job_id.startswith(job_id):
             model_name = model_key
             break
 
@@ -369,9 +369,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         text.SELECT_IMAGE_PROGRESS_TEXT,
     )
 
-    model_name, group_number, image_index, generation_id_prefix = (
+    full_model_key, group_number, image_index, job_id_prefix = (
         call.data.split("|")[1:]
     )
+
+    # Извлекаем model_name и model_key из полного ключа
+    if "_" in full_model_key:
+        model_name, model_key = full_model_key.rsplit("_", 1)
+    else:
+        model_name = full_model_key
+        model_key = None
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -383,20 +390,20 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         "imageGeneration_mediagroup_messages_ids",
         model_name,
         call.message.chat.id,
-        generation_id=generation_id_prefix,
+        job_id=job_id_prefix,
     )
     try:
         if image_index == "regenerate":
             model_name_for_regenerate = (
-                await get_model_name_with_generation_id(
+                await get_model_name_with_job_id(
                     state,
-                    generation_id_prefix,
+                    job_id_prefix,
                 )
             )
 
             if not model_name_for_regenerate:
                 logger.warning(
-                    f"[regenerate] Не найден model_name_for_regenerate для generation_id_prefix={generation_id_prefix}",
+                    f"[regenerate] Не найден model_name_for_regenerate для job_id_prefix={job_id_prefix}",
                 )
                 return await editMessageOrAnswer(
                     call,
@@ -410,15 +417,15 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             )
         elif image_index == "prompt_regen":
             model_name_for_regenerate = (
-                await get_model_name_with_generation_id(
+                await get_model_name_with_job_id(
                     state,
-                    generation_id_prefix,
+                    job_id_prefix,
                 )
             )
 
             if not model_name_for_regenerate:
                 logger.warning(
-                    f"[regenerate_with_new_prompt] Не найден model_name_for_regenerate для generation_id_prefix={generation_id_prefix}",
+                    f"[regenerate_with_new_prompt] Не найден model_name_for_regenerate для job_id_prefix={job_id_prefix}",
                 )
                 return await editMessageOrAnswer(
                     call,
@@ -428,7 +435,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             await state.update_data(
                 group_number_for_regenerate_image=group_number,
                 model_name_for_regenerate_image=model_name_for_regenerate,
-                generation_id_for_regenerate=generation_id_prefix,
+                job_id_for_regenerate=job_id_prefix,
             )
 
             await state.set_state(
@@ -465,51 +472,14 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 "Не получилось обнаружить сообщение!",
             )
 
-        try:
-            logger.info("Обрабатываем изображение")
-            await process_image(
-                call,
-                state,
-                model_name,
-                image_index,
-            )
-        except httpx.ReadTimeout as e:
-            logger.exception(f"Таймаут при обработке изображения: {e}")
-            await editMessageOrAnswer(
-                call,
-                "❌ Превышено время ожидания при обработке изображения. Попробуйте еще раз.",
-            )
-            raise e
-        except httpx.ConnectTimeout as e:
-            logger.exception(f"Таймаут подключения при обработке изображения: {e}")
-            await editMessageOrAnswer(
-                call,
-                "❌ Ошибка подключения при обработке изображения. Попробуйте еще раз.",
-            )
-            raise e
-        except Exception as e:
-            traceback.print_exc()
-            logger.exception(f"Ошибка в process_image: {e}")
-            await editMessageOrAnswer(
-                call,
-                f"❌ Ошибка при обработке изображения: {e}",
-            )
-            raise e
-
-    except httpx.ReadTimeout as e:
-        logger.exception(f"Таймаут при обработке изображения: {e}")
-        await editMessageOrAnswer(
+        logger.info("Обрабатываем изображение")
+        await process_image(
             call,
-            "❌ Превышено время ожидания при обработке изображения. Попробуйте еще раз.",
+            state,
+            model_name,
+            image_index,
+            model_key=model_key,
         )
-        raise e
-    except httpx.ConnectTimeout as e:
-        logger.exception(f"Таймаут подключения при обработке изображения: {e}")
-        await editMessageOrAnswer(
-            call,
-            "❌ Ошибка подключения при обработке изображения. Попробуйте еще раз.",
-        )
-        raise e
     except Exception as e:
         traceback.print_exc()
         model_name_index = get_model_index_by_model_name(model_name)
@@ -801,10 +771,10 @@ async def write_new_prompt_for_regenerate_image(
             )
 
     model_name = state_data.get("model_name_for_regenerate_image", "")
-    generation_id = state_data.get("generation_id_for_regenerate", "")
+    job_id = state_data.get("job_id_for_regenerate", "")
 
-    if not generation_id:
-        logger.warning("Нет generation_id_for_regenerate в state!")
+    if not job_id:
+        logger.warning("Нет job_id_for_regenerate в state!")
         return
 
     data_for_update = {f"{model_name}": prompt}
