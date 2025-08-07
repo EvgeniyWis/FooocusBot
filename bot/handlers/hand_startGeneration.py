@@ -539,6 +539,13 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
                     message,
                 )
                 return
+    else:
+        # Если формат не найден, отправляем сообщение об ошибке
+        await safe_send_message(
+            text.WRONG_FORMAT_TEXT,
+            message,
+        )
+        return
 
     chunks.append(msg)
     await state.update_data(

@@ -1,5 +1,3 @@
-
-import httpx
 from aiogram.fsm.context import FSMContext
 
 from bot.logger import logger
