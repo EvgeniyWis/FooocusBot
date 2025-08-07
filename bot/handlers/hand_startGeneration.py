@@ -369,9 +369,16 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         text.SELECT_IMAGE_PROGRESS_TEXT,
     )
 
-    model_name, group_number, image_index, job_id_prefix = (
+    full_model_key, group_number, image_index, job_id_prefix = (
         call.data.split("|")[1:]
     )
+
+    # Извлекаем model_name и model_key из полного ключа
+    if "_" in full_model_key:
+        model_name, model_key = full_model_key.rsplit("_", 1)
+    else:
+        model_name = full_model_key
+        model_key = None
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(model_name)
@@ -465,51 +472,14 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 "Не получилось обнаружить сообщение!",
             )
 
-        try:
-            logger.info("Обрабатываем изображение")
-            await process_image(
-                call,
-                state,
-                model_name,
-                image_index,
-            )
-        except httpx.ReadTimeout as e:
-            logger.exception(f"Таймаут при обработке изображения: {e}")
-            await editMessageOrAnswer(
-                call,
-                "❌ Превышено время ожидания при обработке изображения. Попробуйте еще раз.",
-            )
-            raise e
-        except httpx.ConnectTimeout as e:
-            logger.exception(f"Таймаут подключения при обработке изображения: {e}")
-            await editMessageOrAnswer(
-                call,
-                "❌ Ошибка подключения при обработке изображения. Попробуйте еще раз.",
-            )
-            raise e
-        except Exception as e:
-            traceback.print_exc()
-            logger.exception(f"Ошибка в process_image: {e}")
-            await editMessageOrAnswer(
-                call,
-                f"❌ Ошибка при обработке изображения: {e}",
-            )
-            raise e
-
-    except httpx.ReadTimeout as e:
-        logger.exception(f"Таймаут при обработке изображения: {e}")
-        await editMessageOrAnswer(
+        logger.info("Обрабатываем изображение")
+        await process_image(
             call,
-            "❌ Превышено время ожидания при обработке изображения. Попробуйте еще раз.",
+            state,
+            model_name,
+            image_index,
+            model_key=model_key,
         )
-        raise e
-    except httpx.ConnectTimeout as e:
-        logger.exception(f"Таймаут подключения при обработке изображения: {e}")
-        await editMessageOrAnswer(
-            call,
-            "❌ Ошибка подключения при обработке изображения. Попробуйте еще раз.",
-        )
-        raise e
     except Exception as e:
         traceback.print_exc()
         model_name_index = get_model_index_by_model_name(model_name)

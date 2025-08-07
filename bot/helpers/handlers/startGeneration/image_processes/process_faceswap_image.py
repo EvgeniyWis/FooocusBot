@@ -6,9 +6,11 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from PIL import Image
 
+from bot.constants import TEMP_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
 from bot.helpers.handlers.messages import send_progress_message
+from bot.helpers.jobs.get_job_id_by_model_name import get_job_id_by_model_name
 from bot.logger import logger
 from bot.utils import retryOperation
 from bot.utils.facefusion import facefusion_swap
@@ -21,6 +23,7 @@ async def process_faceswap_image(
     state: FSMContext,
     image_index: int,
     model_name: str,
+    model_key: str = None,
 ) -> str:
     """
     Функция для обработки замены лица, обработки процесса в хендлере, циклической проверки очереди на замену лица
@@ -57,13 +60,12 @@ async def process_faceswap_image(
         call.message.message_id,
     )
 
-    # Локальный путь для проверки существования файла
-    from bot.constants import TEMP_FOLDER_PATH
-
-    temp_user_dir = TEMP_FOLDER_PATH / f"{model_name}_{user_id}"
+    # Получаем job_id для текущей модели и индекса
+    job_id = await get_job_id_by_model_name(state, model_name, model_key)
+    temp_user_dir = TEMP_FOLDER_PATH / f"{job_id}"
     local_faceswap_target_path = os.path.join(
         str(TEMP_FOLDER_PATH),
-        f"{model_name}_{user_id}",
+        f"{job_id}",
         f"{image_index}.jpg",
     )
     logger.info(
@@ -72,7 +74,7 @@ async def process_faceswap_image(
         f"dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
     # Путь для передачи в facefusion_swap (виден внутри facefusion-контейнера)
-    faceswap_target_path = f"/facefusion/.assets/images/temp/{model_name}_{user_id}/{image_index}.jpg"
+    faceswap_target_path = f"/facefusion/.assets/images/temp/{job_id}/{image_index}.jpg"
     faceswap_source_path = (
         f"/facefusion/.assets/images/faceswap/{model_name}.jpg"
     )
