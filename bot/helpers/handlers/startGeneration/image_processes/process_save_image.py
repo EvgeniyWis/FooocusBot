@@ -106,15 +106,23 @@ async def process_save_image(
     }
     state_data = await state.get_data()
     saved_images_urls = state_data.get("saved_images_urls", [])
+    
+    logger.info(f"Сохраняем данные для ({model_name}, {image_index}): {data_for_update}")
+    logger.info(f"Текущий массив saved_images_urls: {saved_images_urls}")
+    
     updated = False
     for idx, obj in enumerate(saved_images_urls):
         if obj["model_name"] == model_name and obj["image_index"] == image_index:
+            logger.info(f"Обновляем существующую запись для ({model_name}, {image_index})")
             saved_images_urls[idx] = data_for_update
             updated = True
             break
     if not updated:
+        logger.info(f"Добавляем новую запись для ({model_name}, {image_index})")
         saved_images_urls.append(data_for_update)
+    
     await state.update_data(saved_images_urls=saved_images_urls)
+    logger.info(f"Обновленный массив saved_images_urls: {saved_images_urls}")
 
     if not link:
         traceback.print_exc()

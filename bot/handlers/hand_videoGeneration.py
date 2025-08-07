@@ -39,6 +39,21 @@ async def quick_generate_video(call: types.CallbackQuery, state: FSMContext):
 
     if len(temp) == 3:
         image_index = int(temp[2])
+        
+        # Проверяем, есть ли сохраненные изображения для данной модели
+        state_data = await state.get_data()
+        saved_images_urls = state_data.get("saved_images_urls", [])
+        model_entries = [entry for entry in saved_images_urls if entry.get("model_name") == model_name]
+        
+        # Проверяем, есть ли запись с указанным image_index
+        matching_entry = next((entry for entry in model_entries if entry.get("image_index") == image_index), None)
+        if not matching_entry:
+            logger.warning(f"Запись для ({model_name}, {image_index}) не найдена в saved_images_urls. Доступные записи: {model_entries}")
+            # Если нет записи с указанным image_index, используем первую доступную
+            if model_entries:
+                fallback_entry = model_entries[0]
+                image_index = fallback_entry.get("image_index")
+                logger.info(f"Используем fallback image_index {image_index} для модели {model_name}")
 
         await state.update_data(
             model_name_for_video_generation=model_name,
@@ -83,6 +98,18 @@ async def handle_rewrite_prompt_button(
 
     state_data = await state.get_data()
     current_prompt = state_data.get("prompt_for_video", "")
+    
+    # Проверяем, есть ли сохраненные изображения для данной модели
+    saved_images_urls = state_data.get("saved_images_urls", [])
+    model_entries = [entry for entry in saved_images_urls if entry.get("model_name") == model_name]
+    
+    if not model_entries:
+        logger.warning(f"Не найдено сохраненных изображений для модели {model_name}")
+        await safe_send_message(
+            f"Ошибка: не найдено сохраненных изображений для модели {model_name}",
+            call.message,
+        )
+        return
 
     # Сохраняем model_name, чтобы потом знать куда применить
     await state.update_data(model_name_for_video_generation=model_name)
@@ -122,6 +149,17 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
             f"Произвожу поиск изображения по индексу {image_index} и имени модели {model_name} в массиве: {saved_images_urls}",
         )
 
+        # Проверяем, есть ли записи для данной модели
+        model_entries = [entry for entry in saved_images_urls if entry.get("model_name") == model_name]
+        logger.info(f"Найдено записей для модели {model_name}: {model_entries}")
+        
+        # Проверяем, есть ли запись с нужным image_index
+        matching_entry = next((entry for entry in model_entries if entry.get("image_index") == image_index), None)
+        if matching_entry:
+            logger.info(f"Найдена запись для ({model_name}, {image_index}): {matching_entry}")
+        else:
+            logger.warning(f"Запись для ({model_name}, {image_index}) не найдена. Доступные записи для модели: {model_entries}")
+
         image_url = await getDataInDictsArray(
             saved_images_urls,
             model_name,
@@ -129,8 +167,18 @@ async def write_prompt_for_video(message: types.Message, state: FSMContext):
         )
 
         if not image_url:
-            error_message = "Ошибка: не удалось найти URL изображения"
-            raise Exception(error_message)
+            # Пытаемся найти любую запись для данной модели
+            fallback_entry = next((entry for entry in model_entries if entry.get("direct_url")), None)
+            if fallback_entry:
+                logger.warning(f"Используем fallback запись для модели {model_name}: {fallback_entry}")
+                image_url = fallback_entry.get("direct_url")
+                # Обновляем image_index на найденный
+                image_index = fallback_entry.get("image_index")
+                await state.update_data(image_index_for_video_generation=image_index)
+            else:
+                error_message = f"Ошибка: не удалось найти URL изображения для модели {model_name} с индексом {image_index}. Доступные записи: {model_entries}"
+                logger.error(error_message)
+                raise Exception(error_message)
 
     else:
         # Сначала проверяем данные из режима уникальных промптов
