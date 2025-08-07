@@ -27,7 +27,6 @@ async def regenerateImage(
     state: FSMContext,
 ):
     state_data = await state.get_data()
-    is_test_generation = state_data.get("generations_type", "") == "test"
 
     # Получаем индекс модели
     model_name_index = get_model_index_by_model_name(

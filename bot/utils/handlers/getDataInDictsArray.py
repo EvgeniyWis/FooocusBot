@@ -26,6 +26,8 @@ async def getDataInDictsArray(
                 and item.get("image_index") == image_index
             ):
                 return item.get("direct_url")
+        elif item.get("model_name") == model_name:
+            return item.get("prompt")
         elif model_name in item:
             return item[model_name]
 
