@@ -16,7 +16,11 @@ from bot.InstanceBot import (
     storage,
 )
 from bot.logger import logger
-from bot.middleware import ErrorHandlingMiddleware, MediaGroupMiddleware
+from bot.middleware import (
+    ErrorHandlingMiddleware,
+    MediaGroupMiddleware,
+    TextValidationMiddleware,
+)
 from bot.settings import settings
 from bot.storage import get_redis_storage, init_redis_storage
 
@@ -87,6 +91,7 @@ async def on_startup():
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())
     dp.message.middleware(MediaGroupMiddleware())
+    dp.message.middleware(TextValidationMiddleware())
 
     await bot.delete_webhook(drop_pending_updates=True)
 
