@@ -246,17 +246,29 @@ async def write_prompts_for_models(message: types.Message, state: FSMContext):
         )
         return
 
-    data_for_update = {
-        f"{get_model_name_by_index(key)}_{key}": prompt
-        for key, prompt in model_prompts.items()
-    }
-
-    await appendDataToStateArray(
-        state,
-        "model_prompts_for_generation",
-        data_for_update,
-        unique_keys=("model_name",),
-    )
+    # Получаем текущий список промптов
+    state_data = await state.get_data()
+    current_prompts = state_data.get("model_prompts_for_generation", [])
+    
+    # Добавляем новые промпты
+    for key, prompt in model_prompts.items():
+        new_prompt_data = {
+            "model_name": f"{get_model_name_by_index(key)}_{key}", 
+            "prompt": prompt
+        }
+        
+        # Проверяем, есть ли уже такой промпт
+        updated = False
+        for idx, item in enumerate(current_prompts):
+            if item.get("model_name") == new_prompt_data["model_name"]:
+                current_prompts[idx] = new_prompt_data
+                updated = True
+                break
+        
+        if not updated:
+            current_prompts.append(new_prompt_data)
+    
+    await state.update_data(model_prompts_for_generation=current_prompts)
 
     await safe_send_message(
         "✅ Промпты получены. Начинаю генерацию...",
@@ -721,10 +733,10 @@ async def write_model_for_generation(
         model_prompts[key] = prompt.strip()
         prompt_counter[index] += 1
 
-    data_for_update = {
-        f"{get_model_name_by_index(key)}_{key}": prompt
+    data_for_update = [
+        {"model_name": f"{get_model_name_by_index(key)}_{key}", "prompt": prompt}
         for key, prompt in model_prompts.items()
-    }
+    ]
 
     logger.info(f"Обновляем промпты в состоянии: {data_for_update}")
     await state.update_data(model_prompts_for_generation=data_for_update)
