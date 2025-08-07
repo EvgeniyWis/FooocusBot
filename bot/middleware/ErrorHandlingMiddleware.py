@@ -9,6 +9,9 @@ from bot.InstanceBot import bot
 from bot.logger import logger
 from bot.utils.error_notifier import send_error_to_developers
 from bot.utils.httpx.error_texts import PAYMENT_RUNPOD_ERROR_TEXT
+from bot.utils.videos.errors_texts import (
+    PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT,
+)
 
 
 class ErrorHandlingMiddleware(BaseMiddleware):
@@ -39,7 +42,7 @@ class ErrorHandlingMiddleware(BaseMiddleware):
                 )
 
                 # Если ошибка произошла в чате с пользователем, отправляем ему сообщение
-                if hasattr(event, "chat"):
+                if hasattr(event, "chat") and str(e) not in [PROMPT_NOT_PASSED_MODERATION_ERROR_TEXT]:
                     await bot.send_message(
                         event.chat.id,
                         "😔 Произошла ошибка при обработке вашего запроса. "
