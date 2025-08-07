@@ -27,29 +27,29 @@ async def select_multi_image(
         [],
     )
 
-    generation_id = None
+    job_id = None
 
-    # Ищем generation_id по текущему message_id и type='keyboard'
+    # Ищем job_id по текущему message_id и type='keyboard'
     for item in mediagroup_data:
         if (
             item.get("type") == "keyboard"
             and item.get("message_id") == message_id
         ):
-            generation_id = item.get("generation_id")
+            job_id = item.get("job_id")
             break
 
-    if not generation_id:
+    if not job_id:
         logger.exception(
-            f"[select_multi_image] generation_id not found for message_id={message_id} in state_data={state_data}",
+            f"[select_multi_image] job_id not found for message_id={message_id} in state_data={state_data}",
         )
-        raise Exception("generation_id is None")
+        raise Exception("job_id is None")
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
-        selected_indexes_dict = {generation_id: selected_indexes_raw}
+        selected_indexes_dict = {job_id: selected_indexes_raw}
     else:
         selected_indexes_dict = selected_indexes_raw
-    selected_indexes = selected_indexes_dict.get(generation_id, [])
+    selected_indexes = selected_indexes_dict.get(job_id, [])
 
     if image_index in selected_indexes:
         selected_indexes.remove(image_index)
@@ -57,7 +57,7 @@ async def select_multi_image(
         if len(selected_indexes) < MULTI_IMAGE_NUMBER:
             selected_indexes.append(image_index)
 
-    selected_indexes_dict[generation_id] = selected_indexes
+    selected_indexes_dict[job_id] = selected_indexes
     await state.update_data(selected_indexes=selected_indexes_dict)
 
     from bot.keyboards.startGeneration.keyboards import (
@@ -70,7 +70,7 @@ async def select_multi_image(
         group_number,
         MULTI_IMAGE_NUMBER,
         selected_indexes,
-        generation_id,
+        job_id,
     )
     # Проверяем, отличается ли новая разметка от текущей
     current_markup = call.message.reply_markup
@@ -91,22 +91,17 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     await call.answer()
 
     state_data = await state.get_data()
-    _, model_name, group_number, generation_id = call.data.split("|")
+    _, model_name, _, job_id = call.data.split("|")
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
-        selected_indexes_dict = {generation_id: selected_indexes_raw}
+        selected_indexes_dict = {job_id: selected_indexes_raw}
     else:
         selected_indexes_dict = selected_indexes_raw
-    full_generation_id = next(
-        (
-            k
-            for k in selected_indexes_dict.keys()
-            if k.startswith(generation_id)
-        ),
-        None,
+    full_job_id = next(
+        k for k in selected_indexes_dict.keys() if k.startswith(job_id)
     )
-    selected_indexes = selected_indexes_dict.get(full_generation_id, [])
+    selected_indexes = selected_indexes_dict.get(full_job_id, [])
 
     if not selected_indexes:
         await call.answer(
@@ -153,7 +148,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         model_name,
         call.message.chat.id,
         delete_keyboard_message=True,
-        generation_id=generation_id,
+        job_id=job_id,
     )
 
     tasks = []
