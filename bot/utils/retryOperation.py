@@ -19,8 +19,6 @@ async def retryOperation(operation, max_attempts, delay, *args):
         delay: Начальная задержка между попытками в секундах
         *args: Аргументы для передачи в операцию
     """
-    last_exception = None
-    
     for attempt in range(max_attempts):
         try:
             logger.info(f"Попытка {attempt + 1} из {max_attempts}")

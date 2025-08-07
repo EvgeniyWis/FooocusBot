@@ -18,7 +18,15 @@ async def select_multi_image(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
-    _, model_name, group_number, image_index = call.data.split("|")
+    _, full_model_key, group_number, image_index = call.data.split("|")
+    
+    # Извлекаем model_name и model_key из полного ключа
+    if "_" in full_model_key:
+        model_name, model_key = full_model_key.rsplit("_", 1)
+    else:
+        model_name = full_model_key
+        model_key = None
+    
     image_index = int(image_index)
     message_id = call.message.message_id
     state_data = await state.get_data()
@@ -71,6 +79,7 @@ async def select_multi_image(
         MULTI_IMAGE_NUMBER,
         selected_indexes,
         job_id,
+        model_key=model_key,
     )
     # Проверяем, отличается ли новая разметка от текущей
     current_markup = call.message.reply_markup
@@ -91,7 +100,14 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     await call.answer()
 
     state_data = await state.get_data()
-    _, model_name, _, job_id = call.data.split("|")
+    _, full_model_key, _, job_id = call.data.split("|")
+
+    # Извлекаем model_name и model_key из полного ключа
+    if "_" in full_model_key:
+        model_name, model_key = full_model_key.rsplit("_", 1)
+    else:
+        model_name = full_model_key
+        model_key = None
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
@@ -110,7 +126,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         )
         return
 
-    temp_dir = TEMP_FOLDER_PATH / f"{model_name}_{call.from_user.id}"
+    temp_dir = TEMP_FOLDER_PATH / f"{job_id}"
     if os.path.exists(temp_dir):
         files_in_dir = sorted(os.listdir(temp_dir))
         logger.info(
@@ -173,7 +189,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         )
 
         task = asyncio.create_task(
-            process_image(fake_call, state, model_name, image_index),
+            process_image(fake_call, state, model_name, image_index, model_key=model_key),
         )
         tasks.append(task)
 
@@ -189,15 +205,11 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
                 f"❌ Ошибка при обработке изображения {image_index}: {str(result)}",
             )
 
-    await call.message.answer(
-        f"✅ Все выбранные изображения для модели {model_name} успешно обработаны!",
-    )
-
     # Удаляем папку модели с оставшимися изображениями
     try:
         temp_path = os.path.join(
             TEMP_FOLDER_PATH,
-            f"{model_name}_{call.from_user.id}",
+            f"{job_id}",
         )
         if os.path.exists(temp_path):
             shutil.rmtree(temp_path)

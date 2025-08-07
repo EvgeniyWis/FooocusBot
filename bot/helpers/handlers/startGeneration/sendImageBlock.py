@@ -29,6 +29,7 @@ async def sendImageBlock(
     group_number: str,
     user_id: int,
     job_id: str,
+    model_key: str = None,
 ):
     try:
         # Ограничиваем media_group до 10 элементов (Telegram лимит)
@@ -64,7 +65,7 @@ async def sendImageBlock(
         for i, message in enumerate(media_group_message):
             await appendDataToStateArray(
                 state,
-                "media_messages",
+                "imageGeneration_mediagroup_messages_ids",
                 {
                     "model_name": model_name,
                     "image_index": i,
@@ -121,6 +122,7 @@ async def sendImageBlock(
                         MULTI_IMAGE_NUMBER,
                         selected_indexes,
                         job_id,
+                        model_key=model_key,
                     )
                 )
                 select_message = await bot.send_message(
@@ -136,11 +138,11 @@ async def sendImageBlock(
                     "imageGeneration_mediagroup_messages_ids",
                     {
                         "model_name": model_name,
-                        "generation_id": job_id,
+                        "job_id": job_id,
                         "message_id": select_message.message_id,
                         "type": "keyboard",
                     },
-                    unique_keys=("model_name", "generation_id", "type"),
+                    unique_keys=("model_name", "job_id", "type"),
                 )
             else:
                 reply_markup = start_generation_keyboards.selectImageKeyboard(
@@ -148,6 +150,7 @@ async def sendImageBlock(
                     group_number,
                     model_data["json"]["input"]["image_number"],
                     job_id,
+                    model_key=model_key,
                 )
                 await bot.send_message(
                     chat_id=user_id,

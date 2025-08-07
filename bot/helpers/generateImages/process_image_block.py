@@ -26,6 +26,7 @@ async def process_image_block(
     message_id: int,
     checkOtherJobs: bool,
     chat_id: int,
+    model_key: str = None,
 ) -> bool:
     """
     Функция для обработки работы по её id и после удачного завершения - отправки сообщения с изображениями
@@ -107,9 +108,8 @@ async def process_image_block(
             for i, image_data in enumerate(images_output):
                 file_path = await base64_to_image(
                     image_data["base64"],
-                    model_name,
+                    job_id,
                     i + 1,
-                    user_id,
                 )
                 media_group.append(
                     types.InputMediaPhoto(
@@ -143,6 +143,7 @@ async def process_image_block(
             group_number,
             user_id,
             job_id=job_id,
+            model_key=model_key,
         )
 
         return True

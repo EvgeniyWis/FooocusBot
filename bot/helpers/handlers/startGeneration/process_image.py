@@ -16,6 +16,7 @@ from bot.helpers.handlers.startGeneration.image_processes import (
     process_upscale_image,
     update_process_image_step,
 )
+from bot.helpers.jobs.get_job_id_by_model_name import get_job_id_by_model_name
 from bot.keyboards.startGeneration import keyboards
 from bot.logger import logger
 from bot.settings import settings
@@ -34,6 +35,7 @@ async def process_image(
     state: FSMContext,
     model_name: str,
     image_index: int,
+    model_key: str = None,
 ):
     """
     Обрабатывает изображение после выбора индекса среди сгенерированных изображений.
@@ -77,10 +79,15 @@ async def process_image(
         f"[process_image] step for ({model_name}, {image_index}) = {process_image_step}",
     )
 
+    # Получаем job_id для текущей модели
+    job_id = await get_job_id_by_model_name(state, model_name, model_key)
+    if not job_id:
+        raise Exception(f"Не найден job_id для model_name={model_name}")
+
     if not settings.MOCK_IMAGES_MODE:
         temp_image_path = (
             TEMP_FOLDER_PATH
-            / f"{model_name}_{call.from_user.id}"
+            / f"{job_id}"
             / f"{image_index}.jpg"
         )
         if process_image_step == ProcessImageStep.UPSCALE:
@@ -88,26 +95,37 @@ async def process_image(
                 f"[process_image] UPSCALE START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}",
             )
             logger.info(
-                f"[process_image] temp dir before UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir before UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
             logger.info(f"Запускаем upscale для ({model_name}, {image_index})")
 
             if settings.UPSCALE_MODE:
-                await retryOperation(
-                    process_upscale_image,
-                    3,
-                    2,
-                    call,
-                    state,
-                    image_index,
-                    model_name,
-                )
+                try:
+                    await retryOperation(
+                        process_upscale_image,
+                        3,
+                        2,
+                        call,
+                        state,
+                        image_index,
+                        model_name,
+                        False,  # is_second=False для первого апскейла
+                        model_key,
+                    )
+                except Exception as e:
+                    logger.error(f"[process_image] Ошибка при первом апскейле для ({model_name}, {image_index}): {e}")
+                    # Отправляем ошибку разработчикам, но продолжаем обработку для пользователя
+                    await send_error_to_developers_with_callback(
+                        e, 
+                        f"First upscale failed for ({model_name}, {image_index})", 
+                        call
+                    )
 
             logger.info(
                 f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}",
             )
             logger.info(
-                f"[process_image] temp dir after UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir after UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
 
             process_image_step = await update_process_image_step(
@@ -128,6 +146,7 @@ async def process_image(
                         image_index=image_index,
                         model_name=model_name,
                         is_second=True,
+                        model_key=model_key,
                     )
                 except Exception as e:
                     # Отправляем ошибку разработчикам, но продолжаем обработку для пользователя
@@ -156,7 +175,7 @@ async def process_image(
                 f"[process_image] Проверка файла перед faceswap: {faceswap_target_path} exists={os.path.exists(faceswap_target_path)}",
             )
             logger.info(
-                f"[process_image] temp dir before FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir before FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
             if not os.path.exists(faceswap_target_path):
                 logger.warning(
@@ -170,6 +189,7 @@ async def process_image(
                     state,
                     image_index,
                     model_name,
+                    model_key=model_key,
                 )
             else:
                 result_path = MOCK_FACEFUSION_PATH
@@ -178,7 +198,7 @@ async def process_image(
                 f"[process_image] FACEFUSION END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(faceswap_target_path)}",
             )
             logger.info(
-                f"[process_image] temp dir after FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}') if (TEMP_FOLDER_PATH / f'{model_name}_{call.from_user.id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir after FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
             if result_path:
                 await state.update_data(
@@ -248,6 +268,7 @@ async def process_image(
             model_name,
             image_index,
             result_path=result_path,
+            model_key=model_key,
         )
 
         state_data = await state.get_data()

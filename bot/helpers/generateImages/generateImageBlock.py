@@ -18,6 +18,7 @@ async def generateImageBlock(
     variable_prompt: str,
     checkOtherJobs: bool = True,
     chat_id: int = None,
+    model_key: str = None,
 ):
     # Проверяем наличие переменного промпта
     if not variable_prompt:
@@ -55,11 +56,19 @@ async def generateImageBlock(
     )
     state_data = await state.get_data()
     job_map = state_data.get("job_id_to_full_model_key", {})
-    job_map[job_id] = f"{model_name}_{setting_number}"
+    
+    # Формируем полный ключ модели
+    if model_key:
+        full_model_key = f"{model_name}_{model_key}"
+    else:
+        # Обратная совместимость - используем старый формат
+        full_model_key = f"{model_name}_{setting_number}"
+    
+    job_map[job_id] = full_model_key
     await state.update_data(job_id_to_full_model_key=job_map)
 
     logger.info(
-        f"[generateImageBlock] Сохранили: {job_id} -> {model_name}_{setting_number}",
+        f"[generateImageBlock] Сохранили: {job_id} -> {full_model_key}",
     )
 
     # Обрабатываем работу
@@ -75,6 +84,7 @@ async def generateImageBlock(
         message_id,
         checkOtherJobs,
         chat_id=chat_id,
+        model_key=model_key,
     )
 
     return result, job_id

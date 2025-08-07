@@ -93,6 +93,7 @@ async def generateImages(
                 user_id,
                 prompt_for_model,
                 chat_id=message.chat.id,
+                model_key=key,
             )
 
             images.append(result)  # Добавляем в общий список только результат

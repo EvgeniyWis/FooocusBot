@@ -13,9 +13,10 @@ from bot.assets.mocks.links import (
 )
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getDataByModelName,
     get_model_index_by_model_name,
+    getDataByModelName,
 )
+from bot.helpers.jobs.get_job_id_by_model_name import get_job_id_by_model_name
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.settings import settings
@@ -35,6 +36,7 @@ async def process_save_image(
     result_url: str = None,
     name_postfix: str = None,
     kb_with_magnific_upscale: bool = True,
+    model_key: str = None,
 ) -> str:
     """
     Обрабатывает сохранение изображения после этапа замены лица.
@@ -54,7 +56,9 @@ async def process_save_image(
 
     # Получаем данные пользователя
     user_id = call.from_user.id
-    temp_user_dir = TEMP_FOLDER_PATH / f"{model_name}_{user_id}"
+    # Получаем job_id для текущей модели
+    job_id = await get_job_id_by_model_name(state, model_name, model_key)
+    temp_user_dir = TEMP_FOLDER_PATH / f"{job_id}"
     logger.info(
         f"[save] START: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )
