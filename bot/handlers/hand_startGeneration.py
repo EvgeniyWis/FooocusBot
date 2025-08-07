@@ -338,23 +338,23 @@ async def write_prompt(message: types.Message, state: FSMContext):
         )
 
 
-async def get_model_name_with_generation_id(
+async def get_model_name_with_job_id(
     state: FSMContext,
-    generation_id: str,
+    job_id: str,
 ) -> str:
     state_data = await state.get_data()
     mapping: dict = state_data.get(
-        "generation_id_to_full_model_key",
+        "job_id_to_full_model_key",
         {},
     )
     logger.info(
-        f"Ищем model_name по generation_id: generation_id={generation_id}",
+        f"Ищем model_name по job_id: job_id={job_id}",
     )
-    logger.info(f"generation_id_to_full_model_key: {mapping}")
+    logger.info(f"job_id_to_full_model_key: {mapping}")
 
     model_name: str | None = None
     for full_job_id, model_key in mapping.items():
-        if full_job_id.startswith(generation_id):
+        if full_job_id.startswith(job_id):
             model_name = model_key
             break
 
@@ -369,7 +369,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         text.SELECT_IMAGE_PROGRESS_TEXT,
     )
 
-    model_name, group_number, image_index, generation_id_prefix = (
+    model_name, group_number, image_index, job_id_prefix = (
         call.data.split("|")[1:]
     )
 
@@ -383,20 +383,20 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
         "imageGeneration_mediagroup_messages_ids",
         model_name,
         call.message.chat.id,
-        generation_id=generation_id_prefix,
+        job_id=job_id_prefix,
     )
     try:
         if image_index == "regenerate":
             model_name_for_regenerate = (
-                await get_model_name_with_generation_id(
+                await get_model_name_with_job_id(
                     state,
-                    generation_id_prefix,
+                    job_id_prefix,
                 )
             )
 
             if not model_name_for_regenerate:
                 logger.warning(
-                    f"[regenerate] Не найден model_name_for_regenerate для generation_id_prefix={generation_id_prefix}",
+                    f"[regenerate] Не найден model_name_for_regenerate для job_id_prefix={job_id_prefix}",
                 )
                 return await editMessageOrAnswer(
                     call,
@@ -410,15 +410,15 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             )
         elif image_index == "prompt_regen":
             model_name_for_regenerate = (
-                await get_model_name_with_generation_id(
+                await get_model_name_with_job_id(
                     state,
-                    generation_id_prefix,
+                    job_id_prefix,
                 )
             )
 
             if not model_name_for_regenerate:
                 logger.warning(
-                    f"[regenerate_with_new_prompt] Не найден model_name_for_regenerate для generation_id_prefix={generation_id_prefix}",
+                    f"[regenerate_with_new_prompt] Не найден model_name_for_regenerate для job_id_prefix={job_id_prefix}",
                 )
                 return await editMessageOrAnswer(
                     call,
@@ -428,7 +428,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
             await state.update_data(
                 group_number_for_regenerate_image=group_number,
                 model_name_for_regenerate_image=model_name_for_regenerate,
-                generation_id_for_regenerate=generation_id_prefix,
+                job_id_for_regenerate=job_id_prefix,
             )
 
             await state.set_state(
@@ -801,10 +801,10 @@ async def write_new_prompt_for_regenerate_image(
             )
 
     model_name = state_data.get("model_name_for_regenerate_image", "")
-    generation_id = state_data.get("generation_id_for_regenerate", "")
+    job_id = state_data.get("job_id_for_regenerate", "")
 
-    if not generation_id:
-        logger.warning("Нет generation_id_for_regenerate в state!")
+    if not job_id:
+        logger.warning("Нет job_id_for_regenerate в state!")
         return
 
     data_for_update = {f"{model_name}": prompt}

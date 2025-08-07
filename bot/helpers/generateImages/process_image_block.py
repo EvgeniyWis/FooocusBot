@@ -142,7 +142,7 @@ async def process_image_block(
             model_name,
             group_number,
             user_id,
-            generation_id=job_id,
+            job_id=job_id,
         )
 
         return True
