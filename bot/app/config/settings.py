@@ -87,4 +87,4 @@ class Settings(BaseSettings):
     TEMP_CLEANUP_INTERVAL_MINUTES: int = 60
 
 
-settings = Settings()  # type: ignore
+settings = Settings()  # type: ignore 

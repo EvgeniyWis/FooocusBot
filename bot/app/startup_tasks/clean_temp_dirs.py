@@ -1,8 +1,8 @@
 import os
 import shutil
 
-import bot.constants as constants
-from bot.logger import logger
+import bot.app.config.constants as constants
+from bot.app.core.logging import logger
 
 
 async def clean_temp_dirs() -> None:

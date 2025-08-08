@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 def resolve_job_id(

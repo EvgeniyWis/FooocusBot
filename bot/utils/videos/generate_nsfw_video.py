@@ -8,7 +8,7 @@ from domain.entities.video_generation import (
 )
 
 from bot.factory.comfyui_video_service import get_video_service
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 async def generate_nsfw_video(

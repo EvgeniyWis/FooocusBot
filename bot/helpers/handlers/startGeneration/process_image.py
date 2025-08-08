@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.assets.mocks.links import MOCK_FACEFUSION_PATH
-from bot.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
+from bot.app.config.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
 from bot.domain.entities.task import TaskProcessImageDTO
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes import (
@@ -18,8 +18,8 @@ from bot.helpers.handlers.startGeneration.image_processes import (
 )
 from bot.helpers.jobs.get_job_id_by_model_name import get_job_id_by_model_name
 from bot.keyboards.startGeneration import keyboards
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.error_notifier import send_error_to_developers_with_callback

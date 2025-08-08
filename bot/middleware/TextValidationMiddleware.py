@@ -6,7 +6,7 @@ from aiogram.types import Message, TelegramObject
 from bot.helpers.handlers.messages.send_progress_message import (
     safe_send_message,
 )
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 class TextValidationMiddleware(BaseMiddleware):

@@ -8,9 +8,9 @@ from runpod.error import RunPodError
 from services.comfyui.video_service import ComfyUIVideoService
 from utils import retryOperation
 
-import bot.constants as constants
-from bot.logger import logger
-from bot.settings import settings
+import bot.app.config.constants as constants
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 
 
 class UnknownRunPodException(Exception):

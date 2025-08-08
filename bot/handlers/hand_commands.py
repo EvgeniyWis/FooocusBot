@@ -9,9 +9,9 @@ from bot.helpers import text
 from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
     cancelImageGenerationJobs,
 )
-from bot.InstanceBot import commands_router
+from bot.app.instance import commands_router
 from bot.keyboards import start_generation_keyboards
-from bot.settings import settings
+from bot.app.config.settings import settings
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )

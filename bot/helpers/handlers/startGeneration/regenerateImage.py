@@ -9,7 +9,7 @@ from bot.helpers.generateImages.dataArray import (
     getDataByModelName,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.handlers import getDataInDictsArray
 from bot.utils.handlers.messages.editMessageOrAnswer import editMessageOrAnswer
 

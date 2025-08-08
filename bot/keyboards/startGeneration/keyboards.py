@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.constants import MULTI_IMAGE_NUMBER
+from bot.app.config.constants import MULTI_IMAGE_NUMBER
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )

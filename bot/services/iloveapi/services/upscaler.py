@@ -1,6 +1,6 @@
 from typing import Any
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.services.iloveapi.client.api_client import ILoveApiClient
 from bot.services.iloveapi.services.task_service import ILoveApiTaskService
 from bot.services.iloveapi.utils.file_validator import APIFileValidator

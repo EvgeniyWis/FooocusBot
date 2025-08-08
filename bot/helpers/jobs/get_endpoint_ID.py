@@ -1,4 +1,4 @@
-from bot.settings import settings
+from bot.app.config.settings import settings
 
 
 # Получение ID эндпоинта для генерации изображений с помощью номера настройки

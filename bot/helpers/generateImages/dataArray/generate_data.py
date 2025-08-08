@@ -1,4 +1,4 @@
-from bot.settings import settings
+from bot.app.config.settings import settings
 
 
 # Глобальная функция для генерации данных для запроса

@@ -14,7 +14,7 @@ from bot.services.freepik.services.magnific.services.status_service import (
 from bot.services.freepik.services.magnific.services.upscaler import (
     UpscalerService,
 )
-from bot.settings import settings
+from bot.app.config.settings import settings
 
 
 def get_magnific_task_factory(

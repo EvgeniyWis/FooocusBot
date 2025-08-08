@@ -2,7 +2,7 @@ import asyncio
 
 import httpx
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.httpx.error_texts import PAYMENT_RUNPOD_ERROR_TEXT
 
 

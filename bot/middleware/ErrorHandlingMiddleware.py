@@ -5,8 +5,8 @@ from typing import Any, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from bot.InstanceBot import bot
-from bot.logger import logger
+from bot.app.instance import bot
+from bot.app.core.logging import logger
 from bot.utils.error_notifier import send_error_to_developers
 from bot.utils.httpx.error_texts import PAYMENT_RUNPOD_ERROR_TEXT
 from bot.utils.videos.errors_texts import (

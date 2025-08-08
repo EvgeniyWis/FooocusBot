@@ -6,9 +6,9 @@ from aiogram.exceptions import (
     TelegramAPIError,
     TelegramRetryAfter,
 )
-from InstanceBot import bot
 
-from bot.logger import logger
+from bot.app.core.logging import logger
+from bot.app.instance import bot
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )

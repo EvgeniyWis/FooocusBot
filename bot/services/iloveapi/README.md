@@ -70,6 +70,6 @@ task = task_service.process_task_with_retry(
 
 ## Настройки
 
-Сервис использует настройки из `bot.settings`:
+Сервис использует настройки из `bot.app.config.settings`:
 - `PUBLIC_ILOVEAPI_API_KEY` - публичный ключ API
 - `SECRET_ILOVEAPI_API_KEY` - секретный ключ API 

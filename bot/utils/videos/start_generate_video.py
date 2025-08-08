@@ -1,9 +1,9 @@
 import aiofiles
 
 from bot.helpers import text
-from bot.InstanceBot import bot
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.instance import bot
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.utils.get_api_headers import get_kling_headers
 from bot.utils.googleDrive.files import (
     downloadFromGoogleDrive,

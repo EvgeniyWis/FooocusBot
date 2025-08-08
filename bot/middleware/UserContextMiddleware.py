@@ -3,7 +3,7 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery, Message, TelegramObject
 
-from bot.logger import current_user_id, current_username
+from bot.app.core.logging import current_user_id, current_username
 
 
 class UserContextMiddleware(BaseMiddleware):

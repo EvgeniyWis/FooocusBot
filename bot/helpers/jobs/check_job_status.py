@@ -7,8 +7,8 @@ from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
 from bot.helpers.jobs.delete_job import delete_job
 from bot.helpers.jobs.edit_job_message import edit_job_message
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.utils import httpx_post
 from bot.utils.get_api_headers import get_runpod_headers
 

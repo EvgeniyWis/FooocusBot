@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import Final
 
-BASE_DIR: Final[Path] = Path(__file__).resolve().parent.parent
+# Указываем корень проекта (папка FooocusBot)
+BASE_DIR: Final[Path] = Path(__file__).resolve().parents[2]
 TEMP_FILES_DIR: Final[Path] = BASE_DIR / "bot" / "temp"
 TEMP_IMAGE_FILES_DIR: Final[Path] = BASE_DIR / "bot" / "temp" / "images"
 FACEFUSION_DIR: Final[Path] = BASE_DIR / ".assets"
@@ -21,4 +22,4 @@ COMFYUI_HEATING_IMAGES_PATH: Final[Path] = (
 )
 
 # Не может быть больше 9!
-MULTI_IMAGE_NUMBER: Final[int] = 9
+MULTI_IMAGE_NUMBER: Final[int] = 9 

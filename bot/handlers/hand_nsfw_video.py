@@ -6,15 +6,15 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from utils.handlers.messages import safe_edit_message
 
-import bot.constants as constants
+import bot.app.config.constants as constants
 from bot.factory.comfyui_video_service import get_video_service
 from bot.helpers.handlers.videoGeneration import (
     process_write_prompt,
     saveVideo,
 )
-from bot.InstanceBot import bot, nsfw_video_router
+from bot.app.instance import bot, nsfw_video_router
 from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.states import StartGenerationState
 from bot.utils import retryOperation
 from bot.utils.handlers import appendDataToStateArray, getDataInDictsArray

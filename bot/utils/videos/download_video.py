@@ -1,7 +1,7 @@
 import os
 import aiofiles
 
-import bot.constants as constants
+import bot.app.config.constants as constants
 from bot.utils.httpx import httpx_get
 
 

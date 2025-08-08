@@ -1,26 +1,26 @@
 import asyncio
 
 from bot import handlers
-from bot.helpers.generateImages.process_image_block import process_image_block
-from bot.helpers.handlers.startGeneration import process_image
-from bot.helpers.handlers.videoGeneration import process_video
-from bot.InstanceBot import (
+from bot.app.config.settings import settings
+from bot.app.core.logging import logger
+from bot.app.instance import (
     bot,
     dp,
     redis_client,
     storage,
 )
-from bot.logger import logger
+from bot.app.startup_tasks.clean_temp_dirs import clean_temp_dirs
+from bot.app.startup_tasks.periodic_cleanup_task import periodic_cleanup_task
+from bot.app.startup_tasks.register_commands import register_commands
+from bot.helpers.generateImages.process_image_block import process_image_block
+from bot.helpers.handlers.startGeneration import process_image
+from bot.helpers.handlers.videoGeneration import process_video
 from bot.middleware import (
     ErrorHandlingMiddleware,
     MediaGroupMiddleware,
     TextValidationMiddleware,
     UserContextMiddleware,
 )
-from bot.settings import settings
-from bot.startup_tasks.clean_temp_dirs import clean_temp_dirs
-from bot.startup_tasks.periodic_cleanup_task import periodic_cleanup_task
-from bot.startup_tasks.register_commands import register_commands
 from bot.storage import get_redis_storage, init_redis_storage
 
 
@@ -75,4 +75,4 @@ async def on_startup():
     # Запускаем задачу очистки временных файлов
     asyncio.create_task(periodic_cleanup_task())
 
-    await dp.start_polling(bot, skip_updates=True)
+    await dp.start_polling(bot, skip_updates=True) 

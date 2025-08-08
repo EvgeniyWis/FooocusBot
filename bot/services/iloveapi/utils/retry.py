@@ -5,7 +5,7 @@ from typing import Any
 
 import httpx
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 def download_with_retry(

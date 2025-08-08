@@ -10,8 +10,8 @@ from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes.process_save_image import (
     process_save_image,
 )
-from bot.InstanceBot import magnific_upscale_router
-from bot.logger import logger
+from bot.app.instance import magnific_upscale_router
+from bot.app.core.logging import logger
 from bot.utils.file_validation import (
     FileValidationError,
     validate_image_for_magnific,
