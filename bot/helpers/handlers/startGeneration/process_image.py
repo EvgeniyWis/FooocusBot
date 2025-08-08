@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 
 from bot.assets.mocks.links import MOCK_FACEFUSION_PATH
-from bot.constants import TEMP_FOLDER_PATH
+from bot.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
 from bot.domain.entities.task import TaskProcessImageDTO
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration.image_processes import (
@@ -86,7 +86,7 @@ async def process_image(
 
     if not settings.MOCK_IMAGES_MODE:
         temp_image_path = (
-            TEMP_FOLDER_PATH
+            FACEFUSION_TEMP_IMAGES_FOLDER_PATH
             / f"{job_id}"
             / f"{image_index}.jpg"
         )
@@ -95,7 +95,7 @@ async def process_image(
                 f"[process_image] UPSCALE START: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}",
             )
             logger.info(
-                f"[process_image] temp dir before UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir before UPSCALE: {os.listdir(FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}') if (FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
             logger.info(f"Запускаем upscale для ({model_name}, {image_index})")
 
@@ -125,7 +125,7 @@ async def process_image(
                 f"[process_image] UPSCALE END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(temp_image_path)}",
             )
             logger.info(
-                f"[process_image] temp dir after UPSCALE: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir after UPSCALE: {os.listdir(FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}') if (FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
 
             process_image_step = await update_process_image_step(
@@ -175,7 +175,7 @@ async def process_image(
                 f"[process_image] Проверка файла перед faceswap: {faceswap_target_path} exists={os.path.exists(faceswap_target_path)}",
             )
             logger.info(
-                f"[process_image] temp dir before FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir before FACEFUSION: {os.listdir(FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}') if (FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
             if not os.path.exists(faceswap_target_path):
                 logger.warning(
@@ -198,7 +198,7 @@ async def process_image(
                 f"[process_image] FACEFUSION END: model_name={model_name}, image_index={image_index}, user_id={call.from_user.id}, file exists={os.path.exists(faceswap_target_path)}",
             )
             logger.info(
-                f"[process_image] temp dir after FACEFUSION: {os.listdir(TEMP_FOLDER_PATH / f'{job_id}') if (TEMP_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
+                f"[process_image] temp dir after FACEFUSION: {os.listdir(FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}') if (FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f'{job_id}').exists() else 'NO_DIR'}",
             )
             if result_path:
                 await state.update_data(

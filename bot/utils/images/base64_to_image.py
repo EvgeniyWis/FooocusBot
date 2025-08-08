@@ -95,7 +95,7 @@ async def base64_to_image(
             image_bytes,
         )
 
-        save_dir = f"{constants.TEMP_FOLDER_PATH}/{job_id}"
+        save_dir = f"{constants.FACEFUSION_TEMP_IMAGES_FOLDER_PATH}/{job_id}"
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index}.jpg"
 
