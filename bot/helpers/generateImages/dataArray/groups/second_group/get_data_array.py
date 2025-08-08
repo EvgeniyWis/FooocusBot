@@ -52,7 +52,7 @@ def second_group_get_data_array():
             video_folder_id="1KY5NttoHI1ZvaRLjqsNfMp33AjhyuxM-",
             nsfw_video_folder_id="1WadINZaETk_qE2fIeYG6Lm3iEa6VbxU6",
             prompt="photorealistic portrait, 18 years old, platinum-blonde hair with black curls, huge breasts, slim waist, big bubble butt, tan skin, big lips, smirk, green eyes, high quality.",
-            loras_weights=[-1.50, 1.30, 0.7, 2.00, 1.45, -1.00],
+            loras_weights=[-1.50, 1.30, 0.7, 2.40, 1.5, -1.00],
         ),
         setting3_generate_data(
             model_name="simona.caramella",
