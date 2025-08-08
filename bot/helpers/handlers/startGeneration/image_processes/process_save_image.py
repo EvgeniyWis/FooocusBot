@@ -5,7 +5,7 @@ from datetime import datetime
 import pytz
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from constants import TEMP_FOLDER_PATH
+from constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
 from utils.handlers.messages.rate_limiter_for_send_photo import safe_send_photo
 
 from bot.assets.mocks.links import (
@@ -58,7 +58,7 @@ async def process_save_image(
     user_id = call.from_user.id
     # Получаем job_id для текущей модели
     job_id = await get_job_id_by_model_name(state, model_name, model_key)
-    temp_user_dir = TEMP_FOLDER_PATH / f"{job_id}"
+    temp_user_dir = FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f"{job_id}"
     logger.info(
         f"[save] START: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )

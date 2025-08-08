@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from PIL import Image, UnidentifiedImageError
 
-from bot.constants import TEMP_FOLDER_PATH
+from bot.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_model_index_by_model_name,
@@ -63,9 +63,9 @@ async def process_upscale_image(
     # Получаем job_id для текущей модели
     job_id = await get_job_id_by_model_name(state, model_name, model_key)
     image_path = (
-        TEMP_FOLDER_PATH / f"{job_id}" / f"{image_index}.jpg"
+        FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f"{job_id}" / f"{image_index}.jpg"
     )
-    temp_user_dir = TEMP_FOLDER_PATH / f"{job_id}"
+    temp_user_dir = FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f"{job_id}"
     log_prefix = "second_upscale" if is_second else "upscale"
     
     # Добавляем подробное логирование в начале
@@ -95,7 +95,7 @@ async def process_upscale_image(
         call.message.message_id,
     )
 
-    logger.info(f"TEMP_FOLDER_PATH: {TEMP_FOLDER_PATH} | type: {type(TEMP_FOLDER_PATH)}")
+    logger.info(f"FACEFUSION_TEMP_IMAGES_FOLDER_PATH: {FACEFUSION_TEMP_IMAGES_FOLDER_PATH} | type: {type(FACEFUSION_TEMP_IMAGES_FOLDER_PATH)}")
     logger.info(f"image_path: {image_path} | type: {type(image_path)} | exists: {os.path.exists(str(image_path))}")
     logger.info(f"str(image_path): {str(image_path)}")
 

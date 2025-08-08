@@ -1,6 +1,7 @@
 import asyncio
 import os
 import shutil
+import time
 
 from aiogram.types import BotCommand
 
@@ -50,6 +51,55 @@ async def clean_temp_dirs():
         os.path.join(constants.TEMP_VIDEOS_FILES_DIR),
         exist_ok=True,
     )
+
+
+def _remove_old_files_in_dir(directory_path: str, older_than_seconds: int) -> None:
+    """Удаляет файлы и пустые папки в каталоге, старше указанного возраста.
+
+    Не падает, если каталога нет.
+    """
+    try:
+        if not os.path.exists(directory_path):
+            return
+
+        now = time.time()
+        for root, _, files in os.walk(directory_path, topdown=False):
+            for name in files:
+                file_path = os.path.join(root, name)
+                try:
+                    if now - os.path.getmtime(file_path) > older_than_seconds:
+                        os.remove(file_path)
+                except Exception as e:
+                    logger.warning(f"Не удалось удалить файл {file_path}: {e}")
+    except Exception as e:
+        logger.error(f"Ошибка при обходе каталога {directory_path}: {e}")
+
+
+async def periodic_cleanup_task() -> None:
+    """Периодическая очистка временных файлов старше TTL.
+
+    Охватывает каталоги: bot/temp/images, bot/temp/videos, temp, .assets/images/temp
+    """
+    ttl_seconds = settings.TEMP_FILES_TTL_HOURS * 3600
+    interval_seconds = settings.TEMP_CLEANUP_INTERVAL_MINUTES * 60
+    target_dirs = [
+        str(constants.TEMP_IMAGE_FILES_DIR),
+        str(constants.TEMP_VIDEOS_FILES_DIR),
+        str(constants.FACEFUSION_TEMP_IMAGES_FOLDER_PATH),
+        str(constants.FACEFUSION_RESULTS_DIR),
+        str(constants.TEMP_FILES_DIR),
+    ]
+
+    logger.info(
+        f"Запущена фоновая очистка временных файлов: ttl={settings.TEMP_FILES_TTL_HOURS}ч, interval={settings.TEMP_CLEANUP_INTERVAL_MINUTES}м"
+    )
+    while True:
+        try:
+            for d in target_dirs:
+                _remove_old_files_in_dir(d, ttl_seconds)
+        except Exception as e:
+            logger.error(f"Ошибка при периодической очистке временных файлов: {e}")
+        await asyncio.sleep(interval_seconds)
 
 
 async def register_commands():
@@ -112,5 +162,6 @@ async def on_startup():
     await clean_temp_dirs()
 
     # Запускаем задачу очистки временных файлов
+    asyncio.create_task(periodic_cleanup_task())
 
     await dp.start_polling(bot, skip_updates=True)

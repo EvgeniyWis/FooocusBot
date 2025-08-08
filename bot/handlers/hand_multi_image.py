@@ -5,7 +5,10 @@ import shutil
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.constants import MULTI_IMAGE_NUMBER, TEMP_FOLDER_PATH
+from bot.constants import (
+    FACEFUSION_TEMP_IMAGES_FOLDER_PATH,
+    MULTI_IMAGE_NUMBER,
+)
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     process_image,
@@ -157,7 +160,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         )
         return
 
-    temp_dir = TEMP_FOLDER_PATH / f"{full_job_id}"
+    temp_dir = FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f"{full_job_id}"
     if os.path.exists(temp_dir):
         files_in_dir = sorted(os.listdir(temp_dir))
         logger.info(
@@ -239,7 +242,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     # Удаляем папку модели с оставшимися изображениями
     try:
         temp_path = os.path.join(
-            TEMP_FOLDER_PATH,
+            FACEFUSION_TEMP_IMAGES_FOLDER_PATH,
             f"{full_job_id}",
         )
         if os.path.exists(temp_path):
