@@ -20,6 +20,7 @@ from bot.middleware import (
     ErrorHandlingMiddleware,
     MediaGroupMiddleware,
     TextValidationMiddleware,
+    UserContextMiddleware,
 )
 from bot.settings import settings
 from bot.storage import get_redis_storage, init_redis_storage
@@ -53,11 +54,10 @@ async def clean_temp_dirs():
 
 async def register_commands():
     commands = [
-        BotCommand(command="/start", description="Перезапустить бота"),
-        BotCommand(
-            command="/stop",
-            description="Остановить генерацию изображений",
-        ),
+        BotCommand(command="start", description="Запустить бота"),
+        BotCommand(command="generate", description="Сгенерировать изображение"),
+        BotCommand(command="video", description="Сгенерировать видео"),
+        BotCommand(command="cancel", description="Отменить генерацию"),
     ]
     await bot.set_my_commands(commands)
 
@@ -87,7 +87,9 @@ async def on_startup():
     handlers.hand_img2video.hand_add()
     handlers.hand_magnific_upscale.hand_add()
 
-    # Добавление middleware
+    # Добавление middleware (UserContext должен идти раньше ErrorHandling)
+    dp.message.middleware(UserContextMiddleware())
+    dp.callback_query.middleware(UserContextMiddleware())
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())
     dp.message.middleware(MediaGroupMiddleware())

@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from contextvars import ContextVar
 from datetime import datetime, timedelta
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
@@ -16,6 +17,18 @@ class MoscowFormatter(logging.Formatter):
         return s
 
 
+# Контекстные переменные для пользователя
+current_user_id: ContextVar[str] = ContextVar("current_user_id", default="-")
+current_username: ContextVar[str] = ContextVar("current_username", default="-")
+
+
+class UserContextFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        record.user_id = current_user_id.get()
+        record.username = current_username.get()
+        return True
+
+
 log_dir = Path(__file__).resolve().parent / "logs"
 backup_dir = log_dir / "backups"
 log_dir.mkdir(parents=True, exist_ok=True)
@@ -24,10 +37,12 @@ backup_dir.mkdir(parents=True, exist_ok=True)
 logger = logging.getLogger("tg_bot_logger")
 logger.setLevel(logging.INFO)
 logger.propagate = False
+# Добавляем фильтр пользовательского контекста
+logger.addFilter(UserContextFilter())
 
 # Используем наш кастомный форматтер
 formatter = MoscowFormatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
+    "%(asctime)s - %(name)s - %(levelname)s - [user_id=%(user_id)s username=%(username)s] - %(filename)s:%(funcName)s:%(lineno)d - %(message)s",
 )
 
 
