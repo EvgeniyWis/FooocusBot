@@ -40,6 +40,8 @@ async def generateImagesInHandler(
     group_number: str,
     with_randomizer: bool = False,
 ):
+    await state.set_state(None)
+
     data = await state.get_data()
     if data.get("message_to_del"):
         try:
