@@ -1,3 +1,4 @@
 from bot.middleware.ErrorHandlingMiddleware import ErrorHandlingMiddleware
 from bot.middleware.MediaGroupMiddleware import MediaGroupMiddleware
 from bot.middleware.TextValidationMiddleware import TextValidationMiddleware
+from bot.middleware.UserContextMiddleware import UserContextMiddleware
