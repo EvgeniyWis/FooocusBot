@@ -802,7 +802,14 @@ async def write_new_prompt_for_regenerate_image(
         unique_keys=("model_name"),
     )
 
-    normal_model_name = await get_normal_model(model_name)
+    # Преобразуем возможный full_model_key в базовое имя модели
+    full_model_key = model_name
+    if "_" in full_model_key:
+        base_model_name, _ = full_model_key.rsplit("_", 1)
+    else:
+        base_model_name = full_model_key
+
+    normal_model_name = await get_normal_model(base_model_name)
 
     # Получаем индекс модели
     model_name_index = get_model_index_by_model_name(normal_model_name)
@@ -822,6 +829,19 @@ async def write_new_prompt_for_regenerate_image(
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(normal_model_name)
+
+    if not data:
+        logger.error(f"[write_new_prompt_for_regenerate_image] Не найдены данные для модели: {normal_model_name} (исходный ключ: {full_model_key})")
+        await editMessageOrAnswer(
+            message,
+            text.REGENERATE_IMAGE_ERROR_TEXT.format(
+                normal_model_name,
+                model_name_index,
+                "Модель не найдена",
+            ),
+        )
+        await regenerate_progress_message.delete()
+        return
 
     await generateImageBlock(
         data,
