@@ -212,6 +212,7 @@ def selectMultiImageKeyboard(
     
     # Первое изображение (index=0) - референсное, поэтому показываем кнопки с 1 по 9
     inline_keyboard = []
+    short_job_id = job_id[:8]
     for i in range(1, min(image_number, MULTI_IMAGE_NUMBER) + 1, 2):
         row = []
         for j in [i, i + 1]:
@@ -223,13 +224,12 @@ def selectMultiImageKeyboard(
             row.append(
                 InlineKeyboardButton(
                     text=text,
-                    callback_data=f"select_multi_image|{full_model_key}|{group_number}|{idx}",
+                    callback_data=f"select_multi_image|{full_model_key}|{group_number}|{idx}|{short_job_id}",
                 ),
             )
         if row:
             inline_keyboard.append(row)
 
-    short_job_id = job_id[:8]
     inline_keyboard.append(
         [
             InlineKeyboardButton(

@@ -10,6 +10,7 @@ from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     process_image,
 )
+from bot.helpers.handlers.startGeneration.resolve_job_id import resolve_job_id
 from bot.InstanceBot import multi_image_router
 from bot.logger import logger
 
@@ -18,7 +19,13 @@ async def select_multi_image(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
-    _, full_model_key, group_number, image_index = call.data.split("|")
+    parts = call.data.split("|")
+    # поддержка старого формата без short_job_id и нового с ним
+    if len(parts) == 5:
+        _, full_model_key, group_number, image_index, short_job_id = parts
+    else:
+        _, full_model_key, group_number, image_index = parts
+        short_job_id = None
     
     # Извлекаем model_name и model_key из полного ключа
     if "_" in full_model_key:
@@ -30,27 +37,23 @@ async def select_multi_image(
     image_index = int(image_index)
     message_id = call.message.message_id
     state_data = await state.get_data()
-    mediagroup_data = state_data.get(
-        "imageGeneration_mediagroup_messages_ids",
-        [],
+
+    # Используем хелпер для определения job_id
+    job_id = resolve_job_id(
+        state_data=state_data,
+        model_name=model_name,
+        model_key=model_key,
+        message_id=message_id,
+        short_job_id=short_job_id,
     )
 
-    job_id = None
-
-    # Ищем job_id по текущему message_id и type='keyboard'
-    for item in mediagroup_data:
-        if (
-            item.get("type") == "keyboard"
-            and item.get("message_id") == message_id
-        ):
-            job_id = item.get("job_id")
-            break
-
     if not job_id:
+        target_full_key = f"{model_name}_{model_key}" if model_key is not None else model_name
         logger.exception(
-            f"[select_multi_image] job_id not found for message_id={message_id} in state_data={state_data}",
+            f"[select_multi_image] job_id not found for message_id={message_id}, model_name={model_name}, short={short_job_id}, full_model_key={target_full_key} in state_data={state_data}",
         )
-        raise Exception("job_id is None")
+        # текущее поведение — кидаем исключение
+        raise RuntimeError("Не удалось определить задание. Попробуйте снова отправить генерацию.")
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
