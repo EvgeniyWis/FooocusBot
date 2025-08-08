@@ -405,8 +405,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 logger.warning(
                     f"[regenerate] Не найден model_name_for_regenerate для job_id_prefix={job_id_prefix}",
                 )
-                return await editMessageOrAnswer(
-                    call,
+                raise Exception(
                     "❌ Не удалось определить модель для перегенерации.",
                 )
 
@@ -427,8 +426,7 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
                 logger.warning(
                     f"[regenerate_with_new_prompt] Не найден model_name_for_regenerate для job_id_prefix={job_id_prefix}",
                 )
-                return await editMessageOrAnswer(
-                    call,
+                raise Exception(
                     "❌ Не удалось определить модель для перегенерации по новому промпту.",
                 )
 
