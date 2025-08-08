@@ -54,10 +54,11 @@ async def clean_temp_dirs():
 
 async def register_commands():
     commands = [
-        BotCommand(command="start", description="Запустить бота"),
-        BotCommand(command="generate", description="Сгенерировать изображение"),
-        BotCommand(command="video", description="Сгенерировать видео"),
-        BotCommand(command="cancel", description="Отменить генерацию"),
+        BotCommand(command="/start", description="Перезапустить бота"),
+        BotCommand(
+            command="/stop",
+            description="Остановить генерацию изображений",
+        ),
     ]
     await bot.set_my_commands(commands)
 
