@@ -7,14 +7,14 @@ from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
+from bot.app.config.settings import settings
+from bot.app.core.logging import logger
 from bot.domain.entities.task import (
     TaskImageBlockDTO,
     TaskProcessImageDTO,
     TaskProcessVideoDTO,
 )
 from bot.factory.redis_factory import create_redis_client
-from bot.logger import logger
-from bot.settings import settings
 from bot.utils.task_storage.rebuild_callback_query_from_task import (
     rebuild_callback_query_from_task,
 )

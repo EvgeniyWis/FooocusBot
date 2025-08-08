@@ -5,8 +5,8 @@ from collections import defaultdict
 from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 from aiogram.types import InputMedia
 
-from bot.InstanceBot import bot
-from bot.logger import logger
+from bot.app.instance import bot
+from bot.app.core.logging import logger
 
 _chat_locks = defaultdict(asyncio.Lock)
 _last_send_time_per_chat = defaultdict(lambda: 0.0)

@@ -4,7 +4,7 @@ import time
 
 import httpx
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.get_api_headers import get_kling_headers
 from bot.utils.httpx import httpx_get
 from bot.utils.videos import download_video

@@ -5,8 +5,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.fsm.storage.redis import RedisStorage
 
+from bot.app.config.settings import settings
 from bot.factory.redis_factory import create_redis_client
-from bot.settings import settings
 
 # Создаём отдельные роутеры для каждого хендлера
 commands_router = Router()
@@ -44,4 +44,4 @@ dp.include_router(nsfw_video_router)
 dp.include_router(video_generation_router)
 dp.include_router(multi_image_router)
 dp.include_router(img2video_router)
-dp.include_router(magnific_upscale_router)
+dp.include_router(magnific_upscale_router) 

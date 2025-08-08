@@ -2,7 +2,7 @@ import asyncio
 import os
 import time
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.services.comfyui.api_client import ComfyUIAPI
 from bot.services.comfyui.metrics import ComfyUIMetricsService
 from bot.services.comfyui.prompt_executor import ComfyUIPromptExecutor

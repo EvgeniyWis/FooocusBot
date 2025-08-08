@@ -11,8 +11,8 @@ from bot.helpers.jobs.check_job_status import (
     check_job_status,
 )
 from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils import retryOperation
 from bot.utils.images.base64_to_image import base64_to_image

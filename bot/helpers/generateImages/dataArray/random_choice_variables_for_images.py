@@ -1,7 +1,7 @@
 import random
 from collections.abc import MutableSequence
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 class VariableValuesIsNull(Exception):

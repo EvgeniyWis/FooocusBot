@@ -4,8 +4,8 @@ import time
 from aiogram import types
 from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 
-from bot.InstanceBot import bot
-from bot.logger import logger
+from bot.app.instance import bot
+from bot.app.core.logging import logger
 from bot.utils.handlers.messages.spinner_registry import pop_spinner
 
 _send_lock = asyncio.Lock()

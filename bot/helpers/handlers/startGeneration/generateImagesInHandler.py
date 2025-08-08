@@ -2,9 +2,9 @@ import traceback
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from InstanceBot import bot
-from utils.handlers.messages import safe_edit_message
 
+from bot.app.core.logging import logger
+from bot.app.instance import bot
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_data_array_by_group_number,
@@ -25,7 +25,7 @@ from bot.helpers.handlers.startGeneration.cancelImageGenerationJobs import (
 from bot.keyboards.startGeneration import (
     keyboards as start_generation_keyboards,
 )
-from bot.logger import logger
+from bot.utils.handlers.messages import safe_edit_message
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )

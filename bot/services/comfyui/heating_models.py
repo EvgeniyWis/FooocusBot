@@ -1,7 +1,7 @@
 from utils import retryOperation
 
-import bot.constants as contants
-from bot.logger import logger
+import bot.app.config.constants as contants
+from bot.app.core.logging import logger
 from bot.services.comfyui.video_service import ComfyUIVideoService
 
 

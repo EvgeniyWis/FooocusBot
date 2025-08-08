@@ -7,8 +7,8 @@ from concurrent.futures import ProcessPoolExecutor
 
 from PIL import Image, UnidentifiedImageError
 
-import bot.constants as constants
-from bot.logger import logger
+import bot.app.config.constants as constants
+from bot.app.core.logging import logger
 
 executor = ProcessPoolExecutor()
 

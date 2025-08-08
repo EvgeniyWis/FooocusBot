@@ -9,7 +9,7 @@ from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
 from bot.helpers.handlers.videoGeneration import (
     check_video_path,
 )
-from bot.InstanceBot import bot
+from bot.app.instance import bot
 from bot.keyboards import video_generation_keyboards
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,

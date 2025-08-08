@@ -1,4 +1,4 @@
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.services.comfyui.api_client import ComfyUIAPI
 
 

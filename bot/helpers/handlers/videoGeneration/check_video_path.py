@@ -1,10 +1,10 @@
 
 from aiogram import types
 
-from bot import constants
+from bot.app.config import constants
+from bot.app.config.settings import settings
 from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
 from bot.keyboards import video_generation_keyboards
-from bot.settings import settings
 from bot.utils import retryOperation, text
 from bot.utils.handlers.messages import safe_send_message
 from bot.utils.videos.errors_texts import (

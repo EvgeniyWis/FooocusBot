@@ -1,4 +1,4 @@
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.services.freepik.services.magnific.client.api_client import (
     MagnificAPI,
 )

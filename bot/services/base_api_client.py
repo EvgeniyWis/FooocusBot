@@ -1,6 +1,6 @@
 import httpx
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.httpx import httpx_get, httpx_post
 
 

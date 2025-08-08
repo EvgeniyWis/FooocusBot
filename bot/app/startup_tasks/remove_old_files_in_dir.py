@@ -1,7 +1,7 @@
 import os
 import time
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 def remove_old_files_in_dir(directory_path: str, older_than_seconds: int) -> None:

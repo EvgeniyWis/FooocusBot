@@ -29,7 +29,9 @@ class UserContextFilter(logging.Filter):
         return True
 
 
-log_dir = Path(__file__).resolve().parent / "logs"
+# Корень пакета bot
+package_root = Path(__file__).resolve().parents[1]
+log_dir = package_root / "logs"
 backup_dir = log_dir / "backups"
 log_dir.mkdir(parents=True, exist_ok=True)
 backup_dir.mkdir(parents=True, exist_ok=True)
@@ -82,4 +84,4 @@ if not logger.handlers:
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
+    logger.addHandler(console_handler) 

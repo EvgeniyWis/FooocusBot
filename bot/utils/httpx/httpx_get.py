@@ -1,7 +1,7 @@
 import asyncio
 import httpx
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 # Функция для отправки GET-запросов с настройками таймаутов

@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-import bot.constants as constants
+import bot.app.config.constants as constants
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray.check_model_index_is_exist import (
     check_model_index_is_exist,
@@ -17,9 +17,9 @@ from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
     get_model_name_by_index,
 )
 from bot.helpers.handlers.img2video import process_video
-from bot.InstanceBot import bot, img2video_router
+from bot.app.instance import bot, img2video_router
 from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.states import StartGenerationState
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import LONG_PROMPT_PROCESSING_SPINNER_TEXT

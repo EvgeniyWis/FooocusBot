@@ -5,7 +5,7 @@ import shutil
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.constants import (
+from bot.app.config.constants import (
     FACEFUSION_TEMP_IMAGES_FOLDER_PATH,
     MULTI_IMAGE_NUMBER,
 )
@@ -14,8 +14,8 @@ from bot.helpers.handlers.startGeneration import (
     process_image,
 )
 from bot.helpers.handlers.startGeneration.resolve_job_id import resolve_job_id
-from bot.InstanceBot import multi_image_router
-from bot.logger import logger
+from bot.app.instance import multi_image_router
+from bot.app.core.logging import logger
 
 
 async def select_multi_image(

@@ -1,8 +1,8 @@
 from aiogram.fsm.context import FSMContext
-from logger import logger
+from bot.app.core.logging import logger
 from utils.handlers.appendDataToStateArray import appendDataToStateArray
 
-from bot.constants import MULTI_IMAGE_NUMBER
+from bot.app.config.constants import MULTI_IMAGE_NUMBER
 from bot.helpers.jobs.send_run_request import send_run_request
 from bot.utils.retryOperation import retryOperation
 

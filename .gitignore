@@ -197,7 +197,8 @@ keys_and_token.txt
 # facefusion
 .jobs/
 
-bot/config
+# bot
+bot/secrets
 temp/
 
 # redis

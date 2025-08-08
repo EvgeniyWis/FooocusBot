@@ -1,6 +1,6 @@
 from aiogram import types
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.handlers.messages.preserve_code_tags import preserve_code_tags
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
     safe_edit_message,

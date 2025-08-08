@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from PIL import Image, UnidentifiedImageError
 
-from bot.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
+from bot.app.config.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_model_index_by_model_name,
@@ -16,7 +16,7 @@ from bot.helpers.generateImages.upscale import (
 )
 from bot.helpers.handlers.messages import send_progress_message
 from bot.helpers.jobs.get_job_id_by_model_name import get_job_id_by_model_name
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.handlers import (
     deleteDataFromStateArray,
 )

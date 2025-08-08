@@ -5,8 +5,8 @@ import socket
 
 from aiogoogle import Aiogoogle
 
-from bot import constants
-from bot.logger import logger
+from bot.app.config import constants
+from bot.app.core.logging import logger
 from bot.utils.googleDrive.auth import client_creds, user_creds
 from bot.utils.googleDrive.files.uploadFile import uploadFile
 from bot.utils.googleDrive.folders.createFolder import createFolder

@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.handlers import (
     getDataInDictsArray,
 )

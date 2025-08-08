@@ -1,8 +1,8 @@
 import asyncio
 
-import bot.constants as constants
-from bot.logger import logger
-from bot.settings import settings
+import bot.app.config.constants as constants
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 
 from .remove_old_files_in_dir import remove_old_files_in_dir
 

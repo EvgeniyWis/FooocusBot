@@ -1,8 +1,8 @@
 from aiogram.fsm.context import FSMContext
 
 from bot.adapters.redis_task_storage_repository import key_for_image_block
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.storage import get_redis_storage
 
 

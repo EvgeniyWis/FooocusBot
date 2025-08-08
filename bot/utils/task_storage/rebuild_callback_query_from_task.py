@@ -3,7 +3,7 @@ from datetime import datetime
 from aiogram.types import CallbackQuery, Chat, Message, User
 
 from bot.domain.entities.task import TaskProcessImageDTO
-from bot.InstanceBot import bot
+from bot.app.instance import bot
 
 
 def rebuild_callback_query_from_task(

@@ -4,15 +4,15 @@ import traceback
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 
-from bot.constants import MULTI_IMAGE_NUMBER
+from bot.app.config.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_model_index_by_model_name,
     getDataByModelName,
 )
-from bot.InstanceBot import bot
+from bot.app.instance import bot
 from bot.keyboards import start_generation_keyboards
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.handlers import (
     appendDataToStateArray,
 )

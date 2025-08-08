@@ -1,6 +1,6 @@
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.utils import httpx_post
 from bot.utils.get_api_headers import get_runpod_headers
 

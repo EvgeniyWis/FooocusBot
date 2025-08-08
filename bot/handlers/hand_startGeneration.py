@@ -10,7 +10,7 @@ from keyboards.startGeneration.keyboards import done_typing_keyboard
 from pydantic import ValidationError
 from utils.handlers.messages import safe_edit_message
 
-from bot.constants import MULTI_IMAGE_NUMBER
+from bot.app.config.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_all_model_indexes,
@@ -30,12 +30,12 @@ from bot.helpers.handlers.startGeneration import (
     process_image,
     regenerateImage,
 )
-from bot.InstanceBot import bot, start_generation_router
+from bot.app.instance import bot, start_generation_router
 from bot.keyboards import (
     randomizer_keyboards,
     start_generation_keyboards,
 )
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.states.StartGenerationState import (
     MultiPromptInputState,
     StartGenerationState,

@@ -1,6 +1,6 @@
 from aiogram.types import BotCommand
 
-from bot.InstanceBot import bot
+from bot.app.instance import bot
 
 
 async def register_commands() -> None:

@@ -1,6 +1,6 @@
 from typing import Any
 
-from bot.settings import settings
+from bot.app.config.settings import settings
 
 
 def get_runpod_headers() -> dict[str, Any]:

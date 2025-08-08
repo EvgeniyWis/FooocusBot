@@ -1,6 +1,6 @@
-import bot.constants as contants
+import bot.app.config.constants as contants
 from bot.services.comfyui.video_service import ComfyUIVideoService
-from bot.settings import settings
+from bot.app.config.settings import settings
 
 
 def get_video_service():

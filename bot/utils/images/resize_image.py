@@ -1,6 +1,6 @@
 from PIL import Image
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 async def resize_image(image_path: str, target_width: int, target_height: int) -> str:

@@ -4,8 +4,8 @@ from typing import Optional
 
 import httpx
 
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from iloveapi import ILoveApi
 
 
