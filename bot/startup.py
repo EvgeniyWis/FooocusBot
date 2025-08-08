@@ -1,11 +1,5 @@
 import asyncio
-import os
-import shutil
-import time
 
-from aiogram.types import BotCommand
-
-import bot.constants as constants
 from bot import handlers
 from bot.helpers.generateImages.process_image_block import process_image_block
 from bot.helpers.handlers.startGeneration import process_image
@@ -24,93 +18,10 @@ from bot.middleware import (
     UserContextMiddleware,
 )
 from bot.settings import settings
+from bot.startup_tasks.clean_temp_dirs import clean_temp_dirs
+from bot.startup_tasks.periodic_cleanup_task import periodic_cleanup_task
+from bot.startup_tasks.register_commands import register_commands
 from bot.storage import get_redis_storage, init_redis_storage
-
-
-async def clean_temp_dirs():
-    logger.info("Cleaning temp directories...")
-
-    if os.path.exists(constants.TEMP_DIR):
-        shutil.rmtree(constants.TEMP_DIR)
-
-    if os.path.exists(constants.TEMP_IMAGE_FILES_DIR):
-        shutil.rmtree(constants.TEMP_IMAGE_FILES_DIR)
-
-    if os.path.exists(constants.FACEFUSION_RESULTS_DIR):
-        for file in os.listdir(constants.FACEFUSION_RESULTS_DIR):
-            file_path = os.path.join(constants.FACEFUSION_RESULTS_DIR, file)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-
-    os.makedirs(
-        os.path.join(constants.TEMP_IMAGE_FILES_DIR),
-        exist_ok=True,
-    )
-
-    os.makedirs(
-        os.path.join(constants.TEMP_VIDEOS_FILES_DIR),
-        exist_ok=True,
-    )
-
-
-def _remove_old_files_in_dir(directory_path: str, older_than_seconds: int) -> None:
-    """Удаляет файлы и пустые папки в каталоге, старше указанного возраста.
-
-    Не падает, если каталога нет.
-    """
-    try:
-        if not os.path.exists(directory_path):
-            return
-
-        now = time.time()
-        for root, _, files in os.walk(directory_path, topdown=False):
-            for name in files:
-                file_path = os.path.join(root, name)
-                try:
-                    if now - os.path.getmtime(file_path) > older_than_seconds:
-                        os.remove(file_path)
-                except Exception as e:
-                    logger.warning(f"Не удалось удалить файл {file_path}: {e}")
-    except Exception as e:
-        logger.error(f"Ошибка при обходе каталога {directory_path}: {e}")
-
-
-async def periodic_cleanup_task() -> None:
-    """Периодическая очистка временных файлов старше TTL.
-
-    Охватывает каталоги: bot/temp/images, bot/temp/videos, temp, .assets/images/temp
-    """
-    ttl_seconds = settings.TEMP_FILES_TTL_HOURS * 3600
-    interval_seconds = settings.TEMP_CLEANUP_INTERVAL_MINUTES * 60
-    target_dirs = [
-        str(constants.TEMP_IMAGE_FILES_DIR),
-        str(constants.TEMP_VIDEOS_FILES_DIR),
-        str(constants.FACEFUSION_TEMP_IMAGES_FOLDER_PATH),
-        str(constants.FACEFUSION_RESULTS_DIR),
-        str(constants.TEMP_FILES_DIR),
-    ]
-
-    logger.info(
-        f"Запущена фоновая очистка временных файлов: ttl={settings.TEMP_FILES_TTL_HOURS}ч, interval={settings.TEMP_CLEANUP_INTERVAL_MINUTES}м"
-    )
-    while True:
-        try:
-            for d in target_dirs:
-                _remove_old_files_in_dir(d, ttl_seconds)
-        except Exception as e:
-            logger.error(f"Ошибка при периодической очистке временных файлов: {e}")
-        await asyncio.sleep(interval_seconds)
-
-
-async def register_commands():
-    commands = [
-        BotCommand(command="/start", description="Перезапустить бота"),
-        BotCommand(
-            command="/stop",
-            description="Остановить генерацию изображений",
-        ),
-    ]
-    await bot.set_my_commands(commands)
 
 
 async def on_startup():
