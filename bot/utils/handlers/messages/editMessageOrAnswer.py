@@ -1,10 +1,12 @@
 from aiogram import types
-from InstanceBot import bot
 
 from bot.logger import logger
 from bot.utils.handlers.messages.preserve_code_tags import preserve_code_tags
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
     safe_edit_message,
+)
+from bot.utils.handlers.messages.rate_limiter_for_send_message import (
+    safe_send_message,
 )
 
 
@@ -34,11 +36,10 @@ async def editMessageOrAnswer(
         logger.debug(
             f"Отправляем новое сообщение с reply_markup: {reply_markup}",
         )
-        message = await bot.send_message(
-            call.message.chat.id,
+        message = await safe_send_message(
             safe_text,
+            call,
             reply_markup=reply_markup,
-            parse_mode="HTML",
         )
 
     return message
