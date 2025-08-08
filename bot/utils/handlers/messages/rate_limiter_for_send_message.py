@@ -6,6 +6,7 @@ from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
 
 from bot.InstanceBot import bot
 from bot.logger import logger
+from bot.utils.handlers.messages.spinner_registry import pop_spinner
 
 _send_lock = asyncio.Lock()
 _last_send_time = 0.0
@@ -41,26 +42,81 @@ async def safe_send_message(
             if message:
                 method = message.answer(text, reply_markup=reply_markup)
                 msg = await bot(method)
+                target_chat_id = message.chat.id
             elif chat_id:
                 msg = await bot.send_message(
                     chat_id=chat_id,
                     text=text,
                     reply_markup=reply_markup,
                 )
+                target_chat_id = chat_id
             else:
                 raise ValueError(
                     "safe_send_message: ни message, ни chat_id не передан!"
                 )
 
             _last_send_time = time.monotonic()
+
+            # После успешной отправки удаляем спиннер в этом чате (если был)
+            try:
+                if target_chat_id:
+                    spinner_id = pop_spinner(target_chat_id)
+                    if spinner_id:
+                        try:
+                            await bot.delete_message(
+                                chat_id=target_chat_id,
+                                message_id=spinner_id,
+                            )
+                        except Exception as e:
+                            logger.debug(
+                                f"Не удалось удалить спиннер {spinner_id} в чате {target_chat_id}: {e}",
+                            )
+            except Exception:
+                logger.debug(
+                    "Ошибка при попытке удалить спиннер после отправки сообщения",
+                )
+
             return msg
 
         except TelegramRetryAfter as e:
             logger.warning(f"Telegram RetryAfter: {e.retry_after}s")
             await asyncio.sleep(e.retry_after)
             try:
-                msg = await message.answer(text, reply_markup=reply_markup)
+                if message:
+                    msg = await message.answer(text, reply_markup=reply_markup)
+                    target_chat_id = message.chat.id
+                elif chat_id:
+                    msg = await bot.send_message(
+                        chat_id=chat_id,
+                        text=text,
+                        reply_markup=reply_markup,
+                    )
+                    target_chat_id = chat_id
+                else:
+                    raise ValueError(
+                        "safe_send_message: ни message, ни chat_id не передан!"
+                    )
+
                 _last_send_time = time.monotonic()
+
+                try:
+                    if target_chat_id:
+                        spinner_id = pop_spinner(target_chat_id)
+                        if spinner_id:
+                            try:
+                                await bot.delete_message(
+                                    chat_id=target_chat_id,
+                                    message_id=spinner_id,
+                                )
+                            except Exception as e:
+                                logger.debug(
+                                    f"Не удалось удалить спиннер {spinner_id} в чате {target_chat_id}: {e}",
+                                )
+                except Exception:
+                    logger.debug(
+                        "Ошибка при попытке удалить спиннер после отправки сообщения (повтор)",
+                    )
+
                 return msg
             except Exception:
                 logger.exception("RetryAfter повторная попытка не удалась")

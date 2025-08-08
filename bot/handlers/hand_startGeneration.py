@@ -2,7 +2,6 @@ import re
 import traceback
 from collections import defaultdict
 
-import httpx
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
@@ -45,6 +44,7 @@ from bot.utils.handlers import (
     appendDataToStateArray,
 )
 from bot.utils.handlers.messages import (
+    LONG_PROMPT_PROCESSING_SPINNER_TEXT,
     editMessageOrAnswer,
 )
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
@@ -590,7 +590,7 @@ async def finish_prompt_input(
 
     await safe_edit_message(
         callback.message,
-        "🧠 Обрабатываю длинный промпт...",
+        LONG_PROMPT_PROCESSING_SPINNER_TEXT,
     )
     try:
         fake_message = types.Message(

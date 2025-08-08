@@ -16,15 +16,13 @@ from bot.helpers.generateImages.dataArray.get_all_model_indexes import (
 from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
     get_model_name_by_index,
 )
-from bot.helpers.generateImages.dataArray.getAllDataArrays import (
-    getAllDataArrays,
-)
 from bot.helpers.handlers.img2video import process_video
 from bot.InstanceBot import bot, img2video_router
 from bot.keyboards import video_generation_keyboards
 from bot.logger import logger
 from bot.states import StartGenerationState
 from bot.utils.handlers import appendDataToStateArray
+from bot.utils.handlers.messages import LONG_PROMPT_PROCESSING_SPINNER_TEXT
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
     safe_edit_message,
 )
@@ -294,9 +292,9 @@ async def finish_prompt_input_for_img2video(
 
     await safe_edit_message(
         callback.message,
-        "🧠 Обрабатываю длинный промпт...",
+        LONG_PROMPT_PROCESSING_SPINNER_TEXT,
     )
-    
+
     try:
         fake_message = types.Message(
             message_id=callback.message.message_id,
