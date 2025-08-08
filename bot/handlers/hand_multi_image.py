@@ -10,6 +10,7 @@ from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     process_image,
 )
+from bot.helpers.handlers.startGeneration.resolve_job_id import resolve_job_id
 from bot.InstanceBot import multi_image_router
 from bot.logger import logger
 
@@ -36,50 +37,23 @@ async def select_multi_image(
     image_index = int(image_index)
     message_id = call.message.message_id
     state_data = await state.get_data()
-    mediagroup_data = state_data.get(
-        "imageGeneration_mediagroup_messages_ids",
-        [],
+
+    # Используем хелпер для определения job_id
+    job_id = resolve_job_id(
+        state_data=state_data,
+        model_name=model_name,
+        model_key=model_key,
+        message_id=message_id,
+        short_job_id=short_job_id,
     )
 
-    job_id = None
-
-    # 1) Если пришёл short_job_id, попробуем найти полноценный job_id по префиксу в state
-    if short_job_id:
-        # собираем все возможные job_id из медиагруппы и клавиатуры
-        possible_job_ids = [item.get("job_id") for item in mediagroup_data if item.get("job_id")]
-        # уникализируем
-        possible_job_ids = list({jid for jid in possible_job_ids if isinstance(jid, str)})
-        for jid in possible_job_ids:
-            if jid.startswith(short_job_id):
-                job_id = jid
-                break
-
-    # 2) Если не нашли по префиксу, ищем job_id по текущему message_id и type='keyboard'
     if not job_id:
-        for item in mediagroup_data:
-            if (
-                item.get("type") == "keyboard"
-                and item.get("message_id") == message_id
-            ):
-                job_id = item.get("job_id")
-                break
-
-    # 3) Доп. попытка: ищем любую запись клавиатуры для этой модели и берём её job_id
-    if not job_id:
-        for item in mediagroup_data:
-            if item.get("type") == "keyboard" and item.get("model_name") == model_name:
-                candidate = item.get("job_id")
-                if not short_job_id or (isinstance(candidate, str) and candidate.startswith(short_job_id)):
-                    job_id = candidate
-                    break
-
-    if not job_id:
+        target_full_key = f"{model_name}_{model_key}" if model_key is not None else model_name
         logger.exception(
-            f"[select_multi_image] job_id not found for message_id={message_id}, model_name={model_name}, short={short_job_id} in state_data={state_data}",
+            f"[select_multi_image] job_id not found for message_id={message_id}, model_name={model_name}, short={short_job_id}, full_model_key={target_full_key} in state_data={state_data}",
         )
-        # вместо падения просто ответим пользователю и выйдем
-        await call.answer("Не удалось определить задание. Попробуйте снова отправить генерацию.", show_alert=True)
-        return
+        # текущее поведение — кидаем исключение
+        raise RuntimeError("Не удалось определить задание. Попробуйте снова отправить генерацию.")
 
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
