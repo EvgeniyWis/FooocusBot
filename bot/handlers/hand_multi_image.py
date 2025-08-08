@@ -112,14 +112,42 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         model_name = full_model_key
         model_key = None
 
+    # В коллбэке передаётся короткий job_id, восстановим полный через helper
+    message_id = call.message.message_id
+    short_job_id = job_id
+    resolved_job_id = resolve_job_id(
+        state_data=state_data,
+        model_name=model_name,
+        model_key=model_key,
+        message_id=message_id,
+        short_job_id=short_job_id,
+    )
+
     selected_indexes_raw = state_data.get("selected_indexes", {})
     if isinstance(selected_indexes_raw, list):
-        selected_indexes_dict = {job_id: selected_indexes_raw}
+        # если по каким-то причинам лежит список, привяжем его к найденному job_id
+        key_for_list = resolved_job_id or short_job_id
+        selected_indexes_dict = {key_for_list: selected_indexes_raw}
     else:
         selected_indexes_dict = selected_indexes_raw
-    full_job_id = next(
-        k for k in selected_indexes_dict.keys() if k.startswith(job_id)
-    )
+
+    # Определяем полный job_id
+    full_job_id = resolved_job_id
+    if not full_job_id:
+        full_job_id = next(
+            (k for k in selected_indexes_dict.keys() if isinstance(k, str) and k.startswith(short_job_id)),
+            None,
+        )
+
+    if not full_job_id:
+        # Не удалось определить задание — сообщаем пользователю и выходим без ошибки
+        target_full_key = f"{model_name}_{model_key}" if model_key is not None else model_name
+        logger.exception(
+            f"[multi_image_done] job_id not found for message_id={message_id}, model_name={model_name}, short={short_job_id}, full_model_key={target_full_key}, selected_indexes_dict_keys={list(selected_indexes_dict.keys())}"
+        )
+        await call.answer("Не удалось определить задание. Попробуйте снова.", show_alert=True)
+        return
+
     selected_indexes = selected_indexes_dict.get(full_job_id, [])
 
     if not selected_indexes:
@@ -129,7 +157,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         )
         return
 
-    temp_dir = TEMP_FOLDER_PATH / f"{job_id}"
+    temp_dir = TEMP_FOLDER_PATH / f"{full_job_id}"
     if os.path.exists(temp_dir):
         files_in_dir = sorted(os.listdir(temp_dir))
         logger.info(
@@ -167,7 +195,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
         model_name,
         call.message.chat.id,
         delete_keyboard_message=True,
-        job_id=job_id,
+        job_id=full_job_id,
     )
 
     tasks = []
@@ -212,7 +240,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     try:
         temp_path = os.path.join(
             TEMP_FOLDER_PATH,
-            f"{job_id}",
+            f"{full_job_id}",
         )
         if os.path.exists(temp_path):
             shutil.rmtree(temp_path)
