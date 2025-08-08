@@ -104,7 +104,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="1vOfFUGtvfMXWAKH_f_nHIo3WdBwh1M3h",
             prompt="""photorealistic, high quality, BREAK
             1girl, 18 years old, brown hair, tan skin, green eyes""",
-            loras_weights=[1, 0.7, 3, 1.7, -0.15, -1.5],
+            loras_weights=[1, 0.7, 3, 1.5, -0.15, -1.5],
         ),
         setting2_generate_data(
             model_name="gracelowell.xo",
