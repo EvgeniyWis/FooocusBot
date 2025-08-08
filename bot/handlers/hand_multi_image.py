@@ -3,25 +3,36 @@ import os
 import shutil
 
 from aiogram import types
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 
 from bot.app.config.constants import (
     FACEFUSION_TEMP_IMAGES_FOLDER_PATH,
     MULTI_IMAGE_NUMBER,
 )
+from bot.app.core.logging import logger
+from bot.app.instance import multi_image_router
 from bot.helpers.handlers.messages import deleteMessageFromState
 from bot.helpers.handlers.startGeneration import (
     process_image,
 )
 from bot.helpers.handlers.startGeneration.resolve_job_id import resolve_job_id
-from bot.app.instance import multi_image_router
-from bot.app.core.logging import logger
 
 
 async def select_multi_image(
     call: types.CallbackQuery,
     state: FSMContext,
 ):
+    # Быстрый ответ на callback, чтобы избежать таймаута Telegram
+    try:
+        await call.answer()
+    except TelegramBadRequest:
+        # Игнорируем устаревшие/некорректные callback-запросы
+        pass
+    except Exception:
+        # На всякий случай не роняем обработчик
+        pass
+
     parts = call.data.split("|")
     # поддержка старого формата без short_job_id и нового с ним
     if len(parts) == 5:
@@ -78,7 +89,6 @@ async def select_multi_image(
         selectMultiImageKeyboard,
     )
 
-    await call.answer()
     kb = selectMultiImageKeyboard(
         model_name,
         group_number,
