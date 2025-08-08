@@ -421,22 +421,33 @@ async def process_img2video_with_data(
 
     # После завершения задачи — обновляем state
     for coro in asyncio.as_completed(tasks):
-        model_name, video_path = await coro
+        try:
+            result = await coro
+            # process_video из img2video возвращает кортеж (model_name, video_path)
+            if isinstance(result, tuple) and len(result) == 2:
+                model_name, video_path = result
 
-        if not video_path:
+                if not video_path:
+                    await safe_send_message(
+                        f"Ошибка: не удалось найти путь к видео для сохранения для модели {model_name}",
+                        message,
+                    )
+                    continue
+
+                data_for_update = {f"{model_name}": video_path}
+                await appendDataToStateArray(
+                    state,
+                    "generated_video_paths",
+                    data_for_update,
+                    unique_keys=("model_name",),
+                )
+        except Exception as e:
+            logger.error(f"Ошибка при обработке видео: {e}")
             await safe_send_message(
-                f"Ошибка: не удалось найти путь к видео для сохранения для модели {model_name}",
+                f"Ошибка при генерации видео: {str(e)}",
                 message,
             )
             continue
-
-        data_for_update = {f"{model_name}": video_path}
-        await appendDataToStateArray(
-            state,
-            "generated_video_paths",
-            data_for_update,
-            unique_keys=("model_name",),
-        )
 
 
 # Обработка ввода одного промпта для img2video (старый функционал)
@@ -616,7 +627,7 @@ async def handle_model_index_for_video_generation_from_image(
             # process_video из img2video возвращает кортеж (model_name, video_path)
             if isinstance(result, tuple) and len(result) == 2:
                 model_name, video_path = result
-                
+
                 if not video_path:
                     await safe_send_message(
                         f"Ошибка: не удалось найти путь к видео для сохранения для модели {model_name}",
