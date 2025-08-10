@@ -63,7 +63,7 @@ def first_group_get_data_array():
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic, blonde hair, green eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
-            loras_weights=[2, 0.65, -0.90, -1.70, 3.5, 1, 1.75, 1.00],
+            loras_weights=[2, 0.65, -0.90, -1.70, 3.6, 1, 1.75, 1.00],
         ),
         setting1_generate_data(
             model_name="miahazelton.xo",
@@ -72,7 +72,7 @@ def first_group_get_data_array():
             video_folder_id="1LCR_JQEg2JIisADrnochKASReWbUCfrb",
             nsfw_video_folder_id="18dssne4ftnQl6bwpY9QYj01UIp69HFbp",
             prompt="""photorealistic, high quality, BREAK
-            1girl, 18 years old, blonde hair, green eyes, medium tan skin, smiling.""",
+            1girl, 18 years old, blonde hair, green eyes, smiling.""",
             loras_weights=[2, 3.10, -0.90, -1.70, 1.50, 0.9, 1.00, 0.40],
         ),
         setting1_generate_data(
@@ -242,7 +242,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="1UOWiammfsu8kn_aFnfy9W9-SWU7KbBSD",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 1.7, 1, -1.05, -1.5],
+            loras_weights=[1, 0.7, 1, 0.5, -1.05, -1.5],
         ),
         setting2_generate_data(
             model_name="janiceblair.xo",
