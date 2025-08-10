@@ -1,5 +1,5 @@
 import redis.asyncio as aioredis
-from settings import settings
+from bot.app.config.settings import settings
 
 _redis_client = None
 

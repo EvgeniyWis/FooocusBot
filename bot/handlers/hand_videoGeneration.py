@@ -16,9 +16,9 @@ from bot.helpers.handlers.videoGeneration import (
     process_write_prompt,
     saveVideo,
 )
-from bot.InstanceBot import video_generation_router
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.instance import video_generation_router
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.states import StartGenerationState
 from bot.utils.handlers import (
     getDataInDictsArray,

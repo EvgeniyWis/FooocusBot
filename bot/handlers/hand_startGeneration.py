@@ -2,7 +2,6 @@ import re
 import traceback
 from collections import defaultdict
 
-import httpx
 from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
@@ -11,7 +10,7 @@ from keyboards.startGeneration.keyboards import done_typing_keyboard
 from pydantic import ValidationError
 from utils.handlers.messages import safe_edit_message
 
-from bot.constants import MULTI_IMAGE_NUMBER
+from bot.app.config.constants import MULTI_IMAGE_NUMBER
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_all_model_indexes,
@@ -31,12 +30,12 @@ from bot.helpers.handlers.startGeneration import (
     process_image,
     regenerateImage,
 )
-from bot.InstanceBot import bot, start_generation_router
+from bot.app.instance import bot, start_generation_router
 from bot.keyboards import (
     randomizer_keyboards,
     start_generation_keyboards,
 )
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.states.StartGenerationState import (
     MultiPromptInputState,
     StartGenerationState,
@@ -45,6 +44,7 @@ from bot.utils.handlers import (
     appendDataToStateArray,
 )
 from bot.utils.handlers.messages import (
+    LONG_PROMPT_PROCESSING_SPINNER_TEXT,
     editMessageOrAnswer,
 )
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
@@ -590,7 +590,7 @@ async def finish_prompt_input(
 
     await safe_edit_message(
         callback.message,
-        "🧠 Обрабатываю длинный промпт...",
+        LONG_PROMPT_PROCESSING_SPINNER_TEXT,
     )
     try:
         fake_message = types.Message(
@@ -802,7 +802,14 @@ async def write_new_prompt_for_regenerate_image(
         unique_keys=("model_name"),
     )
 
-    normal_model_name = await get_normal_model(model_name)
+    # Преобразуем возможный full_model_key в базовое имя модели
+    full_model_key = model_name
+    if "_" in full_model_key:
+        base_model_name, _ = full_model_key.rsplit("_", 1)
+    else:
+        base_model_name = full_model_key
+
+    normal_model_name = await get_normal_model(base_model_name)
 
     # Получаем индекс модели
     model_name_index = get_model_index_by_model_name(normal_model_name)
@@ -822,6 +829,19 @@ async def write_new_prompt_for_regenerate_image(
 
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(normal_model_name)
+
+    if not data:
+        logger.error(f"[write_new_prompt_for_regenerate_image] Не найдены данные для модели: {normal_model_name} (исходный ключ: {full_model_key})")
+        await editMessageOrAnswer(
+            message,
+            text.REGENERATE_IMAGE_ERROR_TEXT.format(
+                normal_model_name,
+                model_name_index,
+                "Модель не найдена",
+            ),
+        )
+        await regenerate_progress_message.delete()
+        return
 
     await generateImageBlock(
         data,

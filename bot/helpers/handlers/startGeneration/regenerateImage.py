@@ -3,13 +3,13 @@ import re
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
+from bot.app.core.logging import logger
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
     get_model_index_by_model_name,
     getDataByModelName,
 )
 from bot.helpers.generateImages.generateImageBlock import generateImageBlock
-from bot.logger import logger
 from bot.utils.handlers import getDataInDictsArray
 from bot.utils.handlers.messages.editMessageOrAnswer import editMessageOrAnswer
 
@@ -102,9 +102,32 @@ async def regenerateImage(
     else:
         raise Exception("Промпт для перегенерации изображения не найден")
 
-    normal_model_name = await get_normal_model(model_name)
+    # Преобразуем возможный full_model_key в базовое имя модели
+    full_model_key = model_name
+    if "_" in full_model_key:
+        base_model_name, _ = full_model_key.rsplit("_", 1)
+    else:
+        base_model_name = full_model_key
+
+    normal_model_name = await get_normal_model(base_model_name)
     # Получаем данные генерации по названию модели
     data = await getDataByModelName(normal_model_name)
+
+    if not data:
+        logger.error(f"[regenerateImage] Не найдены данные для модели: {normal_model_name} (исходный ключ: {full_model_key})")
+        await editMessageOrAnswer(
+            call,
+            text.REGENERATE_IMAGE_ERROR_TEXT.format(
+                normal_model_name,
+                model_name_index,
+                "Модель не найдена",
+            ),
+        )
+        try:
+            await regenerate_message.delete()
+        except Exception as e:
+            logger.error(f"Ошибка при удалении сообщения о перегенерации изображения: {e}")
+        return
 
     try:
         result, _ = await generateImageBlock(

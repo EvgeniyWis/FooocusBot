@@ -1,5 +1,5 @@
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
-from bot.settings import settings
+from bot.app.config.settings import settings
 from bot.utils import httpx_post
 from bot.utils.get_api_headers import get_runpod_headers
 

@@ -1,7 +1,7 @@
 import copy
 
 from aiogram.fsm.context import FSMContext
-from logger import logger
+from bot.app.core.logging import logger
 
 from bot.helpers.generateImages.dataArray import (
     get_setting_number_by_model_name,

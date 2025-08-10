@@ -6,7 +6,7 @@ from bot.helpers.generateImages.dataArray import (
     get_setting_number_by_model_name,
 )
 from bot.helpers.jobs.check_job_status import check_job_status
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils.images.base64_to_image import base64_to_image
 
 

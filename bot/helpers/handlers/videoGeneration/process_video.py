@@ -13,10 +13,10 @@ from bot.helpers.handlers.messages import send_progress_message
 from bot.helpers.handlers.videoGeneration.check_video_path import (
     check_video_path,
 )
-from bot.InstanceBot import bot
+from bot.app.instance import bot
 from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.storage import get_redis_storage
 from bot.utils.handlers import (
     appendDataToStateArray,

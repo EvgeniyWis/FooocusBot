@@ -2,7 +2,7 @@ from bot.helpers.generateImages.dataArray.generate_data import generate_data
 from bot.helpers.generateImages.dataArray.settings.setting_3.generate_loras import (
     setting3_generate_loras,
 )
-from bot.settings import settings
+from bot.app.config.settings import settings
 
 
 # Функция для генерации данных для запроса группы 3

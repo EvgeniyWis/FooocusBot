@@ -1,65 +1,27 @@
 import asyncio
-import os
-import shutil
 
-from aiogram.types import BotCommand
-
-import bot.constants as constants
 from bot import handlers
-from bot.helpers.generateImages.process_image_block import process_image_block
-from bot.helpers.handlers.startGeneration import process_image
-from bot.helpers.handlers.videoGeneration import process_video
-from bot.InstanceBot import (
+from bot.app.config.settings import settings
+from bot.app.core.logging import logger
+from bot.app.instance import (
     bot,
     dp,
     redis_client,
     storage,
 )
-from bot.logger import logger
+from bot.app.startup_tasks.clean_temp_dirs import clean_temp_dirs
+from bot.app.startup_tasks.periodic_cleanup_task import periodic_cleanup_task
+from bot.app.startup_tasks.register_commands import register_commands
+from bot.helpers.generateImages.process_image_block import process_image_block
+from bot.helpers.handlers.startGeneration import process_image
+from bot.helpers.handlers.videoGeneration import process_video
 from bot.middleware import (
     ErrorHandlingMiddleware,
     MediaGroupMiddleware,
     TextValidationMiddleware,
+    UserContextMiddleware,
 )
-from bot.settings import settings
 from bot.storage import get_redis_storage, init_redis_storage
-
-
-async def clean_temp_dirs():
-    logger.info("Cleaning temp directories...")
-
-    if os.path.exists(constants.TEMP_DIR):
-        shutil.rmtree(constants.TEMP_DIR)
-
-    if os.path.exists(constants.TEMP_IMAGE_FILES_DIR):
-        shutil.rmtree(constants.TEMP_IMAGE_FILES_DIR)
-
-    if os.path.exists(constants.FACEFUSION_RESULTS_DIR):
-        for file in os.listdir(constants.FACEFUSION_RESULTS_DIR):
-            file_path = os.path.join(constants.FACEFUSION_RESULTS_DIR, file)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-
-    os.makedirs(
-        os.path.join(constants.TEMP_IMAGE_FILES_DIR),
-        exist_ok=True,
-    )
-
-    os.makedirs(
-        os.path.join(constants.TEMP_VIDEOS_FILES_DIR),
-        exist_ok=True,
-    )
-
-
-async def register_commands():
-    commands = [
-        BotCommand(command="/start", description="Перезапустить бота"),
-        BotCommand(
-            command="/stop",
-            description="Остановить генерацию изображений",
-        ),
-    ]
-    await bot.set_my_commands(commands)
 
 
 async def on_startup():
@@ -87,7 +49,9 @@ async def on_startup():
     handlers.hand_img2video.hand_add()
     handlers.hand_magnific_upscale.hand_add()
 
-    # Добавление middleware
+    # Добавление middleware (UserContext должен идти раньше ErrorHandling)
+    dp.message.middleware(UserContextMiddleware())
+    dp.callback_query.middleware(UserContextMiddleware())
     dp.message.middleware(ErrorHandlingMiddleware())
     dp.callback_query.middleware(ErrorHandlingMiddleware())
     dp.message.middleware(MediaGroupMiddleware())
@@ -109,5 +73,6 @@ async def on_startup():
     await clean_temp_dirs()
 
     # Запускаем задачу очистки временных файлов
+    asyncio.create_task(periodic_cleanup_task())
 
-    await dp.start_polling(bot, skip_updates=True)
+    await dp.start_polling(bot, skip_updates=True) 

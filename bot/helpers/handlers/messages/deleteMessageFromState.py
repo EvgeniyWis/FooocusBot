@@ -1,6 +1,6 @@
 from aiogram.fsm.context import FSMContext
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 async def deleteMessageFromState(
@@ -12,7 +12,7 @@ async def deleteMessageFromState(
     image_index: int = None,
     job_id: str = None,
 ):
-    from bot.InstanceBot import bot
+    from bot.app.instance import bot
 
     state_data = await state.get_data()
     data_list = state_data.get(key, [])

@@ -7,8 +7,8 @@ from concurrent.futures import ProcessPoolExecutor
 
 from PIL import Image, UnidentifiedImageError
 
-import bot.constants as constants
-from bot.logger import logger
+import bot.app.config.constants as constants
+from bot.app.core.logging import logger
 
 executor = ProcessPoolExecutor()
 
@@ -95,7 +95,7 @@ async def base64_to_image(
             image_bytes,
         )
 
-        save_dir = f"{constants.TEMP_FOLDER_PATH}/{job_id}"
+        save_dir = f"{constants.FACEFUSION_TEMP_IMAGES_FOLDER_PATH}/{job_id}"
         os.makedirs(save_dir, exist_ok=True)
         file_path = f"{save_dir}/{index}.jpg"
 

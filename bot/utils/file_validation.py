@@ -3,7 +3,7 @@ import os
 from typing import Tuple
 
 from PIL import Image
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 class FileValidationError(Exception):

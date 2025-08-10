@@ -3,10 +3,9 @@ import time
 
 from aiogram import types
 from aiogram.exceptions import TelegramAPIError, TelegramRetryAfter
-from aiogram.methods import SendPhoto
-from InstanceBot import bot
 
-from bot.logger import logger
+from bot.app.core.logging import logger
+from bot.app.instance import bot
 
 _send_lock = asyncio.Lock()
 _last_send_time = 0.0

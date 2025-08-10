@@ -6,7 +6,7 @@ from aiohttp import ClientError
 from factory.comfyui_video_service import get_video_service
 
 from bot.domain.entities.video_generation import DownloadedVideo
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 async def _download_single_video(

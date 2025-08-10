@@ -1,7 +1,7 @@
 from bot.helpers.generateImages.dataArray.getAllDataArrays import (
     getAllDataArrays,
 )
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 def get_group_model_indexes(group_number: int | str) -> str:

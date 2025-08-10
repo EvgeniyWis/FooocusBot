@@ -1,6 +1,6 @@
 from aiogram.fsm.context import FSMContext
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 async def appendDataToStateArray(

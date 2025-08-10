@@ -5,8 +5,8 @@ import socket
 
 from aiogoogle import Aiogoogle
 
-from bot import constants
-from bot.logger import logger
+from bot.app.config import constants
+from bot.app.core.logging import logger
 from bot.utils.googleDrive.auth import client_creds, user_creds
 from bot.utils.googleDrive.files.uploadFile import uploadFile
 from bot.utils.googleDrive.folders.createFolder import createFolder
@@ -138,7 +138,7 @@ async def saveFile(
                 if image_index is not None:
                     # Удаляем файл изображения
                     temp_path = os.path.join(
-                        constants.TEMP_FOLDER_PATH,
+                        constants.FACEFUSION_TEMP_IMAGES_FOLDER_PATH,
                         f"{folder_name}_{user_id}",
                         f"{image_index}.jpg",
                     )
@@ -147,7 +147,7 @@ async def saveFile(
                 else:
                     # Удаляем папку с изображениями
                     temp_path = os.path.join(
-                        constants.TEMP_FOLDER_PATH,
+                        constants.FACEFUSION_TEMP_IMAGES_FOLDER_PATH,
                         f"{folder_name}_{user_id}",
                     )
                     if os.path.exists(temp_path):

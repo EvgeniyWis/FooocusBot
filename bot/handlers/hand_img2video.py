@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
-import bot.constants as constants
+import bot.app.config.constants as constants
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray.check_model_index_is_exist import (
     check_model_index_is_exist,
@@ -16,15 +16,13 @@ from bot.helpers.generateImages.dataArray.get_all_model_indexes import (
 from bot.helpers.generateImages.dataArray.get_model_name_by_index import (
     get_model_name_by_index,
 )
-from bot.helpers.generateImages.dataArray.getAllDataArrays import (
-    getAllDataArrays,
-)
 from bot.helpers.handlers.img2video import process_video
-from bot.InstanceBot import bot, img2video_router
+from bot.app.instance import bot, img2video_router
 from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.states import StartGenerationState
 from bot.utils.handlers import appendDataToStateArray
+from bot.utils.handlers.messages import LONG_PROMPT_PROCESSING_SPINNER_TEXT
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
     safe_edit_message,
 )
@@ -294,9 +292,9 @@ async def finish_prompt_input_for_img2video(
 
     await safe_edit_message(
         callback.message,
-        "🧠 Обрабатываю длинный промпт...",
+        LONG_PROMPT_PROCESSING_SPINNER_TEXT,
     )
-    
+
     try:
         fake_message = types.Message(
             message_id=callback.message.message_id,
@@ -423,22 +421,33 @@ async def process_img2video_with_data(
 
     # После завершения задачи — обновляем state
     for coro in asyncio.as_completed(tasks):
-        model_name, video_path = await coro
+        try:
+            result = await coro
+            # process_video из img2video возвращает кортеж (model_name, video_path)
+            if isinstance(result, tuple) and len(result) == 2:
+                model_name, video_path = result
 
-        if not video_path:
+                if not video_path:
+                    await safe_send_message(
+                        f"Ошибка: не удалось найти путь к видео для сохранения для модели {model_name}",
+                        message,
+                    )
+                    continue
+
+                data_for_update = {f"{model_name}": video_path}
+                await appendDataToStateArray(
+                    state,
+                    "generated_video_paths",
+                    data_for_update,
+                    unique_keys=("model_name",),
+                )
+        except Exception as e:
+            logger.error(f"Ошибка при обработке видео: {e}")
             await safe_send_message(
-                f"Ошибка: не удалось найти путь к видео для сохранения для модели {model_name}",
+                f"Ошибка при генерации видео: {str(e)}",
                 message,
             )
             continue
-
-        data_for_update = {f"{model_name}": video_path}
-        await appendDataToStateArray(
-            state,
-            "generated_video_paths",
-            data_for_update,
-            unique_keys=("model_name",),
-        )
 
 
 # Обработка ввода одного промпта для img2video (старый функционал)
@@ -618,7 +627,7 @@ async def handle_model_index_for_video_generation_from_image(
             # process_video из img2video возвращает кортеж (model_name, video_path)
             if isinstance(result, tuple) and len(result) == 2:
                 model_name, video_path = result
-                
+
                 if not video_path:
                     await safe_send_message(
                         f"Ошибка: не удалось найти путь к видео для сохранения для модели {model_name}",

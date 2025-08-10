@@ -6,11 +6,15 @@ from aiogram.exceptions import (
     TelegramAPIError,
     TelegramRetryAfter,
 )
-from InstanceBot import bot
 
-from bot.logger import logger
+from bot.app.core.logging import logger
+from bot.app.instance import bot
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
+)
+from bot.utils.handlers.messages.spinner_registry import (
+    SPINNER_TEXTS,
+    set_spinner,
 )
 
 _edit_lock = asyncio.Lock()
@@ -47,6 +51,14 @@ async def safe_edit_message(
             method = method.as_(bot)
             result = await method
             _last_edit_time = time.monotonic()
+
+            # если это спиннер, запомним его, чтобы потом удалить
+            try:
+                if safe_text in SPINNER_TEXTS:
+                    set_spinner(message.chat.id, result.message_id)
+            except Exception:
+                logger.debug("Не удалось сохранить id спиннера")
+
             return result
         except TelegramRetryAfter as e:
             logger.warning(f"Telegram RetryAfter: {e.retry_after}s")
@@ -60,6 +72,13 @@ async def safe_edit_message(
                 method = method.as_(bot)
                 result = await method
                 _last_edit_time = time.monotonic()
+
+                try:
+                    if safe_text in SPINNER_TEXTS:
+                        set_spinner(message.chat.id, result.message_id)
+                except Exception:
+                    logger.debug("Не удалось сохранить id спиннера")
+
                 return result
             except Exception:
                 logger.exception("RetryAfter second attempt failed")

@@ -1,4 +1,4 @@
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 def log_magnific_step(step_name: str):

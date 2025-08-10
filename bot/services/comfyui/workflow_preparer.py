@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 @dataclass

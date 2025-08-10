@@ -3,7 +3,7 @@ import tempfile
 
 import aiohttp
 from aiogoogle import Aiogoogle
-from logger import logger
+from bot.app.core.logging import logger
 
 from bot.utils.googleDrive.auth import client_creds, user_creds
 

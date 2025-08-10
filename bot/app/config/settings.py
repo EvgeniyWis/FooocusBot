@@ -82,5 +82,9 @@ class Settings(BaseSettings):
     # Параметры Freepik API
     FREEPIK_API_URL: str
 
+    # Очистка временных файлов
+    TEMP_FILES_TTL_HOURS: int = 24
+    TEMP_CLEANUP_INTERVAL_MINUTES: int = 60
 
-settings = Settings()  # type: ignore
+
+settings = Settings()  # type: ignore 

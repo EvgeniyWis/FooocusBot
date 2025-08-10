@@ -2,9 +2,9 @@ import asyncio
 import os
 import uuid
 
-import bot.constants as constants
-from bot.logger import logger
-from bot.settings import settings
+import bot.app.config.constants as constants
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 
 
 async def facefusion_swap(source_filename: str, target_filename: str) -> str:

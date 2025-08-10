@@ -5,9 +5,10 @@ from datetime import datetime
 import pytz
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from constants import TEMP_FOLDER_PATH
-from utils.handlers.messages.rate_limiter_for_send_photo import safe_send_photo
 
+from bot.app.config.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
+from bot.app.config.settings import settings
+from bot.app.core.logging import logger
 from bot.assets.mocks.links import (
     MOCK_LINK_FOR_SAVE_IMAGE,
 )
@@ -18,13 +19,14 @@ from bot.helpers.generateImages.dataArray import (
 )
 from bot.helpers.jobs.get_job_id_by_model_name import get_job_id_by_model_name
 from bot.keyboards import video_generation_keyboards
-from bot.logger import logger
-from bot.settings import settings
 from bot.utils.googleDrive.files import convertDriveLink
 from bot.utils.googleDrive.files.saveFile import saveFile
 from bot.utils.googleDrive.folders.getFolderDataByID import getFolderDataByID
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.handlers.messages.rate_limiter_for_send_photo import (
+    safe_send_photo,
+)
 
 
 async def process_save_image(
@@ -58,7 +60,7 @@ async def process_save_image(
     user_id = call.from_user.id
     # Получаем job_id для текущей модели
     job_id = await get_job_id_by_model_name(state, model_name, model_key)
-    temp_user_dir = TEMP_FOLDER_PATH / f"{job_id}"
+    temp_user_dir = FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f"{job_id}"
     logger.info(
         f"[save] START: dir={os.listdir(temp_user_dir) if temp_user_dir.exists() else 'NO_DIR'}",
     )

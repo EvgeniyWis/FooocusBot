@@ -1,5 +1,5 @@
 import re
-from bot.logger import logger
+from bot.app.core.logging import logger
 
 
 def getGoogleDriveFileID(url: str) -> str | None:

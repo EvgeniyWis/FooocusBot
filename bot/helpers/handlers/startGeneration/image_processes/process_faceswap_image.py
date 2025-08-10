@@ -6,12 +6,12 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from PIL import Image
 
-from bot.constants import TEMP_FOLDER_PATH
+from bot.app.config.constants import FACEFUSION_TEMP_IMAGES_FOLDER_PATH
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
 from bot.helpers.handlers.messages import send_progress_message
 from bot.helpers.jobs.get_job_id_by_model_name import get_job_id_by_model_name
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.utils import retryOperation
 from bot.utils.facefusion import facefusion_swap
 from bot.utils.handlers import appendDataToStateArray, deleteDataFromStateArray
@@ -62,9 +62,9 @@ async def process_faceswap_image(
 
     # Получаем job_id для текущей модели и индекса
     job_id = await get_job_id_by_model_name(state, model_name, model_key)
-    temp_user_dir = TEMP_FOLDER_PATH / f"{job_id}"
+    temp_user_dir = FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f"{job_id}"
     local_faceswap_target_path = os.path.join(
-        str(TEMP_FOLDER_PATH),
+        str(FACEFUSION_TEMP_IMAGES_FOLDER_PATH),
         f"{job_id}",
         f"{image_index}.jpg",
     )

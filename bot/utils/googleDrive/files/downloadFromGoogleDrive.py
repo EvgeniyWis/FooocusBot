@@ -2,8 +2,8 @@ import os
 
 import aiofiles
 
-import bot.constants as constants
-from bot.logger import logger
+import bot.app.config.constants as constants
+from bot.app.core.logging import logger
 from bot.utils.httpx import httpx_get
 
 

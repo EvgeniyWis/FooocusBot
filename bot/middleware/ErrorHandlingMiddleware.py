@@ -3,10 +3,11 @@ from collections.abc import Awaitable
 from typing import Any, Callable, Dict
 
 from aiogram import BaseMiddleware
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import TelegramObject
 
-from bot.InstanceBot import bot
-from bot.logger import logger
+from bot.app.core.logging import logger
+from bot.app.instance import bot
 from bot.utils.error_notifier import send_error_to_developers
 from bot.utils.httpx.error_texts import PAYMENT_RUNPOD_ERROR_TEXT
 from bot.utils.videos.errors_texts import (
@@ -23,6 +24,13 @@ class ErrorHandlingMiddleware(BaseMiddleware):
     ) -> Any:
         try:
             return await handler(event, data)
+        except TelegramBadRequest as e:
+            # Игнорируем частый кейс устаревшего callback query, чтобы не ронять обработчик
+            if "query is too old" in str(e) or "query ID is invalid" in str(e):
+                logger.warning(f"Игнорирую устаревший/некорректный callback query: {e}")
+                return
+            # Прочие BadRequest пробрасываем дальше, чтобы попасть в общий обработчик
+            raise
         except Exception as e:
             if str(e) in [PAYMENT_RUNPOD_ERROR_TEXT]:
                 return

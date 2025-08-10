@@ -7,8 +7,8 @@ from bot.helpers.generateImages.upscale.check_upscale_status import (
     check_upscale_status,
 )
 from bot.helpers.jobs.get_job_ID import get_job_ID
-from bot.logger import logger
-from bot.settings import settings
+from bot.app.core.logging import logger
+from bot.app.config.settings import settings
 from bot.utils.handlers import appendDataToStateArray
 
 

@@ -2,15 +2,18 @@ from aiogram import types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from keyboards.randomizer.keyboards import done_typing_keyboard_for_prompts
-from logger import logger
 from pydantic import ValidationError
 
+from bot.app.core.logging import logger
+from bot.app.instance import randomizer_router
 from bot.helpers import text
 from bot.helpers.handlers.startGeneration import generateImagesInHandler
-from bot.InstanceBot import randomizer_router
 from bot.keyboards import randomizer_keyboards
 from bot.states.RandomizerState import RandomizerState
-from bot.utils.handlers.messages import editMessageOrAnswer
+from bot.utils.handlers.messages import (
+    LONG_PROMPT_PROCESSING_SPINNER_TEXT,
+    editMessageOrAnswer,
+)
 from bot.utils.handlers.messages.rate_limiter_for_edit_message import (
     safe_edit_message,
 )
@@ -372,7 +375,7 @@ async def finish_prompt_input(
 
     await safe_edit_message(
         callback.message,
-        "🧠 Обрабатываю длинный промпт...",
+        LONG_PROMPT_PROCESSING_SPINNER_TEXT,
     )
     try:
         fake_message = types.Message(

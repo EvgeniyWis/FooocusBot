@@ -4,7 +4,7 @@ from typing import Any
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
-from logger import logger
+from bot.app.core.logging import logger
 
 from bot.helpers.generateImages.dataArray.get_data_array_by_group_number import (
     get_data_array_by_group_number,

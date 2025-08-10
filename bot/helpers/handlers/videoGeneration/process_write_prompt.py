@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
-from bot.logger import logger
+from bot.app.core.logging import logger
 from bot.states import StartGenerationState
 from bot.utils.handlers import appendDataToStateArray
 from bot.utils.handlers.messages import editMessageOrAnswer
