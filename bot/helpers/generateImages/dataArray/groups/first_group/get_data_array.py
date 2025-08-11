@@ -63,7 +63,7 @@ def first_group_get_data_array():
             prompt="""photorealistic, high quality, vibrant colors, skin detail, BREAK
             1girl, 18 years old, athletic, blonde hair, green eyes, tanned skin.
             Style: Instagram photo style, Canon DSLR, bright sunlight""",
-            loras_weights=[2, 0.65, -0.90, -1.70, 3.6, 1, 1.75, 1.00],
+            loras_weights=[2, 0.65, -0.90, -1.70, 3.5, 0.7, 1.75, 1.00],
         ),
         setting1_generate_data(
             model_name="miahazelton.xo",

@@ -22,7 +22,7 @@ def second_group_get_data_array():
             nsfw_video_folder_id="13BJa1CqmGefEE5tg7cVrD8pKZT460Ro4",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, Latina, 18 years old, black hair, huge breasts, slim waist, tan skin, thin lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 3.80, 0.1, -3.00, -1.50],
+            loras_weights=[1, 0.7, 3.60, 0, -3.00, -1.50],
         ),
         # setting_3 модели
         setting3_generate_data(
