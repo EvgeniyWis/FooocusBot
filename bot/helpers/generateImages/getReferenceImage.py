@@ -2,8 +2,8 @@ import os
 
 import aiofiles
 
+import bot.app.config.constants as constants
 from bot.app.core.logging import logger
-
 from bot.helpers.generateImages.dataArray import get_model_index_by_model_name
 
 
@@ -12,15 +12,12 @@ async def getReferenceImage(model_name: str) -> str:
     # Получаем индекс модели
     model_index = get_model_index_by_model_name(model_name)
 
-    reference_image_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            "..",
-            "..",
-            "assets",
-            "reference_images",
-            f"{model_index}. {model_name}.jpg",
-        ),
+    reference_image_path = os.path.join(
+        str(constants.BASE_DIR),
+        "bot",
+        "assets",
+        "reference_images",
+        f"{model_index}. {model_name}.jpg",
     )
 
     # Асинхронная проверка на существование файла
