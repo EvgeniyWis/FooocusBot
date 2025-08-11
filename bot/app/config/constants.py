@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Final
 
 # Указываем корень проекта (папка FooocusBot)
-BASE_DIR: Final[Path] = Path(__file__).resolve().parents[2]
+BASE_DIR: Final[Path] = Path(__file__).resolve().parents[3]
 TEMP_FILES_DIR: Final[Path] = BASE_DIR / "bot" / "temp"
 TEMP_IMAGE_FILES_DIR: Final[Path] = BASE_DIR / "bot" / "temp" / "images"
 FACEFUSION_DIR: Final[Path] = BASE_DIR / ".assets"
