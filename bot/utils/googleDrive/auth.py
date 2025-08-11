@@ -7,8 +7,8 @@ from aiogoogle.auth.creds import ClientCreds
 import bot.app.config.constants as constants
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
-CLIENT_SECRET_FILE = os.path.join(str(constants.BASE_DIR), "secrets", "googleDrive.json")
-TOKEN_PICKLE = os.path.join(str(constants.BASE_DIR), "secrets", "token.pickle")
+CLIENT_SECRET_FILE = os.path.join(str(constants.BASE_DIR), "bot", "secrets", "googleDrive.json")
+TOKEN_PICKLE = os.path.join(str(constants.BASE_DIR), "bot", "secrets", "token.pickle")
 
 # Чтение client_id и client_secret из googleDrive.json
 with open(CLIENT_SECRET_FILE) as f:
