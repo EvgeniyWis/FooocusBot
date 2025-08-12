@@ -237,7 +237,7 @@ def selectMultiImageKeyboard(
     inline_keyboard.append(
         [
             InlineKeyboardButton(
-                text="🔄 Перегенерировать с новым промптом",
+                text="🔄 Regenerate with new prompt",
                 callback_data=f"select_image|{full_model_key}|{group_number}|prompt_regen|{short_job_id}",
             ),
         ],

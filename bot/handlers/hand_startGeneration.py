@@ -108,7 +108,7 @@ async def choose_group(call: types.CallbackQuery, state: FSMContext):
     if call.data == "select_group|specific_model":
         await safe_edit_message(
             call.message,
-            "🖼 Выберите тип генерации:",
+            "🖼 Select generation type:",
             reply_markup=start_generation_keyboards.select_type_specific_generation(),
         )
         await state.update_data(specific_model=True)

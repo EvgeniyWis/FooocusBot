@@ -13,7 +13,7 @@ def getGenerationsTypeButtons(
         inline_buttons.append(
             [
                 InlineKeyboardButton(
-                    text="⚡️ Рабочая генерация",
+                    text="⚡️ Work generation",
                     callback_data=f"{prefix}|work",
                 ),
             ],
@@ -23,7 +23,7 @@ def getGenerationsTypeButtons(
         inline_buttons.append(
             [
                 InlineKeyboardButton(
-                    text="📹 Переписать промпт",
+                    text="📹 Rewrite prompt",
                     callback_data=f"rewrite_prompt|{prefix.split('|')[1]}",
                 ),
             ],

@@ -45,21 +45,6 @@ async def process_faceswap_image(
     # Получаем индекс модели
     model_name_index = get_model_index_by_model_name(model_name)
 
-    # Меняем текст на сообщении об очереди на замену лица
-    await send_progress_message(
-        state,
-        "faceswap_generation_wait_messages",
-        model_name,
-        call.message,
-        text.FACE_SWAP_WAIT_TEXT.format(
-            image_index,
-            model_name,
-            model_name_index,
-        ),
-        image_index,
-        call.message.message_id,
-    )
-
     # Получаем job_id для текущей модели и индекса
     job_id = await get_job_id_by_model_name(state, model_name, model_key)
     temp_user_dir = FACEFUSION_TEMP_IMAGES_FOLDER_PATH / f"{job_id}"
@@ -132,21 +117,6 @@ async def process_faceswap_image(
 
         # Если в списке генераций настала очередь этой модели, то запускаем генерацию
         if model_name == faceswap_generated_models[0]["model_name"]:
-            # Меняем текст на сообщении об очереди на замену лица
-            await send_progress_message(
-                state,
-                "faceswap_generation_progress_messages",
-                model_name,
-                call.message,
-                text.FACE_SWAP_PROGRESS_TEXT.format(
-                    image_index,
-                    model_name,
-                    model_name_index,
-                ),
-                image_index,
-                call.message.message_id,
-            )
-
             # Удаляем из стейта данные о ожидании замены лица
             await deleteDataFromStateArray(
                 state,
