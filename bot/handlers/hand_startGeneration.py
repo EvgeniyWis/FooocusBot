@@ -84,8 +84,10 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(multi_select_mode=False)
     await editMessageOrAnswer(
         call,
-        text.GET_GENERATIONS_SUCCESS_TEXT,
-        reply_markup=start_generation_keyboards.selectGroupKeyboard(),
+        text.WRITE_MODELS_NAME_TEXT,
+    )
+    await state.set_state(
+        StartGenerationState.write_models_for_specific_generation,
     )
 
 
