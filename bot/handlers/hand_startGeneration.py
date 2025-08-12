@@ -68,9 +68,9 @@ async def choose_generations_type(
 
     await editMessageOrAnswer(
         call,
-        "Выберите режим генерации:\n\n"
-        f"🖼 Мультивыбор - можно выбрать несколько фотографий одновременно, присылается {MULTI_IMAGE_NUMBER} на выбор\n"
-        "✅ Одиночный - можно выбрать только одну генерацию, присылается 4 на выбор",
+        "Select the generation mode:\n\n"
+        f"🖼 Multi-selection - you can select several photos at the same time, {MULTI_IMAGE_NUMBER} is sent to choose from\n"
+        "✅ Single - you can select only one generation, 4 are sent to choose from.",
         reply_markup=start_generation_keyboards.generationModeKeyboard(),
     )
 
