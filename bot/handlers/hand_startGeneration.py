@@ -66,12 +66,13 @@ async def choose_generations_type(
     generations_type = call.data.split("|")[1]
     await state.update_data(generations_type=generations_type)
 
+    await state.update_data(model_indexes_for_generation=["3"])
     await editMessageOrAnswer(
         call,
-        "Select the generation mode:\n\n"
-        f"🖼 Multi-selection - you can select several photos at the same time, {MULTI_IMAGE_NUMBER} is sent to choose from\n"
-        "✅ Single - you can select only one generation, 4 are sent to choose from.",
-        reply_markup=start_generation_keyboards.generationModeKeyboard(),
+        text.GET_MODEL_INDEX_SUCCESS_TEXT,
+    )
+    await state.set_state(
+        StartGenerationState.write_prompt_for_images,
     )
 
 
