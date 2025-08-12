@@ -302,7 +302,7 @@ WRONG_MODEL_INDEX_TEXT = (
 
 # Текст при получении названия модели и запроса ввести промпт
 GET_MODEL_INDEX_SUCCESS_TEXT = (
-    "✅ Model number received successfully! Now enter your prompt:"
+    "✅ Now enter your prompt:"
 )
 
 # Текст при получении номера модели и запроса выбрать тип написания промпта

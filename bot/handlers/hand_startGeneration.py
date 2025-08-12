@@ -82,12 +82,15 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(multi_select_mode=True)
     else:
         await state.update_data(multi_select_mode=False)
+    
+    # Автовыбор модели: всегда третья
+    await state.update_data(model_indexes_for_generation=["3"])
     await editMessageOrAnswer(
         call,
-        text.WRITE_MODELS_NAME_TEXT,
+        text.GET_MODEL_INDEX_SUCCESS_TEXT,
     )
     await state.set_state(
-        StartGenerationState.write_models_for_specific_generation,
+        StartGenerationState.write_prompt_for_images,
     )
 
 
@@ -552,12 +555,17 @@ async def handle_chunk_input(message: types.Message, state: FSMContext):
                 )
                 return
     else:
-        # Если формат не найден, отправляем сообщение об ошибке
-        await safe_send_message(
-            text.WRONG_FORMAT_TEXT,
-            message,
-        )
-        return
+        # Если формат не найден, допускаем свободный ввод для режима сбора частей промпта
+        current_state = await state.get_state()
+        if (
+            current_state
+            != MultiPromptInputState.collecting_prompt_parts.state
+        ):
+            await safe_send_message(
+                text.WRONG_FORMAT_TEXT,
+                message,
+            )
+            return
 
     chunks.append(msg)
     await state.update_data(
@@ -623,10 +631,12 @@ async def finish_prompt_input(
             state=state,
         )
     else:
+        # Для режима множественного ввода без индексов автоматически привязываем к модели 3
+        prepared_text = "\n".join([f"3: {line}" for line in prompt_chunks]) if prompt_chunks else full_text
         await write_model_for_generation(
             message=fake_message,
             state=state,
-            text_input=full_text,
+            text_input=prepared_text,
         )
 
 
@@ -634,12 +644,14 @@ async def send_message_with_info_for_write_prompts_for_models(
     callback: types.CallbackQuery,
     state: FSMContext,
 ):
+    # Автовыбор модели: всегда третья
+    await state.update_data(model_indexes_for_generation=["3"])
     await safe_edit_message(
         callback.message,
-        text.WRITE_MODELS_NAME_TEXT,
+        text.GET_MODEL_INDEX_SUCCESS_TEXT,
     )
     await state.set_state(
-        StartGenerationState.write_models_for_specific_generation,
+        StartGenerationState.write_prompt_for_images,
     )
 
 
