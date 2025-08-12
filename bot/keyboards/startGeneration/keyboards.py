@@ -7,7 +7,7 @@ from bot.helpers.generateImages.dataArray.getAllDataArrays import (
 from bot.keyboards.startGeneration.buttons import getGenerationsTypeButtons
 
 
-# Инлайн-клавиатура для выбора количества генераций
+# Inline keyboard for selecting the number of generations
 def generationsTypeKeyboard(
     with_work_generation: bool = True,
     with_video_from_image_generation: bool = True,
@@ -16,18 +16,6 @@ def generationsTypeKeyboard(
         "generations_type",
         with_work_generation,
     )
-
-    if with_video_from_image_generation:
-        inline_keyboard.extend(
-            [
-                [
-                    InlineKeyboardButton(
-                        text="📹 Сгенерировать видео из изображения",
-                        callback_data="generateVideoFromImage",
-                    ),
-                ],
-            ],
-        )
     kb = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
     return kb
@@ -79,7 +67,7 @@ def selectImageKeyboard(
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
-# Инлайн-клавиатура для выбора группы
+# Inline keyboard for selecting a group
 def selectGroupKeyboard():
     inline_keyboard = []
     dataArrays = getAllDataArrays()
@@ -88,7 +76,7 @@ def selectGroupKeyboard():
         inline_keyboard.append(
             [
                 InlineKeyboardButton(
-                    text=f"Группа {i}",
+                                            text=f"Group {i}",
                     callback_data=f"select_group|{i}",
                 ),
             ],
@@ -97,17 +85,17 @@ def selectGroupKeyboard():
     inline_keyboard.append(
         [
             InlineKeyboardButton(
-                text="Все группы",
+                                        text="All groups",
                 callback_data="select_group|all",
             ),
         ],
     )
 
-    # Генерация конкретной модели
+    # Generation of a specific model
     inline_keyboard.append(
         [
             InlineKeyboardButton(
-                text="🔄 Индивидуальная генерация",
+                                        text="🔄 Individual generation",
                 callback_data="select_group|specific_model",
             ),
         ],
@@ -118,19 +106,19 @@ def selectGroupKeyboard():
     return kb
 
 
-# Клавиатура для выбора режима написания промпта
+# Keyboard to choose prompt writing mode
 def writePromptTypeKeyboard():
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="1️⃣ Один промпт + рандомайзер 🎲",
+                                            text="1️⃣ One prompt + randomizer 🎲",
                     callback_data="write_prompt_type|one",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="✨ Уникальный промпт",
+                                            text="✨ Unique prompt",
                     callback_data="write_prompt_type|unique",
                 ),
             ],
@@ -140,13 +128,13 @@ def writePromptTypeKeyboard():
     return kb
 
 
-# Клавиатура для подтверждения написания уникального промпта для следующей модели
+# Keyboard to confirm writing a unique prompt for the next model
 def confirmWriteUniquePromptForNextModelKeyboard():
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="✍️ Написать промпт",
+                                            text="✍️ Write a prompt",
                     callback_data="confirm_write_unique_prompt_for_next_model",
                 ),
             ],
@@ -156,19 +144,19 @@ def confirmWriteUniquePromptForNextModelKeyboard():
     return kb
 
 
-# Клавиатура для выбора режима при генерации с одним промптом
+# Keyboard to choose mode for single-prompt generation
 def onePromptGenerationChooseTypeKeyboard():
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="⚖️ Статичный промпт",
+                                            text="⚖️ Static prompt",
                     callback_data="one_prompt_generation_type|static",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="🎲 Использовать рандомайзер",
+                                            text="🎲 Use randomizer",
                     callback_data="one_prompt_generation_type|random",
                 ),
             ],
@@ -178,19 +166,19 @@ def onePromptGenerationChooseTypeKeyboard():
     return kb
 
 
-# Клавиатура для выбора режима генерации
+# Keyboard to select generation mode
 def generationModeKeyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="🖼 Мультивыбор",
+                                            text="🖼 Multi-select",
                     callback_data="generation_mode|multi_select",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="1️⃣ Выбор одного фото",
+                                            text="1️⃣ Select one photo",
                     callback_data="generation_mode|single_select",
                 ),
             ],
@@ -198,7 +186,7 @@ def generationModeKeyboard():
     )
 
 
-# Инлайн-клавиатура для мультивыборной генерации изображений
+# Inline keyboard for multi-select image generation
 def selectMultiImageKeyboard(
     model_name: str,
     group_number: str,
@@ -210,7 +198,7 @@ def selectMultiImageKeyboard(
     # Формируем полный ключ модели для callback data
     full_model_key = f"{model_name}_{model_key}" if model_key else model_name
     
-    # Первое изображение (index=0) - референсное, поэтому показываем кнопки с 1 по 9
+    # The first image (index=0) is the reference, so show buttons from 1 to MULTI_IMAGE_NUMBER
     inline_keyboard = []
     short_job_id = job_id[:8]
     for i in range(1, min(image_number, MULTI_IMAGE_NUMBER) + 1, 2):
@@ -233,7 +221,7 @@ def selectMultiImageKeyboard(
     inline_keyboard.append(
         [
             InlineKeyboardButton(
-                text="Готово",
+                                    text="Done",
                 callback_data=f"multi_image_done|{full_model_key}|{group_number}|{short_job_id}",
             ),
         ],
@@ -262,7 +250,7 @@ def done_typing_keyboard():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="✅ Готово",
+                    text="✅ Done",
                     callback_data="done_typing",
                 ),
             ],
@@ -275,13 +263,13 @@ def select_type_specific_generation():
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="1️⃣ Обычная",
+                                            text="1️⃣ Regular",
                     callback_data="specific_generation|one_prompt",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text="🔢 С уникальным промптом",
+                                            text="🔢 With unique prompt",
                     callback_data="specific_generation|more_prompts",
                 ),
             ],
@@ -289,13 +277,13 @@ def select_type_specific_generation():
     )
 
 
-# Клавиатура, когда все изображения успешно сохранены
+# Keyboard shown when all images are successfully saved
 def all_images_successfully_saved_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="✨ Сгенерировать все видео по 1 промпту",
+                                            text="✨ Generate all videos with one prompt",
                     callback_data="generate_video_by_one_prompt",
                 ),
             ],
