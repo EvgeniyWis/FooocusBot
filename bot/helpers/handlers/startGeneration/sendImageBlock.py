@@ -1,18 +1,17 @@
 import asyncio
 import traceback
 
+from aiogram import types
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 
-from bot.app.config.constants import MULTI_IMAGE_NUMBER
-from bot.helpers import text
-from bot.helpers.generateImages.dataArray import (
-    get_model_index_by_model_name,
-    getDataByModelName,
-)
-from bot.app.instance import bot
-from bot.keyboards import start_generation_keyboards
 from bot.app.core.logging import logger
+from bot.app.instance import bot
+from bot.helpers import text
+from bot.helpers.handlers.messages.deleteMessageFromState import (
+    deleteMessageFromState,
+)
+from bot.helpers.handlers.startGeneration.process_image import process_image
 from bot.utils.handlers import (
     appendDataToStateArray,
 )
@@ -59,7 +58,7 @@ async def sendImageBlock(
 
         await asyncio.sleep(0.7)
         logger.info(
-            f"Slept 0.7s before sending keyboard to user_id={user_id}, model_name={model_name}",
+            f"Slept 0.7s before starting auto-processing for user_id={user_id}, model_name={model_name}",
         )
 
         for i, message in enumerate(media_group_message):
@@ -104,73 +103,72 @@ async def sendImageBlock(
                 1,
             )
 
-        # Получаем индекс модели
-        model_name_index = get_model_index_by_model_name(model_name)
-
-        # Получаем данные модели
-        model_data = await getDataByModelName(model_name)
-
-        # Отправляем клавиатуру для выбора изображения
+        # Автоматическая обработка: запускаем процесс обработки без клавиатуры выбора
         try:
-            multi_select_mode = state_data.get("multi_select_mode", False)
-            selected_indexes = state_data.get("selected_indexes", [])
-            if multi_select_mode:
-                reply_markup = (
-                    start_generation_keyboards.selectMultiImageKeyboard(
+            images_count = min(len(media_group_message), 4)
+
+            # Сообщаем пользователю, что начинается обработка всех изображений
+            header_message = await bot.send_message(
+                chat_id=user_id,
+                text=text.SELECT_IMAGE_PROGRESS_TEXT,
+            )
+
+            # Удаляем медиагруппу изображений (и потенциальные клавиатуры, если были)
+            await deleteMessageFromState(
+                state,
+                "imageGeneration_mediagroup_messages_ids",
+                model_name,
+                header_message.chat.id,
+                delete_keyboard_message=True,
+                job_id=job_id,
+            )
+
+            # Запускаем последовательную обработку для каждого изображения
+            for image_index in range(1, images_count + 1):
+                status_message = await bot.send_message(
+                    chat_id=user_id,
+                    text=f"🔄 Работаю с изображением для модели {model_name} под номером {image_index}... ({image_index}/{images_count})",
+                )
+
+                fake_call = types.CallbackQuery(
+                    id=f"{job_id[:8]}_{image_index}",
+                    from_user=types.User(id=user_id, is_bot=False, first_name="User"),
+                    chat_instance="",
+                    message=status_message,
+                    data=f"auto_process|{model_name}|{group_number}|{image_index}|{job_id[:8]}",
+                )
+
+                logger.info(
+                    f"Запускаем автоматическую обработку изображения {image_index}/{images_count} для модели {model_name} (job_id={job_id})",
+                )
+
+                try:
+                    await process_image(
+                        fake_call,
+                        state,
                         model_name,
-                        group_number,
-                        MULTI_IMAGE_NUMBER,
-                        selected_indexes,
-                        job_id,
+                        image_index,
                         model_key=model_key,
                     )
-                )
-                select_message = await bot.send_message(
-                    chat_id=user_id,
-                    text=text.SELECT_SOME_IMAGES_TEXT.format(
-                        model_name,
-                        model_name_index,
-                    ),
-                    reply_markup=reply_markup,
-                )
-                await appendDataToStateArray(
-                    state,
-                    "imageGeneration_mediagroup_messages_ids",
-                    {
-                        "model_name": model_name,
-                        "job_id": job_id,
-                        "message_id": select_message.message_id,
-                        "type": "keyboard",
-                    },
-                    unique_keys=("model_name", "job_id", "type"),
-                )
-            else:
-                reply_markup = start_generation_keyboards.selectImageKeyboard(
-                    model_name,
-                    group_number,
-                    model_data["json"]["input"]["image_number"],
-                    job_id,
-                    model_key=model_key,
-                )
-                await bot.send_message(
-                    chat_id=user_id,
-                    text=text.SELECT_IMAGE_TEXT.format(
-                        model_name,
-                        model_name_index,
-                    ),
-                    reply_markup=reply_markup,
-                )
-            logger.info(
-                f"Keyboard sent to user_id={user_id}, model_name={model_name}",
-            )
+                except Exception as e:
+                    logger.error(
+                        f"Ошибка при обработке изображения {image_index}: {e}",
+                    )
+                    try:
+                        await bot.send_message(
+                            chat_id=user_id,
+                            text=f"❌ Ошибка при обработке изображения {image_index}: {str(e)}",
+                        )
+                    except Exception:
+                        pass
         except Exception as e:
-            logger.error(f"Ошибка при отправке сообщения с клавиатурой: {e}")
+            logger.error(f"Ошибка при автозапуске обработки изображения: {e}")
             try:
                 await bot.send_message(
                     chat_id=user_id,
-                    text="Произошла ошибка при отправке клавиатуры...",
+                    text="❌ Произошла ошибка при запуске обработки изображения",
                 )
-            except:
+            except Exception:
                 pass
     except Exception as e:
         raise Exception(f"Произошла ошибка в функции sendImageBlock: {e}")
