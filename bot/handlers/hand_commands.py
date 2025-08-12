@@ -25,32 +25,6 @@ async def start(message: types.Message, state: FSMContext):
         await safe_send_message(text.ACCESS_DENIED_TEXT, message)
         return
 
-    # Получаем из стейта все ошибки, которые есть
-    state_data = await state.get_data()
-
-    # Получаем все данные с постфиксом _errors
-    second_upscale_errors = state_data.get("second_upscale_errors", [])
-    upscale_errors = state_data.get("upscale_errors", [])
-    faceswap_errors = state_data.get("faceswap_errors", [])
-    save_image_errors = state_data.get("save_image_errors", [])
-    video_generation_errors = state_data.get("video_generation_errors", [])
-    is_errors = any([upscale_errors, second_upscale_errors, faceswap_errors, save_image_errors, video_generation_errors])
-
-    if is_errors:
-        def format_errors(errors):
-            return "\n".join([f"{error['model_name']} - {error['image_index']} изображение" for error in errors]) if errors else "Отсутствуют"
-
-        errors_text = text.ERRORS_STATS_TEXT.format(
-            format_errors(upscale_errors),
-            format_errors(second_upscale_errors),
-            format_errors(faceswap_errors),
-            format_errors(save_image_errors),
-            format_errors(video_generation_errors),
-        )
-
-        await safe_send_message(errors_text, message)
-
-
     # Отправляем сообщение с кнопками
     await safe_send_message(
         text.START_TEXT,
