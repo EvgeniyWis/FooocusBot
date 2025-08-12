@@ -4,8 +4,6 @@ START_TEXT = """
 To get started, choose the type of generation you will use:
 
 ⚡️ Production generation — used for generating production images; it is not recommended to run multiple generations in parallel.
-
-‼️ When you press one of the buttons below, data from the previous generation will be completely cleared!
 """
 
 # Текст при отсутствии доступа
