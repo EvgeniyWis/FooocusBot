@@ -282,7 +282,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="1zqKil1L8WThOn1Sb_yjqcU_7dgtvIzzr",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 2, 0.5, -1.05, -1.5],
+            loras_weights=[1, 0.7, 2, 0, -1.05, -1.5],
         ),
         setting2_generate_data(
             model_name="nicolevalaine",
