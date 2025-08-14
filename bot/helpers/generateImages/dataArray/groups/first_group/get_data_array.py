@@ -241,7 +241,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="1UOWiammfsu8kn_aFnfy9W9-SWU7KbBSD",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 1, 0.5, -1.05, -1.5],
+            loras_weights=[1, 0.7, 1, 0.3, -1.05, -1.5],
         ),
         setting2_generate_data(
             model_name="janiceblair.xo",

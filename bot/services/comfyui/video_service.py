@@ -152,6 +152,7 @@ class ComfyUIVideoService:
         return urls
 
     def cleanup_local_output(self, folder="./ComfyUI/output"):
+        logger.info(f"Очистка папки ComfyUI/output: {folder}")
         for root, _, files in os.walk(folder):
             for f in files:
                 if f.endswith((".mp4", ".jpg", ".png", ".mov", ".gif")):
