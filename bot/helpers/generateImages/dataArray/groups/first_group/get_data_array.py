@@ -27,9 +27,8 @@ def first_group_get_data_array():
             picture_folder_id="10sDc9ypgszlwXRmD6_V_FHz_f9CIK6Rx",
             video_folder_id="1_20xxewMNIaO31v06yvUwn-1bKUHaNFI",
             nsfw_video_folder_id="1UGGBVhIgTx-JooGysreAQ4MV7PPZMBor",
-            prompt="""photorealistic, high quality, vibrant colors, bright lighting, skin detail, BREAK
-            1girl, 18 years old, athletic, blonde hair, brown eyes, fair skin, slight smile.
-            Style: realistic photo, Canon DSLR, soft daylight.""",
+            prompt="""photorealistic, high quality, BREAK
+            1girl, 18 years old, blonde hair, brown eyes, fair skin, slight smile, soft daylight.""",
             loras_weights=[2, 3.10, -0.90, -1.10, 1.75, 0.6, 0.65, 0.80],
         ),
         setting1_generate_data(
@@ -282,7 +281,7 @@ def first_group_get_data_array():
             nsfw_video_folder_id="1zqKil1L8WThOn1Sb_yjqcU_7dgtvIzzr",
             prompt="""photorealistic, high quality, skin detail, BREAK
             1girl, 18 years old, ash-blonde hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
-            loras_weights=[1, 0.7, 2, 0.5, -1.05, -1.5],
+            loras_weights=[1, 0.7, 1.5, 0, -1.05, -1.5],
         ),
         setting2_generate_data(
             model_name="nicolevalaine",
