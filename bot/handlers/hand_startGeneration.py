@@ -66,7 +66,7 @@ async def choose_generations_type(
     generations_type = call.data.split("|")[1]
     await state.update_data(generations_type=generations_type)
 
-    await state.update_data(model_indexes_for_generation=["3"])
+    await state.update_data(model_indexes_for_generation=["24"])
     await editMessageOrAnswer(
         call,
         text.GET_MODEL_INDEX_SUCCESS_TEXT,
@@ -85,7 +85,7 @@ async def choose_generation_mode(call: types.CallbackQuery, state: FSMContext):
         await state.update_data(multi_select_mode=False)
     
     # Автовыбор модели: всегда третья
-    await state.update_data(model_indexes_for_generation=["3"])
+    await state.update_data(model_indexes_for_generation=["24"])
     await editMessageOrAnswer(
         call,
         text.GET_MODEL_INDEX_SUCCESS_TEXT,
@@ -646,7 +646,7 @@ async def send_message_with_info_for_write_prompts_for_models(
     state: FSMContext,
 ):
     # Автовыбор модели: всегда третья
-    await state.update_data(model_indexes_for_generation=["3"])
+    await state.update_data(model_indexes_for_generation=["24"])
     await safe_edit_message(
         callback.message,
         text.GET_MODEL_INDEX_SUCCESS_TEXT,
