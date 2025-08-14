@@ -3,10 +3,9 @@ from typing import AsyncGenerator
 
 import aiohttp
 from aiohttp import ClientError
-from factory.comfyui_video_service import get_video_service
 
-from bot.domain.entities.video_generation import DownloadedVideo
 from bot.app.core.logging import logger
+from bot.domain.entities.video_generation import DownloadedVideo
 
 
 async def _download_single_video(
@@ -57,15 +56,11 @@ async def download_nsfw_videos(
         DownloadedVideo с путем к скачанному файлу и подписью,
         или с None если произошла ошибка
     """
-    try:
-        async with aiohttp.ClientSession() as session:
-            for idx, url in enumerate(video_urls, 1):
-                try:
-                    video = await _download_single_video(session, url, idx)
-                    yield video, idx
-                except Exception as e:
-                    logger.error(f"Ошибка при обработке видео {idx}: {e}")
-                    yield DownloadedVideo(path=None, caption=None)
-    finally:
-        video_service = get_video_service()
-        video_service.cleanup_local_output()
+    async with aiohttp.ClientSession() as session:
+        for idx, url in enumerate(video_urls, 1):
+            try:
+                video = await _download_single_video(session, url, idx)
+                yield video, idx
+            except Exception as e:
+                logger.error(f"Ошибка при обработке видео {idx}: {e}")
+                yield DownloadedVideo(path=None, caption=None)

@@ -509,22 +509,19 @@
     }
   },
   "210": {
-    "inputs": {
-      "frame_rate": 16,
+      "inputs": {
+      "frame_rate": 16.0,
       "loop_count": 0,
       "filename_prefix": "wan2/upscaled/upscaled",
-      "format": "video/h264-mp4",
-      "pix_fmt": "yuv420p",
-      "crf": 19,
-      "save_metadata": true,
-      "trim_to_audio": false,
+      "format": "video/ProRes",
+      "profile": "hq",
       "pingpong": false,
       "save_output": true,
       "images": [
         "239",
         0
       ]
-    },
+    },  
     "class_type": "VHS_VideoCombine",
     "_meta": {
       "title": "Video Combine 🎥🅥🅗🅢"

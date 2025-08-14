@@ -7,14 +7,14 @@ from aiogram.fsm.context import FSMContext
 from utils.handlers.messages import safe_edit_message
 
 import bot.app.config.constants as constants
+from bot.app.core.logging import logger
+from bot.app.instance import bot, nsfw_video_router
 from bot.factory.comfyui_video_service import get_video_service
 from bot.helpers.handlers.videoGeneration import (
     process_write_prompt,
     saveVideo,
 )
-from bot.app.instance import bot, nsfw_video_router
 from bot.keyboards import video_generation_keyboards
-from bot.app.core.logging import logger
 from bot.states import StartGenerationState
 from bot.utils import retryOperation
 from bot.utils.handlers import appendDataToStateArray, getDataInDictsArray
@@ -22,9 +22,6 @@ from bot.utils.handlers.messages.rate_limiter_for_send_message import (
     safe_send_message,
 )
 from bot.utils.videos import generate_nsfw_video
-from bot.utils.videos.download_nsfw_video import (
-    download_nsfw_videos,
-)
 
 
 async def quick_generate_nsfw_video(
@@ -182,33 +179,27 @@ async def generate_nsfw_video_and_send_result(
     if result_final.get("video_urls"):
         video_urls: list = result_final["video_urls"]
 
-        async for v, idx in download_nsfw_videos(video_urls):
-            idx = idx - 1
-            if not v.path:
-                continue
-
-            video = types.FSInputFile(v.path)
-            await (
-                message_or_call.message.answer_video
-                if isinstance(
-                    message_or_call,
-                    types.CallbackQuery,
-                )
-                else message_or_call.answer_video
-            )(video=video, caption=v.caption,
-            reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
-                model_name=model_name,
-                image_index=image_index,
-                is_nsfw=True,
-                video_index=idx,
-                with_regenerate=False,
-            ))
+        for idx, url in enumerate(video_urls, 1):
+            caption = (
+                f'Видео №{idx} 🎬\n<a href="{url}">Смотреть или скачать</a>'
+            )
+            await get_target_message(message_or_call).answer(
+                caption,
+                parse_mode="HTML",
+                reply_markup=video_generation_keyboards.videoCorrectnessKeyboard(
+                    model_name=model_name,
+                    image_index=image_index,
+                    is_nsfw=True,
+                    video_index=idx - 1,
+                    with_regenerate=False,
+                ),
+            )
 
             data_for_update = {
-                "video_index": idx,
+                "video_index": idx - 1,
                 "image_index": image_index,
                 "model_name": model_name,
-                "direct_url": video_urls[idx],
+                "direct_url": url,
             }
             await appendDataToStateArray(
                 state,
@@ -217,14 +208,8 @@ async def generate_nsfw_video_and_send_result(
                 unique_keys=("model_name", "image_index", "video_index"),
             )
 
-            try:
-                os.remove(v.path)
-            except Exception as e:
-                logger.error(
-                    f"Ошибка при удалении временного файла {v.path}: {e}",
-                )
-
         await state.set_state(None)
+
     elif result_final.get("error"):
         await safe_send_message(
             f"❌ Ошибка генерации: {result_final['error']}",
@@ -406,7 +391,9 @@ async def handle_video_save_button(
 
     # Получаем путь к видео
     generated_nsfw_video_urls = state_data.get("generated_nsfw_video_urls", [])
-    logger.info(f"Попытка получить путь к видео из generated_nsfw_video_urls: {generated_nsfw_video_urls} для model_name: {model_name}, image_index: {image_index}, video_index: {video_index}")
+    logger.info(
+        f"Попытка получить путь к видео из generated_nsfw_video_urls: {generated_nsfw_video_urls} для model_name: {model_name}, image_index: {image_index}, video_index: {video_index}",
+    )
     video_url = await getDataInDictsArray(
         generated_nsfw_video_urls,
         model_name,
@@ -424,7 +411,13 @@ async def handle_video_save_button(
 
     # Сохраняем видео
     logger.info(f"URL NSFW видео для сохранения: {video_url}")
-    await saveVideo(video_url=video_url, model_name=model_name, message=call.message, is_nsfw_generation=True, extension="mov")
+    await saveVideo(
+        video_url=video_url,
+        model_name=model_name,
+        message=call.message,
+        is_nsfw_generation=True,
+        extension="mov",
+    )
 
 
 # Добавление обработчиков
