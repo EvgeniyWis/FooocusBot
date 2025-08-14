@@ -220,7 +220,7 @@ def first_group_get_data_array():
             video_folder_id="1neZGiBZjrnEJiWtDCbh0-u7UIus5P8WR",
             nsfw_video_folder_id="1NCEHcTwE1MSFpMmY35EVQjsjR1d7qZnZ",
             prompt="""photorealistic, high quality, skin detail, BREAK
-            1girl, 18 years old, black hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
+            1girl, 18 years old, brown hair, huge breasts, slim waist, tan skin, plump lips, smirk, blue eyes""",
             loras_weights=[1, 0.7, 2.2, 1, -1.05, -1.5],
         ),
         setting2_generate_data(
