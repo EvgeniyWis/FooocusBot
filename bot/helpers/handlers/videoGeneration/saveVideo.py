@@ -3,14 +3,14 @@ from datetime import datetime
 
 import pytz
 from aiogram import types
-from bot.app.core.logging import logger
 
+from bot.app.config.settings import settings
+from bot.app.core.logging import logger
 from bot.helpers import text
 from bot.helpers.generateImages.dataArray import (
-    getDataByModelName,
     get_model_index_by_model_name,
+    getDataByModelName,
 )
-from bot.app.config.settings import settings
 from bot.utils.googleDrive.files import saveFile
 from bot.utils.googleDrive.folders import getFolderDataByID
 from bot.utils.handlers.messages.rate_limiter_for_send_message import (
@@ -55,7 +55,9 @@ async def saveVideo(
         file_url=video_url,
         user_id=user_id,
         folder_name=model_name,
-        initial_folder_id=model_data["video_folder_id"] if not is_nsfw_generation else model_data["nsfw_video_folder_id"],
+        initial_folder_id=model_data["video_folder_id"]
+        if not is_nsfw_generation
+        else model_data["nsfw_video_folder_id"],
         current_date=now,
         extension=extension,
     )

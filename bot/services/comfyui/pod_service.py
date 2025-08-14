@@ -2,15 +2,16 @@ import asyncio
 from typing import Optional
 
 import runpod
-from domain.entities.comfyui_pod import PodStatus
-from requests import ReadTimeout
+from httpx import ReadTimeout
 from runpod.error import RunPodError
-from services.comfyui.video_service import ComfyUIVideoService
-from utils import retryOperation
 
 import bot.app.config.constants as constants
-from bot.app.core.logging import logger
 from bot.app.config.settings import settings
+from bot.app.core.logging import logger
+from bot.domain.entities.comfyui_pod import PodStatus
+from bot.factory.comfyui_video_service import get_video_service
+from bot.services.comfyui.video_service import ComfyUIVideoService
+from bot.utils import retryOperation
 
 
 class UnknownRunPodException(Exception):
@@ -34,7 +35,7 @@ class PodManager:
 
     async def request_start_pod(self, pod_id: str) -> PodStatus:
         try:
-            runpod.resume_pod(pod_id, gpu_count=4)
+            runpod.resume_pod(pod_id, gpu_count=1)
             logger.info(f"Запрос на запуск пода {pod_id} успешно отправлен.")
             return PodStatus.START_REQUESTED
         except RunPodError as e:
@@ -149,3 +150,12 @@ class PodManager:
                 logger.exception(
                     "Не удалось прогреть модели даже после повторной попытки.",
                 )
+
+
+async def main():
+    service = PodManager(settings.COMFYUI_API_KEY, get_video_service())
+    await service.start_pod()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
