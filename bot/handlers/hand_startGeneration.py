@@ -386,8 +386,8 @@ async def select_image(call: types.CallbackQuery, state: FSMContext):
     )
 
     # Извлекаем model_name и model_key из полного ключа
-    if "_" in full_model_key:
-        model_name, model_key = full_model_key.rsplit("_", 1)
+    if "/" in full_model_key:
+        model_name, model_key = full_model_key.rsplit("/", 1)
     else:
         model_name = full_model_key
         model_key = None
@@ -804,8 +804,8 @@ async def write_new_prompt_for_regenerate_image(
 
     # Преобразуем возможный full_model_key в базовое имя модели
     full_model_key = model_name
-    if "_" in full_model_key:
-        base_model_name, _ = full_model_key.rsplit("_", 1)
+    if "/" in full_model_key:
+        base_model_name, _ = full_model_key.rsplit("/", 1)
     else:
         base_model_name = full_model_key
 

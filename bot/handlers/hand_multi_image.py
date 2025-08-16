@@ -42,8 +42,8 @@ async def select_multi_image(
         short_job_id = None
     
     # Извлекаем model_name и model_key из полного ключа
-    if "_" in full_model_key:
-        model_name, model_key = full_model_key.rsplit("_", 1)
+    if "/" in full_model_key:
+        model_name, model_key = full_model_key.rsplit("/", 1)
     else:
         model_name = full_model_key
         model_key = None
@@ -62,7 +62,7 @@ async def select_multi_image(
     )
 
     if not job_id:
-        target_full_key = f"{model_name}_{model_key}" if model_key is not None else model_name
+        target_full_key = f"{model_name}/{model_key}" if model_key is not None else model_name
         logger.exception(
             f"[select_multi_image] job_id not found for message_id={message_id}, model_name={model_name}, short={short_job_id}, full_model_key={target_full_key} in state_data={state_data}",
         )
@@ -119,8 +119,8 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
     _, full_model_key, _, job_id = call.data.split("|")
 
     # Извлекаем model_name и model_key из полного ключа
-    if "_" in full_model_key:
-        model_name, model_key = full_model_key.rsplit("_", 1)
+    if "/" in full_model_key:
+        model_name, model_key = full_model_key.rsplit("/", 1)
     else:
         model_name = full_model_key
         model_key = None
@@ -154,7 +154,7 @@ async def multi_image_done(call: types.CallbackQuery, state: FSMContext):
 
     if not full_job_id:
         # Не удалось определить задание — сообщаем пользователю и выходим без ошибки
-        target_full_key = f"{model_name}_{model_key}" if model_key is not None else model_name
+        target_full_key = f"{model_name}/{model_key}" if model_key is not None else model_name
         logger.exception(
             f"[multi_image_done] job_id not found for message_id={message_id}, model_name={model_name}, short={short_job_id}, full_model_key={target_full_key}, selected_indexes_dict_keys={list(selected_indexes_dict.keys())}"
         )

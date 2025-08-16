@@ -104,8 +104,8 @@ async def regenerateImage(
 
     # Преобразуем возможный full_model_key в базовое имя модели
     full_model_key = model_name
-    if "_" in full_model_key:
-        base_model_name, _ = full_model_key.rsplit("_", 1)
+    if "/" in full_model_key:
+        base_model_name, _ = full_model_key.rsplit("/", 1)
     else:
         base_model_name = full_model_key
 

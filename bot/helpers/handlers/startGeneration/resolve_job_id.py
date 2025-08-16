@@ -55,7 +55,7 @@ def resolve_job_id(
     if not job_id:
         try:
             mapping = state_data.get("job_id_to_full_model_key", {}) or {}
-            target_full_key = f"{model_name}_{model_key}" if model_key is not None else model_name
+            target_full_key = f"{model_name}/{model_key}" if model_key is not None else model_name
             candidates = []
             if short_job_id:
                 candidates = [
@@ -74,7 +74,7 @@ def resolve_job_id(
         try:
             jobs_dict = state_data.get("jobs", {}) or {}
             mapping = state_data.get("job_id_to_full_model_key", {}) or {}
-            target_full_key = f"{model_name}_{model_key}" if model_key is not None else model_name
+            target_full_key = f"{model_name}/{model_key}" if model_key is not None else model_name
             for jid in jobs_dict.keys():
                 if isinstance(jid, str) and jid.startswith(short_job_id):
                     if not mapping or mapping.get(jid) == target_full_key:
