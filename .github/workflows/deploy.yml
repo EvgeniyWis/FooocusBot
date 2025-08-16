@@ -19,6 +19,8 @@ jobs:
             bot: 3
           - server: 109.172.38.90
             bot: 4
+          - server: 212.74.231.107
+            bot: 5
 
     steps:
       - name: Checkout code
@@ -26,6 +28,8 @@ jobs:
 
       - name: Set up SSH
         run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
           mkdir -p ~/.ssh
           echo "${{ secrets[format('SSH_PRIVATE_KEY_FOOOCUSBOT_{0}', matrix.bot)] }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
@@ -34,11 +38,11 @@ jobs:
 
       - name: Test SSH connection
         run: |
-          ssh root@${{ matrix.server }} "echo 'SSH connection successful to server ${{ matrix.server }}'"
+          sshpass -p "FooocusBot_${{ matrix.bot }}" ssh root@${{ matrix.server }} "echo 'SSH connection successful to server ${{ matrix.server }}'"
 
       - name: Deploy to server ${{ matrix.server }} (bot ${{ matrix.bot }})
         run: |
-          ssh root@${{ matrix.server }} << 'EOF'
+          sshpass -p "FooocusBot_${{ matrix.bot }}" ssh root@${{ matrix.server }} << 'EOF'
           cd ../FooocusBotFolder_${{ matrix.bot }}/FooocusBot
           git pull origin master
           pip install -r requirements.txt
