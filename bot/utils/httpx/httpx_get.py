@@ -1,4 +1,5 @@
 import asyncio
+
 import httpx
 
 from bot.app.core.logging import logger
@@ -52,9 +53,31 @@ async def httpx_get(
                     # Для бинарных данных (изображения, файлы) возвращаем response
                     return response
 
-            response_json = response.json()
-            logger.error(f"Ошибка при выполнении запроса: {response.status_code} Ответ: {response_json}")
-            return None
+            try:
+                response_json = response.json()
+                logger.error(f"Ошибка при выполнении запроса: {response.status_code} Ответ: {response_json}")
+                
+                # Извлекаем сообщение об ошибке из ответа
+                if (
+                    "error" in response_json
+                    and "message" in response_json["error"]
+                ):
+                    error_message = response_json["error"]["message"]
+                elif "message" in response_json:
+                    error_message = response_json["message"]
+                elif "result" in response_json:
+                    error_message = response_json["result"]
+                elif "error" in response_json:
+                    error_message = str(response_json["error"])
+                else:
+                    error_message = f"HTTP {response.status_code}: {response.text[:200]}"
+                    
+                raise Exception(error_message)
+            except ValueError:
+                # Если ответ не является JSON
+                error_message = f"HTTP {response.status_code}: {response.text[:200]}"
+                logger.error(f"Невалидный JSON ответ. Статус: {response.status_code}, Тело: {response.text}")
+                raise Exception(error_message)
             
     except httpx.ReadTimeout:
         logger.error("Превышено время ожидания ответа от сервера!")
@@ -66,5 +89,9 @@ async def httpx_get(
         raise
     except httpx.RequestError as e:
         logger.error(f"Ошибка при выполнении запроса: {str(e)}")
+        await asyncio.sleep(10)
+        raise
+    except Exception as e:
+        logger.error(f"Неожиданная ошибка при выполнении GET запроса: {str(e)}")
         await asyncio.sleep(10)
         raise

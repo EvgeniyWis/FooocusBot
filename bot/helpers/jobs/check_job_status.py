@@ -3,12 +3,12 @@ import asyncio
 import httpx
 from aiogram.fsm.context import FSMContext
 
+from bot.app.config.settings import settings
+from bot.app.core.logging import logger
 from bot.helpers.jobs.constants import CANCELLED_JOB_TEXT
 from bot.helpers.jobs.delete_job import delete_job
 from bot.helpers.jobs.edit_job_message import edit_job_message
 from bot.helpers.jobs.get_endpoint_ID import get_endpoint_ID
-from bot.app.core.logging import logger
-from bot.app.config.settings import settings
 from bot.utils import httpx_post
 from bot.utils.get_api_headers import get_runpod_headers
 
@@ -43,9 +43,11 @@ async def check_job_status(
         start_time = asyncio.get_event_loop().time()
 
         while True:
-            if asyncio.get_event_loop().time() - start_time > timeout:
+            current_time = asyncio.get_event_loop().time()
+            if current_time - start_time > timeout:
+                logger.error(f"Превышено время ожидания статуса работы {job_id} (таймаут: {timeout} сек)")
                 raise TimeoutError(
-                    "Превышено время ожидания статуса работы",
+                    f"Превышено время ожидания статуса работы {job_id}",
                 )
 
             try:
@@ -65,10 +67,17 @@ async def check_job_status(
                 httpx.ConnectTimeout,
                 httpx.ReadTimeout,
                 httpx.RemoteProtocolError,
+                Exception,
             ) as e:
                 logger.error(
-                    f"Ошибка соединения при получении статуса работы: {e}",
+                    f"Ошибка при получении статуса работы {job_id}: {e}",
                 )
+                await asyncio.sleep(10)
+                continue
+
+            # Проверяем, что получили валидный ответ
+            if not response_json:
+                logger.error(f"Получен пустой ответ при проверке статуса работы {job_id}")
                 await asyncio.sleep(10)
                 continue
 
@@ -80,6 +89,12 @@ async def check_job_status(
                     response_json,
                     user_id,
                 )
+
+            # Проверяем наличие поля status в ответе
+            if "status" not in response_json:
+                logger.error(f"Ответ не содержит поле 'status': {response_json}")
+                await asyncio.sleep(10)
+                continue
 
             if response_json["status"] == "COMPLETED":
                 break
