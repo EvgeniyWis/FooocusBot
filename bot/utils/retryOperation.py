@@ -27,12 +27,13 @@ async def retryOperation(operation, max_attempts, delay, *args):
         except (FileNotFoundError, ValueError, TypeError, RuntimeError, socket.gaierror, 
                 http.client.RemoteDisconnected, http.client.HTTPException, ConnectionError, 
                 OSError, httpx.ReadTimeout, httpx.ConnectTimeout, httpx.TimeoutException,
-                httpx.RemoteProtocolError, httpx.ConnectError) as e:
+                httpx.RemoteProtocolError, httpx.ConnectError, Exception) as e:
             
             traceback.print_exc()
             
             if attempt == max_attempts - 1:
                 logger.error(f"Все {max_attempts} попыток исчерпаны. Последняя ошибка: {str(e)}")
+                logger.error(f"Тип ошибки: {type(e).__name__}")
                 raise e
                 
             # Экспоненциальная задержка с максимальным ограничением

@@ -55,12 +55,18 @@ async def httpx_post(
 
             if response.status_code != 200:
                 if response.status_code == 404:
-                    logger.info(
-                        f"Несуществующий URL. Ответ от сервера: {response}",
+                    logger.error(
+                        f"Несуществующий URL: {url}. Статус: {response.status_code}, Ответ: {response.text[:200]}",
                     )
+                    raise Exception(f"Сервер не найден (404): {url}")
 
                 if response.status_code == 402 and "runpod" in url.lower():
                     raise Exception(PAYMENT_RUNPOD_ERROR_TEXT)
+
+                # Логируем детали ошибки
+                logger.error(f"HTTP ошибка {response.status_code} для URL: {url}")
+                logger.error(f"Заголовки ответа: {dict(response.headers)}")
+                logger.error(f"Тело ответа: {response.text[:500]}")
 
                 try:
                     response_json = response.json()
@@ -83,6 +89,11 @@ async def httpx_post(
                     # Если ответ не является JSON
                     error_message = f"HTTP {response.status_code}: {response.text[:200]}"
                     logger.error(f"Невалидный JSON ответ. Статус: {response.status_code}, Тело: {response.text}")
+
+                # Проверяем, не содержит ли ошибка подозрительные сообщения
+                if "failed to get" in error_message.lower():
+                    logger.error(f"Сервер вернул подозрительное сообщение об ошибке: {error_message}")
+                    error_message = f"Ошибка сервера {response.status_code}: {response.text[:100]}"
 
                 raise Exception(error_message)
 
